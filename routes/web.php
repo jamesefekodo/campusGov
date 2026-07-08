@@ -1,43 +1,32 @@
 <?php
 
-use App\Http\Controllers\SystemSettings\Setup\SystemSetupController;
+use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Frontend\FrontendController;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-
-
-
-// installation
-Route::get('system_setup', [SystemSetupController::class, 'installSystem'])->name('installSystem');
-Route::get('system_setup/check_basic_requrement', [SystemSetupController::class, 'installSystemBasicRequirementCheck'])->name('installSystemBasicRequirementCheck');
-Route::get('system_setup/install/step1', [SystemSetupController::class, 'installSystemStep1'])->name('installSystemStep1');
-Route::post('system_setup/install/step1/submit', [SystemSetupController::class, 'installSystemSubmitAppSystemInfo'])->name('installSystemSubmitAppSystemInfo');
-Route::get('system_setup/install/step2', [SystemSetupController::class, 'installSystemStep2'])->name('installSystemStep2');
-Route::post('system_setup/install/step2/submit', [SystemSetupController::class, 'installSystemSubmitDatabaseInfo'])->name('installSystemSubmitDatabaseInfo');
-Route::get('system_setup/install/step3', [SystemSetupController::class, 'installSystemStep3'])->name('installSystemStep3');
-Route::post('system_setup/install/step3/submit', [SystemSetupController::class, 'installSystemSubmitProductKeys'])->name('installSystemSubmitProductKeys');
-Route::get('system_setup/install/step4', [SystemSetupController::class, 'installSystemStep4'])->name('installSystemStep4');
-Route::post('system_setup/install/step4/submit', [SystemSetupController::class, 'installSystemFetchLicenceDetails'])->name('installSystemFetchLicenceDetails');
-Route::get('system_setup/install/step5', [SystemSetupController::class, 'installSystemStep5'])->name('installSystemStep5');
-Route::post('system_setup/install/step5/submit', [SystemSetupController::class, 'setupRootAccount'])->name('setupRootAccount');
-
-Route::get('system_setup/install/step5b', [SystemSetupController::class, 'installSystemStep5b'])->name('installSystemConfigureEmailService');
-Route::post('system_setup/install/step5b/submit', [SystemSetupController::class, 'installSystemConfigureEmailServiceSubmit'])->name('installSystemConfigureEmailServiceSubmit');
-Route::get('system_setup/install/setupComplete', [SystemSetupController::class, 'installSystemSetupComplete'])->name('installSystemSetupComplete');
-Route::get('system_setup/setup_info/refresh', [SystemSetupController::class, 'setupInfoRefresh'])->name('setupInfoRefresh');
-Route::post('system_setup/setupInfo/refresh/submit', [SystemSetupController::class, 'setupInfoRefreshSubmit'])->name('setupInfoRefreshSubmit');
-
-
-
-
-
-
-
-
-
+Route::get('/clear-all', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    return 'All cleared!';
+});
 
 // basic/general routes
-Route::middleware(['setup_middleware', 'authenticationMiddlewares'])->group(function () {
-    Route::get('/', function () {
-        return view('welcome');
+Route::middleware(['authenticationMiddlewares'])->group(function () {
+
+      Route::get('/', function () {
+        return redirect()->route('homepage');
     });
+    Route::get('/home', [FrontendController::class, 'homepage'])->name('homepage');
+
+    Route::get('register', [AuthController::class, 'register'])->name('registrationPage');
+    Route::post('register/submit', [AuthController::class, 'submitUserRegistrationRequest'])->name('submitUserRegistrationRequest');
+    Route::get('login', [AuthController::class, 'login'])->name('loginPage');
+    Route::post('login/submit', [AuthController::class, 'authLogin'])->name('submitLoginRequest');
+    Route::get('logout', [AuthController::class, 'AuthLogout'])->name('logoutRequest');
+    Route::get('forgot_password', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
+    Route::post('forgot_password/send_password_reset_link', [AuthController::class, 'requestPasswordResetLink'])->name('requestPasswordResetLink');
+    Route::get('reset_password/{token}', [AuthController::class, 'passwordResetPage'])->name('passwordResetLink');
+    Route::post('reset_password/change_password/{token}', [AuthController::class, 'submitPasswordResetRequest'])->name('submitPasswordResetRequest');
 });

@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Middleware\Setup\CheckInstallationMiddleware;
+use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\AuthenticationMiddleware;
+use App\Http\Middleware\StudentMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,10 +15,24 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $checkInstallation = CheckInstallationMiddleware::class;
+        $authMiddleware = AuthenticationMiddleware::class;
+        $adminMiddleware = AdminMiddleware::class;
+        $studentMiddleware = StudentMiddleware::class;
 
-        $middleware->appendToGroup('setup_middleware', [
-            $checkInstallation,
+
+        // Authentication
+        $middleware->appendToGroup('authenticationMiddlewares', [
+            $authMiddleware,
+        ]);
+
+        // Admin
+        $middleware->appendToGroup('adminMiddlewares', [
+            $adminMiddleware,
+        ]);
+
+        // student
+        $middleware->appendToGroup('studentMiddlewares', [
+            $studentMiddleware,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

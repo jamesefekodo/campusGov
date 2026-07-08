@@ -1,16 +1,12 @@
 <?php
 
-namespace App\Http\Middleware\Setup;
+namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
 use Symfony\Component\HttpFoundation\Response;
 
-
-class CheckInstallationMiddleware
+class AuthenticationMiddleware
 {
     /**
      * Handle an incoming request.
@@ -19,10 +15,6 @@ class CheckInstallationMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!File::exists(storage_path('installed'))) {
-            return redirect()->route('installSystem');
-        }
-
         return $next($request);
     }
 }
