@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Authentication;
 
 use App\Http\Controllers\Controller;
+use App\Mail\AccountSetup\NewAccountWelcomeMail;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 
@@ -108,6 +110,16 @@ class AuthController extends Controller
             } else {
                 $deviceType = 'Desktop';
             }
+
+            if ($user) {
+                if ($user->require_login_mfa == 1) {
+                    return redirect()->route('authenticateLogin');
+                } else {
+                    return $this->redirectToUserDashboard($user->account_type);
+                }
+            } else {
+                return redirect()->route('AuthLogout');
+            }
         } else {
             return redirect()->back()->with('error', "Invalid Credentials");
         }
@@ -142,8 +154,10 @@ class AuthController extends Controller
                 'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',  // No email format allowed
                 'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',  // No emoji or symbols
             ],
-            'email' => 'required|email|unique:users,email|unique:student_personal_profiles,email2',
-            'phone' => 'required|string|unique:users,phone|unique:student_personal_profiles,phone2',
+            'email' => 'required|email|unique:users,email',
+            // |unique:student_personal_profiles,email2
+            'phone' => 'required|string|unique:users,phone',
+            // |unique:student_personal_profiles,phone2
             'password' => $passwordRules,
             'confirm_password' => 'required|string|same:password',
         ], [
@@ -173,8 +187,14 @@ class AuthController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
 
-        // Mail::to($user->email)->send(new NewAccountWelcomeMail($user));
+        Mail::to($user->email)->send(new NewAccountWelcomeMail($user));
 
-        return redirect()->route('loginPage')->with('success', 'Done!');
+        $loginRequest = new Request([
+            'login_id' => $user->email,
+            'password' => $request->password,
+        ]);
+
+        return $this->authLogin($loginRequest);
+        // return redirect()->route('loginPage')->with('success', 'Done!');
     }
 }

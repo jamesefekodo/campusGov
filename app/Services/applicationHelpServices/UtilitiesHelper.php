@@ -2,6 +2,8 @@
 
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+
 
 if (!function_exists('getUserType')) {
     function getUserType()
@@ -64,5 +66,14 @@ if (!function_exists('schoolLogo')) {
             $logo = asset('system/images/transcend_logo.webp');
         }
         return $logo;
+    }
+}
+
+
+
+if (!function_exists('basicSystemInfo')) {
+    function basicSystemInfo()
+    {
+        return BasicSystemSetting::first();
     }
 }

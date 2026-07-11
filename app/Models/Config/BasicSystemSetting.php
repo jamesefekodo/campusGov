@@ -16,6 +16,8 @@ class BasicSystemSetting extends Model
         'association_acronym',
         'association_logo',
         'association_slogan',
+        'description',
+        'operational_level',
         'school_name',
         'school_acronym',
         'school_logo',

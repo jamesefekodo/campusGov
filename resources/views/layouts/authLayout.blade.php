@@ -8,9 +8,9 @@
 
     <style>
         :root {
-            --tenant-primary: {{ $currentCompany->primary_colour ?? '#3b5edd' }};
-            --tenant-secondary: {{ $currentCompany->secondary_colour ?? '#7a97ff' }};
-            --tenant-tertiary: {{ $currentCompany->tertiary_colour ?? 'var(--tenant-secondary)' }};
+            --system-primary: {{ basicSystemInfo()['primary_colour'] ?: '#3b5edd' }};
+            --system-secondary: {{ basicSystemInfo()['secondary_colour'] ?: '#7a97ff' }};
+            --system-tertiary: {{ basicSystemInfo()['tertiary_colour'] ?: 'var(--system-secondary)' }};
         }
     </style>
 

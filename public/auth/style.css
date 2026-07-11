@@ -100,7 +100,7 @@ html {
 .arrow {
     font-size: 40px;
     color: white;
-    background: rgba(var(--tenant-primary), 0.1);
+    background: rgba(var(--system-primary), 0.1);
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
@@ -110,7 +110,7 @@ html {
 }
 
 .arrow:hover {
-    background: rgba(var(--tenant-primary), 0.9);
+    background: rgba(var(--system-primary), 0.9);
 }
 
 .nav-dots {
@@ -139,12 +139,12 @@ html {
 }
 
 .dot.active {
-    background-color: var(--tenant-primary);
+    background-color: var(--system-primary);
     transform: scale(1.5);
 }
 
 .dot:hover {
-    background-color: var(--tenant-primary);
+    background-color: var(--system-primary);
     transform: scale(1.36);
 }
 
@@ -153,7 +153,7 @@ html {
     content: "";
     position: absolute;
     border-radius: 50%;
-    background-color: rgba(var(--tenant-primary), 0.2);
+    background-color: rgba(var(--system-primary), 0.2);
     transition: transform 0.3s ease-in-out;
 }
 
@@ -185,7 +185,7 @@ html {
 .login-form input:active,
 .login-form select:focus,
 .login-form select:active {
-    outline: 2px solid var(--tenant-primary);
+    outline: 2px solid var(--system-primary);
 }
 
 .form-container {
@@ -232,14 +232,14 @@ select {
 }
 
 .form-options a {
-    color: var(--tenant-primary);
+    color: var(--system-primary);
     text-decoration: none;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    background: var(--tenant-primary);
+    background: var(--system-primary);
     color: white;
     border: none;
     border-radius: 8px !important;
@@ -248,7 +248,7 @@ button {
 }
 
 button:hover {
-    background: var(--tenant-secondary);
+    background: var(--system-secondary);
 }
 
 .signup {
@@ -258,7 +258,7 @@ button:hover {
 }
 
 .signup a {
-    color: var(--tenant-primary);
+    color: var(--system-primary);
     text-decoration: none;
     font-weight: bold;
 }
@@ -296,7 +296,7 @@ button:hover {
     padding: 0px !important;
 }
 .primary-color {
-    color: var(--tenant-primary);
+    color: var(--system-primary);
 }
 
 /* .change_lang_dark_background {
@@ -344,7 +344,7 @@ button:hover {
 /* The loader itself */
 .loader {
     border: 4px solid transparent;
-    border-top: 4px solid var(--tenant-primary);
+    border-top: 4px solid var(--system-primary);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -461,6 +461,13 @@ button:hover {
 }
 
 
+.auth_header {
+    color: var(--system-primary) !important;
+    margin: 12px;
+    padding-bottom: 8px;
+}
+
+
 /* Divider */
 .divider {
     text-align: center;
@@ -475,12 +482,12 @@ button:hover {
     right: 0;
     top: 50%;
     height: 1px;
-    background: var(--tenant-secondary);
+    background: var(--system-secondary);
     /* blue line */
 }
 
 .divider span {
-    background: var(--tenant-secondary);
+    background: var(--system-secondary);
     padding: 4px 15px;
     position: relative;
     color: white;

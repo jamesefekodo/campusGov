@@ -10,7 +10,7 @@
 
                 <h2 class="m-2 text-center auth_header">Welcome Back</h2>
                 <p class="m-2 text-center">Please sign in to your account</p>
-                <form class="" {{-- action="{{ route('submitLoginRequest') }}" --}} method="POST">
+                <form class="" action="{{ route('submitLoginRequest') }}" method="POST">
                     @csrf
                     <input type="text" placeholder="Username/Email" name="login_id" required />
                     <p style="color: red">{{ $errors->first('login_id') }}</p>
@@ -22,7 +22,7 @@
                     </div>
                     <p style="color: red">{{ $errors->first('password') }}</p>
 
-                    <button type="submit" class="">
+                    <button type="submit" class="submit-btn">
                         <span class="btn-text">
                             Login
                         </span>

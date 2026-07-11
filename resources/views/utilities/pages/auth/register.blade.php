@@ -53,7 +53,7 @@
                         </ul>
                     </div>
 
-                    <button type="submit" class="">
+                    <button type="submit" class="submit-btn">
                         <span class="btn-text">
                             Submit
                         </span>
