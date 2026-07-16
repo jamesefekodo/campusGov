@@ -11,15 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('role_users', function (Blueprint $table) {
-            $table->id();
-            $table->string('username'); // Foreign
-            $table->unsignedBigInteger('role_id'); // Foreign
-            $table->timestamps();
+        Schema::create('role_users', function (Blueprint $table) { // pivot table for many-to-many relationship between users and roles
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
+            $table->foreignId('role_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-            $table->foreign('username')->references('username')->on('users')->onUpdate('cascade');
-            $table->foreign('role_id')->references('id')->on('roles')->onUpdate('cascade');
+            $table->primary(['user_id', 'role_id']);
         });
     }
 
