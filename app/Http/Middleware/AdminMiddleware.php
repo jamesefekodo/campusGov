@@ -17,7 +17,7 @@ class AdminMiddleware
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check()) {
-            if (Auth::user()->account_type == '0' || Auth::user()->account_type == '1') { // 0 - root, 1-admin , 2- student
+            if (Auth::user()->account_type === 0 || Auth::user()->account_type === 1) { // 0 - root, 1-admin , 2- student
                 return $next($request);
             } else {
                 return redirect('/')->with('error', 'Access Denied!');

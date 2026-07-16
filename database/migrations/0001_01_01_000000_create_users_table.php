@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique();
-            $table->string('account_type')->default(2); // 0 - root, 1-admin , 2- student
-            $table->string('account_status')->default(0); // 0 - new , 1- awaiting approval , 2- active, 3 - disabled
+            $table->integer('account_type')->default(2); // 0 - root, 1-admin , 2- student
+            $table->integer('account_status')->default(0); // 0 - new , 1- awaiting approval , 2- active, 3 - disabled
             $table->string('phone')->unique();
             $table->string('photo')->nullable();
             $table->string('email')->unique();

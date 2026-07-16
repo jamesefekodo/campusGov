@@ -23,6 +23,16 @@ class PermissionMiddleware
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Root user bypasses all permission checks
+        if ($user->account_type === 0) {
+            return $next($request);
+        }
+
+        // No permissions were supplied
+        if (empty($permissions)) {
+            return $next($request);
+        }
+
         foreach ($permissions as $permission) {
             if ($user->hasPermission($permission)) {
                 return $next($request);

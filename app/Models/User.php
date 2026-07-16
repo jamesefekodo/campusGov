@@ -53,16 +53,26 @@ class User extends Authenticatable
     }
 
 
-    public function hasRole($role)
+    public function hasRole(string $role): bool
     {
+        if ($this->account_type === 0) {
+            return true;
+        }
+
         return $this->roles()
             ->where('slug', $role)
             ->exists();
 
         // usage ... auth()->user()->hasRole('admin');
+
     }
-    public function hasAnyRole(array $roles)
+
+    public function hasAnyRole(array $roles): bool
     {
+        if ($this->account_type === 0) {
+            return true;
+        }
+
         return $this->roles()
             ->whereIn('slug', $roles)
             ->exists();
@@ -73,14 +83,21 @@ class User extends Authenticatable
         //  'speaker'
         // ]);
     }
-    public function hasPermission($permission)
-    {
-        return $this->roles()
-            ->whereHas('permissions', function ($q) use ($permission) {
-                $q->where('slug', $permission);
-            })
-            ->exists();
 
-        // usage $user->hasPermission('create-user');
+    public function hasPermission(string $permission): bool
+    {
+        // // Root account bypasses all permission checks
+        // if ($this->account_type === 0) {
+        //     return true;
+        // }
+
+        // return $this->roles()
+        //     ->whereHas('permissions', function ($query) use ($permission) {
+        //         $query->where('slug', $permission);
+        //     })
+        //     ->exists();
+
+        // // usage $user->hasPermission('create-user');
+
     }
 }
