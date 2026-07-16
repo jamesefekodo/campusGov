@@ -2,6 +2,8 @@
 
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\AuthenticationMiddleware;
+use App\Http\Middleware\PermissionMiddleware;
+use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\StudentMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $authMiddleware = AuthenticationMiddleware::class;
         $adminMiddleware = AdminMiddleware::class;
         $studentMiddleware = StudentMiddleware::class;
+        $roleMiddleware = RoleMiddleware::class;
+        $permissionMiddleware = PermissionMiddleware::class;
+
 
 
         // Authentication
@@ -28,6 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Admin
         $middleware->appendToGroup('adminMiddlewares', [
             $adminMiddleware,
+            $roleMiddleware,
+            $permissionMiddleware,
         ]);
 
         // student
