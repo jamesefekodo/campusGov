@@ -28,6 +28,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'account_type' => 'integer',
+            'account_status' => 'integer',
+
         ];
     }
 
@@ -87,17 +90,17 @@ class User extends Authenticatable
     public function hasPermission(string $permission): bool
     {
         // // Root account bypasses all permission checks
-        // if ($this->account_type === 0) {
-        //     return true;
-        // }
+        if ($this->account_type === 0) {
+            return true;
+        }
 
-        // return $this->roles()
-        //     ->whereHas('permissions', function ($query) use ($permission) {
-        //         $query->where('slug', $permission);
-        //     })
-        //     ->exists();
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($permission) {
+                $query->where('slug', $permission);
+            })
+            ->exists();
 
-        // // usage $user->hasPermission('create-user');
+        // usage $user->hasPermission('create-user');
 
     }
 }

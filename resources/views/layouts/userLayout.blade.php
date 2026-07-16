@@ -58,7 +58,7 @@
 
 
     <title>
-        @yield('title') | {{ basicSystemInfo()->association_acronym }}
+        @yield('title') | {{ basicSystemInfo()->association_acronym ?? config('app.name') }}
     </title>
 
     @yield('style')
@@ -91,7 +91,7 @@
                                 <img class="logo-icon logo-sidebar me-2" src="{{ associationLogo() }}" alt="logo">
                             </div>
                             <div class="zone-header-item">
-                                <span class="logo-text">{{ basicSystemInfo()->association_acronym }}</span>
+                                <span class="logo-text">{{ basicSystemInfo()->association_acronym ?? config('app.name') }}</span>
                             </div>
                         </a>
 

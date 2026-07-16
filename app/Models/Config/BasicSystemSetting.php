@@ -28,4 +28,12 @@ class BasicSystemSetting extends Model
         'instagram_link',
         'twitter_link',
     ];
+
+    // caset attributes
+    protected function casts(): array
+    {
+        return [
+            'maintenance_mode' => 'boolean',
+        ];
+    }
 }

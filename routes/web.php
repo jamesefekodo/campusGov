@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
@@ -38,5 +39,14 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard'])->name('adminDashboard');
 
-    Route::get('admin/config/access_control/user_permissions', [SystemConfigurationController::class, 'userPermisssions'])->name('config.userPermisssions');
+    // basic system configuration
+    Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
+
+    // user roles and permissions
+    Route::get('admin/config/user_roles', [PermissionAccessController::class, 'viewUserRoles'])->name('viewUserRoles');
+    Route::get('admin/config/user_roles/search', [PermissionAccessController::class, 'viewUserRoles'])->name('rolesSearch');
+    Route::post('admin/config/user_roles/add/submit', [PermissionAccessController::class, 'addNewRoleSubmit'])->name('addNewRoleSubmit');
+    Route::get('admin/config/user_roles/view/{uuid}', [PermissionAccessController::class, 'viewRole'])->name('viewRole');
+    Route::put('admin/config/user_roles/update/{uuid}', [PermissionAccessController::class, 'updateRoleSubmit'])->name('updateRoleSubmit');
+    Route::get('admin/config/user_roles/delete/{uuid}', [PermissionAccessController::class, 'deleteRole'])->name('deleteRole');
 });

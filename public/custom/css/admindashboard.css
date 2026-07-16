@@ -98,7 +98,7 @@ video {
 }
 
 .system-primary-color {
-    color: #145bd9;
+    color: var(--system-primary);
 }
 
 /* body{
@@ -112,7 +112,7 @@ video {
     position: fixed;
     left: 0;
     top: 0;
-    background: #145BD9;
+    background: var(--system-primary);
     color: #fff;
     padding: 1rem;
     transition: width 500ms;
@@ -191,7 +191,7 @@ ion-icon {
 /* .company-name {
     font-size: 18px;
     font-weight: bolder;
-    color: #145BD9 !important;
+    color: var(--system-primary) !important;
 }
 
 .company-link {
@@ -213,14 +213,14 @@ ion-icon {
 .logo-text {
     font-size: 1.3rem !important;
     line-height: 1.4rem;
-    color: #145bd9 !important;
+    color: var(--system-primary) !important;
     font-weight: bold !important;
     text-transform: uppercase;
 }
 
 .sub-menu,
 a.sub-menu {
-    color: #145bd9 !important;
+    color: var(--system-primary) !important;
     background: white !important;
 }
 
@@ -235,19 +235,23 @@ a.sub-menu {
     right: 0;
     bottom: 0;
     color: white;
-    background: #145bd9;
+    background: var(--system-primary);
     min-width: 100vw !important;
     width: 100vw !important;
 }
 
 .sidebar-active,
 .sidebar-active > a {
-    background: #145bd9 !important;
+    background: var(--system-primary) !important;
     color: white !important;
 }
 
 .sidebar-active-section {
-    background: #b8ddff !important;
+    background: color-mix(
+        in srgb,
+        var(--system-primary) 20%,
+        white 80%
+    ) !important;
     color: #000000 !important;
 }
 
@@ -282,7 +286,7 @@ a.sub-menu {
 }
 
 /* .container-xl {
-    background-color: #145BD9;
+    background-color: var(--system-primary);
     color: #fff;
     padding: 5px;
     display: flex;
@@ -307,7 +311,7 @@ a.sub-menu {
 } */
 
 .inner_nav_container {
-    background-color: #145bd9;
+    background-color: var(--system-primary);
     color: #fff;
     padding: 5px;
     display: flex;
@@ -372,12 +376,12 @@ a.sub-menu {
 .my_form select:focus,
 .my_form textarea:focus {
     background: white;
-    border: 1px solid #145bd9;
-    box-shadow: 0 0 10px #145bd9;
+    border: 1px solid var(--system-primary);
+    box-shadow: 0 0 10px var(--system-primary);
 }
 
 .my_form_header {
-    background: #145bd9;
+    background: var(--system-primary);
     color: white;
     text-transform: uppercase;
     font-size: 1.3rem;
@@ -390,8 +394,8 @@ a.sub-menu {
 
 .green-button {
     border-radius: 5px;
-    border: 1px solid #145bd9;
-    background-color: #145bd9;
+    border: 1px solid var(--system-primary);
+    background-color: var(--system-primary);
     color: #ffffff;
     font-size: 18px;
     text-transform: uppercase;
@@ -440,7 +444,7 @@ a.sub-menu {
 
 /* table head 0 */
 .table_head {
-    background: #145bd9;
+    background: var(--system-primary);
     color: white;
     display: flex;
     flex-wrap: wrap;
@@ -481,6 +485,27 @@ a.sub-menu {
     display: inline-block;
 }
 
+.table_header {
+    background: color-mix(
+        in srgb,
+        var(--system-primary) 95%,
+        white 5%
+    ) !important;
+    color: #fff !important;
+}
+
+.modal_header {
+    background: color-mix(
+        in srgb,
+        var(--system-primary) 95%,
+        white 5%
+    ) !important;
+    color: #fff !important;
+}
+.type-b-page-header {
+    background: var(--system-primary) !important;
+    color: white !important;
+}
 /* @media(max-width: 1200px) {
     .table_head {
         display: flex;
@@ -499,6 +524,14 @@ a.sub-menu {
 .table_title .table_summary {
     font-size: 13px;
     text-transform: capitalize;
+}
+
+.table_column_header {
+    font-size: 20px;
+    padding: 1px 20px;
+    font-weight: bolder;
+    width: 100%;
+    text-transform: uppercase;
 }
 
 /* CARDS */
@@ -526,7 +559,7 @@ a.sub-menu {
 }
 
 .mini_card_header {
-    background: #145bd9;
+    background: var(--system-primary);
     color: white;
     text-transform: uppercase;
     font-size: 1rem;
@@ -607,7 +640,7 @@ a.sub-menu {
 }
 
 .mini_card_header {
-    background: #145BD9;
+    background: var(--system-primary);
     color: white;
     text-transform: uppercase;
     font-size: 1rem;
@@ -731,7 +764,7 @@ a.sub-menu {
     font-size: 20px;
     font-weight: bold;
     line-height: 1.2;
-    color: #145bd9;
+    color: var(--system-primary);
 
     line-clamp: 2;
 
@@ -766,79 +799,9 @@ a.sub-menu {
     }
 }
 
-/*
-.user-info-aside a {
-    text-decoration: none;
-    color: black;
-}
-
-.review-info-card-container {
-    width: 100%;
-    padding: 1rem;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    grid-gap: 15px;
-}
-
-.mini-card {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    margin: 0.5rem;
-    height: 150px;
-    max-width: 280px;
-    background: red;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-    transition: transform 0.2s;
-}
-
-.mini-card:nth-child(odd) {
-    background: #f1f4f1;
-}
-
-.mini-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-} */
-/*
-.mini-card-picture {
-    width: 90px;
-    padding: 0;
-    margin: 0;
-    color: #005c43;
-    font-size: 3rem;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-} */
-
-/*
-.mini-card-picture img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.mini-card-content {
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-}
-
-.review-card-info-title {
-    color: #005c43;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    margin: 0.5rem;
-} */
-
 /* Replace Bootstrap BG */
 .bg-custom-green {
-    background: #145bd9;
+    background: var(--system-primary);
 }
 
 .bg-green {
@@ -955,7 +918,7 @@ a.sub-menu {
 }
 
 .review-info-icon i {
-    color: #145bd9;
+    color: var(--system-primary);
     font-size: 3rem;
     text-align: center;
     justify-content: center;
@@ -970,7 +933,7 @@ a.sub-menu {
 }
 
 .review-card-info-title {
-    color: #145bd9;
+    color: var(--system-primary);
     font-size: 1.2rem;
     font-weight: bold;
     text-align: center;
@@ -1052,7 +1015,7 @@ a.sub-menu {
     font-size: 25px;
     font-weight: bold;
     line-height: 1;
-    color: #145bd9;
+    color: var(--system-primary);
     text-overflow: ellipsis;
 }
 
@@ -1073,7 +1036,7 @@ a.sub-menu {
 /* MINI MENU */
 .mini-menu {
     background-color: #ffffff;
-    color: #145bd9;
+    color: var(--system-primary);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     padding: 5px;
@@ -1087,22 +1050,22 @@ a.sub-menu {
 }
 
 .mini-menu-active {
-    background: #145bd9;
+    background: var(--system-primary);
     color: #fff;
 }
 .mini-menu-active:hover {
     background: #fff;
-    color: #145bd9;
+    color: var(--system-primary);
 }
 
 .accordion-item {
-    background: #145bd9;
+    background: var(--system-primary);
     color: #fff;
 }
 
 /* Accordion */
 .accordion-header {
-    background-color: #145bd9;
+    background-color: var(--system-primary);
     color: white;
     padding: 5px 5px 1px 20px;
     font-size: 25px;
@@ -1162,7 +1125,7 @@ a.sub-menu {
 }
 
 .quicklink_card_body {
-    color: #145bd9;
+    color: var(--system-primary);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1210,7 +1173,7 @@ a.sub-menu {
     padding: auto;
     margin: auto;
     height: 100%;
-    color: #145BD9;
+    color: var(--system-primary);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1238,7 +1201,9 @@ a.sub-menu {
     text-decoration: none;
     cursor: pointer;
     border-radius: 5px;
-    transition: background-color 0.3s ease, color 0.3s ease,
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease,
         border-color 0.3s ease;
 }
 
@@ -1531,7 +1496,9 @@ a.sub-menu {
     height: 60px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease,
+    transition:
+        transform 0.3s ease,
+        box-shadow 0.3s ease,
         background-color 0.3s ease;
 }
 
@@ -1549,7 +1516,9 @@ a.sub-menu {
 /* front end support card */
 .user-support-card {
     border-radius: 12px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease;
     cursor: pointer;
 }
 

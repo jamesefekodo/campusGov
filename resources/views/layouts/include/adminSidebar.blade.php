@@ -331,17 +331,18 @@
             </a><!--//nav-link-->
             <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                     <li class="submenu-item"><a
+                    <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('configBasicSettings') }} --}}
+                            {{ route('configBasicSettings') }}
                              ">Basics</a>
                     </li>
-                     <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
+                    <li class="submenu-item"><a
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/user_roles') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('configBasicSettings') }} --}}
-                             ">Access Control</a>
+                            {{ route('viewUserRoles') }}
+                             ">User
+                            Roles</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/policies') ? 'sidebar-active' : '' }}"
