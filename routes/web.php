@@ -38,5 +38,5 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard'])->name('adminDashboard');
 
-    Route::get('admin/dashboard', [SystemConfigurationController::class, 'userPermisssions'])->name('config.userPermisssions');
+    Route::get('admin/config/access_control/user_permissions', [SystemConfigurationController::class, 'userPermisssions'])->name('config.userPermisssions');
 });
