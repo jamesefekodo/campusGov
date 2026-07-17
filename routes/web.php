@@ -41,6 +41,13 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // basic system configuration
     Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
+    Route::put('admin/config/basics/maintenance_mode/update', [SystemConfigurationController::class, 'updateMaintenanceMode'])->name('updateMaintenanceMode');
+    Route::put('admin/config/basics/system_info/update', [SystemConfigurationController::class, 'updateBasicSystemInfoUpdate'])->name('updateBasicSystemInfoUpdate');
+    Route::put('admin/config/basics/email_config/update', [SystemConfigurationController::class, 'updateEmailConfigSubmit'])->name('updateEmailConfigSubmit');
+
+
+
+
 
     // user roles and permissions
     Route::get('admin/config/user_roles', [PermissionAccessController::class, 'viewUserRoles'])->name('viewUserRoles');

@@ -242,14 +242,14 @@ a.sub-menu {
 
 .sidebar-active,
 .sidebar-active > a {
-    background: var(--system-primary) !important;
+    background: var(--system-secondary) !important;
     color: white !important;
 }
 
 .sidebar-active-section {
     background: color-mix(
         in srgb,
-        var(--system-primary) 20%,
+        var(--system-secondary) 20%,
         white 80%
     ) !important;
     color: #000000 !important;
@@ -492,6 +492,10 @@ a.sub-menu {
         white 5%
     ) !important;
     color: #fff !important;
+}
+
+.logo_header_text{
+    color: var(--system-primary) !important;
 }
 
 .modal_header {
@@ -1036,7 +1040,7 @@ a.sub-menu {
 /* MINI MENU */
 .mini-menu {
     background-color: #ffffff;
-    color: var(--system-primary);
+    color: var(--system-secondary);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     padding: 5px;
@@ -1050,12 +1054,12 @@ a.sub-menu {
 }
 
 .mini-menu-active {
-    background: var(--system-primary);
+    background: var(--system-secondary);
     color: #fff;
 }
 .mini-menu-active:hover {
     background: #fff;
-    color: var(--system-primary);
+    color: var(--system-secondary);
 }
 
 .accordion-item {
@@ -1065,7 +1069,7 @@ a.sub-menu {
 
 /* Accordion */
 .accordion-header {
-    background-color: var(--system-primary);
+    background-color: var(--system-secondary);
     color: white;
     padding: 5px 5px 1px 20px;
     font-size: 25px;

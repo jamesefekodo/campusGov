@@ -11,9 +11,9 @@
 
     <style>
         :root {
-            --system-primary: {{ basicSystemInfo()['primary_colour'] ?: '#3b5edd' }};
-            --system-secondary: {{ basicSystemInfo()['secondary_colour'] ?: '#7a97ff' }};
-            --system-tertiary: {{ basicSystemInfo()['tertiary_colour'] ?: 'var(--system-secondary)' }};
+            --system-primary: {{ basicSystemInfo()->primary_colour ?: '#3b5edd' }};
+            --system-secondary: {{ basicSystemInfo()->secondary_colour ?: '#7a97ff' }};
+            --system-tertiary: {{ basicSystemInfo()->tertiary_colour ?: 'var(--system-secondary)' }};
         }
     </style>
 
@@ -91,7 +91,7 @@
                                 <img class="logo-icon logo-sidebar me-2" src="{{ associationLogo() }}" alt="logo">
                             </div>
                             <div class="zone-header-item">
-                                <span class="logo-text">{{ basicSystemInfo()->association_acronym ?? config('app.name') }}</span>
+                                <span class="logo-text logo_header_text">{{ basicSystemInfo()->association_acronym ?? config('app.name') }}</span>
                             </div>
                         </a>
 

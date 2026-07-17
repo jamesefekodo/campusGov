@@ -30,6 +30,10 @@ return new class extends Migration
             $table->text('facebook_link')->nullable();
             $table->text('instagram_link')->nullable();
             $table->text('twitter_link')->nullable();
+            $table->text('primary_colour')->nullable();
+            $table->text('secondary_colour')->nullable();
+            $table->text('tertiary_colour')->nullable();
+
             $table->timestamps();
         });
     }

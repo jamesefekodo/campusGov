@@ -27,6 +27,9 @@ class BasicSystemSetting extends Model
         'facebook_link',
         'instagram_link',
         'twitter_link',
+        'primary_color',
+        'secondary_color',
+        'tertiary_color',
     ];
 
     // caset attributes
