@@ -15,7 +15,7 @@ if (!function_exists('getUserType')) {
         return match ((int) Auth::user()->account_type) {
             0 => 'root',
             1 => 'admin',
-            2 => 'student',
+            2 => 'member',
             default => 'guest',
         };
     }

@@ -16,8 +16,8 @@ class FrontendController extends Controller
             if (in_array($userType, ['root', 'admin'])) {
                 return redirect()->route('adminDashboard');
             }
-            if ($userType === 'student') {
-                return redirect()->route('studentDashboard');
+            if ($userType === 'member') {
+                return redirect()->route('memberDashboard');
             }
         }
 

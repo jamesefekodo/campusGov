@@ -69,7 +69,7 @@
                             </div>
                             {{-- Back Home --}}
                             <div class="w-100 justify-content-center text-center my-4">
-                                <a class="btn btn-primary" href="{{ route('viewUserRoles') }}"> <i
+                                <a class="btn btn-primary" href="{{ route('userRoles') }}"> <i
                                         class="fas fa-chevron-left"></i>
                                     Back
                                 </a>

@@ -34,10 +34,8 @@ class PermissionAccessController extends Controller
             $roles = Role::where('name', 'like', "%$searchKey%")
                 ->orWhere('description', 'like', "%$searchKey%")
                 ->orderBy('name')
-                ->paginate(20);
+                ->paginate(20)->withQueryString();
 
-            // Append search parameter to pagination links
-            $roles->appends(['searchKey' => $searchKey]);
 
             $totalRoles = $roles->total();
             $requestType = 'search';

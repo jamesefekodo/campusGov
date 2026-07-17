@@ -36,9 +36,7 @@
                 <div class="form-options my-4">
                     <p class="">Have no account? <a href="{{ route('registrationPage') }}">Register</a></p>
                     <p class=""><a
-                            href="
-                        {{-- {{ route('forgotPassword') }} --}}
-                         ">Forgot
+                            href="{{ route('forgotPassword') }}">Forgot
                             Password</a>
                     </p>
                     <p class=""><a

@@ -19,11 +19,12 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('photo')->nullable();
             $table->string('email')->unique();
-            $table->string('require_login_mfa')->default(0);
+            $table->boolean('require_login_mfa')->default(false);
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('email_verification')->nullable()->default('not_verified');
+            $table->boolean('email_verification')->default(false);
             $table->string('email_verification_code')->nullable();
             $table->timestamp('email_verification_code_expires_at')->nullable();
+            $table->boolean('admin_privilege')->default(false);
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();

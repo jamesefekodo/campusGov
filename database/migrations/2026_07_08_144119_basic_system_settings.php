@@ -22,6 +22,7 @@ return new class extends Migration
             $table->longText('description')->nullable();
             $table->string('operational_level')->default('department'); // department, faculty (+school), university
             $table->text('school_name')->nullable();
+            $table->boolean('is_polytechnic')->default(true);
             $table->string('school_acronym')->nullable();
             $table->string('school_logo')->nullable();
             $table->text('phone')->nullable();

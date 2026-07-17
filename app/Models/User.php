@@ -19,10 +19,27 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Get the attributes that should be cast.
+     * The attributes that are mass assignable.
      *
-     * @return array<string, string>
+     * @var list<string>
      */
+    protected $fillable = [
+        'username',
+        'account_type',
+        'account_status',
+        'phone',
+        'photo',
+        'email',
+        'require_login_mfa',
+        'email_verified_at',
+        'email_verification',
+        'email_verification_code',
+        'email_verification_code_expires_at',
+        'password',
+        'admin_privilege',
+    ];
+
+
     protected function casts(): array
     {
         return [
@@ -30,11 +47,22 @@ class User extends Authenticatable
             'password' => 'hashed',
             'account_type' => 'integer',
             'account_status' => 'integer',
-
+            'email_verification' => 'boolean',
+            'require_login_mfa'=> 'boolean',
+            'admin_privilege' => 'boolean',
         ];
     }
 
 
+    // static functions
+    static public function getEmailCheck($email)
+    {
+        return User::where('email', '=', $email)->first();
+    }
+    static public function getTokenSingle($remember_token)
+    {
+        return User::where('remember_token', '=', $remember_token)->first();
+    }
 
     // relationships
     public function roles()

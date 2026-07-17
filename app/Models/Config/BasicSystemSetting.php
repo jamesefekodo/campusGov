@@ -19,6 +19,7 @@ class BasicSystemSetting extends Model
         'description',
         'operational_level',
         'school_name',
+        'is_polytechnic',
         'school_acronym',
         'school_logo',
         'phone',
@@ -37,6 +38,7 @@ class BasicSystemSetting extends Model
     {
         return [
             'maintenance_mode' => 'boolean',
+            'is_polytechnic' => 'boolean',
         ];
     }
 }

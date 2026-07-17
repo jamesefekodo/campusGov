@@ -10,7 +10,7 @@
             Best regards,
         </p>
         <p style="margin: 0">
-            {{ config('app.name') }}.
+            {{ basicSystemInfo()->association_acronym ?? config('app.name') }}.
         </p>
     </div>
 
@@ -37,7 +37,7 @@
         background: #ffffff;
         text-align: left;
         margin: 0.2rem auto;
-        padding: 2rem;
+        padding: 1.7rem;
         font-family: Arial, sans-serif;
     }
 

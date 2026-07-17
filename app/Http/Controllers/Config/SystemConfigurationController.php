@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Config;
 
 use App\Http\Controllers\Controller;
 use App\Models\Config\BasicSystemSetting;
+use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
@@ -29,6 +30,18 @@ class SystemConfigurationController extends Controller
         $appUrl = env('APP_URL', 'http://localhost');
         $timezone = env('APP_TIMEZONE', 'Etc/GMT');
         $timezones = DateTimeZone::listIdentifiers();
+
+        usort($timezones, function ($a, $b) {
+            $offsetA = (new DateTime('now', new DateTimeZone($a)))->getOffset();
+            $offsetB = (new DateTime('now', new DateTimeZone($b)))->getOffset();
+
+            if ($offsetA === $offsetB) {
+                return strcmp($a, $b); // sort alphabeticaly within the same offset
+            }
+
+            return $offsetA <=> $offsetB;
+        });
+
 
 
 
@@ -86,7 +99,7 @@ class SystemConfigurationController extends Controller
 
         return redirect()->back()->with('success', 'Maintenance mode updated successfully.');
     }
-     protected function updateEnv(array $data)
+    protected function updateEnv(array $data)
     {
         $path = base_path('.env');
 
@@ -149,6 +162,7 @@ class SystemConfigurationController extends Controller
             'primary_colour' => 'nullable',
             'secondary_colour' => 'nullable',
             'tertiary_colour' => 'nullable',
+            'is_polytechnic' => 'required'
 
         ]);
 
@@ -162,6 +176,8 @@ class SystemConfigurationController extends Controller
         $basicSystemSetting->primary_colour = $request->primary_colour;
         $basicSystemSetting->secondary_colour = $request->secondary_colour;
         $basicSystemSetting->tertiary_colour = $request->tertiary_colour;
+        $basicSystemSetting->is_polytechnic = $request->is_polytechnic;
+
 
 
         if ($request->hasFile('association_logo')) {

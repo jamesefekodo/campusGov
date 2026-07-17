@@ -331,25 +331,26 @@
             </a><!--//nav-link-->
             <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
-                            href="
+                    @if (Auth::user()->hasPermission('basic_system_config.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
+                                href="
                             {{ route('configBasicSettings') }}
                              ">Basics</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/user_roles') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{ route('viewUserRoles') }}
-                             ">User
-                            Roles</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/policies') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('systemPolicies') }} --}}
-                             ">Policies</a>
-                    </li>
+                        </li>
+                    @endif
+                    @if (Auth::user()->hasPermission('roles.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/user_roles') ? 'sidebar-active' : '' }}"
+                                href="{{ route('userRoles') }}">User Roles</a>
+                        </li>
+                    @endif
+                    @if (Auth::user()->hasPermission('policy.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/policies') ? 'sidebar-active' : '' }}"
+                                href="{{ route('systemPolicies') }}">Policies</a>
+                        </li>
+                    @endif
 
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/other_pages') ? 'sidebar-active' : '' }}"

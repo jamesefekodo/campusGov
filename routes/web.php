@@ -3,6 +3,7 @@
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
+use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
 use Illuminate\Support\Facades\Artisan;
@@ -32,6 +33,26 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::post('forgot_password/send_password_reset_link', [AuthController::class, 'requestPasswordResetLink'])->name('requestPasswordResetLink');
     Route::get('reset_password/{token}', [AuthController::class, 'passwordResetPage'])->name('passwordResetLink');
     Route::post('reset_password/change_password/{token}', [AuthController::class, 'submitPasswordResetRequest'])->name('submitPasswordResetRequest');
+
+    Route::get('maintenance_mode', [AuthController::class, 'maintenanceMode'])->name('maintenanceMode');
+
+    Route::get('verify_email', [AuthController::class, 'verifyUserEmail'])->name('verifyUserEmail');
+    Route::get('verify_email/resend_otp', [AuthController::class, 'resendEmailVerificationCodeEmailtoUser'])->name('verifyUserEmailResendOtp');
+    Route::post('verify_emal/submit', [AuthController::class, 'verifyUserEmailSubmit'])->name('verifyUserEmailSubmit');
+
+    Route::get('login/authenticate', [AuthController::class, 'authenticateLogin'])->name('authenticateLogin');
+    Route::post('login/authenticate/submit', [AuthController::class, 'verifyLoginOtpSubmit'])->name('verifyLoginOtpSubmit');
+    Route::get('login/authenticate/resend_otp', [AuthController::class, 'resendLoginOtp'])->name('resendLoginOtp');
+
+    // Policy Agreement
+    Route::get('system/configuration/policies_and_terms/user/manage', [SystemPolicyController::class, 'manageSystemPolicyAgreement'])->name('manageSystemPolicyAgreement');
+    Route::post('system/configuration/policies_and_terms/user/agree', [SystemPolicyController::class, 'userAgreeToSystemPolicy'])->name('userAgreeToSystemPolicy');
+});
+
+Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(function () {
+    Route::get('member/dashboard', [DashboardController::class, 'dashboard'])->name('memberDashboard');
+
+    // profile setup
 });
 
 
@@ -45,12 +66,22 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/config/basics/system_info/update', [SystemConfigurationController::class, 'updateBasicSystemInfoUpdate'])->name('updateBasicSystemInfoUpdate');
     Route::put('admin/config/basics/email_config/update', [SystemConfigurationController::class, 'updateEmailConfigSubmit'])->name('updateEmailConfigSubmit');
 
+    // policy setup
+    Route::get('admin/config/policies', [SystemPolicyController::class, 'systemPolicies'])->name('systemPolicies');
+    Route::get('admin/config/policies/search', [SystemPolicyController::class, 'systemPolicies'])->name('systemPoliciesSearch');
+    Route::post('admin/config/policies/create/submit', [SystemPolicyController::class, 'systemAddNewSystemPolicySubmities'])->name('addNewSystemPolicySubmit');
+    Route::get('admin/config/policies/view/{slug}', [SystemPolicyController::class, 'viewPolicy'])->name('viewPolicy');
+
+
+
+
+
 
 
 
 
     // user roles and permissions
-    Route::get('admin/config/user_roles', [PermissionAccessController::class, 'viewUserRoles'])->name('viewUserRoles');
+    Route::get('admin/config/user_roles', [PermissionAccessController::class, 'viewUserRoles'])->name('userRoles');
     Route::get('admin/config/user_roles/search', [PermissionAccessController::class, 'viewUserRoles'])->name('rolesSearch');
     Route::post('admin/config/user_roles/add/submit', [PermissionAccessController::class, 'addNewRoleSubmit'])->name('addNewRoleSubmit');
     Route::get('admin/config/user_roles/view/{uuid}', [PermissionAccessController::class, 'viewRole'])->name('viewRole');

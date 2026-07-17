@@ -7,13 +7,15 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            <div class="d-flex justify-content-end">
-                <div class="m-1">
-                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewRoleModal">
-                        <i class="fas fa-plus"></i> New Role</button>
+            @if (Auth::user()->hasPermission('roles.create'))
+                <div class="d-flex justify-content-end">
+                    <div class="m-1">
+                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewRoleModal">
+                            <i class="fas fa-plus"></i> New Role</button>
+                    </div>
                 </div>
-            </div>
-            @include('users.admin.config.accessControl.roles.include.addNewRoleModal')
+                @include('users.admin.config.accessControl.roles.include.addNewRoleModal')
+            @endif
 
             <div class="individual-review-card-container">
                 <div class="col-md-12 individual-review-card">
@@ -30,9 +32,7 @@
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
-                                            value="
-                                                {{-- {{ $data['searchKey'] }} --}}
-                                                 "><button
+                                            value="{{ $data['searchKey'] }}"><button
                                             type="submit"
                                             class="table_search_button btn btn-primary
                                                 "><i
@@ -101,20 +101,20 @@
                                         @include('layouts.include.pagination')
                                         {{-- Back Home --}}
                                         <div class="w-100 justify-content-center text-center mb-4">
-                                            {{-- @switch($data['requestType'])
-                                                    @case('all')
-                                                        {{ '' }}
-                                                    @break
+                                            @switch($data['requestType'])
+                                                @case('all')
+                                                    {{ '' }}
+                                                @break
 
-                                                    @case('search')
-                                                        <a class="btn btn-success" href="{{ route('systemPolicies') }}"> <i
-                                                                class="fas fa-chevron-left"></i>
-                                                            Back
-                                                        </a>
-                                                    @break
+                                                @case('search')
+                                                    <a class="btn btn-success" href="{{ route('userRoles') }}"> <i
+                                                            class="fas fa-chevron-left"></i>
+                                                        Back
+                                                    </a>
+                                                @break
 
-                                                    @default
-                                                @endswitch --}}
+                                                @default
+                                            @endswitch
 
                                         </div>
                                     </div>
