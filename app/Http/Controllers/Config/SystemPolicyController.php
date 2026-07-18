@@ -99,6 +99,69 @@ class SystemPolicyController extends Controller
         ];
         return view('users.admin.config.systemPolicy.viewSystemPolicy', compact('data'));
     }
+    public function updatePolicySubmit(Request $request, $slug)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('policy.update'),
+            403
+        );
+
+        $request->validate([
+            'title' => 'required',
+            'policy_statement' => 'required',
+            'is_active' => 'required',
+            'applicable_to_member' => 'required',
+            'applicable_to_administrator' => 'required',
+        ]);
+
+
+
+        $policy = SystemPolicy::where('slug', $slug)->first();
+        if (!$policy) {
+            return redirect()->back()->with('error', 'Policy not found!');
+        }
+
+        $existingAgreements = UserAgreedPolicy::where('policy', $policy->slug)->get();
+        $policy->title = trim($request->title);
+        $policy->policy_statement = $request->policy_statement;
+        $policy->is_active = $request->is_active;
+        $policy->applicable_to_member = $request->applicable_to_member;
+        $policy->applicable_to_administrator = $request->applicable_to_administrator;
+        $policy->save();
+
+
+        if ($existingAgreements) {
+            foreach ($existingAgreements as $agreement) {
+                $agreement->agreement_status = 'updated';
+                $agreement->save();
+            }
+        }
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deletePolicy($slug)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('policy.delete'),
+            403
+        );
+
+        $policy = SystemPolicy::where('slug', $slug)->first();
+        if (!$policy) {
+            return redirect()->back()->with('error', 'Policy not found!');
+        }
+
+        $policy->userAgreedPolicies()->delete();
+        $policy->delete();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
     public function manageSystemPolicyAgreement()
     {
         $user = Auth::user();

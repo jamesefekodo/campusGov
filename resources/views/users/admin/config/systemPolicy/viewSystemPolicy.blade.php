@@ -103,7 +103,7 @@
                                             </p>
                                         </div>
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            @if (Auth::user()->hasPermission('roles.update'))
+                                            @if (Auth::user()->hasPermission('policy.update'))
                                                 <button class="btn btn-warning m-1 d-flex align-items-center"
                                                     data-toggle="modal" data-target="#editPolicyModal">
                                                     <i class="fas fa-edit me-2"></i>
@@ -111,14 +111,15 @@
                                                 </button>
                                             @endif
 
-                                            @if (Auth::user()->hasPermission('roles.delete'))
+                                            @if (Auth::user()->hasPermission('policy.delete'))
                                                 <button type="button"
                                                     class="btn btn-danger m-1 d-flex align-items-center delete-role"
-                                                    {{-- data-url="{{ route('deleteRole', ['uuid' => $data['role']->uuid]) }}" --}}>
+                                                    data-url="{{ route('deletePolicy', ['slug' => $data['policy']->slug]) }}">
                                                     <i class="fas fa-trash me-2"></i>
                                                     <span>Delete</span>
                                                 </button>
                                             @endif
+
                                         </div>
                                     </div>
                                 </div>
@@ -138,6 +139,33 @@
 
             {{-- modals start --}}
             @include('users.admin.config.systemPolicy.include.editPolicyModal')
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.delete-role').forEach(button => {
+                        button.addEventListener('click', function() {
+
+                            const url = this.dataset.url;
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "This policy will be permanently deleted.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Yes, delete it!',
+                                cancelButtonText: 'Cancel',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = url;
+                                }
+                            });
+
+                        });
+                    });
+                });
+            </script>
             {{-- modals end --}}
 
         </div><!--//container-fluid-->
