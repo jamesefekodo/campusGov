@@ -1,5 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', 'View Role :: ' . $data['policy']->title)
+@section('title', 'View Policy :: ' . $data['policy']->title)
 @section('content')
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
         <div class="container-fluid">
@@ -11,7 +11,7 @@
                             <div class="col-md-12 m-auto">
                                 <div class="my_form_container">
                                     <h4 class="block text-center py-2 text-uppercase type-b-page-header">
-                                        View Role ::
+                                        View Policy ::
                                         {{ $data['policy']->title }}
                                     </h4>
                                     <div class="card-body pt-2 pb-5 px-4">

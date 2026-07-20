@@ -544,4 +544,39 @@ class AuthController extends Controller
             return $this->accessDeniedLogout();
         }
     }
+    public function manageSession()
+    {
+        $user = Auth::user();
+
+        if ($user) {
+            $currentSessionId = Session::getId();
+            $currentSession = DB::table('sessions')->where('id', $currentSessionId)->first();
+            $userActiveSessions = DB::table('sessions')->where('user_id', $user->id)->count();
+            if ($userActiveSessions > $user->session_limit) {
+                return view('utilities.pages.auth.manageSessions');
+            } else {
+                return $this->redirectToUserDashboard(Auth::user()->account_type);
+            }
+        } else {
+            return $this->accessDeniedLogout();
+        }
+    }
+    public function endOtherSessions()
+    {
+        $user = Auth::user();
+        $currentSessionId = Session::getId();
+
+        // Get all sessions for the user except the current one
+        $otherSessions = DB::table('sessions')
+            ->where('user_id', $user->id)
+            ->where('id', '!=', $currentSessionId)
+            ->get();
+
+        // Loop through each session and delete it
+        foreach ($otherSessions as $session) {
+            DB::table('sessions')->where('id', $session->id)->delete();
+        }
+
+        return redirect('/');
+    }
 }

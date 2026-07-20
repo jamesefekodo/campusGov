@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AcademicConfig\Faculty;
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -69,11 +70,16 @@ if (!function_exists('schoolLogo')) {
     }
 }
 
-
-
 if (!function_exists('basicSystemInfo')) {
     function basicSystemInfo()
     {
         return BasicSystemSetting::first();
+    }
+}
+
+if (!function_exists('faculties')) {
+    function faculties()
+    {
+        return Faculty::query()->orderBy('name');
     }
 }

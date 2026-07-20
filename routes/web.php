@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Authentication\AuthController;
+use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Member\MemberSelfProfileController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -47,18 +49,42 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     // Policy Agreement
     Route::get('system/configuration/policies_and_terms/user/manage', [SystemPolicyController::class, 'manageSystemPolicyAgreement'])->name('manageSystemPolicyAgreement');
     Route::post('system/configuration/policies_and_terms/user/agree', [SystemPolicyController::class, 'userAgreeToSystemPolicy'])->name('userAgreeToSystemPolicy');
+
+    // session management
+    Route::get('manage_sessions', [AuthController::class, 'manageSession'])->name('manageSession');
+    Route::get('end_other_sessions', [AuthController::class, 'endOtherSessions'])->name('endOtherSessions');
 });
 
 Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(function () {
     Route::get('member/dashboard', [DashboardController::class, 'dashboard'])->name('memberDashboard');
 
     // profile setup
+    Route::get('student/account_setup', [MemberSelfProfileController::class, 'studentAccountSetup'])->name('studentAccountSetup');
 });
 
 
 
 Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard'])->name('adminDashboard');
+
+
+
+    // academic config
+    Route::get('admin/academic_config/faculties', [AcademicConfigController::class, 'faculties'])->name('faculties');
+    Route::get('admin/academic_config/faculties/search', [AcademicConfigController::class, 'faculties'])->name('facultiesSearch');
+    Route::post('admin/academic_config/faculties/add/submit', [AcademicConfigController::class, 'addFacultySubmit'])->name('addFacultySubmit');
+    Route::get('admin/academic_config/faculties/view/{uuid}', [AcademicConfigController::class, 'viewFaculty'])->name('viewFaculty');
+    Route::put('admin/academic_config/faculties/edit/submit/{uuid}', [AcademicConfigController::class, 'updateFacultySubmit'])->name('updateFacultySubmit');
+    Route::post('admin/academic_config/faculties/head/submit', [AcademicConfigController::class, 'addFacultyDeanSubmit'])->name('addFacultyDeanSubmit');
+    Route::put('admin/academic_config/faculties/head/update/submit', [AcademicConfigController::class, 'editFacultyDeanSubmit'])->name('editFacultyDeanSubmit');
+    Route::put('admin/academic_config/faculties/head/end_tenure/submit', [AcademicConfigController::class, 'editEndFacultyDeanTenureSubmit'])->name('editEndFacultyDeanTenureSubmit');
+    Route::get('admin/academic_config/faculties/past_heads/{uuid}', [AcademicConfigController::class, 'pastFacultyHeads'])->name('pastFacultyHeads');
+
+
+
+
+
+
 
     // basic system configuration
     Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
@@ -73,12 +99,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/config/policies/view/{slug}', [SystemPolicyController::class, 'viewPolicy'])->name('viewPolicy');
     Route::put('admin/config/policies/update/{slug}', [SystemPolicyController::class, 'updatePolicySubmit'])->name('updatePolicySubmit');
     Route::get('admin/config/policies/delete/{slug}', [SystemPolicyController::class, 'deletePolicy'])->name('deletePolicy');
-
-
-
-
-
-
 
 
 

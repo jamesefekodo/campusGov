@@ -157,10 +157,10 @@ class SystemPolicyController extends Controller
             return redirect()->back()->with('error', 'Policy not found!');
         }
 
-        $policy->userAgreedPolicies()->delete();
+        $policy->policyAgreements()->delete();
         $policy->delete();
 
-        return redirect()->back()->with('success', 'Done!');
+        return redirect()->route('systemPolicies')->with('success', 'Done!');
     }
     public function manageSystemPolicyAgreement()
     {

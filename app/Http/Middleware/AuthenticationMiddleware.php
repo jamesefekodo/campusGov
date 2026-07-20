@@ -60,15 +60,15 @@ class AuthenticationMiddleware
             $emailVerificationStatus = 'waiting';
             $mfaVerificationStatus = 'waiting';
             $policyGuard = 'waiting';
-            // $sessionLimitStatus = 'waiting';
-            // if ($accountType == 2) {
-            //     $sessionLimitStatus = 'cleared';
-            // }
-            // $freshStudentAccountStatus = 'waiting';
+            $sessionLimitStatus = 'waiting';
+            if ($accountType == 2 && $user->admin_privilege === false) {
+                $sessionLimitStatus = 'cleared';
+            }
+            $profileSetupStatus = 'waiting';
 
-            // if ($accountType !== 2) {
-            //     $freshStudentAccountStatus = 'cleared';
-            // }
+            if ($accountType !== 2) {
+                $profileSetupStatus = 'cleared';
+            }
             // $freshAssociationAccountStatus = 'waiting';
             // if ($accountType !== 3) {
             //     $freshAssociationAccountStatus = 'cleared';
@@ -210,60 +210,55 @@ class AuthenticationMiddleware
 
 
 
-            // // Session Management
-            // // Reverify the first functions
-            // if (
-            //     $maintenanceStatus === 'cleared' &&
-            //     $emailVerificationStatus === 'cleared' &&
-            //     $mfaVerificationStatus === 'cleared' &&
-            //     $policyGuard === 'cleared' &&
-            //     $sessionLimitStatus === 'waiting'
-            // ) {
-            //     if (
-            //         $userActiveSessions > 1
-            //     ) {
-            //         if (
-            //             !Route::is('manageSession')
-            //             && !Route::is('logoutRequest')
-            //             && !Route::is('endOtherSessions')
-            //         ) {
-            //             return redirect()->route('manageSession');
-            //         }
-            //     } else {
-            //         $sessionLimitStatus = 'cleared';
-            //     }
-            // }
+            // Session Management
+            // Reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'waiting'
+            ) {
+                if (
+                    $userActiveSessions > 1
+                ) {
+                    if (
+                        !Route::is('manageSession')
+                        && !Route::is('logoutRequest')
+                        && !Route::is('endOtherSessions')
+                    ) {
+                        return redirect()->route('manageSession');
+                    }
+                } else {
+                    $sessionLimitStatus = 'cleared';
+                }
+            }
 
-            // // Fresh student account
-            // // Reverify the first functions
-            // if (
-            //     $maintenanceStatus === 'cleared' &&
-            //     $emailVerificationStatus === 'cleared' &&
-            //     $mfaVerificationStatus === 'cleared' &&
-            //     $policyGuard === 'cleared' &&
-            //     $sessionLimitStatus === 'cleared' &&
-            //     $freshStudentAccountStatus === 'waiting'
+            // Fresh student account
+            // Reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'cleared' &&
+                $profileSetupStatus === 'waiting'
 
-            // ) {
-            //     if ($accountType == 2 && $accountStatus == 0) {
-            //         if (
-            //             !Route::is('registerStudentPersonalProfile')
-            //             && !Route::is('registerStudentAcademicInfo')
-            //             && !Route::is('registerStudentAcademicHistory')
-            //             && !Route::is('registerStudentSkill')
-            //             && !Route::is('registerStudentBusinessHistory')
-            //             && !Route::is('registerLeadershipPosition')
-            //             && !Route::is('registerStudentAward')
-            //             && !Route::is('studentAccountSetup')
-            //             && !Route::is('studentSubmitAccountForVerification')
-            //             && !Route::is('logoutRequest')
-            //         ) {
-            //             return redirect()->route('studentAccountSetup');
-            //         }
-            //     } else {
-            //         $freshStudentAccountStatus = 'cleared';
-            //     }
-            // }
+            ) {
+                if ($accountType == 2 && $accountStatus == 0) {
+                    if (
+                        !Route::is('registerStudentPersonalProfile')
+                        && !Route::is('registerStudentAcademicInfo')
+                        && !Route::is('studentAccountSetup')
+                        && !Route::is('studentSubmitAccountForVerification')
+                        && !Route::is('logoutRequest')
+                    ) {
+                        return redirect()->route('studentAccountSetup');
+                    }
+                } else {
+                    $profileSetupStatus = 'cleared';
+                }
+            }
 
             // // Awaiting Verification
             // // Reverify the first functions
@@ -273,7 +268,7 @@ class AuthenticationMiddleware
             //     $mfaVerificationStatus === 'cleared' &&
             //     $policyGuard === 'cleared' &&
             //     $sessionLimitStatus === 'cleared' &&
-            //     $freshStudentAccountStatus === 'cleared'
+            //     $profileSetupStatus === 'cleared'
 
             // ) {
             //     if ($accountType == 2 && $accountStatus == 1) {
@@ -304,7 +299,7 @@ class AuthenticationMiddleware
             //     $mfaVerificationStatus === 'cleared' &&
             //     $policyGuard === 'cleared' &&
             //     $sessionLimitStatus === 'cleared' &&
-            //     $freshStudentAccountStatus === 'cleared' &&
+            //     $profileSetupStatus === 'cleared' &&
             //     $awaitingVerificationStatus === 'cleared'
 
             // ) {
@@ -328,7 +323,7 @@ class AuthenticationMiddleware
             //     $mfaVerificationStatus === 'cleared' &&
             //     $policyGuard === 'cleared' &&
             //     $sessionLimitStatus === 'cleared' &&
-            //     $freshStudentAccountStatus === 'cleared' &&
+            //     $profileSetupStatus === 'cleared' &&
             //     $awaitingVerificationStatus === 'cleared' &&
             //     $disabledAccountStatus === 'cleared'
 

@@ -28,7 +28,7 @@
                                 <p style="color: red">{{ $errors->first('title') }}</p>
                             </div>
                             <div class="form-group col-md-4">
-                                <label for="is_active">Status: <span class="text-danger"></span></label>
+                                <label for="is_active">Status: <span class="text-danger">*</span></label>
                                 <select class="form-select" name="is_active" required>
                                     <option selected disabled>
                                         -Select-</option>

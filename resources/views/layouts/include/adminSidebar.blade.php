@@ -297,9 +297,7 @@
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/faculties') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('academicConfigFaculties') }} --}}
-                             ">Faculties</a>
+                            href="{{ route('faculties') }}">Faculties</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/departments') ? 'sidebar-active' : '' }}"
