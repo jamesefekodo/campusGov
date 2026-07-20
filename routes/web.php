@@ -79,6 +79,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_config/faculties/head/update/submit', [AcademicConfigController::class, 'editFacultyDeanSubmit'])->name('editFacultyDeanSubmit');
     Route::put('admin/academic_config/faculties/head/end_tenure/submit', [AcademicConfigController::class, 'editEndFacultyDeanTenureSubmit'])->name('editEndFacultyDeanTenureSubmit');
     Route::get('admin/academic_config/faculties/past_heads/{uuid}', [AcademicConfigController::class, 'pastFacultyHeads'])->name('pastFacultyHeads');
+    Route::get('admin/academic_config/faculties/past_heads/search/{uuid}', [AcademicConfigController::class, 'pastFacultyHeads'])->name('pastFacultyHeadsSearch');
+    Route::put('admin/academic_config/faculties/past_heads/update/{uuid}', [AcademicConfigController::class, 'updatePastFacultyHeawdProfileSubmit'])->name('updatePastFacultyHeawdProfileSubmit');
+    Route::get('admin/academic_config/faculties/past_heads/delete/{uuid}', [AcademicConfigController::class, 'deletePastFacultyHead'])->name('deletePastFacultyHead');
+
+
 
 
 

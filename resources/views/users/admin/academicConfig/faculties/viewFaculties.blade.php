@@ -167,7 +167,7 @@
                                                             </div>
                                                             <div class="m-1">
                                                                 <a class="btn btn-primary" href="{{ route('pastFacultyHeads', ['uuid' => $data['faculty']->uuid]) }}">
-                                                                    <i class="fas fa-address-book"></i> Past Deans
+                                                                    <i class="fas fa-address-book"></i> Past Heads
                                                                 </a>
                                                             </div>
 

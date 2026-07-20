@@ -186,8 +186,17 @@ class AcademicConfigController extends Controller
             if ($request->hasFile('photo')) {
                 $image = $request->file('photo');
                 $logoExtension = $image->getClientOriginalExtension();
-                $imageName = $faculty->slug . '.' . $logoExtension;
-                $image->move(public_path('assets/uploads/faculty/head/photo'), $imageName);
+                $uploadPath = public_path('assets/uploads/faculty/head/photo');
+                $baseName = $faculty->slug;
+                $imageName = $baseName . '.' . $logoExtension;
+                $counter = 1;
+
+                while (File::exists($uploadPath . '/' . $imageName)) {
+                    $imageName = $baseName . '-' . $counter . '.' . $logoExtension;
+                    $counter++;
+                }
+
+                $image->move($uploadPath, $imageName);
                 $head->photo = $imageName;
             }
         }
@@ -229,14 +238,24 @@ class AcademicConfigController extends Controller
 
         // Process the image
         if ($request->hasFile('photo')) {
-            $filePath = 'assets/uploads/faculty/head/photo/' . $head->photo;
+
+            // Delete old if exists
+            $filePath = public_path('assets/uploads/faculty/head/photo/' . $head->photo);
+
             if (File::exists($filePath)) {
                 File::delete($filePath);
             }
             $newImage = $request->file('photo');
             $newImageExtension = $newImage->getClientOriginalExtension();
-            $newImageName = $faculty->slug . '.' . $newImageExtension;
-            $newImage->move(public_path('assets/uploads/faculty/head/photo'), $newImageName);
+            $uploadPath = public_path('assets/uploads/faculty/head/photo');
+            $baseName = $faculty->slug;
+            $newImageName = $baseName . '.' . $newImageExtension;
+            $counter = 1;
+            while (File::exists($uploadPath . '/' . $newImageName)) {
+                $newImageName = $baseName . '-' . $counter . '.' . $newImageExtension;
+                $counter++;
+            }
+            $newImage->move($uploadPath, $newImageName);
             $head->photo = $newImageName;
         }
         $head->save();
@@ -255,8 +274,8 @@ class AcademicConfigController extends Controller
         $request->validate([
             'name' => 'required|string',
             'qualifications' => 'nullable|string',
-            'assumed_office_on' => 'nullable',
-            'tenure_end_on' => 'nullable',
+            'assumed_office_on' => 'required',
+            'tenure_end_on' => 'required',
             'phone' => 'nullable',
             'email' => 'nullable|email',
             'profile' => 'nullable',
@@ -280,16 +299,29 @@ class AcademicConfigController extends Controller
 
         // Process the image
         if ($request->hasFile('photo')) {
-            $filePath = 'assets/uploads/faculty/head/photo/' . $head->photo;
+            $filePath = public_path('assets/uploads/faculty/head/photo/' . $head->photo);
+
             if (File::exists($filePath)) {
                 File::delete($filePath);
             }
+
             $newImage = $request->file('photo');
             $newImageExtension = $newImage->getClientOriginalExtension();
-            $newImageName = $faculty->slug . '.' . $newImageExtension;
-            $newImage->move(public_path('assets/uploads/faculty/head/photo'), $newImageName);
+
+            $uploadPath = public_path('assets/uploads/faculty/head/photo');
+            $baseName = $faculty->slug;
+            $newImageName = $baseName . '.' . $newImageExtension;
+
+            $counter = 1;
+
+            while (file_exists($uploadPath . '/' . $newImageName)) {
+                $newImageName = $baseName . '-' . $counter . '.' . $newImageExtension;
+                $counter++;
+            }
+            $newImage->move($uploadPath, $newImageName);
             $head->photo = $newImageName;
         }
+
         $head->save();
         return redirect()->back()->with('success', 'Done!');
     }
@@ -334,7 +366,7 @@ class AcademicConfigController extends Controller
                 ->paginate(20);
             $totalPastHeads = $faculty->pastFacultyHeads->count();
             $requestType = 'all';
-            $pageTitle = 'Past Faculty Head';
+            $pageTitle = 'Past Faculty Heads';
         }
         $data = [
             'faculty' => $faculty,
@@ -346,5 +378,95 @@ class AcademicConfigController extends Controller
         ];
 
         return view('users.admin.academicConfig.faculties.pastFacultyHeads', compact('data'));
+    }
+    public function updatePastFacultyHeawdProfileSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('faculty.update'),
+            403
+        );
+
+
+        $request->validate([
+            'name' => 'required|string',
+            'qualifications' => 'nullable|string',
+            'assumed_office_on' => 'required',
+            'tenure_end_on' => 'required',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'profile' => 'nullable',
+            'photo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:300',
+        ]);
+
+        $head = HeadOfFaculty::where('uuid', $uuid)->first();
+        if (!$head) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $faculty = $head->hisFaculty;
+        if (!$faculty) {
+            return redirect()->back()->with('error', 'Faculty record not found!');
+        }
+        $head->name = trim($request->name);
+        $head->qualifications = trim($request->qualifications);
+        $head->phone = trim($request->phone);
+        $head->email = trim($request->email);
+        $head->assumed_office_on = $request->assumed_office_on;
+        $head->tenure_end_on = $request->tenure_end_on;
+        $head->profile = $request->profile;
+        // Process the image
+        if ($request->hasFile('photo')) {
+            $filePath = 'assets/uploads/faculty/head/photo/' . $head->photo;
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+            $newImage = $request->file('photo');
+            $newImageExtension = $newImage->getClientOriginalExtension();
+            // $newImageName = $head->slug . '.' . $newImageExtension;
+            // $newImage->move(public_path('assets/uploads/faculty/head/photo'), $newImageName);
+            // $head->photo = $newImageName;
+            $uploadPath = public_path('assets/uploads/faculty/head/photo');
+            $baseName = $faculty->slug;
+            $newImageName = $baseName . '.' . $newImageExtension;
+
+            $counter = 1;
+
+            while (file_exists($uploadPath . '/' . $newImageName)) {
+                $newImageName = $baseName . '-' . $counter . '.' . $newImageExtension;
+                $counter++;
+            }
+
+            $newImage->move($uploadPath, $newImageName);
+
+            $head->photo = $newImageName;
+        }
+        $head->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deletePastFacultyHead($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('faculty.delete'),
+            403
+        );
+
+        $head = HeadOfFaculty::where('uuid', $uuid)->first();
+        if (!$head) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $filePath = public_path('assets/uploads/faculty/head/photo/' . $head->photo);
+
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
+
+        $head->delete();
+        return redirect()->back()->with('success', 'Done!');
     }
 }

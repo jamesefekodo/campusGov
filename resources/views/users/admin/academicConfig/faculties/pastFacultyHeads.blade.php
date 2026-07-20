@@ -7,31 +7,34 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if ($data['operationalLevel'] !== 'institute' && !faculties()->exists())
-                @if (Auth::user()->hasPermission('faculty.create'))
-                    <div class="d-flex justify-content-end">
-                        <div class="m-1">
-                            <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                                data-target="#addNewFacultyModal">
-                                <i class="fas fa-plus"></i> New Faculty</button>
-                        </div>
-                    </div>
-                    @include('users.admin.academicConfig.faculties.include.addNewFaculty')
-                @endif
-            @endif
+            <div class="d-flex justify-content-end">
+                <div class="m-1">
+                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewFacultyModal">
+                        <i class="fas fa-plus"></i> Add New</button>
+                </div>
+                <div class="m-1">
+                    <a class="btn btn-danger btn-sm table_btn"
+                        href="{{ route('viewFaculty', ['uuid' => $data['faculty']->uuid]) }}">
+                        <i class="fas fa-chevron-left"></i> Faculty</a>
+                </div>
+            </div>
+            {{-- @include('users.admin.academicConfig.faculties.include.addNewFaculty') --}}
 
             <div class="individual-review-card-container">
                 <div class="col-md-12 individual-review-card">
                     <div class="table_head">
                         <div class="table_head_item col-md-8">
                             <div class="table_title">
-                                {{ $data['pageTitle'] }}
+                                {{ $data['pageTitle'] }} @if ($data['faculty']->administrative_head_title)
+                                    ({{ $data['faculty']->administrative_head_title }})
+                                @endif
                             </div>
                         </div>
 
                         <div class="table_head_item col-md-4">
                             <div class="custom_search">
-                                <form type="GET" action="{{ route('facultiesSearch') }}">
+                                <form type="GET"
+                                    action="{{ route('pastFacultyHeadsSearch', ['uuid' => $data['faculty']->uuid]) }}">
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
@@ -58,15 +61,15 @@
                                                         Name
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Description
+                                                        Tenure
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        View
+                                                        Actions
                                                     </th>
                                                 </tr>
                                             </thead>
 
-                                            @if ($data['faculties']->isEmpty())
+                                            @if ($data['pastHeads']->isEmpty())
                                                 <tr>
                                                     <td colspan="4" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
@@ -76,19 +79,41 @@
                                                 </tr>
                                             @else
                                                 <tbody>
-                                                    @foreach ($data['faculties'] as $faculty)
+                                                    @foreach ($data['pastHeads'] as $head)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start">
-                                                                {{ $faculty->name }}
+                                                                {{ $head->name }}
                                                             </td>
                                                             <td class="text-start text-center">
-                                                                {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($faculty->description)), 10, '...') !!}
+                                                                @if ($head->assumed_office_on)
+                                                                    {{ \Carbon\Carbon::parse($head->assumed_office_on)->format('l, d F, Y') }}
+                                                                @else
+                                                                    -
+                                                                    @endif to @if ($head->tenure_end_on)
+                                                                        {{ \Carbon\Carbon::parse($head->tenure_end_on)->format('l, d F, Y') }}
+                                                                    @else
+                                                                        -
+                                                                    @endif
                                                             </td>
 
                                                             <td>
-                                                                <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewFaculty', ['uuid' => $faculty->uuid]) }}">View</a>
+                                                                <a class="btn btn-primary btn-sm m-1" data-toggle="modal"
+                                                                    data-target="#viewPastFacultyHeadModalModal">
+                                                                    <i class="fas fa-eye"></i>
+                                                                    View</a>
+                                                                <button class="btn btn-warning btn-sm m-1"
+                                                                    data-toggle="modal"
+                                                                    data-target="#editPastFacultyHeadModalModal">
+                                                                    <i class="fas fa-edit"></i>
+                                                                    Update</button>
+                                                                @if (Auth::user()->hasPermission('faculty.delete'))
+                                                                    <button class="btn btn-danger btn-sm m-1 delete-head"
+                                                                        data-toggle="modal"
+                                                                        data-url="{{ route('deletePastFacultyHead', ['uuid' => $head->uuid]) }}">
+                                                                        <i class="fas fa-trash"></i>
+                                                                        Delete</button>
+                                                                @endif
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -97,7 +122,7 @@
                                         </table>
                                         {{-- Pagination --}}
                                         @php
-                                            $paginatedArray = $data['faculties'];
+                                            $paginatedArray = $data['pastHeads'];
                                         @endphp
 
                                         @include('layouts.include.pagination')
@@ -110,8 +135,9 @@
                                                     @break
 
                                                     @case('search')
-                                                        <a class="btn btn-success" href="{{ route('faculties') }}"> <i
-                                                                class="fas fa-chevron-left"></i>
+                                                        <a class="btn btn-success"
+                                                            href="{{ route('pastFacultyHeads', ['uuid' => $data['faculty']->uuid]) }}">
+                                                            <i class="fas fa-chevron-left"></i>
                                                             Back
                                                         </a>
                                                     @break
@@ -136,7 +162,39 @@
                 </div>
             </div>
 
+            <script>
+                document.addEventListener('click', function(e) {
+                    const button = e.target.closest('.delete-head');
 
+                    if (!button) return;
+
+                    const url = button.dataset.url;
+
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'This record will be permanently deleted.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Yes, delete it!',
+                        cancelButtonText: 'Cancel',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            </script>
+            {{-- models start --}}
+            @if ($data['pastHeads']->isNotEmpty())
+                @foreach ($data['pastHeads'] as $head)
+                    @include('users.admin.academicConfig.faculties.include.viewPastFacultyHeadModalModal')
+                    @include('users.admin.academicConfig.faculties.include.editPastFacultyHeadModalModal')
+                @endforeach
+            @endif
+            {{-- modals end --}}
 
 
 
