@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('head_of_departments', function (Blueprint $table) {
             $table->id();
-            $table->string('uuid')->unique(); // Foreign
+            $table->string('uuid')->unique();
             $table->string('department'); // Foreign
             $table->string('name');
             $table->string('qualifications')->nullable();

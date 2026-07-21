@@ -86,9 +86,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/academic_config/faculties/past_heads/delete/{uuid}', [AcademicConfigController::class, 'deletePastFacultyHead'])->name('deletePastFacultyHead');
 
 
-
-
-
     // departments
     Route::get('admin/academic_config/departments', [AcademicConfigController::class, 'departments'])->name('departments');
     Route::get('admin/academic_config/departments/search', [AcademicConfigController::class, 'departments'])->name('departmentsSearch');
@@ -105,6 +102,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/academic_config/departments/past_heads/add_new/submit', [AcademicConfigController::class, 'addNewPastDepartmentHead'])->name('addNewPastDepartmentHead');
 
 
+    // programs
+    Route::get('admin/academic_config/programs', [AcademicConfigController::class, 'programs'])->name('programs');
+    Route::get('admin/academic_config/programs/search', [AcademicConfigController::class, 'programs'])->name('programsSearch');
 
 
 

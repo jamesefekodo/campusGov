@@ -91,3 +91,58 @@ if (!function_exists('departments')) {
         return Department::query()->orderBy('name');
     }
 }
+
+if (!function_exists('currentLevel')) {
+    function currentLevel($program, int $currentLevel): string
+    {
+        $value = match ($program->numbering) {
+            'roman'    => toRoman($currentLevel),
+            'weighted' => $currentLevel * $program->increment,
+            default    => $currentLevel,
+        };
+
+        return str_replace('{value}', $value, $program->level_format);
+    }
+}
+
+if (!function_exists('toRoman')) {
+    function toRoman(int $number): string
+    {
+        $map = [
+            1000 => 'M',
+            900  => 'CM',
+            500  => 'D',
+            400  => 'CD',
+            100  => 'C',
+            90   => 'XC',
+            50   => 'L',
+            40   => 'XL',
+            10   => 'X',
+            9    => 'IX',
+            5    => 'V',
+            4    => 'IV',
+            1    => 'I',
+        ];
+
+        $result = '';
+
+        foreach ($map as $value => $roman) {
+            while ($number >= $value) {
+                $result .= $roman;
+                $number -= $value;
+            }
+        }
+
+        return $result;
+    }
+}
+
+// usage
+// getLevel($program, 1); // ND I
+// getLevel($program, 2); // ND II
+// getLevel($program, 3); // ND III
+
+// getLevel($bscProgram, 1); // 100L
+// getLevel($bscProgram, 2); // 200L
+
+// getLevel($mscProgram, 2); // MSc II

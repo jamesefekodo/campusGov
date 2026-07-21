@@ -295,22 +295,28 @@
             </a><!--//nav-link-->
             <div id="submenu-8" class="collapse submenu submenu-8" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/faculties') ? 'sidebar-active' : '' }}"
-                            href="{{ route('faculties') }}">Faculties</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/departments') ? 'sidebar-active' : '' }}"
-                            href="
+                    @if (Auth::user()->hasPermission('faculty.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/faculties') ? 'sidebar-active' : '' }}"
+                                href="{{ route('faculties') }}">Faculties</a>
+                        </li>
+                    @endif
+                    @if (Auth::user()->hasPermission('department.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/departments') ? 'sidebar-active' : '' }}"
+                                href="
                             {{ route('departments') }}
                              ">Departments</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/programs') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('academicConfigPrograms') }} --}}
+                        </li>
+                    @endif
+                    @if (Auth::user()->hasPermission('program.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/programs') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{ route('programs') }}
                              ">Programs</a>
-                    </li>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->

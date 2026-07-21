@@ -7,6 +7,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\HeadOfDepartment;
 use App\Models\AcademicConfig\HeadOfFaculty;
+use App\Models\AcademicConfig\Program;
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1065,5 +1066,54 @@ class AcademicConfigController extends Controller
         }
         $head->save();
         return redirect()->back()->with('success', 'Done!');
+    }
+
+    public function programs(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.read'),
+            403
+        );
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $programs = '';
+        $totalPrograms = 0;
+
+        if (Route::currentRouteName() == 'programsSearch') {
+            $searchKey = $request->input('searchKey');
+            $programs = Program::where('name', 'like', "%$searchKey%")
+                ->orWhere('short_name', 'like', "%$searchKey%")
+                ->orWhere('level_format', 'like', "%$searchKey%")
+                ->orWhere('numbering', 'like', "%$searchKey%")
+                ->orWhere('increment', 'like', "%$searchKey%")
+                ->orWhere('duration', 'like', "%$searchKey%")
+                ->orWhere('award', 'like', "%$searchKey%")
+                ->orderBy('name')
+                ->paginate(20)->withQueryString();
+
+
+            $totalPrograms = $programs->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results:: ' . $searchKey;
+        } else {
+            $programs = Program::orderBy('name')->paginate(20);
+            $totalPrograms = Program::count();
+            $requestType = 'all';
+            $pageTitle = 'Programs';
+        }
+        $data = [
+            'programs' => $programs,
+            'totalPrograms' => $totalPrograms,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.academicConfig.programs.programs', compact('data'));
     }
 }
