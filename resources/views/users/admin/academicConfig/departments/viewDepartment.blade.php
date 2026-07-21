@@ -122,7 +122,7 @@
                                                             </div>
                                                         </div>
                                                     @endif
-                                                    {{-- @include('users.admin.academicConfig.departments.include.createDepartmentHeadModal') --}}
+                                                    @include('users.admin.academicConfig.departments.include.createDepartmentHeadModal')
                                                 @else
                                                     <div class="col-md-12 container">
                                                         <div class="row">
@@ -174,7 +174,7 @@
                                                             </div>
                                                             <div class="m-1">
                                                                 <a class="btn btn-primary"
-                                                                {{-- href="{{ route('pastFacultyHeads', ['uuid' => $data['faculty']->uuid]) }}" --}}
+                                                                href="{{ route('pastDepartmentHeads', ['uuid' => $data['department']->uuid]) }}"
                                                                 >
                                                                     <i class="fas fa-address-book"></i> Past Heads
                                                                 </a>

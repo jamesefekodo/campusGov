@@ -398,7 +398,7 @@ class AcademicConfigController extends Controller
             'tenure_end_on' => 'required',
             'phone' => 'nullable',
             'email' => 'nullable|email',
-            'profile' => 'nullable',
+            'profile' => 'required',
             'photo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:300',
         ]);
 
@@ -795,7 +795,7 @@ class AcademicConfigController extends Controller
         $head->save();
         return redirect()->back()->with('success', 'Done!');
     }
-    public function editEndDepertmentHeadTenureSubmit(Request $request)
+    public function endDepertmentHeadTenureSubmit(Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -856,6 +856,213 @@ class AcademicConfigController extends Controller
             $head->photo = $newImageName;
         }
 
+        $head->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function pastDepartmentHeads($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('department.read'),
+            403
+        );
+
+        $department = Department::where('uuid', $uuid)->first();
+        if (!$department) {
+            return redirect()->back()->with('error', 'Department record not found!');
+        }
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $pastHeads = '';
+        $totalPastHeads = 0;
+
+        if (Route::currentRouteName() == 'pastDepartmentHeadsSearch') {
+            $searchKey = $request->input('searchKey');
+            $pastHeads = HeadOfDepartment::where('department', $department->slug)->where('name', 'like', "%$searchKey%")
+                ->orWhere('qualifications', 'like', "%$searchKey%")
+                ->orWhere('phone', 'like', "%$searchKey%")
+                ->orWhere('email', 'like', "%$searchKey%")
+                ->orWhere('profile', 'like', "%$searchKey%")
+                ->orderBy('name')
+                ->paginate(20)->withQueryString();
+
+
+            $totalPastHeads = $pastHeads->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results:: ' . $searchKey;
+        } else {
+            $pastHeads = HeadOfDepartment::where('department', $department->slug)
+                ->orderBy('tenure_end_on', 'desc')
+                ->paginate(20);
+            $totalPastHeads = $department->pastHods->count();
+            $requestType = 'all';
+            $pageTitle = 'Past Department Heads';
+        }
+        $data = [
+            'department' => $department,
+            'pastHeads' => $pastHeads,
+            'totalPastHeads' => $totalPastHeads,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.academicConfig.departments.pastDepartmentHeads', compact('data'));
+    }
+    public function updatePastDepartmentHeadProfileSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('department.update'),
+            403
+        );
+
+
+        $request->validate([
+            'name' => 'required|string',
+            'qualifications' => 'nullable|string',
+            'assumed_office_on' => 'required',
+            'tenure_end_on' => 'required',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'profile' => 'nullable',
+            'photo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:300',
+        ]);
+
+        $head = HeadOfDepartment::where('uuid', $uuid)->first();
+        if (!$head) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $department = $head->hisDepartment;
+        if (!$department) {
+            return redirect()->back()->with('error', 'Department record not found!');
+        }
+        $head->name = trim($request->name);
+        $head->qualifications = trim($request->qualifications);
+        $head->phone = trim($request->phone);
+        $head->email = trim($request->email);
+        $head->assumed_office_on = $request->assumed_office_on;
+        $head->tenure_end_on = $request->tenure_end_on;
+        $head->profile = $request->profile;
+        // Process the image
+        if ($request->hasFile('photo')) {
+            $filePath = 'assets/uploads/department/head/photo/' . $head->photo;
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+            $newImage = $request->file('photo');
+            $newImageExtension = $newImage->getClientOriginalExtension();
+            // $newImageName = $head->slug . '.' . $newImageExtension;
+            // $newImage->move(public_path('assets/uploads/department/head/photo'), $newImageName);
+            // $head->photo = $newImageName;
+            $uploadPath = public_path('assets/uploads/department/head/photo');
+            $baseName = $department->slug;
+            $newImageName = $baseName . '.' . $newImageExtension;
+
+            $counter = 1;
+
+            while (file_exists($uploadPath . '/' . $newImageName)) {
+                $newImageName = $baseName . '-' . $counter . '.' . $newImageExtension;
+                $counter++;
+            }
+
+            $newImage->move($uploadPath, $newImageName);
+
+            $head->photo = $newImageName;
+        }
+        $head->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deletePastDepartmentHead($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('department.delete'),
+            403
+        );
+
+        $head = HeadOfDepartment::where('uuid', $uuid)->first();
+        if (!$head) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $filePath = public_path('assets/uploads/department/head/photo/' . $head->photo);
+
+        if (File::exists($filePath)) {
+            File::delete($filePath);
+        }
+
+        $head->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function addNewPastDepartmentHead(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('faculty.create'),
+            403
+        );
+
+        $request->validate([
+            'name' => 'required|string',
+            'qualifications' => 'nullable|string',
+            'assumed_office_on' => 'required',
+            'tenure_end_on' => 'required',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'profile' => 'required',
+            'photo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:300',
+        ]);
+
+        $department = Department::where('uuid', $request->department)->first();
+        if (!$department) {
+            return redirect()->back()->with('error', 'Faculty record not found!');
+        }
+
+        $head = new HeadOfDepartment();
+        $head->department = $department->slug;
+        $head->name = trim($request->name);
+        $head->qualifications = trim($request->qualifications);
+        $head->phone = trim($request->phone);
+        $head->email = trim($request->email);
+        $head->profile = $request->profile;
+        $head->is_active = false;
+        $head->assumed_office_on = trim($request->assumed_office_on);
+        $head->tenure_end_on = trim($request->tenure_end_on);
+
+        if ($request->hasFile('photo')) {
+            $filePath = public_path('assets/uploads/department/head/photo/' . $head->photo);
+
+            if (File::exists($filePath)) {
+                File::delete($filePath);
+            }
+
+            $newImage = $request->file('photo');
+            $newImageExtension = $newImage->getClientOriginalExtension();
+
+            $uploadPath = public_path('assets/uploads/department/head/photo');
+            $baseName = $department->slug;
+            $newImageName = $baseName . '.' . $newImageExtension;
+
+            $counter = 1;
+
+            while (file_exists($uploadPath . '/' . $newImageName)) {
+                $newImageName = $baseName . '-' . $counter . '.' . $newImageExtension;
+                $counter++;
+            }
+            $newImage->move($uploadPath, $newImageName);
+            $head->photo = $newImageName;
+        }
         $head->save();
         return redirect()->back()->with('success', 'Done!');
     }

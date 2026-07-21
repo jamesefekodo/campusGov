@@ -53,8 +53,7 @@
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="phone">Phone:</label>
-                                <input type="text" class="form-control" name="phone"
-                                    value="{{ $head->phone }}">
+                                <input type="text" class="form-control" name="phone" value="{{ $head->phone }}">
                                 <p style="color: red">{{ $errors->first('phone') }}</p>
                             </div>
                             <div class="form-group col-md-4">
@@ -87,7 +86,7 @@
                             </div>
                             <div class="form-group col-md-12">
                                 <label for="profile">Profile:<span class="text-red">*</span></label>
-                                <textarea id="profile2" name="profile" value="{{ old('profile') }}" required>
+                                <textarea id="profile_{{ $head->uuid }}" name="profile" value="{{ old('profile') }}" required>
                                     {{ $head->profile }}
                                 </textarea>
                                 <p style="color: red">
@@ -116,10 +115,9 @@
 
             <script>
                 $(document).ready(function() {
-                    $('#profile2').summernote({
-                        height: 200, // Set editor height
+                    $('#profile_{{ $head->uuid }}').summernote({
+                        height: 200,
                         toolbar: [
-                            // [groupName, [list of buttons]]
                             ['style', ['bold', 'italic', 'underline', 'clear']],
                             ['font', ['strikethrough', 'superscript', 'subscript']],
                             ['fontsize', ['fontsize']],

@@ -15,7 +15,7 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('editEndDepertmentHeadTenureSubmit') }}"
+                    <form class="form my_form" method="POST" action="{{ route('endDepertmentHeadTenureSubmit') }}"
                         enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
