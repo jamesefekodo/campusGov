@@ -90,7 +90,7 @@
                                                                     ({{ $department->theFaculty->acronym }})
                                                                 @endif
                                                             </td>
-                                                            <td class="text-start text-center">
+                                                            <td class="text-start">
                                                                 {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($department->description)), 10, '...') !!}
                                                             </td>
 

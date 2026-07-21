@@ -8,6 +8,7 @@ use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\HeadOfDepartment;
 use App\Models\AcademicConfig\HeadOfFaculty;
 use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramType;
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1115,5 +1116,157 @@ class AcademicConfigController extends Controller
         ];
 
         return view('users.admin.academicConfig.programs.programs', compact('data'));
+    }
+    public function addAcademicProgramSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.create'),
+            403
+        );
+
+        $request->validate([
+            'name' => 'required|string',
+            'short_name' => 'required|string',
+            'duration' => 'required|integer',
+            'level_format' => 'required|string',
+            'numbering' => 'required|string',
+            'increment' => 'required|integer',
+            'award' => 'required|string',
+        ]);
+
+        do {
+            $programSlug = 'prog-' . now()->format('mY') . '-' . random_int(1000000000, 9999999999);
+        } while (Program::where('slug', $programSlug)->exists());
+
+
+        $program = new Program();
+        $program->slug = $programSlug;
+        $program->name = trim($request->name);
+        $program->short_name = trim($request->short_name);
+        $program->level_format = trim($request->level_format);
+        $program->numbering = trim($request->numbering);
+        $program->increment = trim($request->increment);
+        $program->duration = trim($request->duration);
+        $program->award = trim($request->award);
+        $program->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function viewProgram($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.read'),
+            403
+        );
+
+        $program = Program::where('uuid', $uuid)->first();
+        if (!$program) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $data = [
+            'program' => $program,
+        ];
+
+        return view('users.admin.academicConfig.programs.viewProgram', compact('data'));
+    }
+    public function updateAcademicProgramSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.update'),
+            403
+        );
+
+        $program = Program::where('uuid', $uuid)->first();
+        if (!$program) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+
+        $request->validate([
+            'name' => 'required|string',
+            'short_name' => 'required|string',
+            'duration' => 'required|integer',
+            'level_format' => 'required|string',
+            'numbering' => 'required|string',
+            'increment' => 'required|integer',
+            'award' => 'required|string',
+            'is_active' => 'required',
+        ]);
+        $program->name = trim($request->name);
+        $program->short_name = trim($request->short_name);
+        $program->level_format = trim($request->level_format);
+        $program->numbering = trim($request->numbering);
+        $program->increment = trim($request->increment);
+        $program->duration = trim($request->duration);
+        $program->award = trim($request->award);
+        $program->is_active = $request->is_active;
+        $program->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function addNewProgramType($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.update'),
+            403
+        );
+
+        $program = Program::where('uuid', $uuid)->first();
+        if (!$program) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        do {
+            $typeSlug = 'progtp-' . now()->format('mY') . '-' . random_int(1000000000, 9999999999);
+        } while (ProgramType::where('slug', $typeSlug)->exists());
+
+
+        ProgramType::create(
+            [
+                'slug' => $typeSlug,
+                'program_slug' => $program->slug,
+                'type_name' => $request->name,
+            ]
+        );
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editProgramType($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.update'),
+            403
+        );
+        $request->validate([
+            'name' => 'required|string',
+            'is_active' => 'required',
+
+        ]);
+
+        $type = ProgramType::where('uuid', $uuid)->first();
+        if (!$type) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $type->update(
+            [
+                'name' => $request->name,
+                'is_active' => $request->is_active,
+            ]
+        );
+        return redirect()->back()->with('success', 'Done!');
     }
 }

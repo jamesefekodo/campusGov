@@ -10,11 +10,11 @@
             @if (Auth::user()->hasPermission('program.create'))
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
-                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewFacultyModal">
+                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewProgramModal">
                             <i class="fas fa-plus"></i> New Faculty</button>
                     </div>
                 </div>
-                {{-- @include('users.admin.academicConfig.faculties.include.addNewFaculty') --}}
+                @include('users.admin.academicConfig.programs.include.addNewProgramModal')
             @endif
 
             <div class="individual-review-card-container">
@@ -55,6 +55,9 @@
                                                         Name
                                                     </th>
                                                     <th scope="col" class="table_header">
+                                                        Duration
+                                                    </th>
+                                                    <th scope="col" class="table_header">
                                                         Levels
                                                     </th>
                                                     <th scope="col" class="table_header">
@@ -74,7 +77,7 @@
 
                                             @if ($data['programs']->isEmpty())
                                                 <tr>
-                                                    <td colspan="7" class="text-center">
+                                                    <td colspan="8" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -86,17 +89,36 @@
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start">
-                                                                {{ $program->name }} {{ $program->short_name }}
+                                                                {{ $program->name }} ({{ $program->short_name }})
                                                             </td>
-                                                            {{--
-                                                            <td class="text-start text-center">
-                                                                {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($faculty->description)), 10, '...') !!}
+                                                            <td class="text-center">
+                                                                {{ $program->duration }} Years
                                                             </td>
+                                                            <td class="text-center">
+                                                                -
+                                                            </td>
+                                                            <td class="text-center">
+                                                                -
+                                                            </td>
+                                                            <td class="text-center">
+                                                                {{ $program->award }}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                @switch($program->is_active)
+                                                                    @case(true)
+                                                                        <span
+                                                                            class="badge bg-success-subtle text-success">Active</span>
+                                                                    @break
 
+                                                                    @default
+                                                                        <span
+                                                                            class="badge bg-danger-subtle text-danger">Inactive</span>
+                                                                @endswitch
+                                                            </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewFaculty', ['uuid' => $faculty->uuid]) }}">View</a>
-                                                            </td> --}}
+                                                                    href="{{ route('viewProgram', ['uuid' => $program->uuid]) }}">View</a>
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

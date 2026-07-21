@@ -105,6 +105,16 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // programs
     Route::get('admin/academic_config/programs', [AcademicConfigController::class, 'programs'])->name('programs');
     Route::get('admin/academic_config/programs/search', [AcademicConfigController::class, 'programs'])->name('programsSearch');
+    Route::post('admin/academic_config/programs/create_new/submit', [AcademicConfigController::class, 'addAcademicProgramSubmit'])->name('addAcademicProgramSubmit');
+    Route::get('admin/academic_config/programs/view/{uuid}', [AcademicConfigController::class, 'viewProgram'])->name('viewProgram');
+    Route::put('admin/academic_config/programs/edit/submit/{uuid}', [AcademicConfigController::class, 'updateAcademicProgramSubmit'])->name('updateAcademicProgramSubmit');
+    Route::post('admin/academic_config/programs/type/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramType'])->name('addNewProgramType');
+    Route::put('admin/academic_config/programs/type/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramType'])->name('editProgramType');
+
+
+    //
+
+
 
 
 

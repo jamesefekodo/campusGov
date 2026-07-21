@@ -41,4 +41,8 @@ class Program extends Model
         });
     }
 
+    public function programTypes()
+    {
+        return $this->hasMany(ProgramType::class, 'program_slug', 'slug');
+    }
 }

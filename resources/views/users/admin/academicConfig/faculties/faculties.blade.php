@@ -82,7 +82,7 @@
                                                             <td class="text-start">
                                                                 {{ $faculty->name }}
                                                             </td>
-                                                            <td class="text-start text-center">
+                                                            <td class="text-start">
                                                                 {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($faculty->description)), 10, '...') !!}
                                                             </td>
 
