@@ -8,17 +8,19 @@
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
             <div class="d-flex justify-content-end">
-                <div class="m-1">
-                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewFacultyModal">
-                        <i class="fas fa-plus"></i> Add New</button>
-                </div>
+                @if (Auth::user()->hasPermission('faculty.create'))
+                    <div class="m-1">
+                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addPastNewFacultyHeadModal">
+                            <i class="fas fa-plus"></i> Add New</button>
+                    </div>
+                @endif
                 <div class="m-1">
                     <a class="btn btn-danger btn-sm table_btn"
                         href="{{ route('viewFaculty', ['uuid' => $data['faculty']->uuid]) }}">
                         <i class="fas fa-chevron-left"></i> Faculty</a>
                 </div>
             </div>
-            {{-- @include('users.admin.academicConfig.faculties.include.addNewFaculty') --}}
+            @include('users.admin.academicConfig.faculties.include.addPastNewFacultyHeadModal')
 
             <div class="individual-review-card-container">
                 <div class="col-md-12 individual-review-card">
@@ -99,12 +101,12 @@
 
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm m-1" data-toggle="modal"
-                                                                    data-target="#viewPastFacultyHeadModalModal">
+                                                                    data-target="#viewPastFacultyHeadModalModal_{{ $head->uuid }}">
                                                                     <i class="fas fa-eye"></i>
                                                                     View</a>
                                                                 <button class="btn btn-warning btn-sm m-1"
                                                                     data-toggle="modal"
-                                                                    data-target="#editPastFacultyHeadModalModal">
+                                                                    data-target="#editPastFacultyHeadModalModal_{{ $head->uuid }}">
                                                                     <i class="fas fa-edit"></i>
                                                                     Update</button>
                                                                 @if (Auth::user()->hasPermission('faculty.delete'))

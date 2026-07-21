@@ -7,7 +7,7 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if ($data['operationalLevel'] !== 'institute' && !faculties()->exists())
+            @if ($data['operationalLevel'] === 'institute' || !faculties()->exists())
                 @if (Auth::user()->hasPermission('faculty.create'))
                     <div class="d-flex justify-content-end">
                         <div class="m-1">

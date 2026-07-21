@@ -15,7 +15,7 @@
                                     </h4>
                                     <div class="card-body pt-2 pb-5 px-4">
                                         <div class="col-md-12 row">
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <p class="m-1 p-0">
                                                     <span class="text-mute">
                                                         Faculty:
@@ -27,10 +27,10 @@
                                                     </span>
                                                 </p>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <p class="m-1 p-0">
                                                     <span class="text-mute">
-                                                        Faculty:
+                                                        Status:
                                                     </span>
                                                     <span class="text-black">
                                                         @switch($data['faculty']->is_active)
@@ -48,10 +48,20 @@
                                                     </span>
                                                 </p>
                                             </div>
-                                            <div class="col-md-4">
+                                            <div class="col-md-6">
                                                 <p class="m-1 p-0">
                                                     <span class="text-mute">
                                                         Departments:
+                                                    </span>
+                                                    <span class="text-black">
+                                                        0
+                                                    </span>
+                                                </p>
+                                            </div>
+                                             <div class="col-md-6">
+                                                <p class="m-1 p-0">
+                                                    <span class="text-mute">
+                                                        Students:
                                                     </span>
                                                     <span class="text-black">
                                                         0

@@ -2,6 +2,7 @@
 
 namespace App\Models\AcademicConfig;
 
+use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\HeadOfFaculty;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,8 +52,8 @@ class Faculty extends Model
     {
         return $this->hasMany(HeadOfFaculty::class, 'faculty', 'slug')->where('is_active', false);
     }
-    // public function departments()
-    // {
-    //     return $this->hasMany(Department::class, 'faculty', 'slug');
-    // }
+    public function departments()
+    {
+        return $this->hasMany(Department::class, 'faculty', 'slug');
+    }
 }

@@ -1,4 +1,4 @@
-<div class="modal fade" id="viewPastFacultyHeadModalModal" tabindex="-1" role="dialog"
+<div class="modal fade" id="viewPastFacultyHeadModalModal_{{ $head->uuid }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">

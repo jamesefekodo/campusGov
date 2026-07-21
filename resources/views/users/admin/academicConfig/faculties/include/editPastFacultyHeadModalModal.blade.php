@@ -1,4 +1,4 @@
-<div class="modal fade" id="editPastFacultyHeadModalModal" tabindex="-1" role="dialog"
+<div class="modal fade" id="editPastFacultyHeadModalModal_{{ $head->uuid }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -54,7 +54,7 @@
                             <div class="form-group col-md-4">
                                 <label for="phone">Phone:</label>
                                 <input type="text" class="form-control" name="phone"
-                                    value="{{ $head->assumed_office_on }}">
+                                    value="{{ $head->phone }}">
                                 <p style="color: red">{{ $errors->first('phone') }}</p>
                             </div>
                             <div class="form-group col-md-4">

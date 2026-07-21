@@ -302,7 +302,7 @@
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/academic_config/departments') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('academicConfigDepartments') }} --}}
+                            {{ route('departments') }}
                              ">Departments</a>
                     </li>
                     <li class="submenu-item"><a

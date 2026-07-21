@@ -70,6 +70,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     // academic config
+    // faculties
     Route::get('admin/academic_config/faculties', [AcademicConfigController::class, 'faculties'])->name('faculties');
     Route::get('admin/academic_config/faculties/search', [AcademicConfigController::class, 'faculties'])->name('facultiesSearch');
     Route::post('admin/academic_config/faculties/add/submit', [AcademicConfigController::class, 'addFacultySubmit'])->name('addFacultySubmit');
@@ -80,6 +81,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_config/faculties/head/end_tenure/submit', [AcademicConfigController::class, 'editEndFacultyDeanTenureSubmit'])->name('editEndFacultyDeanTenureSubmit');
     Route::get('admin/academic_config/faculties/past_heads/{uuid}', [AcademicConfigController::class, 'pastFacultyHeads'])->name('pastFacultyHeads');
     Route::get('admin/academic_config/faculties/past_heads/search/{uuid}', [AcademicConfigController::class, 'pastFacultyHeads'])->name('pastFacultyHeadsSearch');
+    Route::post('admin/academic_config/faculties/past_heads/create_new/submit', [AcademicConfigController::class, 'addNewPastFacultyHead'])->name('addNewPastFacultyHead');
     Route::put('admin/academic_config/faculties/past_heads/update/{uuid}', [AcademicConfigController::class, 'updatePastFacultyHeawdProfileSubmit'])->name('updatePastFacultyHeawdProfileSubmit');
     Route::get('admin/academic_config/faculties/past_heads/delete/{uuid}', [AcademicConfigController::class, 'deletePastFacultyHead'])->name('deletePastFacultyHead');
 
@@ -87,6 +89,20 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
 
+    // departments
+    Route::get('admin/academic_config/departments', [AcademicConfigController::class, 'departments'])->name('departments');
+    Route::get('admin/academic_config/departments/search', [AcademicConfigController::class, 'departments'])->name('departmentsSearch');
+    Route::post('admin/academic_config/departments/add_new/submit', [AcademicConfigController::class, 'addNewDepartmentSubmit'])->name('addNewDepartmentSubmit');
+    Route::get('admin/academic_config/departments/view/{uuid}', [AcademicConfigController::class, 'viewDepartment'])->name('viewDepartment');
+    Route::put('admin/academic_config/departments/edit/submit/{uuid}', [AcademicConfigController::class, 'updateDepartmentSubmit'])->name('updateDepartmentSubmit');
+    Route::post('admin/academic_config/departments/head/add_new/submit', [AcademicConfigController::class, 'addDepartmentHodSubmit'])->name('addDepartmentHodSubmit');
+    Route::put('admin/academic_config/departments/head/edit/submit', [AcademicConfigController::class, 'editDepartmentHeadSubmit'])->name('editDepartmentHeadSubmit');
+    Route::put('admin/academic_config/departments/head/end_tenure/submit', [AcademicConfigController::class, 'editEndDepertmentHeadTenureSubmit'])->name('editEndDepertmentHeadTenureSubmit');
+
+
+
+
+    //
 
 
 

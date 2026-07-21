@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Support\Facades\Auth;
@@ -81,5 +82,12 @@ if (!function_exists('faculties')) {
     function faculties()
     {
         return Faculty::query()->orderBy('name');
+    }
+}
+
+if (!function_exists('departments')) {
+    function departments()
+    {
+        return Department::query()->orderBy('name');
     }
 }
