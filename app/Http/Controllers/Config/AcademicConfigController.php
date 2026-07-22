@@ -8,6 +8,7 @@ use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\HeadOfDepartment;
 use App\Models\AcademicConfig\HeadOfFaculty;
 use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Config\BasicSystemSetting;
 use Illuminate\Http\Request;
@@ -1168,8 +1169,10 @@ class AcademicConfigController extends Controller
         if (!$program) {
             return redirect()->back()->with('error', 'Program record not found!');
         }
+        $activeDepartments = Department::where('is_active', true)->orderBy('name')->get();
         $data = [
             'program' => $program,
+            'activeDepartments' => $activeDepartments,
         ];
 
         return view('users.admin.academicConfig.programs.viewProgram', compact('data'));
@@ -1267,6 +1270,42 @@ class AcademicConfigController extends Controller
                 'is_active' => $request->is_active,
             ]
         );
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function addNewProgramProgramDurationDurationSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.update'),
+            403
+        );
+
+        $program = Program::where('uuid', $uuid)->first();
+        if (!$program) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $request->validate([
+            'duration' => 'required|numeric',
+            'program_type_slug' => 'required_without:department_slug|nullable|string|exists:program_types,slug',
+            'department_slug' => 'required_without:program_type_slug|nullable|string|exists:departments,slug',
+        ], [
+            'program_type_slug.required_without' => 'Either Program Type or Department must be filled.',
+            'department_slug.required_without' => 'Either Program Type or Department must be filled.',
+        ]);
+
+        $program = Program::where('uuid', $uuid)->first();
+        if (!$program) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+
+        $duration = new ProgramDurationOverride();
+        $duration->program_slug = $program->slug;
+        $duration->program_type_slug = $request->program_type_slug;
+        $duration->department_slug = $request->department_slug;
+        $duration->duration = $request->duration;
+        $duration->save();
         return redirect()->back()->with('success', 'Done!');
     }
 }

@@ -2,6 +2,9 @@
 
 namespace App\Models\AcademicConfig;
 
+use App\Models\AcademicConfig\Department;
+use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -40,10 +43,14 @@ class ProgramDurationOverride extends Model
 
     public function program()
     {
-        return $this->belongsTo(Program::class, 'slug', 'program_slug');
+        return $this->belongsTo(Program::class, 'program_slug', 'slug');
     }
     public function department()
     {
-        return $this->belongsTo(Program::class, 'slug', 'department_slug');
+        return $this->belongsTo(Department::class, 'department_slug', 'slug');
+    }
+    public function programType()
+    {
+        return $this->belongsTo(ProgramType::class, 'program_type_slug', 'slug');
     }
 }

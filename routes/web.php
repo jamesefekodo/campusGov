@@ -118,6 +118,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_config/programs/edit/submit/{uuid}', [AcademicConfigController::class, 'updateAcademicProgramSubmit'])->name('updateAcademicProgramSubmit');
     Route::post('admin/academic_config/programs/type/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramType'])->name('addNewProgramType');
     Route::put('admin/academic_config/programs/type/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramType'])->name('editProgramType');
+    Route::post('admin/academic_config/programs/duration_override/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramProgramDurationDurationSubmit'])->name('addNewProgramProgramDurationDurationSubmit');
+
+
+
 
 
     //

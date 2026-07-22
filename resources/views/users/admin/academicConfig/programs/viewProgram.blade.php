@@ -109,13 +109,14 @@
 
                                         </div>
 
+                                        {{-- program types starts --}}
+                                        <span class="text-black text-decoration-underline">
+                                            Program Types :
+                                        </span> <span class="small">(full-time/part-time/odl...)</span>
                                         @if ($data['program']->programTypes->isNotEmpty())
                                             <div class="px-3 pt-3">
                                                 <table class="table">
                                                     @foreach ($data['program']->programTypes as $type)
-                                                        <span class="text-black text-decoration-underline">
-                                                            Program Type :
-                                                        </span> <span class="small">(full-time/part-time/odl...)</span>
                                                         <tbody>
                                                             <tr class="text-black">
                                                                 <th class="" scope="row">{{ $type->type_name }}
@@ -169,10 +170,79 @@
                                                 </div>
                                             </div>
                                         @endif
-                                        @include('users.admin.academicConfig.programs.include.createNewProgramTypeModal')
+                                        {{-- program types endss --}}
+                                        <hr>
+                                        {{-- program duration overrides starts --}}
+                                        <span class="text-black text-decoration-underline mt-3">
+                                            Program Duration Overrides :
+                                        </span>
+                                        @if ($data['program']->durationOverrides->isNotEmpty())
+                                            <div class="px-3 pt-3">
+                                                <table class="table">
+                                                    @foreach ($data['program']->durationOverrides as $duration)
+                                                        <tbody>
+                                                            <tr class="text-black">
+                                                                <th class="" scope="row">
+                                                                    {{ optional($duration->department)->name ?? 'All Departments' }} -
+                                                                    {{ optional($duration->programType)->type_name ?? 'All Program Types' }}
+                                                                    @switch($duration->is_active)
+                                                                        @case(true)
+                                                                            <span class="badge bg-blue text-white ms-2">
+                                                                                Active
+                                                                            </span>
+                                                                        @break
 
-                                        @if ($data['program']->programTypes->isNotEmpty())
-                                            @foreach ($data['program']->programTypes as $type)
+                                                                        @default
+                                                                            <span class="badge bg-red text-white ms-2">
+                                                                                Inactive
+                                                                            </span>
+                                                                    @endswitch
+                                                                </th>
+                                                                <td class="text-start">
+                                                                    {{ $duration->duration }} years
+                                                                </td>
+                                                                <td class="flex-wrap">
+                                                                    <span
+                                                                        class="badge bg-yellow text-black pe-2 ps-3 py-2 m-1 rounded-3"
+                                                                        data-toggle="modal"
+                                                                        data-target="#editProgramTypeModal_{{ $duration->uuid }}"
+                                                                        style="cursor: pointer;">
+                                                                        <i class="fas fa-edit me-1"></i>Edit
+                                                                    </span>
+                                                                    <a href="javascript:void(0)"
+                                                                        class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm m-1"
+                                                                        data-toggle="modal"
+                                                                        data-target="#changeIsPaidBreakModal"
+                                                                        {{-- data-url="{{ route('companyRemoveShiftScheduleStep', ['uuid' => $step->uuid]) }}" --}} style="cursor: pointer;">
+                                                                        <i class="fas fa-trash me-1"></i>Remove
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    @endforeach
+                                                </table>
+                                            </div>
+                                        @else
+                                            <h3 class="p-1 m-1 text-red w-100 text-center">
+                                                No Records Found!
+                                                <br>
+                                            </h3>
+                                        @endif
+                                        @if (Auth::user()->hasPermission('program.update'))
+                                            <div class="d-flex justify-content-center">
+                                                <div class="m-1">
+                                                    <button class="btn btn-primary btn-sm table_btn" data-toggle="modal"
+                                                        data-target="#addNewProgramDurationOverrideModal">
+                                                        <i class="fas fa-plus"></i> Create
+                                                        Duration Override</button>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        {{-- program duration overrides ends --}}
+                                        @include('users.admin.academicConfig.programs.include.addNewProgramDurationOverrideModal')
+
+                                        @if ($data['program']->durationOverrides->isNotEmpty())
+                                             @foreach ($data['program']->durationOverrides as $duration)
                                                 @include('users.admin.academicConfig.programs.include.editProgramTypeModal')
                                             @endforeach
                                         @endif
