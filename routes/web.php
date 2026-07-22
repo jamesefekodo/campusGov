@@ -59,7 +59,15 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/dashboard', [DashboardController::class, 'dashboard'])->name('memberDashboard');
 
     // profile setup
-    Route::get('student/account_setup', [MemberSelfProfileController::class, 'studentAccountSetup'])->name('studentAccountSetup');
+    Route::get('member/account_setup', [MemberSelfProfileController::class, 'studentAccountSetup'])->name('studentAccountSetup');
+    Route::get('member/account_setup/personal_profile', [MemberSelfProfileController::class, 'memberCreatePersonalProfile'])->name('memberCreatePersonalProfile');
+    Route::post('member/account_setup/personal_profile/submit', [MemberSelfProfileController::class, 'memberSelfCreatePersonalProfileSubmit'])->name('memberSelfCreatePersonalProfileSubmit');
+
+    Route::get('member/account_setup/academic_info', [MemberSelfProfileController::class, 'memberCreateAcademicInfo'])->name('memberCreateAcademicInfo');
+
+
+
+    //
 });
 
 

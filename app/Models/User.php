@@ -4,12 +4,15 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Members\MemberAcademicInfo;
+use App\Models\Members\MemberPersonalProfile;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 #[Fillable(['name', 'email', 'password'])]
 #[Hidden(['password', 'remember_token'])]
@@ -24,6 +27,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'uuid',
         'username',
         'account_type',
         'account_status',
@@ -48,9 +52,22 @@ class User extends Authenticatable
             'account_type' => 'integer',
             'account_status' => 'integer',
             'email_verification' => 'boolean',
-            'require_login_mfa'=> 'boolean',
+            'require_login_mfa' => 'boolean',
             'admin_privilege' => 'boolean',
         ];
+    }
+
+
+    // uuid
+    protected static function booted(): void
+    {
+        static::creating(function ($program) {
+            if (empty($program->uuid)) {
+                $program->uuid = 'user-Y' . now()->format('Y') .
+                    '-M' . now()->format('m') .
+                    '-' . Str::uuid();
+            }
+        });
     }
 
 
@@ -131,4 +148,16 @@ class User extends Authenticatable
         // usage $user->hasPermission('create-user');
 
     }
+
+
+    // relational model
+    public function memberPersonalProfile()
+    {
+        return $this->belongsTo(MemberPersonalProfile::class, 'username', 'username');
+    }
+    public function memberAcademicInfo()
+    {
+        return $this->belongsTo(MemberAcademicInfo::class, 'username', 'username');
+    }
+
 }

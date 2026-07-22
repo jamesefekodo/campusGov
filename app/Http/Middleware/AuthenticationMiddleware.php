@@ -247,10 +247,10 @@ class AuthenticationMiddleware
             ) {
                 if ($accountType == 2 && $accountStatus == 0) {
                     if (
-                        !Route::is('registerStudentPersonalProfile')
-                        && !Route::is('registerStudentAcademicInfo')
+                        !Route::is('memberCreatePersonalProfile')
                         && !Route::is('studentAccountSetup')
-                        && !Route::is('studentSubmitAccountForVerification')
+                        && !Route::is('memberSelfCreatePersonalProfileSubmit')
+                        // && !Route::is('studentSubmitAccountForVerification')
                         && !Route::is('logoutRequest')
                     ) {
                         return redirect()->route('studentAccountSetup');

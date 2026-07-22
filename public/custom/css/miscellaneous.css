@@ -142,7 +142,7 @@ body {
 .my_form select {
     margin: 10px 0;
     width: 100%;
-    background: color-mix(in srgb, var(--system-primary) 10%, transparent);
+    background: color-mix(in srgb, var(--system-secondary) 10%, transparent);
     color: #000;
     text-align: center;
     border: none;
@@ -154,8 +154,8 @@ body {
 .my_form input:focus,
 .my_form select:focus {
     background: white;
-    border: 1px solid var(--system-primary);
-    box-shadow: 0 0 10px var(--system-primary);
+    border: 1px solid var(--system-secondary);
+    box-shadow: 0 0 10px var(--system-secondary);
 }
 
 .my_form_header {

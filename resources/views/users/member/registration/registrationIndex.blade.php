@@ -5,7 +5,7 @@
         <div class="col-md-12 m-auto">
             <div class="user_page_title">Account Setup</div>
             <div class="container">
-                <div class="container user_page_container mb-5">
+                <div class="user_page_container mb-5">
                     <div class="col-md-12 row d-flex justify-content-center align-items-center">
                         <div class="col md-5 d-flex justify-content-center align-items-center">
                             @if (
@@ -33,18 +33,12 @@
                     <div class="col-md-12 main_content_container">
                         <br>
 
-                        {{-- <div class="m-0 p-0" style="overflow: hidden; position: relative;">
-                            <h5 class="notice_message m-0 p-0 text-red">Please note that only the 'Personal Profile' and
-                                'Academic Info' sections are compulsory.</h5>
-                        </div> --}}
-
                         <section class="user_dashboard_quicklink_card_container" data-toggle="popover" data-trigger="focus"
                             data-placement="top">
                             {{-- Personal Profile --}}
-                            <a href="#" type="button" data-toggle="modal" data-target="#personalProfileModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Personal Profile">
-                                <div class="quicklink_card @if ($data['member']->studentPersonalProfile) done @endif">
+                            <a href="{{ route('memberCreatePersonalProfile') }}" style="text-decoration: none"
+                                data-toggle="popover" data-trigger="focus" data-placement="top" title="Personal Profile">
+                                <div class="quicklink_card @if ($data['member']->memberPersonalProfile) done @endif">
                                     <div class="quicklink_card_body">
                                         <div class="quicklink_card_icon">
                                             <i class="fas fa-user"></i>
@@ -56,7 +50,7 @@
                                 </div>
                             </a>
                             {{-- Academic Info --}}
-                            <a href="#" type="button" data-toggle="modal" data-target="#academicInfoModal"
+                            <a href="{{ route('memberCreateAcademicInfo') }}" type="button" data-toggle="modal" data-target="#academicInfoModal"
                                 style="text-decoration: none" data-toggle="popover" data-trigger="focus"
                                 data-placement="top" title="Academic Info">
                                 <div class="quicklink_card @if (
@@ -77,99 +71,6 @@
                                     </div>
                                 </div>
                             </a>
-
-                            {{-- <a href="#" type="button" data-toggle="modal" data-target="#academicHistoryModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Academic History">
-
-                                <div
-                                    class="quicklink_card
-                                @if (!$data['member']->studentAcademicHistory->isEmpty()) done @endif
-                                ">
-                                    <div class="quicklink_card_body">
-                                        <div class="quicklink_card_icon">
-                                            <i class="fas fa-user-graduate"></i>
-                                        </div>
-                                        <div class="quicklink_card_content">
-                                            <p>Academic History</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="#" type="button" data-toggle="modal" data-target="#nextStudentSkillsModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Skills">
-                                <div
-                                    class="quicklink_card
-                                @if (!$data['member']->studentSkills->isEmpty()) done @endif
-                                ">
-                                    <div class="quicklink_card_body">
-                                        <div class="quicklink_card_icon">
-                                            <i class="fa-solid fa-brain"></i>
-                                        </div>
-                                        <div class="quicklink_card_content">
-                                            <p>Skills</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="#" type="button" data-toggle="modal" data-target="#employmentAndBusinessModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Employment(s)">
-                                <div
-                                    class="quicklink_card
-                                @if (!$data['member']->studentEmploymentAndBusiness->isEmpty()) done @endif
-                                ">
-                                    <div class="quicklink_card_body">
-                                        <div class="quicklink_card_icon">
-                                            <i class="fa-solid fa-briefcase"></i>
-                                        </div>
-                                        <div class="quicklink_card_content">
-                                            <p>Business(es) / Employment(s)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-
-                            <a href="#" type="button" data-toggle="modal" data-target="#studentLeadershipModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Leadership Position(s)">
-                                <div
-                                    class="quicklink_card
-                                @if (!$data['member']->studentLeadershipPosition->isEmpty()) done @endif
-                                ">
-                                    <div class="quicklink_card_body">
-                                        <div class="quicklink_card_icon">
-                                            <i class="fa-solid fa-crown"></i>
-                                        </div>
-                                        <div class="quicklink_card_content">
-                                            <p>Leadership Position(s)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-
-                            <a href="#" type="button" data-toggle="modal" data-target="#nextStudentAwardModal"
-                                style="text-decoration: none" data-toggle="popover" data-trigger="focus"
-                                data-placement="top" title="Awards/Achievements">
-                                <div
-                                    class="quicklink_card
-                                @if (!$data['member']->StudentAward->isEmpty()) done @endif
-                                ">
-                                    <div class="quicklink_card_body">
-                                        <div class="quicklink_card_icon">
-                                            <i class="fa-solid fa-trophy"></i>
-                                        </div>
-                                        <div class="quicklink_card_content">
-                                            <p>Awards / Achievements</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a> --}}
-
                         </section>
 
                         <br>

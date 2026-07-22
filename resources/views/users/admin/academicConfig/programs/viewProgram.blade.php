@@ -114,8 +114,8 @@
                                                 <table class="table">
                                                     @foreach ($data['program']->programTypes as $type)
                                                         <span class="text-black text-decoration-underline">
-                                                            Status:
-                                                        </span>
+                                                            Program Type :
+                                                        </span> <span class="small">(full-time/part-time/odl...)</span>
                                                         <tbody>
                                                             <tr class="text-black">
                                                                 <th class="" scope="row">{{ $type->type_name }}

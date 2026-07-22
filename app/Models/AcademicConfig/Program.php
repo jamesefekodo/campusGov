@@ -45,4 +45,8 @@ class Program extends Model
     {
         return $this->hasMany(ProgramType::class, 'program_slug', 'slug');
     }
+    public function durationOverrides()
+    {
+        return $this->hasMany(ProgramDurationOverride::class, 'program_slug', 'slug');
+    }
 }
