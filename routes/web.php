@@ -18,6 +18,13 @@ Route::get('/clear-all', function () {
     return 'All cleared!';
 });
 
+
+// general routes (no middleware).... jqajax, callbacks and so on
+Route::get('/fetch-program-types', [AcademicConfigController::class, 'fetchProgramTypes'])
+    ->name('fetchProgramTypes');
+Route::get('/fetch-departments', [AcademicConfigController::class, 'fetchDepartments'])
+    ->name('fetchDepartments');
+
 // basic/general routes
 Route::middleware(['authenticationMiddlewares'])->group(function () {
 
@@ -64,10 +71,11 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::post('member/account_setup/personal_profile/submit', [MemberSelfProfileController::class, 'memberSelfCreatePersonalProfileSubmit'])->name('memberSelfCreatePersonalProfileSubmit');
 
     Route::get('member/account_setup/academic_info', [MemberSelfProfileController::class, 'memberCreateAcademicInfo'])->name('memberCreateAcademicInfo');
+    Route::get('member/account_setup/academic_info/2', [MemberSelfProfileController::class, 'memberCreateAcademicInfo'])->name('memberCreateAcademicInfoStep2');
+    Route::post('member/account_setup/academic_info/submit', [MemberSelfProfileController::class, 'memberSelfCreateAcademicInfoSubmit'])->name('memberSelfCreateAcademicInfoSubmit');
+    Route::get('member/account_setup/submit_for_verification', [MemberSelfProfileController::class, 'memberSubmitSelfAccountForVerification'])->name('memberSubmitSelfAccountForVerification');
 
-
-
-    //
+    Route::get('member/account_setup/awaiting_verification', [MemberSelfProfileController::class, 'awaitingVerification'])->name('memberAccountAwaitingVerification');
 });
 
 
@@ -119,6 +127,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/academic_config/programs/type/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramType'])->name('addNewProgramType');
     Route::put('admin/academic_config/programs/type/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramType'])->name('editProgramType');
     Route::post('admin/academic_config/programs/duration_override/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramProgramDurationDurationSubmit'])->name('addNewProgramProgramDurationDurationSubmit');
+    Route::put('admin/academic_config/programs/duration_override/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramDurationOverrideSubmit'])->name('editProgramDurationOverrideSubmit');
+    Route::get('admin/academic_config/programs/duration_override/delete/{uuid}', [AcademicConfigController::class, 'removeProgramDurationOverride'])->name('removeProgramDurationOverride');
+
+
+    //
 
 
 

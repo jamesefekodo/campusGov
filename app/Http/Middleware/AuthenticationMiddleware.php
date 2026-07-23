@@ -69,14 +69,10 @@ class AuthenticationMiddleware
             if ($accountType !== 2) {
                 $profileSetupStatus = 'cleared';
             }
-            // $freshAssociationAccountStatus = 'waiting';
-            // if ($accountType !== 3) {
-            //     $freshAssociationAccountStatus = 'cleared';
-            // }
-            // $awaitingVerificationStatus = 'waiting';
-            // if (in_array($accountType, [0, 1])) {
-            //     $awaitingVerificationStatus = 'cleared';
-            // }
+            $awaitingVerificationStatus = 'waiting';
+            if (in_array($accountType, [0, 1])) {
+                $awaitingVerificationStatus = 'cleared';
+            }
 
             // $disabledAccountStatus = 'waiting';
 
@@ -250,7 +246,10 @@ class AuthenticationMiddleware
                         !Route::is('memberCreatePersonalProfile')
                         && !Route::is('studentAccountSetup')
                         && !Route::is('memberSelfCreatePersonalProfileSubmit')
-                        // && !Route::is('studentSubmitAccountForVerification')
+                        && !Route::is('memberCreateAcademicInfo')
+                        && !Route::is('memberCreateAcademicInfoStep2')
+                        && !Route::is('memberSelfCreateAcademicInfoSubmit')
+                        && !Route::is('memberSubmitSelfAccountForVerification')
                         && !Route::is('logoutRequest')
                     ) {
                         return redirect()->route('studentAccountSetup');
@@ -260,37 +259,27 @@ class AuthenticationMiddleware
                 }
             }
 
-            // // Awaiting Verification
-            // // Reverify the first functions
-            // if (
-            //     $maintenanceStatus === 'cleared' &&
-            //     $emailVerificationStatus === 'cleared' &&
-            //     $mfaVerificationStatus === 'cleared' &&
-            //     $policyGuard === 'cleared' &&
-            //     $sessionLimitStatus === 'cleared' &&
-            //     $profileSetupStatus === 'cleared'
+            // Awaiting Verification
+            // Reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'cleared' &&
+                $profileSetupStatus === 'cleared'
 
-            // ) {
-            //     if ($accountType == 2 && $accountStatus == 1) {
-            //         // Student
-            //         if (
-            //             !Route::is('studentAccountAwaitingVerification')
-            //             && !Route::is('logoutRequest')
-            //         ) {
-            //             return redirect()->route('studentAccountAwaitingVerification');
-            //         }
-            //     }
-            //     // Association
-            //     elseif ($accountType == 3 && $accountStatus == 1) {
-            //         if (
-            //             !Route::is('associationAccountAwaitingVerification')
-            //             && !Route::is('logoutRequest')
-            //         ) {
-            //             return redirect()->route('associationAccountAwaitingVerification');
-            //         }
-            //     }
-            //     $awaitingVerificationStatus = 'cleared';
-            // }
+            ) {
+                if ($accountType == 2 && $accountStatus == 1) {
+                    if (
+                        !Route::is('memberAccountAwaitingVerification')
+                        && !Route::is('logoutRequest')
+                    ) {
+                        return redirect()->route('memberAccountAwaitingVerification');
+                    }
+                }
+                $awaitingVerificationStatus = 'cleared';
+            }
             // // Disabled Account
             // // Reverify the first functions
             // if (

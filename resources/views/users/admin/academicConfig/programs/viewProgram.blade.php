@@ -183,7 +183,8 @@
                                                         <tbody>
                                                             <tr class="text-black">
                                                                 <th class="" scope="row">
-                                                                    {{ optional($duration->department)->name ?? 'All Departments' }} -
+                                                                    {{ optional($duration->department)->name ?? 'All Departments' }}
+                                                                    -
                                                                     {{ optional($duration->programType)->type_name ?? 'All Program Types' }}
                                                                     @switch($duration->is_active)
                                                                         @case(true)
@@ -205,15 +206,16 @@
                                                                     <span
                                                                         class="badge bg-yellow text-black pe-2 ps-3 py-2 m-1 rounded-3"
                                                                         data-toggle="modal"
-                                                                        data-target="#editProgramTypeModal_{{ $duration->uuid }}"
+                                                                        data-target="#editProgramDurationOverrideModal_{{ $duration->uuid }}"
                                                                         style="cursor: pointer;">
                                                                         <i class="fas fa-edit me-1"></i>Edit
                                                                     </span>
                                                                     <a href="javascript:void(0)"
-                                                                        class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm m-1"
+                                                                        class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-btn m-1"
                                                                         data-toggle="modal"
-                                                                        data-target="#changeIsPaidBreakModal"
-                                                                        {{-- data-url="{{ route('companyRemoveShiftScheduleStep', ['uuid' => $step->uuid]) }}" --}} style="cursor: pointer;">
+                                                                        data-target="#deleteDurationOverride"
+                                                                        data-url="{{ route('removeProgramDurationOverride', ['uuid' => $duration->uuid]) }}"
+                                                                         style="cursor: pointer;">
                                                                         <i class="fas fa-trash me-1"></i>Remove
                                                                     </a>
                                                                 </td>
@@ -241,9 +243,15 @@
                                         {{-- program duration overrides ends --}}
                                         @include('users.admin.academicConfig.programs.include.addNewProgramDurationOverrideModal')
 
-                                        @if ($data['program']->durationOverrides->isNotEmpty())
-                                             @foreach ($data['program']->durationOverrides as $duration)
+                                        @if ($data['program']->programTypes->isNotEmpty())
+                                            @foreach ($data['program']->programTypes as $type)
                                                 @include('users.admin.academicConfig.programs.include.editProgramTypeModal')
+                                            @endforeach
+                                        @endif
+
+                                        @if ($data['program']->durationOverrides->isNotEmpty())
+                                            @foreach ($data['program']->durationOverrides as $duration)
+                                                @include('users.admin.academicConfig.programs.include.editProgramDurationOverrideModal')
                                             @endforeach
                                         @endif
                                     </div>
@@ -266,7 +274,7 @@
             @include('users.admin.academicConfig.programs.include.editProgramModal')
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.delete-role').forEach(button => {
+                    document.querySelectorAll('.delete-btn').forEach(button => {
                         button.addEventListener('click', function() {
 
                             const url = this.dataset.url;

@@ -39,6 +39,10 @@ class ProgramType extends Model
 
     public function program()
     {
-        return $this->belongsTo(Program::class, 'slug', 'program_slug');
+        return $this->belongsTo(
+            Program::class,
+            'program_slug',
+            'slug'
+        );
     }
 }

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('member_academic_infos', function (Blueprint $table) {
             $table->id();
             $table->string('username')->unique(); // Foreign
-            $table->string('academic_status'); // student, extra_year, alumni, withdrawn, suspended, expelled, unkown
+            $table->string('academic_status')->default('unknown'); // student, extra_year, alumni, withdrawn, suspended, expelled, unkown
             $table->string('program')->nullable(); // Foreign
             $table->string('program_type')->nullable(); // Foreign
             $table->string('faculty')->nullable(); // Foreign

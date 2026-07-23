@@ -1,6 +1,6 @@
 @extends('layouts.miscellaneousLayout')
 
-@section('title', 'Personal Profile')
+@section('title', 'Academic Info')
 @section('content')
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
         <div class="user_page_title">Account Setup</div>
@@ -16,219 +16,190 @@
                             <div class="my_form_container">
 
                                 <h4 class="block text-center py-2 pt-3 text-uppercase type-b-page-header">
-                                        Register Academic Info
+                                    Register Academic Info
                                 </h4>
                                 <div class="card-body">
                                     <form class="form my_form" method="POST"
-                                        action="{{ route('memberSelfCreatePersonalProfileSubmit') }}"
+                                        action="{{ route('memberSelfCreateAcademicInfoSubmit') }}"
                                         enctype="multipart/form-data">
                                         @csrf
+                                        <input type="hidden" name="step" value="{{ $data['step'] }}">
 
-                                        <div class="row d-flex justify-content-center">
-                                            @php
-                                                $imagePlaceholder = asset('system/images/default_profile_pic.jpg');
+                                        @switch($data['step'])
+                                            @case(1)
+                                                <div class="row">
+                                                    <div class="form-group col-md-4">
+                                                        <label for="program-select">
+                                                            Program <span class="text-red">*</span>
+                                                        </label>
 
-                                                if ($data['member']->photo) {
-                                                    $imagePlaceholder = asset(
-                                                        'assets/uploads/users/members/photo/' . $data['member']->photo,
-                                                    );
-                                                }
-                                            @endphp
+                                                        <select class="form-select" id="program-select" name="program" required>
 
-                                            {{-- Preview --}}
-                                            <div class="col-md-12 text-center mb-3">
-                                                <img id="passport-preview" src="{{ $imagePlaceholder }}" alt="Profile Photo"
-                                                    class="rounded-circle"
-                                                    style="width:180px; height:180px; object-fit:cover; border: 3px solid #e3e6f0;">
-                                            </div>
+                                                            <option value="">- Select -</option>
 
-                                            {{-- Action Buttons --}}
-                                            <div class="col-md-12 text-center mb-3 d-flex justify-content-center gap-2">
-                                                {{-- Upload --}}
-                                                <label for="passport-upload" class="btn btn-sm btn-outline-primary mb-0">
-                                                    <i class="fa fa-upload me-1"></i> Upload Photo
-                                                </label>
-                                                <input type="file" id="passport-upload" accept=".jpg,.jpeg,.png,.webp"
-                                                    class="d-none">
+                                                            @foreach ($data['activeProgram'] as $program)
+                                                                <option value="{{ $program->slug }}"
+                                                                    {{ old('program', $data['member']->memberAcademicInfo?->program) == $program->slug ? 'selected' : '' }}>
+                                                                    {{ $program->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
 
-                                                {{-- Camera --}}
-                                                <button type="button" class="btn btn-sm btn-outline-secondary"
-                                                    id="open-camera-btn">
-                                                    <i class="fa fa-camera me-1"></i> Take Photo
-                                                </button>
-                                            </div>
-
-                                            {{-- Camera Section --}}
-                                            <div class="col-md-12" id="camera-section" style="display:none;">
-                                                <div class="text-center mb-2">
-                                                    <video id="camera-stream" autoplay playsinline
-                                                        style="width:100%; max-width:600px; border-radius:8px; border:2px solid #e3e6f0;"></video>
-                                                </div>
-                                                <div class="text-center d-flex justify-content-center gap-2 mb-3">
-                                                    <button type="button" class="btn btn-sm btn-success" id="snap-btn">
-                                                        <i class="fa fa-circle me-1"></i> Snap
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-danger"
-                                                        id="close-camera-btn">
-                                                        <i class="fa fa-times me-1"></i> Cancel
-                                                    </button>
-                                                </div>
-                                                <canvas id="snap-canvas" style="display:none;"></canvas>
-                                            </div>
-
-                                            {{-- Crop Modal --}}
-                                            <div class="modal fade" id="cropModal" tabindex="-1" data-bs-backdrop="static">
-                                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                                    <div class="modal-content">
-                                                        {{-- <div class="modal-header">
-                                                            <h6 class="modal-title">Crop Photo
-                                                            </h6>
-                                                        </div> --}}
-                                                        <div
-                                                            class="modal-body text-center p-0 d-flex align-items-center justify-content-center mt-3">
-                                                            <img id="crop-image" src="" alt="Crop"
-                                                                style="max-width:100%;" class="img-fluid"
-                                                                class="w-auto mw-100 mh-100">
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary btn-sm"
-                                                                id="cancel-crop-btn">
-                                                                Cancel
-                                                            </button>
-                                                            <button type="button" class="btn btn-primary btn-sm"
-                                                                id="apply-crop-btn">
-                                                                <i class="fa fa-check me-1"></i>
-                                                                Apply Crop
-                                                            </button>
-                                                        </div>
+                                                        <p class="text-danger">{{ $errors->first('program') }}</p>
                                                     </div>
-                                                </div>
-                                            </div>
 
-                                            {{-- Hidden input for cropped base64 image --}}
-                                            <input type="hidden" name="photo_cropped" id="photo-cropped">
+                                                    <div class="form-group col-md-4">
+                                                        <label for="program-type-select">
+                                                            Program Type <span class="text-red">*</span>
+                                                        </label>
 
-                                            <p class="text-red text-center">{{ $errors->first('photo_cropped') }}</p>
-                                            <p class="text-red text-center">{{ $errors->first('photo') }}</p>
+                                                        <select class="form-select" id="program-type-select" name="program_type"
+                                                            required disabled>
 
-                                        </div>
+                                                            <option value="">- Select Program First -</option>
+                                                        </select>
 
-                                        <div class="row">
-                                            <div class="form-group col-md-4">
-                                                <label for="first_name">First Name<span class="text-red">*</span>:</label>
-                                                <input type="text" class="form-control text-capitalize" name="first_name"
-                                                    value="{{ old('first_name', $data['member']->memberPersonalProfile?->first_name) }}"
-                                                    required>
-                                                <p style="color: red">{{ $errors->first('first_name') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="middle_name">Middle Name:</label>
-                                                <input type="text" class="form-control text-capitalize"
-                                                    name="middle_name"
-                                                    value="{{ old('middle_name', $data['member']->memberPersonalProfile?->middle_name) }}">
-                                                <p style="color: red">{{ $errors->first('middle_name') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="last_name">Last Name<span class="text-red">*</span>:</label>
-                                                <input type="text" class="form-control text-capitalize" name="last_name"
-                                                    value="{{ old('last_name', $data['member']->memberPersonalProfile?->last_name) }}"
-                                                    required>
-                                                <p style="color: red">{{ $errors->first('last_name') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="gender">Gender
-                                                    <span class="text-red">*</span></label>
-                                                <select class="form-select" name="gender" required>
-                                                    <option selected disabled>
-                                                        -Select-</option>
-                                                    <option value="male"
-                                                        {{ old('gender', $data['member']->memberPersonalProfile?->gender) == 'male' ? 'selected' : '' }}>
-                                                        Male
-                                                    </option>
-                                                    <option value="female"
-                                                        {{ old('gender', $data['member']->memberPersonalProfile?->gender) == 'female' ? 'selected' : '' }}>
-                                                        Female
-                                                    </option>
-                                                </select>
-                                                <p style="color: red">
-                                                    {{ $errors->first('gender') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="email1">Email 1<span class="text-red">*</span>:</label>
-                                                <input type="email" class="form-control" name="email1"
-                                                    value="{{ old('email1', $data['member']->email) }}" disabled>
-                                                <p style="color: red">{{ $errors->first('email1') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="phone1">Phone 1<span class="text-red">*</span>:</label>
-                                                <input type="text" class="form-control" name="phone1"
-                                                    value="{{ old('phone1', $data['member']->phone) }}" disabled>
-                                                <p style="color: red">{{ $errors->first('phone1') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="email2">Email 2:</label>
-                                                <input type="email" class="form-control" name="email2"
-                                                    value="{{ old('email2', $data['member']->memberPersonalProfile?->email2) }}">
-                                                <p style="color: red">{{ $errors->first('email2') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="phone2">Phone 2:</label>
-                                                <input type="text" class="form-control" name="phone2"
-                                                    value="{{ old('phone2', $data['member']->memberPersonalProfile?->phone2) }}">
-                                                <p style="color: red">{{ $errors->first('phone2') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="dob">Date of Birth
-                                                    <span class="text-red">*</span></label>
-                                                <input type="date" class="form-control" name="dob"
-                                                    value="{{ old('dob', $data['member']->memberPersonalProfile?->dob) }}"
-                                                    max="{{ now()->subYears(12)->format('Y-m-d') }}" required>
-                                                <p style="color: red">
-                                                    {{ $errors->first('dob') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="nationality">Nationality
-                                                    <span class="text-red">*</span></label>
-                                                <input type="text" class="form-control" name="nationality"
-                                                    value="{{ old('nationality', $data['member']->memberPersonalProfile?->nationality) }}">
-                                                <p style="color: red" required>
-                                                    {{ $errors->first('nationality') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="state_of_origin">State of Origin
-                                                    <span class="text-red">*</span></label>
-                                                <input type="text" class="form-control" name="state_of_origin"
-                                                    value="{{ old('state_of_origin', $data['member']->memberPersonalProfile?->state_of_origin) }}">
-                                                <p style="color: red" required>
-                                                    {{ $errors->first('state_of_origin') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="lga_of_origin">LGA of Origin
-                                                    <span class="text-red">*</span></label>
-                                                <input type="text" class="form-control" name="lga_of_origin"
-                                                    value="{{ old('lga_of_origin', $data['member']->memberPersonalProfile?->lga_of_origin) }}"
-                                                    required>
-                                                <p style="color: red">
-                                                    {{ $errors->first('lga_of_origin') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-12">
-                                                <label for="address1">Address 1
-                                                    <span class="text-red">*</span></label>
-                                                <input type="text" class="form-control" name="address1"
-                                                    value="{{ old('address1', $data['member']->memberPersonalProfile?->address1) }}"
-                                                    required>
-                                                <p style="color: red">
-                                                    {{ $errors->first('address1') }}</p>
-                                            </div>
-                                            <div class="form-group col-md-12">
-                                                <label for="address2">Address 2</label>
-                                                <input type="text" class="form-control" name="address2"
-                                                    value="{{ old('address2', $data['member']->memberPersonalProfile?->address2) }}">
-                                                <p style="color: red">
-                                                    {{ $errors->first('address2') }}</p>
-                                            </div>
-                                            <hr>
-                                            <button type="submit" class="green-button mt-2">Submit</button>
+                                                        <p class="text-danger">{{ $errors->first('program_type') }}</p>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="faculty-select">
+                                                            Faculty <span class="text-red">*</span>
+                                                        </label>
+
+                                                        <select class="form-select" id="faculty-select" name="faculty" required>
+
+                                                            <option value="">- Select -</option>
+
+                                                            @foreach ($data['activeFaculties'] as $faculty)
+                                                                <option value="{{ $faculty->slug }}"
+                                                                    {{ old('faculty', $data['member']->memberAcademicInfo?->faculty) == $faculty->slug ? 'selected' : '' }}>
+                                                                    {{ $faculty->name }}
+                                                                </option>
+                                                            @endforeach
+
+                                                        </select>
+
+                                                        <p class="text-danger">{{ $errors->first('faculty') }}</p>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="department-select">
+                                                            Department <span class="text-red">*</span>
+                                                        </label>
+
+                                                        <select class="form-select" id="department-select" name="department"
+                                                            required disabled>
+
+                                                            <option value="">- Select Faculty First -</option>
+
+                                                        </select>
+
+                                                        <p class="text-danger">{{ $errors->first('department') }}</p>
+                                                    </div>
+
+                                                    <div class="form-group col-md-4">
+                                                        <label for="admission_session">Admission Session<span
+                                                                class="text-red">*</span>:</label>
+                                                        <select name="admission_session" class="form-control">
+                                                            <option value="" disabled selected>Select</option>
+                                                            @php
+                                                                $startYear = 2007;
+                                                                $endYear = date('Y');
+                                                            @endphp
+
+                                                            @for ($year = $endYear; $year >= $startYear; $year--)
+                                                                <option value="{{ $year }}"
+                                                                    {{ isset($data['member']->memberAcademicInfo?->admission_session) &&
+                                                                    $data['member']->memberAcademicInfo?->admission_session == "$year"
+                                                                        ? 'selected'
+                                                                        : '' }}>
+                                                                    {{ $year }}/{{ $year + 1 }}
+                                                                </option>
+                                                            @endfor
+                                                        </select>
+                                                        <p style="color: red">{{ $errors->first('admission_session') }}</p>
+                                                    </div>
+                                                    <div class="form-group col-md-4">
+                                                        <label for="matric_number">Matric Number<span
+                                                                class="text-red">*</span>:</label>
+                                                        <input type="text" class="form-control text-uppercase"
+                                                            name="matric_number"
+                                                            value="{{ old('matric_number', $data['member']->memberAcademicInfo?->matric_number) }}"
+                                                            required>
+                                                        <p style="color: red">{{ $errors->first('matric_number') }}</p>
+                                                    </div>
+
+                                                    <hr>
+                                                    <button type="submit" class="green-button mt-2">Submit/Next</button>
+                                                @break
+
+                                                @case(2)
+                                                    <div class="form-group col-md-12">
+
+                                                        <label>
+                                                            Academic Status
+                                                            <span class="text-red">*</span>
+                                                        </label>
+
+
+                                                        <select name="academic_status" class="form-control" required>
+
+                                                            <option value="">
+                                                                - Select -
+                                                            </option>
+
+
+                                                            @foreach ($data['academicStatus']['statuses'] as $key => $value)
+                                                                <option value="{{ $key }}"
+                                                                    {{ old('academic_status', $data['member']->memberAcademicInfo?->academic_status) == $key ? 'selected' : '' }}>
+                                                                    {{ $value }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+
+                                                    </div>
+
+                                                    @if ($data['academicStatus']['require_graduation_session'])
+                                                        <div class="form-group col-md-12">
+
+                                                            <label>
+                                                                Graduation Session
+                                                                <span class="text-red">*</span>
+                                                            </label>
+
+
+                                                            <select name="graduation_session" class="form-control">
+
+                                                                <option value="">
+                                                                    - Select -
+                                                                </option>
+
+
+                                                                @for ($year = date('Y'); $year >= 2007; $year--)
+                                                                    <option value="{{ $year }}" {{ old('graduation_session', $data['member']->memberAcademicInfo?->graduation_session) == $year ? 'selected' : '' }}>
+                                                                        {{ $year }}/{{ $year + 1 }}
+                                                                    </option>
+                                                                @endfor
+
+
+                                                            </select>
+
+                                                        </div>
+                                                    @endif
+                                                    <hr>
+                                                    <div class="d-flex gap-2 mt-2">
+                                                        <a href="{{ route('memberCreateAcademicInfo') }}"
+                                                            class="btn btn-danger px-3">
+                                                            Back
+                                                        </a>
+
+                                                        <button type="submit" class="green-button flex-grow-1">
+                                                            Submit / Next
+                                                        </button>
+                                                    </div>
+                                                @break
+
+                                                @default
+                                            @endswitch
                                     </form>
                                 </div>
                             </div>
@@ -247,6 +218,131 @@
                 </div>
             </div>
 
+            {{-- scripts start --}}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+
+                    const programSelect = document.getElementById('program-select');
+                    const programTypeSelect = document.getElementById('program-type-select');
+
+                    if (!programSelect || !programTypeSelect) return;
+
+                    const selectedProgramType =
+                        "{{ old('program_type', $data['member']->memberAcademicInfo?->program_type) }}";
+
+                    function loadProgramTypes(programSlug, selected = '') {
+
+                        if (!programSlug) {
+                            programTypeSelect.innerHTML = '<option value="">- Select Program First -</option>';
+                            programTypeSelect.disabled = true;
+                            return;
+                        }
+
+                        programTypeSelect.disabled = true;
+                        programTypeSelect.innerHTML = '<option>Loading...</option>';
+
+                        fetch("{{ route('fetchProgramTypes') }}?program_slug=" + programSlug)
+                            .then(res => res.json())
+                            .then(res => {
+
+                                programTypeSelect.innerHTML = '<option value="">- Select -</option>';
+
+                                if (res.programTypes.length === 0) {
+
+                                    programTypeSelect.innerHTML +=
+                                        '<option disabled>No program types found</option>';
+
+                                } else {
+
+                                    res.programTypes.forEach(type => {
+
+                                        programTypeSelect.innerHTML += `
+                            <option value="${type.slug}"
+                                ${selected === type.slug ? 'selected' : ''}>
+                                ${type.type_name}
+                            </option>`;
+                                    });
+
+                                }
+
+                                programTypeSelect.disabled = false;
+
+                            });
+                    }
+
+                    programSelect.addEventListener('change', function() {
+                        loadProgramTypes(this.value);
+                    });
+
+                    // Edit Mode
+                    if (programSelect.value) {
+                        loadProgramTypes(programSelect.value, selectedProgramType);
+                    }
+
+                });
+            </script>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+
+                    const facultySelect = document.getElementById('faculty-select');
+                    const departmentSelect = document.getElementById('department-select');
+
+                    if (!facultySelect || !departmentSelect) return;
+
+                    const selectedDepartment = "{{ old('department', $data['member']->memberAcademicInfo?->department) }}";
+
+                    function loadDepartments(facultySlug, selected = '') {
+
+                        if (!facultySlug) {
+                            departmentSelect.innerHTML = '<option value="">- Select Faculty First -</option>';
+                            departmentSelect.disabled = true;
+                            return;
+                        }
+
+                        departmentSelect.disabled = true;
+                        departmentSelect.innerHTML = '<option>Loading...</option>';
+
+                        fetch("{{ route('fetchDepartments') }}?faculty_slug=" + facultySlug)
+                            .then(res => res.json())
+                            .then(res => {
+
+                                departmentSelect.innerHTML = '<option value="">- Select -</option>';
+
+                                if (res.departments.length === 0) {
+
+                                    departmentSelect.innerHTML +=
+                                        '<option disabled>No departments found</option>';
+
+                                } else {
+
+                                    res.departments.forEach(department => {
+
+                                        departmentSelect.innerHTML += `
+                            <option value="${department.slug}"
+                                ${selected === department.slug ? 'selected' : ''}>
+                                ${department.name}
+                            </option>`;
+                                    });
+
+                                }
+
+                                departmentSelect.disabled = false;
+
+                            });
+                    }
+
+                    facultySelect.addEventListener('change', function() {
+                        loadDepartments(this.value);
+                    });
+
+                    // Edit Mode
+                    if (facultySelect.value) {
+                        loadDepartments(facultySelect.value, selectedDepartment);
+                    }
+
+                });
+            </script>
+            {{-- scripts end --}}
         </div><!--//container-fluid-->
     </div><!--//app-content-->
 @endsection

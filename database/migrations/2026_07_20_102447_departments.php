@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->string('slug')->unique();
-            $table->string('department'); //Foreign
+            $table->string('faculty'); //Foreign
             $table->string('name');
             $table->string('administrative_head_title');
             $table->longText('description');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->foreign('department')->references('slug')->on('departments')->onUpdate('cascade');
+            $table->foreign('faculty')->references('slug')->on('faculties')->onUpdate('cascade');
         });
     }
 

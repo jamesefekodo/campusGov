@@ -3,9 +3,16 @@
 namespace App\Http\Controllers\Member;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConfig\Department;
+use App\Models\AcademicConfig\Faculty;
+use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramType;
+use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
 
 class MemberSelfProfileController extends Controller
@@ -59,7 +66,6 @@ class MemberSelfProfileController extends Controller
             'address2' => 'nullable|string',
         ]);
 
-        $member = Auth::user();
         $profile = MemberPersonalProfile::updateOrCreate(
             ['username' => $member->username],
             [
@@ -109,9 +115,178 @@ class MemberSelfProfileController extends Controller
     public function memberCreateAcademicInfo()
     {
         $member = Auth::user();
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $step = 1;
+        // $statuses = [];
+        $academicStatus = [];
+
+        if (Route::currentRouteName() == 'memberCreateAcademicInfoStep2') {
+
+            $step = 2;
+
+            $academicInfo = MemberAcademicInfo::where('username', $member->username)
+                ->first();
+
+
+            if (!$academicInfo) {
+
+                return redirect()
+                    ->route('memberCreateAcademicInfo')
+                    ->with('error', 'Please complete academic information first.');
+            }
+
+
+            $program = Program::whereSlug($academicInfo->program)
+                ->firstOrFail();
+
+
+            $programType = ProgramType::whereSlug($academicInfo->program_type)
+                ->first();
+
+
+            $department = Department::whereSlug($academicInfo->department)
+                ->first();
+
+
+
+            // $statuses = academicStatusOptions(
+            //     $academicInfo->admission_session,
+            //     $program,
+            //     $programType,
+            //     $department
+            // );
+            $academicStatus = academicStatusOptions(
+                $academicInfo->admission_session,
+                $program,
+                $programType,
+                $department
+            );
+
+
+            session([
+                // 'academic_status_options' => $statuses
+                'academicStatus' => $academicStatus
+            ]);
+        }
+
         $data = [
             'member' => $member,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+            'step' => $step,
+            // 'statuses' => $statuses,
+            'academicStatus' => $academicStatus,
         ];
+
         return view('users.member.registration.registerAcademicInfo', compact('data'));
+    }
+    public function memberSelfCreateAcademicInfoSubmit(Request $request)
+    {
+        $member = Auth::user();
+        if ($request->step == 1) {
+
+            request()->validate([
+                'program' => 'required|string|exists:programs,slug',
+                'program_type' => 'required|string|exists:program_types,slug',
+                'faculty' => 'required|string|exists:faculties,slug',
+                'department' => 'required|string|exists:departments,slug',
+                'admission_session' => 'required|numeric',
+                'matric_number' => 'required|string',
+            ]);
+
+
+
+            $info = MemberAcademicInfo::updateOrCreate(
+                ['username' => $member->username],
+                [
+                    'username' => $member->username,
+                    'program' => $request->program,
+                    'program_type' => $request->program_type,
+                    'faculty' => $request->faculty,
+                    'department' => $request->department,
+                    'admission_session' => $request->admission_session,
+                    'matric_number' => trim($request->matric_number),
+                ]
+            );
+            return redirect()->route('memberCreateAcademicInfoStep2')->with('success', 'Done!');
+        } elseif ($request->step == 2) {
+            request()->validate([
+                'academic_status' => 'required|not_in:unknown',
+                'graduation_session' => 'nullable|numeric',
+            ]);
+            $info = MemberAcademicInfo::where('username', $member->username)->first();
+            if (!$info) {
+                return redirect()->back()->with('error', 'Please fill section one first!');
+            }
+            $info->update([
+                'academic_status' => $request->academic_status,
+                'graduation_session' => $request->graduation_session,
+            ]);
+        }
+
+        return redirect()->route('studentAccountSetup')->with('success', 'Done!');
+    }
+    public function memberSubmitSelfAccountForVerification()
+    {
+        $member = Auth::user();
+
+        if ((int) $member->account_type == 2 && (int) $member->account_status == 0) {
+
+            // Check personal profile
+            if (!$member->memberPersonalProfile) {
+                return redirect()->back()
+                    ->with('error', 'Please fill in your personal profile first!');
+            }
+
+
+            // Check academic information
+            $academicInfo = $member->memberAcademicInfo;
+
+            if (
+                !$academicInfo ||
+                !filled($academicInfo->academic_status) ||
+                !filled($academicInfo->program) ||
+                !filled($academicInfo->program_type) ||
+                !filled($academicInfo->department) ||
+                !filled($academicInfo->faculty) ||
+                !filled($academicInfo->admission_session) ||
+                !filled($academicInfo->matric_number)
+            ) {
+                return redirect()->back()
+                    ->with('error', 'Please complete your academic info first!');
+            }
+
+
+            // Submit account for verification
+            $userProfile = User::where('username', $member->username)->first();
+            if ($userProfile) {
+                $userProfile->update([
+                    'account_status' => 1,
+                ]);
+            }
+
+
+            return redirect()->back()
+                ->with('success', 'Account submitted for verification successfully!');
+        } else {
+
+            return redirect()->route('homepage');
+        }
+    }
+    public function awaitingVerification()
+    {
+        $member = Auth::user();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        if ((int)$member->account_type == 2 && (int)$member->account_status == 1) {
+            $data = [
+                'member' => $member,
+            ];
+            return view('users.member.verification.awaitingVerification', compact('data'));
+        } else {
+            return redirect()->route('homepage');
+        }
     }
 }

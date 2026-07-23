@@ -18,6 +18,35 @@ use Illuminate\Support\Facades\Route;
 
 class AcademicConfigController extends Controller
 {
+    public function fetchProgramTypes(Request $request)
+    {
+        $programTypes = ProgramType::where('program_slug', $request->program_slug)
+            ->where('is_active', true)
+            ->orderBy('type_name')
+            ->get([
+                'slug',
+                'type_name'
+            ]);
+
+        return response()->json([
+            'programTypes' => $programTypes
+        ]);
+    }
+    public function fetchDepartments(Request $request)
+    {
+        $departments = Department::where('faculty', $request->faculty_slug)
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get([
+                'slug',
+                'name'
+            ]);
+
+        return response()->json([
+            'departments' => $departments
+        ]);
+    }
+
     public function faculties(Request $request)
     {
         /** @var \App\Models\User $user */
@@ -1257,7 +1286,6 @@ class AcademicConfigController extends Controller
         $request->validate([
             'name' => 'required|string',
             'is_active' => 'required',
-
         ]);
 
         $type = ProgramType::where('uuid', $uuid)->first();
@@ -1306,6 +1334,47 @@ class AcademicConfigController extends Controller
         $duration->department_slug = $request->department_slug;
         $duration->duration = $request->duration;
         $duration->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editProgramDurationOverrideSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.update'),
+            403
+        );
+        $request->validate([
+            'duration' => 'required|numeric',
+            'is_active' => 'required',
+            'program_type_slug' => 'required_without:department_slug|nullable|string|exists:program_types,slug',
+            'department_slug' => 'required_without:program_type_slug|nullable|string|exists:departments,slug',
+        ], [
+            'program_type_slug.required_without' => 'Either Program Type or Department must be filled.',
+            'department_slug.required_without' => 'Either Program Type or Department must be filled.',
+        ]);
+
+        $duration = ProgramDurationOverride::where('uuid', $uuid)->first();
+        if (!$duration) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+
+        $duration->update([
+            'program_type_slug' => $request->program_type_slug,
+            'department_slug' => $request->department_slug,
+            'duration' => $request->duration,
+            'is_active' => $request->is_active,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function removeProgramDurationOverride($uuid)
+    {
+        $duration = ProgramDurationOverride::where('uuid', $uuid)->first();
+        if (!$duration) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $duration->delete();
         return redirect()->back()->with('success', 'Done!');
     }
 }

@@ -22,6 +22,40 @@
 <p class="m-0"><span style="font-weight: bold">Phone: </span>
     {{ $data['member']->memberPersonalProfile->phone1 ?? '-' }}
 </p>
+<p class="m-0">
+    <span style="font-weight: bold">
+        @if ($data['member']->memberAcademicInfo?->academic_status == 'student')
+            Current Level:
+        @elseif($data['member']->memberAcademicInfo?->academic_status == 'alumni')
+            Graduation Session:
+        @else
+            Status:
+        @endif
+    </span>
+
+    @php
+        $academic = $data['member']->memberAcademicInfo;
+    @endphp
+
+
+    @if ($academic?->academic_status == 'student')
+
+        {{ currentLevel(
+            \App\Models\AcademicConfig\Program::whereSlug($academic->program)->first(),
+            now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
+        ) }}
+    @elseif($academic?->academic_status == 'alumni')
+        {{ $academic->graduation_session ?? '-' }}
+    @else
+        {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
+
+        @if ($academic?->graduation_session)
+            ({{ $academic->graduation_session }})
+        @endif
+
+    @endif
+
+</p>
 <p class="text-capitalize"><span style="font-weight: bold">Account Status:
     </span>
     @switch($data['member']->account_status)

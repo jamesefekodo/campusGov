@@ -931,3 +931,7 @@ footer {
 .whatsapp-chat-button:hover img {
     transform: rotate(15deg);
 }
+
+label {
+    margin-top: 6px;
+}
