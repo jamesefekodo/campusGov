@@ -578,4 +578,16 @@ class AuthController extends Controller
 
         return redirect('/');
     }
+    public function disabledUserAccount()
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        if ((int) $user->account_type !== 0) {
+            return view('utilities.pages.auth.disabledAccount');
+        } else {
+            return redirect()->route('homepage');
+        }
+    }
 }

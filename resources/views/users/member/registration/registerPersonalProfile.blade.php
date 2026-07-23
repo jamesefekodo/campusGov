@@ -16,7 +16,7 @@
                             <div class="my_form_container">
 
                                 <h4 class="block text-center py-2 pt-3 text-uppercase type-b-page-header">
-                                        Register Personal Profile
+                                    Register Personal Profile
                                 </h4>
                                 <div class="card-body">
                                     <form class="form my_form" method="POST"
@@ -228,7 +228,16 @@
                                                     {{ $errors->first('address2') }}</p>
                                             </div>
                                             <hr>
-                                            <button type="submit" class="green-button mt-2">Submit</button>
+                                            <button type="submit" class="green-button submit-btn">
+                                                <span class="btn-text">
+                                                    Submit
+                                                </span>
+
+                                                <span class="btn-loading" style="display:none;">
+                                                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                                                </span>
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </div>

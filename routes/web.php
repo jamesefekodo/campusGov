@@ -61,6 +61,8 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     // session management
     Route::get('manage_sessions', [AuthController::class, 'manageSession'])->name('manageSession');
     Route::get('end_other_sessions', [AuthController::class, 'endOtherSessions'])->name('endOtherSessions');
+        Route::get('disabled_account', [AuthController::class, 'disabledUserAccount'])->name('disabledUserAccount');
+
 });
 
 // member routes
@@ -94,10 +96,35 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/students/search', [MembersManagementController::class, 'studentMembers'])->name('studentMembersSearch');
 
 
+    Route::put('admin/user_management/members/verification/return_for_correction/{uuid}', [MembersManagementController::class, 'updateBasicAccountInfo'])->name('updateBasicAccountInfo');
+
+
     // awaiting verification
     Route::get('admin/user_management/members/verification', [MembersManagementController::class, 'memberAwaitingVerification'])->name('memberAwaitingVerification');
     Route::get('admin/user_management/members/verification/search', [MembersManagementController::class, 'memberAwaitingVerification'])->name('memberAwaitingVerificationSearch');
-    Route::get('admin/user_management/members/verification/view/{username}', [MembersManagementController::class, 'viewMemberAwaitingVerificationIndex'])->name('viewMemberAwaitingVerificationIndex');
+    Route::get('admin/user_management/members/verification/index/{uuid}', [MembersManagementController::class, 'viewMemberAwaitingVerificationIndex'])->name('viewMemberAwaitingVerificationIndex');
+    Route::get('admin/user_management/members/verification/return_for_correction/{uuid}', [MembersManagementController::class, 'returnProfileFromVerToReg'])->name('returnProfileFromVerToReg');
+    Route::get('admin/user_management/members/verification/personal_profile/{uuid}', [MembersManagementController::class, 'verifyMemberPersonalProfile'])->name('verifyMemberPersonalProfile');
+    Route::put('admin/user_management/members/verification/personal_profile/{uuid}', [MembersManagementController::class, 'verifyMemberPersonalProfileSubmit'])->name('verifyMemberPersonalProfileSubmit');
+
+    Route::get('admin/user_management/members/verification/academic_info/{uuid}', [MembersManagementController::class, 'verifyMemberAcademicInfo'])->name('verifyMemberAcademicInfo');
+    Route::get('admin/user_management/members/verification/academic_info/s2/{uuid}', [MembersManagementController::class, 'verifyMemberAcademicInfo'])->name('verifyMemberAcademicInfoStep2');
+
+    Route::put('admin/user_management/members/verification/academic_info/verify/{uuid}', [MembersManagementController::class, 'verifyMemberAcademicInfoSubmit'])->name('verifyMemberAcademicInfoSubmit');
+    Route::put('admin/user_management/members/verification/academic_info/verify/{uuid}', [MembersManagementController::class, 'verifyMemberAcademicInfoSubmit'])->name('verifyMemberAcademicInfoSubmit');
+    Route::get('admin/user_management/members/verification/complete_verification_and_activate/{uuid}', [MembersManagementController::class, 'verifyAndactivateStudentAccount'])->name('verifyAndactivateStudentAccount');
+
+    Route::get('admin/user_management/members/disable/{uuid}', [MembersManagementController::class, 'disableMemberAccount'])->name('disableMemberAccount');
+
+
+
+
+
+    //
+
+
+
+
 
 
 

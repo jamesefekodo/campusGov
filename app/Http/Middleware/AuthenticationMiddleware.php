@@ -74,7 +74,7 @@ class AuthenticationMiddleware
                 $awaitingVerificationStatus = 'cleared';
             }
 
-            // $disabledAccountStatus = 'waiting';
+            $disabledAccountStatus = 'waiting';
 
 
             // Maintenance mode
@@ -280,70 +280,29 @@ class AuthenticationMiddleware
                 }
                 $awaitingVerificationStatus = 'cleared';
             }
-            // // Disabled Account
-            // // Reverify the first functions
-            // if (
-            //     $maintenanceStatus === 'cleared' &&
-            //     $emailVerificationStatus === 'cleared' &&
-            //     $mfaVerificationStatus === 'cleared' &&
-            //     $policyGuard === 'cleared' &&
-            //     $sessionLimitStatus === 'cleared' &&
-            //     $profileSetupStatus === 'cleared' &&
-            //     $awaitingVerificationStatus === 'cleared'
+            // Disabled Account
+            // Reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'cleared' &&
+                $profileSetupStatus === 'cleared' &&
+                $awaitingVerificationStatus === 'cleared'
 
-            // ) {
-            //     if ($accountType == 2 && $accountStatus == 3) {
-            //         if (
-            //             !Route::is('disabledUserAccount')
-            //             && !Route::is('logoutRequest')
-            //         ) {
-            //             return redirect()->route('disabledUserAccount');
-            //         }
-            //     } else {
-            //         $disabledAccountStatus = 'cleared';
-            //     }
-            // }
-
-            // // Fresh association account
-            // // Reverify the first functions
-            // if (
-            //     $maintenanceStatus === 'cleared' &&
-            //     $emailVerificationStatus === 'cleared' &&
-            //     $mfaVerificationStatus === 'cleared' &&
-            //     $policyGuard === 'cleared' &&
-            //     $sessionLimitStatus === 'cleared' &&
-            //     $profileSetupStatus === 'cleared' &&
-            //     $awaitingVerificationStatus === 'cleared' &&
-            //     $disabledAccountStatus === 'cleared'
-
-            // ) {
-            //     if ($accountType == 3 && $accountStatus == 0) {
-            //         if (
-            //             !Route::is('associationAccountSetup')
-            //             && !Route::is('registerAssociationProfileSubmit')
-            //             && !Route::is('registerPresidentRemarkSubmit')
-            //             && !Route::is('registerNewExecutivesSubmit')
-            //             && !Route::is('registerPastExecutivesSubmit')
-            //             && !Route::is('registerCurrentPatronsSubmit')
-            //             && !Route::is('registerPastPatronsSubmit')
-            //             && !Route::is('registerSocialMediaPlatformsSubmit')
-            //             && !Route::is('registerAssociationOnlinePaymentMethodSubmit')
-            //             && !Route::is('registerAssociationOfflinePaymentSubmit')
-            //             && !Route::is('registerAssociationAlumniPurseSubmit')
-            //             && !Route::is('registerAssociatioNAwardsSubmit')
-            //             && !Route::is('associationSubmitAccountForVerification')
-            //             && !Route::is('logoutRequest')
-
-            //             // policy agreement
-            //             && !Route::is('manageSystemPolicyAgreement')
-            //             && !Route::is('userAgreeToSystemPolicy')
-            //         ) {
-            //             return redirect()->route('associationAccountSetup');
-            //         }
-            //     } else {
-            //         $freshAssociationAccountStatus = 'cleared';
-            //     }
-            // }
+            ) {
+                if ($accountStatus == 3) {
+                    if (
+                        !Route::is('disabledUserAccount')
+                        && !Route::is('logoutRequest')
+                    ) {
+                        return redirect()->route('disabledUserAccount');
+                    }
+                } else {
+                    $disabledAccountStatus = 'cleared';
+                }
+            }
         }
 
         return $response;

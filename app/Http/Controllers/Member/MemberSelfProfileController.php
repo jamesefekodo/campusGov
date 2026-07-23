@@ -39,9 +39,11 @@ class MemberSelfProfileController extends Controller
     {
         $member = Auth::user();
 
+        $hasExistingPhoto = !empty($member->photo) && file_exists(public_path('assets/uploads/users/members/photo/' . $member->photo));
+
         request()->validate([
             // 'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:300',
-            'photo_cropped' => 'required',
+            'photo_cropped' => $hasExistingPhoto ? 'nullable' : 'required',
             'first_name' => 'required|string',
             'middle_name' => 'required|string',
             'last_name' => 'required|string',
@@ -206,7 +208,7 @@ class MemberSelfProfileController extends Controller
                     'faculty' => $request->faculty,
                     'department' => $request->department,
                     'admission_session' => $request->admission_session,
-                    'matric_number' => trim($request->matric_number),
+                    'matric_number' => strtoupper(trim($request->matric_number)),
                 ]
             );
             return redirect()->route('memberCreateAcademicInfoStep2')->with('success', 'Done!');

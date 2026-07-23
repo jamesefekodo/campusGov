@@ -130,219 +130,220 @@
 
                                                     <hr>
                                                     <button type="submit" class="green-button mt-2">Submit/Next</button>
-                                                @break
+                                                </div>
+                                            @break
 
-                                                @case(2)
+                                            @case(2)
+                                                <div class="form-group col-md-12">
+
+                                                    <label>
+                                                        Academic Status
+                                                        <span class="text-red">*</span>
+                                                    </label>
+
+
+                                                    <select name="academic_status" class="form-control" required>
+
+                                                        <option value="">
+                                                            - Select -
+                                                        </option>
+
+
+                                                        @foreach ($data['academicStatus']['statuses'] as $key => $value)
+                                                            <option value="{{ $key }}"
+                                                                {{ old('academic_status', $data['member']->memberAcademicInfo?->academic_status) == $key ? 'selected' : '' }}>
+                                                                {{ $value }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+
+                                                </div>
+
+                                                @if ($data['academicStatus']['require_graduation_session'])
                                                     <div class="form-group col-md-12">
 
                                                         <label>
-                                                            Academic Status
+                                                            Graduation Session
                                                             <span class="text-red">*</span>
                                                         </label>
 
 
-                                                        <select name="academic_status" class="form-control" required>
+                                                        <select name="graduation_session" class="form-control">
 
                                                             <option value="">
                                                                 - Select -
                                                             </option>
 
 
-                                                            @foreach ($data['academicStatus']['statuses'] as $key => $value)
-                                                                <option value="{{ $key }}"
-                                                                    {{ old('academic_status', $data['member']->memberAcademicInfo?->academic_status) == $key ? 'selected' : '' }}>
-                                                                    {{ $value }}
+                                                            @for ($year = date('Y'); $year >= 2007; $year--)
+                                                                <option value="{{ $year }}"
+                                                                    {{ old('graduation_session', $data['member']->memberAcademicInfo?->graduation_session) == $year ? 'selected' : '' }}>
+                                                                    {{ $year }}/{{ $year + 1 }}
                                                                 </option>
-                                                            @endforeach
+                                                            @endfor
+
+
                                                         </select>
-
                                                     </div>
+                                                @endif
+                                                <hr>
+                                                <div class="d-flex gap-2 mt-2">
+                                                    <a href="{{ route('memberCreateAcademicInfo') }}" class="btn btn-danger px-3">
+                                                        Back
+                                                    </a>
 
-                                                    @if ($data['academicStatus']['require_graduation_session'])
-                                                        <div class="form-group col-md-12">
+                                                    <button type="submit" class="green-button flex-grow-1">
+                                                        Submit
+                                                    </button>
+                                                </div>
+                                            @break
 
-                                                            <label>
-                                                                Graduation Session
-                                                                <span class="text-red">*</span>
-                                                            </label>
-
-
-                                                            <select name="graduation_session" class="form-control">
-
-                                                                <option value="">
-                                                                    - Select -
-                                                                </option>
-
-
-                                                                @for ($year = date('Y'); $year >= 2007; $year--)
-                                                                    <option value="{{ $year }}" {{ old('graduation_session', $data['member']->memberAcademicInfo?->graduation_session) == $year ? 'selected' : '' }}>
-                                                                        {{ $year }}/{{ $year + 1 }}
-                                                                    </option>
-                                                                @endfor
-
-
-                                                            </select>
-
-                                                        </div>
-                                                    @endif
-                                                    <hr>
-                                                    <div class="d-flex gap-2 mt-2">
-                                                        <a href="{{ route('memberCreateAcademicInfo') }}"
-                                                            class="btn btn-danger px-3">
-                                                            Back
-                                                        </a>
-
-                                                        <button type="submit" class="green-button flex-grow-1">
-                                                            Submit / Next
-                                                        </button>
-                                                    </div>
-                                                @break
-
-                                                @default
-                                            @endswitch
-                                    </form>
-                                </div>
+                                            @default
+                                        </div>
+                                @endswitch
+                                </form>
                             </div>
-
-
                         </div>
-                        {{-- Back Home --}}
-                        <div class="w-100 justify-content-center text-center my-4">
-                            <a class="btn btn-primary" href="{{ route('studentAccountSetup') }}">
-                                <i class="fas fa-chevron-left"></i>
-                                Back
-                            </a>
 
-                        </div>
+
+                    </div>
+                    {{-- Back Home --}}
+                    <div class="w-100 justify-content-center text-center my-4">
+                        <a class="btn btn-primary" href="{{ route('studentAccountSetup') }}">
+                            <i class="fas fa-chevron-left"></i>
+                            Back
+                        </a>
+
                     </div>
                 </div>
             </div>
+        </div>
 
-            {{-- scripts start --}}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
+        {{-- scripts start --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
 
-                    const programSelect = document.getElementById('program-select');
-                    const programTypeSelect = document.getElementById('program-type-select');
+                const programSelect = document.getElementById('program-select');
+                const programTypeSelect = document.getElementById('program-type-select');
 
-                    if (!programSelect || !programTypeSelect) return;
+                if (!programSelect || !programTypeSelect) return;
 
-                    const selectedProgramType =
-                        "{{ old('program_type', $data['member']->memberAcademicInfo?->program_type) }}";
+                const selectedProgramType =
+                    "{{ old('program_type', $data['member']->memberAcademicInfo?->program_type) }}";
 
-                    function loadProgramTypes(programSlug, selected = '') {
+                function loadProgramTypes(programSlug, selected = '') {
 
-                        if (!programSlug) {
-                            programTypeSelect.innerHTML = '<option value="">- Select Program First -</option>';
-                            programTypeSelect.disabled = true;
-                            return;
-                        }
-
+                    if (!programSlug) {
+                        programTypeSelect.innerHTML = '<option value="">- Select Program First -</option>';
                         programTypeSelect.disabled = true;
-                        programTypeSelect.innerHTML = '<option>Loading...</option>';
+                        return;
+                    }
 
-                        fetch("{{ route('fetchProgramTypes') }}?program_slug=" + programSlug)
-                            .then(res => res.json())
-                            .then(res => {
+                    programTypeSelect.disabled = true;
+                    programTypeSelect.innerHTML = '<option>Loading...</option>';
 
-                                programTypeSelect.innerHTML = '<option value="">- Select -</option>';
+                    fetch("{{ route('fetchProgramTypes') }}?program_slug=" + programSlug)
+                        .then(res => res.json())
+                        .then(res => {
 
-                                if (res.programTypes.length === 0) {
+                            programTypeSelect.innerHTML = '<option value="">- Select -</option>';
 
-                                    programTypeSelect.innerHTML +=
-                                        '<option disabled>No program types found</option>';
+                            if (res.programTypes.length === 0) {
 
-                                } else {
+                                programTypeSelect.innerHTML +=
+                                    '<option disabled>No program types found</option>';
 
-                                    res.programTypes.forEach(type => {
+                            } else {
 
-                                        programTypeSelect.innerHTML += `
+                                res.programTypes.forEach(type => {
+
+                                    programTypeSelect.innerHTML += `
                             <option value="${type.slug}"
                                 ${selected === type.slug ? 'selected' : ''}>
                                 ${type.type_name}
                             </option>`;
-                                    });
+                                });
 
-                                }
+                            }
 
-                                programTypeSelect.disabled = false;
+                            programTypeSelect.disabled = false;
 
-                            });
-                    }
+                        });
+                }
 
-                    programSelect.addEventListener('change', function() {
-                        loadProgramTypes(this.value);
-                    });
-
-                    // Edit Mode
-                    if (programSelect.value) {
-                        loadProgramTypes(programSelect.value, selectedProgramType);
-                    }
-
+                programSelect.addEventListener('change', function() {
+                    loadProgramTypes(this.value);
                 });
-            </script>
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
 
-                    const facultySelect = document.getElementById('faculty-select');
-                    const departmentSelect = document.getElementById('department-select');
+                // Edit Mode
+                if (programSelect.value) {
+                    loadProgramTypes(programSelect.value, selectedProgramType);
+                }
 
-                    if (!facultySelect || !departmentSelect) return;
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
 
-                    const selectedDepartment = "{{ old('department', $data['member']->memberAcademicInfo?->department) }}";
+                const facultySelect = document.getElementById('faculty-select');
+                const departmentSelect = document.getElementById('department-select');
 
-                    function loadDepartments(facultySlug, selected = '') {
+                if (!facultySelect || !departmentSelect) return;
 
-                        if (!facultySlug) {
-                            departmentSelect.innerHTML = '<option value="">- Select Faculty First -</option>';
-                            departmentSelect.disabled = true;
-                            return;
-                        }
+                const selectedDepartment = "{{ old('department', $data['member']->memberAcademicInfo?->department) }}";
 
+                function loadDepartments(facultySlug, selected = '') {
+
+                    if (!facultySlug) {
+                        departmentSelect.innerHTML = '<option value="">- Select Faculty First -</option>';
                         departmentSelect.disabled = true;
-                        departmentSelect.innerHTML = '<option>Loading...</option>';
+                        return;
+                    }
 
-                        fetch("{{ route('fetchDepartments') }}?faculty_slug=" + facultySlug)
-                            .then(res => res.json())
-                            .then(res => {
+                    departmentSelect.disabled = true;
+                    departmentSelect.innerHTML = '<option>Loading...</option>';
 
-                                departmentSelect.innerHTML = '<option value="">- Select -</option>';
+                    fetch("{{ route('fetchDepartments') }}?faculty_slug=" + facultySlug)
+                        .then(res => res.json())
+                        .then(res => {
 
-                                if (res.departments.length === 0) {
+                            departmentSelect.innerHTML = '<option value="">- Select -</option>';
 
-                                    departmentSelect.innerHTML +=
-                                        '<option disabled>No departments found</option>';
+                            if (res.departments.length === 0) {
 
-                                } else {
+                                departmentSelect.innerHTML +=
+                                    '<option disabled>No departments found</option>';
 
-                                    res.departments.forEach(department => {
+                            } else {
 
-                                        departmentSelect.innerHTML += `
+                                res.departments.forEach(department => {
+
+                                    departmentSelect.innerHTML += `
                             <option value="${department.slug}"
                                 ${selected === department.slug ? 'selected' : ''}>
                                 ${department.name}
                             </option>`;
-                                    });
+                                });
 
-                                }
+                            }
 
-                                departmentSelect.disabled = false;
+                            departmentSelect.disabled = false;
 
-                            });
-                    }
+                        });
+                }
 
-                    facultySelect.addEventListener('change', function() {
-                        loadDepartments(this.value);
-                    });
-
-                    // Edit Mode
-                    if (facultySelect.value) {
-                        loadDepartments(facultySelect.value, selectedDepartment);
-                    }
-
+                facultySelect.addEventListener('change', function() {
+                    loadDepartments(this.value);
                 });
-            </script>
-            {{-- scripts end --}}
-        </div><!--//container-fluid-->
+
+                // Edit Mode
+                if (facultySelect.value) {
+                    loadDepartments(facultySelect.value, selectedDepartment);
+                }
+
+            });
+        </script>
+        {{-- scripts end --}}
+    </div><!--//container-fluid-->
     </div><!--//app-content-->
 @endsection

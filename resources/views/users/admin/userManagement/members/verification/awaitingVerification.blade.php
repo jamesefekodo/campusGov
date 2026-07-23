@@ -139,7 +139,7 @@
                                                             <td>
                                                                 <span style="font-weight: bold">
                                                                     @if ($member->academic_status == 'student')
-                                                                        Current:
+                                                                        {{-- Current: --}}
                                                                     @elseif($member->academic_status == 'alumni')
                                                                         Graduated:
                                                                     @else
@@ -158,12 +158,14 @@
                                                                         now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
                                                                     ) }}
                                                                 @elseif($academic?->academic_status == 'alumni')
-                                                                    {{ $academic->graduation_session ?? '-' }}
+                                                                    @if ($academic?->graduation_session)
+                                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
+                                                                    @endif
                                                                 @else
                                                                     {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
 
                                                                     @if ($academic?->graduation_session)
-                                                                        ({{ $academic->graduation_session }})
+                                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
                                                                     @endif
                                                                 @endif
                                                             </td>
@@ -201,7 +203,7 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewMemberAwaitingVerificationIndex', ['username' => $member->username]) }}">
+                                                                    href="{{ route('viewMemberAwaitingVerificationIndex', ['uuid' => $member->userProfile->uuid]) }}">
                                                                     <i class="fas fa-eye me-2"></i>
                                                                     View</a>
                                                             </td>
