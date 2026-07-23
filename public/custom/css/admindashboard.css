@@ -339,7 +339,9 @@ a.sub-menu {
 
 .inner_nav_menu:hover,
 .inner_nav_active {
-    background: #002f82;
+    background:
+        linear-gradient(0deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)),
+        var(--system-secondary);
     border-bottom: 2px solid #fff;
 }
 
@@ -494,7 +496,7 @@ a.sub-menu {
     color: #fff !important;
 }
 
-.logo_header_text{
+.logo_header_text {
     color: var(--system-primary) !important;
 }
 

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('lga_of_origin')->nullable();
             $table->string('address1')->nullable();
             $table->string('address2')->nullable();
-            $table->boolean('is_verified')->default(true);
+            $table->boolean('is_verified')->default(false);
             $table->string('verified_by')->nullable(); // Foreign
             $table->dateTime('verified_at')->nullable();
             $table->timestamps();

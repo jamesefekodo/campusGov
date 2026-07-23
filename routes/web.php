@@ -8,6 +8,7 @@ use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
+use App\Http\Controllers\UserManagement\MembersManagementController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,8 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::get('end_other_sessions', [AuthController::class, 'endOtherSessions'])->name('endOtherSessions');
 });
 
+// member routes
+
 Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(function () {
     Route::get('member/dashboard', [DashboardController::class, 'dashboard'])->name('memberDashboard');
 
@@ -80,8 +83,24 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
 
 
+// administrators routes
 Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(function () {
     Route::get('admin/dashboard', [DashboardController::class, 'dashboard'])->name('adminDashboard');
+
+
+    // user management
+    // students
+    Route::get('admin/user_management/members/students', [MembersManagementController::class, 'studentMembers'])->name('studentMembers');
+    Route::get('admin/user_management/members/students/search', [MembersManagementController::class, 'studentMembers'])->name('studentMembersSearch');
+
+
+    // awaiting verification
+    Route::get('admin/user_management/members/verification', [MembersManagementController::class, 'memberAwaitingVerification'])->name('memberAwaitingVerification');
+    Route::get('admin/user_management/members/verification/search', [MembersManagementController::class, 'memberAwaitingVerification'])->name('memberAwaitingVerificationSearch');
+    Route::get('admin/user_management/members/verification/view/{username}', [MembersManagementController::class, 'viewMemberAwaitingVerificationIndex'])->name('viewMemberAwaitingVerificationIndex');
+
+
+
 
 
 

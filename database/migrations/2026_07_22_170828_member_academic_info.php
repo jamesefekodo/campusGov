@@ -22,7 +22,7 @@ return new class extends Migration
             $table->year('admission_session')->nullable();
             $table->year('graduation_session')->nullable();
             $table->string('matric_number')->nullable();
-            $table->boolean('is_verified')->default(true);
+            $table->boolean('is_verified')->default(false);
             $table->string('verified_by')->nullable(); // Foreign
             $table->dateTime('verified_at')->nullable();
             $table->timestamps();

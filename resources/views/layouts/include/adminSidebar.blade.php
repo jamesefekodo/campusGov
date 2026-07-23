@@ -18,13 +18,13 @@
                     <i class="fas fa-users"></i>
                 </span>
                 <span class="nav-link-text">Users &nbsp;
-                    {{-- @php
-                        $usersNotifications = countVerificationReadyStudents() + countVerificationReadyAssociation();
+                    @php
+                        $usersNotifications = countMemberProfilesAwaitingVerification() + 0;
                     @endphp
                     @if ($usersNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
                             style="font-size: 11px">{{ $usersNotifications }}</span>
-                    @endif --}}
+                    @endif
                 </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
@@ -32,18 +32,19 @@
             </a><!--//nav-link-->
             <div id="submenu-1" class="collapse submenu submenu-1" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/members') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('allStudents') }} --}}
-                             ">Members
-                            &nbsp;
-                            {{-- @if (countVerificationReadyStudents() > 0)
-                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                    style="font-size: 11px">{{ countVerificationReadyStudents() }}</span>
-                            @endif --}}
-                        </a>
-                    </li>
+                    @if (Auth::user()->hasPermission('member_profile.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/members') ? 'sidebar-active' : '' }}"
+                                href="{{ route('studentMembers') }}">Members
+                                &nbsp;
+                                @if (countMemberProfilesAwaitingVerification() > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ countMemberProfilesAwaitingVerification() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/associations') ? 'sidebar-active' : '' }}
                              "
