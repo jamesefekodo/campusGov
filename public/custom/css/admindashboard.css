@@ -518,7 +518,9 @@ a.sub-menu {
         flex: 1;
     }
 } */
-
+.app-page-title{
+    margin: 10px;
+}
 .table_title {
     font-size: 20px;
     padding: 1px 20px;

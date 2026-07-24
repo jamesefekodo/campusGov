@@ -4,8 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
+use App\Models\Members\MemberEmploymentAndBusiness;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Members\MemberSkill;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -159,5 +162,19 @@ class User extends Authenticatable
     {
         return $this->belongsTo(MemberAcademicInfo::class, 'username', 'username');
     }
+    public function memberAcademicHistories()
+    {
+        return $this->hasMany(MemberAcademicHistory::class, 'username', 'username');
+    }
+    public function memberSkills()
+    {
+        return $this->hasMany(MemberSkill::class, 'username', 'username');
+    }
+     public function memberEmploymentAndBusiness()
+    {
+        return $this->hasMany(MemberEmploymentAndBusiness::class, 'username', 'username');
+    }
+
+
 
 }

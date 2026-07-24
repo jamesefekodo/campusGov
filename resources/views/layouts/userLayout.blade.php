@@ -156,8 +156,8 @@
                     @if (in_array(getUserType(), ['root', 'admin']))
                         @include('layouts.include.adminSidebar')
                     @endif
-                    @if (getUserType() === 'companyAdmin')
-                        @include('layouts.include.companySidebar')
+                    @if (getUserType() === 'member')
+                        @include('layouts.include.memberSidebar')
                     @endif
 
 
@@ -175,7 +175,7 @@
 
     </div><!--//app-wrapper-->
     <br><br>
-    {{-- @include('layouts.include.footer') --}}
+    @include('layouts.include.footer')
 
 
     <!-- Javascript -->

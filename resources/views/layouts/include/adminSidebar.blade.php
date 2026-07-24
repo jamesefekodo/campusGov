@@ -46,19 +46,6 @@
                         </li>
                     @endif
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/associations') ? 'sidebar-active' : '' }}
-                             "
-                            href="
-                            {{-- {{ route('allAssociations') }} --}}
-                             ">Associations
-                            &nbsp;
-                            {{-- @if (countVerificationReadyAssociation() > 0)
-                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                    style="font-size: 11px">{{ countVerificationReadyAssociation() }}</span>
-                            @endif --}}
-                        </a>
-                    </li>
-                    <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/product_management/categories') ? 'sidebar-active' : '' }}
                              "
                             href="

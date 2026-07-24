@@ -7,8 +7,10 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Members\MemberSkill;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -112,7 +114,12 @@ class MemberSelfProfileController extends Controller
             $profile->userProfile->save();
         }
 
-        return redirect()->route('studentAccountSetup')->with('success', 'Done!');
+
+        if (Route::currentRouteName() == 'memberSelfCreatePersonalProfileSubmit') {
+            return redirect()->route('studentAccountSetup')->with('success', 'Done!');
+        } elseif (Route::currentRouteName() == 'memberEditPersonalProfileSubmit') {
+            return redirect()->route('myPersonalProfile')->with('success', 'Done!');
+        }
     }
     public function memberCreateAcademicInfo()
     {
@@ -290,5 +297,176 @@ class MemberSelfProfileController extends Controller
         } else {
             return redirect()->route('homepage');
         }
+    }
+
+    public function memberViewSelfProfile()
+    {
+        $member = Auth::user();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myProfile', compact('data'));
+    }
+    public function myPersonalProfile()
+    {
+        $member = Auth::user();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+            'display' => 'view',
+            'pageTitle' => 'Personal Profile',
+        ];
+        return view('users.member.myProfile.myPersonalProfile', compact('data'));
+    }
+    public function memberEditPersonalProfile()
+    {
+        $member = Auth::user();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+            'display' => 'edit',
+            'pageTitle' => 'Update Personal Profile',
+        ];
+        return view('users.member.myProfile.myPersonalProfile', compact('data'));
+    }
+    public function myAcademicInfo()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myAcademicInfo', compact('data'));
+    }
+    public function myAcademicHistory()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myAcademicHistory', compact('data'));
+    }
+    public function addNewAcademicRecordSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'institution' => 'required|string',
+            'address' => 'required|string',
+            'certificate' => 'required|string',
+            'date' => 'required',
+        ]);
+
+        $record = new MemberAcademicHistory();
+        $record->username = $member->username;
+        $record->institution = $request->institution;
+        $record->address = $request->address;
+        $record->certificate = $request->certificate;
+        $record->date = $request->date;
+        $record->save();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editAcademicRecordSubmit($id, Request $request)
+    {
+        $member = Auth::user();
+
+        $record = MemberAcademicHistory::where('id', $id)->where('username', $member->username)->first();
+        if (!$record) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $request->validate([
+            'institution' => 'required|string',
+            'address' => 'required|string',
+            'certificate' => 'required|string',
+            'date' => 'required',
+        ]);
+
+        $record->institution = $request->institution;
+        $record->address = $request->address;
+        $record->certificate = $request->certificate;
+        $record->date = $request->date;
+        $record->save();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deleteAcademicRecordSubmit($id)
+    {
+        $member = Auth::user();
+
+        $record = MemberAcademicHistory::where('id', $id)->where('username', $member->username)->first();
+        if (!$record) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $record->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function myAcademicSkills()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.mySkills', compact('data'));
+    }
+    public function addSkillSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'skill' => 'required|string',
+            'description' => 'required|string',
+        ]);
+        $skill = new MemberSkill();
+        $skill->username = $member->username;
+        $skill->skill = $request->skill;
+        $skill->description = $request->description;
+        $skill->save();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editSkillSubmit($id, Request $request)
+    {
+        $request->validate([
+            'skill' => 'required|string',
+            'description' => 'required|string',
+        ]);
+        $member = Auth::user();
+
+        $skill = MemberSkill::where('id', $id)->where('username', $member->username)->first();
+        if (!$skill) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $skill->update([
+            'skill' => $request->skill,
+            'description' => $request->description,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function memberSelfDeleteSkill($id)
+    {
+        $member = Auth::user();
+
+        $skill = MemberSkill::where('id', $id)->where('username', $member->username)->first();
+        if (!$skill) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $skill->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function myBusiness(){
+
     }
 }

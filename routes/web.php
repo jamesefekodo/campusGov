@@ -61,8 +61,7 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     // session management
     Route::get('manage_sessions', [AuthController::class, 'manageSession'])->name('manageSession');
     Route::get('end_other_sessions', [AuthController::class, 'endOtherSessions'])->name('endOtherSessions');
-        Route::get('disabled_account', [AuthController::class, 'disabledUserAccount'])->name('disabledUserAccount');
-
+    Route::get('disabled_account', [AuthController::class, 'disabledUserAccount'])->name('disabledUserAccount');
 });
 
 // member routes
@@ -81,6 +80,25 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/account_setup/submit_for_verification', [MemberSelfProfileController::class, 'memberSubmitSelfAccountForVerification'])->name('memberSubmitSelfAccountForVerification');
 
     Route::get('member/account_setup/awaiting_verification', [MemberSelfProfileController::class, 'awaitingVerification'])->name('memberAccountAwaitingVerification');
+
+    Route::get('member/my_profile', [MemberSelfProfileController::class, 'memberViewSelfProfile'])->name('memberViewSelfProfile');
+    Route::get('member/my_profile/personal_profile', [MemberSelfProfileController::class, 'myPersonalProfile'])->name('myPersonalProfile');
+    Route::get('member/my_profile/personal_profile/edit', [MemberSelfProfileController::class, 'memberEditPersonalProfile'])->name('memberEditPersonalProfile');
+    Route::put('member/my_profile/personal_profile/update', [MemberSelfProfileController::class, 'memberSelfCreatePersonalProfileSubmit'])->name('memberEditPersonalProfileSubmit');
+
+    Route::get('member/my_profile/academic_info', [MemberSelfProfileController::class, 'myAcademicInfo'])->name('myAcademicInfo');
+
+    Route::get('member/my_profile/academic_history', [MemberSelfProfileController::class, 'myAcademicHistory'])->name('myAcademicHistory');
+    Route::post('member/my_profile/academic_history/add_new/submit', [MemberSelfProfileController::class, 'addNewAcademicRecordSubmit'])->name('addNewAcademicRecordSubmit');
+    Route::put('member/my_profile/academic_history/update/{id}/submit', [MemberSelfProfileController::class, 'editAcademicRecordSubmit'])->name('editAcademicRecordSubmit');
+    Route::get('member/my_profile/academic_history/delete/{id}', [MemberSelfProfileController::class, 'deleteAcademicRecordSubmit'])->name('deleteAcademicRecordSubmit');
+
+    Route::get('member/my_profile/skills', [MemberSelfProfileController::class, 'myAcademicSkills'])->name('myAcademicSkills');
+    Route::post('member/my_profile/skills/add_new', [MemberSelfProfileController::class, 'addSkillSubmit'])->name('addSkillSubmit');
+    Route::put('member/my_profile/skills/update/{id}/submit', [MemberSelfProfileController::class, 'editSkillSubmit'])->name('editSkillSubmit');
+    Route::get('member/my_profile/skills/{id}/delete', [MemberSelfProfileController::class, 'memberSelfDeleteSkill'])->name('memberSelfDeleteSkill');
+
+    Route::get('member/my_profile/business', [MemberSelfProfileController::class, 'myBusiness'])->name('myBusiness');
 });
 
 

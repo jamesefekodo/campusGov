@@ -31,6 +31,7 @@ class BasicSystemSetting extends Model
         'primary_color',
         'secondary_color',
         'tertiary_color',
+        'footer_plus',
     ];
 
     // caset attributes

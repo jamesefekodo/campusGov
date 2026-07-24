@@ -34,6 +34,7 @@ return new class extends Migration
             $table->text('primary_colour')->nullable();
             $table->text('secondary_colour')->nullable();
             $table->text('tertiary_colour')->nullable();
+            $table->text('footer_plus')->nullable();
 
             $table->timestamps();
         });

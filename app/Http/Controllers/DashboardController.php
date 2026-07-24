@@ -18,9 +18,9 @@ class DashboardController extends Controller
 
             if ($user->account_type == 2) {
                 $data = [
-                    'user' => $user,
+                    'member' => $user,
                 ];
-                return view('users.students.dashboard', compact('data'));
+                return view('users.member.dashboard', compact('data'));
             }
             // 1 - Admin, 0 - root
             if ($user->account_type == 0 || $user->account_type == 1) {
