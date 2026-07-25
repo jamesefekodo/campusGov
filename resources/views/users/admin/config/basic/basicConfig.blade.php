@@ -27,7 +27,7 @@
                                                 </div>
 
                                                 <form class="form my_form" method="POST" enctype="multipart/form-data"
-                                                    {{-- action="{{ route('updateAcademicYear') }}" --}}>
+                                                    action="{{ route('updateAcademicYear') }}">
 
                                                     @csrf
                                                     @method('PUT')

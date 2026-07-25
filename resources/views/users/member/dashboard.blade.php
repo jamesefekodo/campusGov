@@ -253,36 +253,34 @@
                                         </p>
                                         <p class="m-1">
                                             Level: <span class="text-black">
-                                                <span style="font-weight: bold">
-                                                    @if ($data['member']->memberAcademicInfo->academic_status == 'student')
-                                                        {{-- Current: --}}
-                                                    @elseif($data['member']->memberAcademicInfo->academic_status == 'alumni')
-                                                        Graduated:
-                                                    @else
-                                                        -
-                                                    @endif
-                                                </span>
-
                                                 @php
                                                     $academic = $data['member']->memberAcademicInfo;
                                                 @endphp
 
+                                                <span style="font-weight: bold">
+                                                    @if ($academic?->academic_status == 'student')
+                                                        {{-- Current Level: --}}
+                                                    @elseif($academic?->academic_status == 'alumni')
+                                                        Graduated:
+                                                    @else
+                                                        {{ $academic?->academic_status }}
+                                                    @endif
+                                                </span>
 
                                                 @if ($academic?->academic_status == 'student')
-                                                    {{ currentLevel(
-                                                        \App\Models\AcademicConfig\Program::whereSlug($academic->program)->first(),
-                                                        now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
-                                                    ) }}
+
+                                                    {{ currentLevel($academic->theProgram, studentCurrentLevel($academic)) }}
                                                 @elseif($academic?->academic_status == 'alumni')
-                                                    @if ($academic?->graduation_session)
-                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
-                                                    @endif
+                                                    {{ $academic->graduation_session
+                                                        ? $academic->graduation_session . '/' . ($academic->graduation_session + 1)
+                                                        : '-' }}
                                                 @else
                                                     {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
 
                                                     @if ($academic?->graduation_session)
                                                         ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
                                                     @endif
+
                                                 @endif
                                             </span>
                                         </p>
@@ -311,8 +309,11 @@
                                         </p>
                                         <p class="m-1">
                                             Program Duration: <span class="text-black">
-                                                {{ getProgramDuration($data['member']->memberAcademicInfo->theProgram) }}
-                                                years
+                                                @php
+                                                    $academic = $data['member']->memberAcademicInfo;
+                                                @endphp
+
+                                                {{ getProgramDuration($academic->theProgram, $academic->programType, $academic->theDepartment) }} Years
                                             </span>
                                         </p>
                                         <p class="m-1">

@@ -43,7 +43,7 @@ class MemberAcademicInfo extends Model
         return $this->belongsTo(User::class, 'username', 'username');
     }
 
-     public function personalProfile()
+    public function personalProfile()
     {
         return $this->belongsTo(MemberPersonalProfile::class, 'username', 'username');
     }
@@ -51,7 +51,7 @@ class MemberAcademicInfo extends Model
     {
         return $this->belongsTo(Program::class, 'program', 'slug');
     }
-     public function theFaculty()
+    public function theFaculty()
     {
         return $this->belongsTo(Faculty::class, 'faculty', 'slug');
     }
@@ -62,5 +62,45 @@ class MemberAcademicInfo extends Model
     public function programType()
     {
         return $this->belongsTo(ProgramType::class, 'program_type', 'slug');
+    }
+
+    // synchronize academic levels per change in academic year
+
+    public static function syncStudentStatuses(): void
+    {
+        static::with([
+            'theProgram',
+            'programType',
+            'theDepartment',
+        ])
+            ->whereIn('academic_status', ['student', 'unknown'])
+            ->chunk(200, function ($records) {
+
+                foreach ($records as $record) {
+
+                    if (!$record->theProgram) {
+                        continue;
+                    }
+
+                    $isStudent = isStillWithinProgramDuration(
+                        $record->admission_session,
+                        $record->theProgram,
+                        $record->programType,
+                        $record->theDepartment
+                    );
+
+                    if ($isStudent && $record->academic_status === 'unknown') {
+
+                        $record->update([
+                            'academic_status' => 'student',
+                        ]);
+                    } elseif (!$isStudent && $record->academic_status === 'student') {
+
+                        $record->update([
+                            'academic_status' => 'unknown',
+                        ]);
+                    }
+                }
+            });
     }
 }

@@ -107,37 +107,37 @@ if (!function_exists('departments')) {
 //     }
 // }
 
-if (!function_exists('toRoman')) {
-    function toRoman(int $number): string
-    {
-        $map = [
-            1000 => 'M',
-            900  => 'CM',
-            500  => 'D',
-            400  => 'CD',
-            100  => 'C',
-            90   => 'XC',
-            50   => 'L',
-            40   => 'XL',
-            10   => 'X',
-            9    => 'IX',
-            5    => 'V',
-            4    => 'IV',
-            1    => 'I',
-        ];
+// if (!function_exists('toRoman')) {
+//     function toRoman(int $number): string
+//     {
+//         $map = [
+//             1000 => 'M',
+//             900  => 'CM',
+//             500  => 'D',
+//             400  => 'CD',
+//             100  => 'C',
+//             90   => 'XC',
+//             50   => 'L',
+//             40   => 'XL',
+//             10   => 'X',
+//             9    => 'IX',
+//             5    => 'V',
+//             4    => 'IV',
+//             1    => 'I',
+//         ];
 
-        $result = '';
+//         $result = '';
 
-        foreach ($map as $value => $roman) {
-            while ($number >= $value) {
-                $result .= $roman;
-                $number -= $value;
-            }
-        }
+//         foreach ($map as $value => $roman) {
+//             while ($number >= $value) {
+//                 $result .= $roman;
+//                 $number -= $value;
+//             }
+//         }
 
-        return $result;
-    }
-}
+//         return $result;
+//     }
+// }
 
 // usage
 // getLevel($program, 1); // ND I
@@ -148,7 +148,23 @@ if (!function_exists('toRoman')) {
 // getLevel($bscProgram, 2); // 200L
 
 // getLevel($mscProgram, 2); // MSc II
+// if (!function_exists('isStillWithinProgramDuration')) {
+//     //   Check if student is still within normal program years
+//     function isStillWithinProgramDuration($admissionSession, $program, $programType = null, $department = null): bool
+//     {
+//         if (!$admissionSession || !$program) return true;
 
+//         $duration = getProgramDuration($program, $programType, $department);
+
+//         // Extract year from admission session (e.g., "2022/2023" → 2022)
+//         $startYear = (int) explode('/', $admissionSession)[0];
+//         $currentYear = now()->year;
+
+//         $yearsElapsed = $currentYear - $startYear;
+
+//         return $yearsElapsed < $duration;
+//     }
+// }
 
 if (!function_exists('currentLevel')) {
     function currentLevel($program, int $currentLevel): string
@@ -193,62 +209,93 @@ if (!function_exists('toRoman')) {
         return $result;
     }
 }
+function getProgramDuration($program, $programType = null, $department = null): int
+{
+    if (!$program) {
+        return 4;
+    }
 
-if (!function_exists('getProgramDuration')) {
-
-    function getProgramDuration($program, $programType = null, $department = null): int
-    {
-        if (!$program) {
-            return 4;
-        }
-
-        $override = ProgramDurationOverride::query()
-            ->where('program_slug', $program->slug)
+    // 1. Exact match: Program + Department + Program Type
+    if ($department && $programType) {
+        $override = ProgramDurationOverride::where('program_slug', $program->slug)
+            ->where('department_slug', $department->slug)
+            ->where('program_type_slug', $programType->slug)
             ->where('is_active', true)
-            ->where(function ($query) use ($programType, $department) {
-
-                if ($department) {
-                    $query->where('department_slug', $department->slug);
-                }
-
-                if ($programType) {
-                    $query->orWhere('program_type_slug', $programType->slug);
-                }
-
-                $query->orWhere(function ($q) {
-                    $q->whereNull('department_slug')
-                        ->whereNull('program_type_slug');
-                });
-            })
-            ->orderByRaw("
-                CASE
-                    WHEN department_slug IS NOT NULL THEN 1
-                    WHEN program_type_slug IS NOT NULL THEN 2
-                    ELSE 3
-                END
-            ")
             ->first();
 
-
-        return $override?->duration ?? $program->duration;
+        if ($override) {
+            return $override->duration;
+        }
     }
+
+    // 2. Program + Department
+    if ($department) {
+        $override = ProgramDurationOverride::where('program_slug', $program->slug)
+            ->where('department_slug', $department->slug)
+            ->whereNull('program_type_slug')
+            ->where('is_active', true)
+            ->first();
+
+        if ($override) {
+            return $override->duration;
+        }
+    }
+
+    // 3. Program + Program Type
+    if ($programType) {
+        $override = ProgramDurationOverride::where('program_slug', $program->slug)
+            ->where('program_type_slug', $programType->slug)
+            ->whereNull('department_slug')
+            ->where('is_active', true)
+            ->first();
+
+        if ($override) {
+            return $override->duration;
+        }
+    }
+
+    // 4. Program only
+    $override = ProgramDurationOverride::where('program_slug', $program->slug)
+        ->whereNull('department_slug')
+        ->whereNull('program_type_slug')
+        ->where('is_active', true)
+        ->first();
+
+    if ($override) {
+        return $override->duration;
+    }
+
+    // 5. Default duration
+    return $program->duration;
 }
 
-if (!function_exists('isStillWithinProgramDuration')) {
-    //   Check if student is still within normal program years
-    function isStillWithinProgramDuration($admissionSession, $program, $programType = null, $department = null): bool
+
+if (!function_exists('currentAcademicYear')) {
+    function currentAcademicYear(): int
     {
-        if (!$admissionSession || !$program) return true;
+        return (int) basicSystemInfo()->current_academic_year;
+    }
+}
+if (!function_exists('isStillWithinProgramDuration')) {
+
+    function isStillWithinProgramDuration(
+        $admissionSession,
+        $program,
+        $programType = null,
+        $department = null
+    ): bool {
+
+        if (!$admissionSession || !$program) {
+            return true;
+        }
 
         $duration = getProgramDuration($program, $programType, $department);
 
-        // Extract year from admission session (e.g., "2022/2023" → 2022)
-        $startYear = (int) explode('/', $admissionSession)[0];
-        $currentYear = now()->year;
+        $admissionYear = (int) $admissionSession;
 
-        $yearsElapsed = $currentYear - $startYear;
+        $currentLevel = currentAcademicYear() - $admissionYear + 1;
 
-        return $yearsElapsed < $duration;
+        return $currentLevel <= $duration;
     }
 }
 
@@ -294,6 +341,16 @@ if (!function_exists('academicStatusOptions')) {
     }
 }
 
+function studentCurrentLevel($academic): int
+{
+    if (!$academic || !$academic->admission_session) {
+        return 1;
+    }
+
+    $admissionYear = (int) explode('/', $academic->admission_session)[0];
+
+    return max(1, currentAcademicYear() - $admissionYear + 1);
+}
 
 if (!function_exists('countMemberProfilesAwaitingVerification')) {
     function countMemberProfilesAwaitingVerification()

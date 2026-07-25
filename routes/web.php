@@ -157,6 +157,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/disable/{uuid}', [MembersManagementController::class, 'disableMemberAccount'])->name('disableMemberAccount');
 
 
+    // view members profile
+    Route::get('admin/user_management/members/view/{uuid}', [MembersManagementController::class, 'viewMMember'])->name('viewMMember');
+
 
 
 
@@ -222,6 +225,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // basic system configuration
     Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
+    Route::put('admin/config/basics/acedemic_year/update', [SystemConfigurationController::class, 'updateAcademicYear'])->name('updateAcademicYear');
     Route::put('admin/config/basics/maintenance_mode/update', [SystemConfigurationController::class, 'updateMaintenanceMode'])->name('updateMaintenanceMode');
     Route::put('admin/config/basics/system_info/update', [SystemConfigurationController::class, 'updateBasicSystemInfoUpdate'])->name('updateBasicSystemInfoUpdate');
     Route::put('admin/config/basics/email_config/update', [SystemConfigurationController::class, 'updateEmailConfigSubmit'])->name('updateEmailConfigSubmit');

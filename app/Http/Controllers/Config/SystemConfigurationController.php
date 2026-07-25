@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Config;
 
 use App\Http\Controllers\Controller;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Members\MemberAcademicInfo;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -72,6 +73,41 @@ class SystemConfigurationController extends Controller
         ];
 
         return view('users.admin.config.basic.basicConfig', compact('data'));
+    }
+    public function updateAcademicYear(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.update'),
+            403
+        );
+
+        $basicSystemSetting = BasicSystemSetting::firstOrFail();
+
+        switch ($request->direction) {
+
+            case 'forward':
+                $basicSystemSetting->current_academic_year++;
+                break;
+
+            case 'backward':
+                $basicSystemSetting->current_academic_year--;
+                break;
+
+            default:
+                return back()->with('error', 'Invalid direction.');
+        }
+
+        $basicSystemSetting->save();
+
+        MemberAcademicInfo::syncStudentStatuses();
+
+        return back()->with(
+            'success',
+            'Academic year updated to ' . $basicSystemSetting->current_academic_year
+        );
     }
     public function updateMaintenanceMode(Request $request)
     {

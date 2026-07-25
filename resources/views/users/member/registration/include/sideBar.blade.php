@@ -24,54 +24,54 @@
 </p>
 <p class="m-0">
     <span style="font-weight: bold">
-        @if ($data['member']->memberAcademicInfo?->academic_status == 'student')
-            Current Level:
-        @elseif($data['member']->memberAcademicInfo?->academic_status == 'alumni')
-            Graduation Session:
+        Level
+    </span>
+    @php
+        $data['member'] = $data['member']->memberAcademicInfo;
+    @endphp
+
+    <span style="font-weight: bold">
+        @if ($data['member']?->academic_status == 'student')
+            {{-- Current Level: --}}
+        @elseif($data['member']?->academic_status == 'alumni')
+            Graduated:
         @else
             Status:
         @endif
     </span>
 
-    @php
-        $academic = $data['member']->memberAcademicInfo;
-    @endphp
+    @if ($data['member']?->academic_status == 'student')
 
-
-    @if ($academic?->academic_status == 'student')
-
-        {{ currentLevel(
-            \App\Models\AcademicConfig\Program::whereSlug($academic->program)->first(),
-            now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
-        ) }}
-    @elseif($academic?->academic_status == 'alumni')
-        {{ $academic->graduation_session ?? '-' }}
+        {{ currentLevel($data['member']->theProgram, studentCurrentLevel($data['member'])) }}
+    @elseif($data['member']?->academic_status == 'alumni')
+        {{ $data['member']->graduation_session
+            ? $data['member']->graduation_session . '/' . ($data['member']->graduation_session + 1)
+            : '-' }}
     @else
-        {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
+        {{ ucfirst(str_replace('_', ' ', $data['member']?->academic_status ?? '-')) }}
 
-        @if ($academic?->graduation_session)
-            ({{ $academic->graduation_session }})
+        @if ($data['member']?->graduation_session)
+            ({{ $data['member']->graduation_session }}/{{ $data['member']->graduation_session + 1 }})
         @endif
 
     @endif
-
 </p>
 <p class="text-capitalize"><span style="font-weight: bold">Account Status:
     </span>
     @switch($data['member']->account_status)
-        @case('0')
+        @case(0)
             Unverified
         @break
 
-        @case('1')
+        @case(1)
             Awaiting Verification
         @break
 
-        @case('2')
+        @case(2)
             Active
         @break
 
-        @case('3')
+        @case(3)
             Disabled
         @break
 

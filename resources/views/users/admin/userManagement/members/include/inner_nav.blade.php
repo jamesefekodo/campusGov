@@ -6,6 +6,18 @@
                 {{ Str::startsWith(request()->path(), 'admin/user_management/members/students') ? 'inner_nav_active' : '' }}">
                 Students</div>
         </a>
+        <a href="#">
+            <div
+                class="inner_nav_menu
+                {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
+                Non-Students</div>
+        </a>
+        <a href="#">
+            <div
+                class="inner_nav_menu
+                {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
+                Inactive</div>
+        </a>
 
         @if (Auth::user()->hasPermission('verify_users'))
             <a href="{{ route('memberAwaitingVerification') }}">

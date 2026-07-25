@@ -137,59 +137,55 @@
                                                                 </p>
                                                             </td>
                                                             <td>
+                                                                @php
+                                                                    $academicInfo = $member;
+                                                                @endphp
+
                                                                 <span style="font-weight: bold">
-                                                                    @if ($member->academic_status == 'student')
-                                                                        {{-- Current: --}}
-                                                                    @elseif($member->academic_status == 'alumni')
+                                                                    @if ($academicInfo?->academic_status == 'student')
+                                                                        {{-- Current Level: --}}
+                                                                    @elseif($academicInfo?->academic_status == 'alumni')
                                                                         Graduated:
                                                                     @else
-                                                                        -
+                                                                        Status:
                                                                     @endif
                                                                 </span>
 
-                                                                @php
-                                                                    $academic = $member;
-                                                                @endphp
-
-
-                                                                @if ($academic?->academic_status == 'student')
-                                                                    {{ currentLevel(
-                                                                        \App\Models\AcademicConfig\Program::whereSlug($academic->program)->first(),
-                                                                        now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
-                                                                    ) }}
-                                                                @elseif($academic?->academic_status == 'alumni')
-                                                                    @if ($academic?->graduation_session)
-                                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
-                                                                    @endif
+                                                                @if ($academicInfo?->academic_status == 'student')
+                                                                    {{ currentLevel($academicInfo->theProgram, studentCurrentLevel($academicInfo)) }}
+                                                                @elseif($academicInfo?->academic_status == 'alumni')
+                                                                    {{ $academicInfo->graduation_session
+                                                                        ? $academicInfo->graduation_session . '/' . ($academicInfo->graduation_session + 1)
+                                                                        : '-' }}
                                                                 @else
-                                                                    {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
+                                                                    {{ ucfirst(str_replace('_', ' ', $academicInfo?->academic_status ?? '-')) }}
 
-                                                                    @if ($academic?->graduation_session)
-                                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
+                                                                    @if ($academicInfo?->graduation_session)
+                                                                        ({{ $academicInfo->graduation_session }}/{{ $academicInfo->graduation_session + 1 }})
                                                                     @endif
                                                                 @endif
                                                             </td>
                                                             <td>
                                                                 @switch($member->userProfile->account_status)
-                                                                    @case('0')
+                                                                    @case(0)
                                                                         <span class="badge bg-yellow text-black">
                                                                             Unverified
                                                                         </span>
                                                                     @break
 
-                                                                    @case('1')
+                                                                    @case(1)
                                                                         <span class="badge bg-blue text-white">
                                                                             Awaiting Verification
                                                                         </span>
                                                                     @break
 
-                                                                    @case('2')
+                                                                    @case(2)
                                                                         <span class="badge bg-green text-white">
                                                                             Active
                                                                         </span>
                                                                     @break
 
-                                                                    @case('3')
+                                                                    @case(3)
                                                                         <span class="badge bg-red text-white">
                                                                             Disabled
                                                                         </span>

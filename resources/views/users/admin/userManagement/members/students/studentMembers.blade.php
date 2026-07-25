@@ -50,7 +50,7 @@
                                                         Program
                                                     </th>
                                                     <th scope="col" style="" class="type-b-page-header">
-                                                        Faculty/Department
+                                                        Department/Faculty
                                                     </th>
                                                     <th scope="col" style="" class="type-b-page-header">
                                                         Level
@@ -59,7 +59,7 @@
                                                         Account Status
                                                     </th>
                                                     <th scope="col" style="" class="type-b-page-header">
-                                                        Action
+                                                        Actions
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -78,174 +78,132 @@
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ ($data['members']->currentPage() - 1) * $data['members']->perPage() + $loop->iteration }}
                                                             </th>
-                                                            {{-- <td class="text-start">
+                                                            <td class="text-start">
 
-                                                                        <div class="d-flex align-items-center gap-3">
-                                                                            Avatar
-                                                                            <div class="flex-shrink-0">
-                                                                                @include('users.company.employees.employees.include.profilePictureAndAvatarDisplay')
-                                                                            </div>
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    {{-- Avatar --}}
+                                                                    <div class="flex-shrink-0">
+                                                                        @php
+                                                                            $user = $member->userProfile;
+                                                                        @endphp
+                                                                        @include('users.admin.userManagement.members.include.profilePictureAndAvatarDisplay')
+                                                                    </div>
 
-                                                                            Name & Code
-                                                                            <div
-                                                                                class="flex-grow-1 min-width-0 text-center">
-                                                                                <p
-                                                                                    class="fw-bold mb-0 text-truncate text-capitalize">
-                                                                                    @php
-                                                                                        $middleInitial = $employee->middle_name
-                                                                                            ? strtoupper(
-                                                                                                    substr(
-                                                                                                        $employee->middle_name,
-                                                                                                        0,
-                                                                                                        1,
-                                                                                                    ),
-                                                                                                ) . '. '
-                                                                                            : '';
-                                                                                    @endphp
-
-                                                                                    {{ strtolower($employee->first_name) . ' ' . $middleInitial . strtolower($employee->last_name) }}
-                                                                                </p>
-                                                                                <p
-                                                                                    class="text-muted mb-0 small text-truncate">
-                                                                                    {{ strtoupper($employee->employee_code) }}
-                                                                                </p>
-                                                                            </div>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="">
-                                                                        <p class="fw-bold mb-0 text-truncate">
+                                                                    {{-- Name & Code --}}
+                                                                    <div class="flex-grow-1 min-width-0 text-center">
+                                                                        <p
+                                                                            class="fw-bold mb-0 text-truncate text-capitalize">
                                                                             @php
-                                                                                $locale = 'name_' . currentLocale();
-
-                                                                                $deptName = $employee->department
-                                                                                    ? $employee->department->$locale ??
-                                                                                        $employee->department->name
-                                                                                    : '';
-                                                                                $subDeptName = $employee->subDepartment
-                                                                                    ? $employee->subDepartment
-                                                                                            ->$locale ??
-                                                                                        $employee->subDepartment->name
+                                                                                $middleInitial = $member->userProfile
+                                                                                    ->memberPersonalProfile->middle_name
+                                                                                    ? strtoupper(
+                                                                                            substr(
+                                                                                                $member->userProfile
+                                                                                                    ->memberPersonalProfile
+                                                                                                    ->middle_name,
+                                                                                                0,
+                                                                                                1,
+                                                                                            ),
+                                                                                        ) . '. '
                                                                                     : '';
                                                                             @endphp
 
-                                                                            {{ $deptName }}
-                                                                            @if (!empty($subDeptName))
-                                                                                <span class="badge text-muted">-
-                                                                                    {{ $subDeptName }}</span>
-                                                                            @endif
-
+                                                                            {{ strtolower($member->userProfile->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($member->userProfile->memberPersonalProfile->last_name) }}
                                                                         </p>
                                                                         <p class="text-muted mb-0 small text-truncate">
-                                                                            {{ $employee->position ?? '-' }}
+                                                                            {{ strtoupper($member->matric_number) }}
                                                                         </p>
-                                                                    </td>
-                                                                    <td class="">
-                                                                        <p class="fw-bold mb-0 text-truncate">
-                                                                            @if ($employee->currentShift)
-                                                                                @php
-                                                                                    $locale = 'name_' . currentLocale();
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <p class="fw-bold mb-0 text-truncate">
+                                                                    {{ $member->theProgram?->name }} @if ($member->theProgram?->short_name)
+                                                                        ({{ $member->theProgram?->short_name }})
+                                                                    @endif
+                                                                </p>
+                                                                <p class="text-muted mb-0 small text-truncate">
+                                                                    {{ $member->programType?->type_name }}
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                <p class="fw-bold mb-0 text-truncate">
+                                                                    {{ $member->theDepartment?->name }}
+                                                                </p>
+                                                                <p class="text-muted mb-0 small text-truncate">
+                                                                    {{ $member->theFaculty?->name }} @if ($member->theFaculty?->acronym)
+                                                                        ({{ $member->theFaculty?->acronym }})
+                                                                    @endif
+                                                                </p>
+                                                            </td>
+                                                            <td>
+                                                                @php
+                                                                    $academicInfo =
+                                                                        $member;
+                                                                @endphp
 
-                                                                                    $shiftName = $employee->currentShift
-                                                                                        ? $employee->currentShift
-                                                                                                ->$locale ??
-                                                                                            $employee->currentShift
-                                                                                                ->name
-                                                                                        : '';
-                                                                                @endphp
-                                                                                {{ $shiftName }}
-                                                                            @else
-                                                                                -
-                                                                            @endif
+                                                                <span style="font-weight: bold">
+                                                                    @if ($academicInfo?->academic_status == 'student')
+                                                                        {{-- Current Level: --}}
+                                                                    @elseif($academicInfo?->academic_status == 'alumni')
+                                                                        Graduated:
+                                                                    @else
+                                                                        Status:
+                                                                    @endif
+                                                                </span>
 
-                                                                        </p>
-                                                                        <p class="text-muted mb-0 small text-truncate">
-                                                                            @if ($employee->shiftSchedule)
-                                                                                @php
-                                                                                    $locale = 'name_' . currentLocale();
+                                                                @if ($academicInfo?->academic_status == 'student')
+                                                                    {{ currentLevel($academicInfo->theProgram, studentCurrentLevel($academicInfo)) }}
+                                                                @elseif($academicInfo?->academic_status == 'alumni')
+                                                                    {{ $academicInfo->graduation_session
+                                                                        ? $academicInfo->graduation_session . '/' . ($academicInfo->graduation_session + 1)
+                                                                        : '-' }}
+                                                                @else
+                                                                    {{ ucfirst(str_replace('_', ' ', $academicInfo?->academic_status ?? '-')) }}
 
-                                                                                    $sheduleName = $employee->shiftSchedule
-                                                                                        ? $employee->shiftSchedule
-                                                                                                ->$locale ??
-                                                                                            $employee->shiftSchedule
-                                                                                                ->name
-                                                                                        : '';
-                                                                                @endphp
-                                                                                {{ $sheduleName }}
-                                                                            @else
-                                                                                -
-                                                                            @endif
-                                                                        </p>
-                                                                    </td>
-                                                                    <td class="text-start">
-                                                                        @if ($employee->resumption_date)
-                                                                            {{ \Carbon\Carbon::parse($employee->resumption_date)->isoFormat('MMMM Do, YYYY') }}
-                                                                        @else
-                                                                            -
-                                                                        @endif
-                                                                    </td>
-                                                                    <td class="">
-                                                                        @switch($employee->employment_status)
-                                                                            @case('active')
-                                                                                <span
-                                                                                    class="badge bg-success text-white">{{ t('app.employees.employmentStatus.active') }}</span>
-                                                                            @break
+                                                                    @if ($academicInfo?->graduation_session)
+                                                                        ({{ $academicInfo->graduation_session }}/{{ $academicInfo->graduation_session + 1 }})
+                                                                    @endif
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @switch($member->userProfile->account_status)
+                                                                    @case(0)
+                                                                        <span class="badge bg-yellow text-black">
+                                                                            Unverified
+                                                                        </span>
+                                                                    @break
 
-                                                                            @case('probationary')
-                                                                                <span
-                                                                                    class="badge bg-blue text-white">{{ t('app.employees.employmentStatus.probationary') }}</span>
-                                                                            @break
+                                                                    @case(1)
+                                                                        <span class="badge bg-blue text-white">
+                                                                            Awaiting Verification
+                                                                        </span>
+                                                                    @break
 
-                                                                            @case('on_leave')
-                                                                                <span
-                                                                                    class="badge bg-warning text-white">{{ t('app.employees.employmentStatus.onLeave') }}</span>
-                                                                            @break
+                                                                    @case(2)
+                                                                        <span class="badge bg-green text-white">
+                                                                            Active
+                                                                        </span>
+                                                                    @break
 
-                                                                            @case('suspended')
-                                                                                <span
-                                                                                    class="badge bg-warning text-white">{{ t('app.employees.employmentStatus.suspended') }}</span>
-                                                                            @break
+                                                                    @case(3)
+                                                                        <span class="badge bg-red text-white">
+                                                                            Disabled
+                                                                        </span>
+                                                                    @break
 
-                                                                            @case('resigned')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.resigned') }}</span>
-                                                                            @break
-
-                                                                            @case('terminated')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.terminated') }}</span>
-                                                                            @break
-
-                                                                            @case('retired')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.retired') }}</span>
-                                                                            @break
-
-                                                                            @case('end_of_contract')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.endOfContract') }}</span>
-                                                                            @break
-
-                                                                            @case('awol')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.awol') }}</span>
-                                                                            @break
-
-                                                                            @case('deceased')
-                                                                                <span
-                                                                                    class="badge bg-danger text-white">{{ t('app.employees.employmentStatus.deceased') }}</span>
-                                                                            @break
-
-                                                                            @default
-                                                                                <span
-                                                                                    class="badge bg-warning text-white">{{ $employee->employment_status }}</span>
-                                                                        @endswitch
-                                                                    </td>
-                                                                    <td>
-                                                                        <a class="btn btn-primary btn-sm"
-                                                                            href="{{ route('companyViewEmployeeProfileIndex', ['username' => $employee->username]) }}">
-                                                                            <i class="fas fa-eye me-2"></i>
-                                                                            {{ t('app.buttons.view') }}</a>
-                                                                    </td> --}}
+                                                                    @default
+                                                                        <span class="badge bg-red text-white">
+                                                                            Unknown
+                                                                        </span>
+                                                                @endswitch
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-primary btn-sm"
+                                                                    href="{{ route('viewMMember', ['uuid' => $member->userProfile->uuid]) }}">
+                                                                    <i class="fas fa-eye me-2"></i>
+                                                                    View</a>
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>

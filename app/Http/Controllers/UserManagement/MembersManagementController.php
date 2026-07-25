@@ -646,4 +646,25 @@ class MembersManagementController extends Controller
         ]);
         return redirect()->route('memberAwaitingVerification')->with('success', 'Done!');
     }
+
+    public function viewMMember($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.profileIndex', compact('data'));
+    }
 }
