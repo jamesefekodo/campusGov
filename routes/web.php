@@ -113,6 +113,14 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::post('member/my_profile/awards/add_new/submit', [MemberSelfProfileController::class, 'addAwardSubmit'])->name('addAwardSubmit');
     Route::put('member/my_profile/awards/edit/{id}/submit', [MemberSelfProfileController::class, 'editAwardSubmit'])->name('editAwardSubmit');
     Route::get('member/my_profile/awards/delete/{id}', [MemberSelfProfileController::class, 'deleteAwardSubmit'])->name('deleteAwardSubmit');
+
+    Route::get('member/my_profile/social_media_handles', [MemberSelfProfileController::class, 'mySocialMediaHandles'])->name('mySocialMediaHandles');
+    Route::post('member/my_profile/social_media_handles/add_new', [MemberSelfProfileController::class, 'addSocialMediaHandleSubmit'])->name('addSocialMediaHandleSubmit');
+    Route::put('member/my_profile/social_media_handles/edit/{id}/submit', [MemberSelfProfileController::class, 'editSocialMediaHandleSubmit'])->name('editSocialMediaHandleSubmit');
+    Route::get('member/my_profile/social_media_handles/delete/{id}', [MemberSelfProfileController::class, 'employeeDeleteSocialMediaHandleSubmit'])->name('employeeDeleteSocialMediaHandleSubmit');
+
+
+    //
 });
 
 
@@ -242,4 +250,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/media/social_media/recognized_platforms', [SocialMediaController::class, 'recognizedSocialMediaPlatforms'])->name('recognizedSocialMediaPlatforms');
     Route::get('admin/media/social_media/recognized_platforms/search', [SocialMediaController::class, 'recognizedSocialMediaPlatforms'])->name('recognizedSocialMediaPlatformsSearch');
+    Route::post('admin/media/social_media/recognized_platforms/add_new/submit', [SocialMediaController::class, 'addRecognizedSocialMediaPlatform'])->name('addRecognizedSocialMediaPlatform');
+    Route::put('admin/media/social_media/recognized_platforms/edit/{slug}/submit', [SocialMediaController::class, 'editRecognizedSocialMediaPlatform'])->name('editRecognizedSocialMediaPlatform');
+    Route::get('admin/media/social_media/recognized_platforms/delete/{slug}', [SocialMediaController::class, 'deletePlatform'])->name('deletePlatform');
 });

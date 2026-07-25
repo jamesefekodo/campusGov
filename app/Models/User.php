@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberAward;
@@ -183,5 +184,9 @@ class User extends Authenticatable
     public function memberAwards()
     {
         return $this->hasMany(MemberAward::class, 'username', 'username');
+    }
+      public function memberSocialMediaHandle()
+    {
+        return $this->hasMany(MemberSocialMediaHandle::class, 'username', 'username');
     }
 }

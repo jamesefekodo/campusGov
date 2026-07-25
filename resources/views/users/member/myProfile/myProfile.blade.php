@@ -92,8 +92,9 @@
                             </div>
                         </div>
                     </a>
-                    <a href="
-                                {{-- {{ route('studentMyProfileSocialMediaPlatforms') }} --}}
+                    <a
+                        href="
+                                {{ route('mySocialMediaHandles') }}
                                  ">
                         <div class="review-info-card">
                             <div class="review-info-icon">

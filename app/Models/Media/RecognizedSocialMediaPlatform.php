@@ -16,4 +16,12 @@ class RecognizedSocialMediaPlatform extends Model
         'decription',
         'is_active',
     ];
+
+    // cast attributes
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean'
+        ];
+    }
 }

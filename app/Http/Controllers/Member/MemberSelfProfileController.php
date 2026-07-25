@@ -7,6 +7,8 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Media\MemberSocialMediaHandle;
+use App\Models\Media\RecognizedSocialMediaPlatform;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberAward;
@@ -660,6 +662,64 @@ class MemberSelfProfileController extends Controller
             return redirect()->back()->with('error', 'Records not found!');
         }
         $award->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+
+    public function mySocialMediaHandles()
+    {
+        $member = Auth::user();
+        $recognizedSocialMediaPlatforms = RecognizedSocialMediaPlatform::where('is_active', true)->orderBy('name')->get();
+
+        $data = [
+            'member' => $member,
+            'recognizedSocialMediaPlatforms' => $recognizedSocialMediaPlatforms,
+        ];
+        return view('users.member.myProfile.mySocialMediaHandles', compact('data'));
+    }
+    public function addSocialMediaHandleSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'platform' => 'required|string|exists:recognized_social_media_platforms,slug',
+            'handle' => 'required|string',
+            'link' => 'required|url',
+        ]);
+        $media = new MemberSocialMediaHandle();
+        $media->username = $member->username;
+        $media->platform = $request->platform;
+        $media->handle = trim($request->handle);
+        $media->link = $request->link;
+        $media->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editSocialMediaHandleSubmit($id, Request $request)
+    {
+        $member = Auth::user();
+        $media = MemberSocialMediaHandle::where('id', $id)->where('username', $member->username)->first();
+        if (!$media) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $request->validate([
+            'platform' => 'required|string|exists:recognized_social_media_platforms,slug',
+            'handle' => 'required|string',
+            'link' => 'required|url',
+        ]);
+        $media->update([
+            'platform' => $request->platform,
+            'handle' => trim($request->handle),
+            'link' => $request->link,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function employeeDeleteSocialMediaHandleSubmit($id)
+    {
+        $member = Auth::user();
+        $media = MemberSocialMediaHandle::where('id', $id)->where('username', $member->username)->first();
+        if (!$media) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $media->delete();
         return redirect()->back()->with('success', 'Done!');
     }
 }
