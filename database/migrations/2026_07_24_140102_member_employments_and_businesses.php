@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('member_employments_and_businesses', function (Blueprint $table) {
             $table->id();
-            $table->string('username'); // Foreign key, NOT unique
+            $table->string('username'); // Foreign key,
             $table->string('business')->nullable();
             $table->string('address')->nullable();
             $table->string('position')->nullable();
-            $table->date('start_date')->nullable();
-            $table->date('end_date')->nullable();
+            $table->string('start_date', 7)->nullable(); // e.g. 2026-07
+            $table->string('end_date', 7)->nullable(); // e.g. 2026-07
             $table->timestamps();
 
 

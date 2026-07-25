@@ -9,6 +9,9 @@ use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
+use App\Models\Members\MemberAward;
+use App\Models\Members\MemberEmploymentAndBusiness;
+use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberSkill;
 use App\Models\User;
@@ -370,10 +373,10 @@ class MemberSelfProfileController extends Controller
 
         $record = new MemberAcademicHistory();
         $record->username = $member->username;
-        $record->institution = $request->institution;
-        $record->address = $request->address;
-        $record->certificate = $request->certificate;
-        $record->date = $request->date;
+        $record->institution = trim($request->institution);
+        $record->address = trim($request->address);
+        $record->certificate = trim($request->certificate);
+        $record->date = trim($request->date);
         $record->save();
 
         return redirect()->back()->with('success', 'Done!');
@@ -393,10 +396,10 @@ class MemberSelfProfileController extends Controller
             'date' => 'required',
         ]);
 
-        $record->institution = $request->institution;
-        $record->address = $request->address;
-        $record->certificate = $request->certificate;
-        $record->date = $request->date;
+        $record->institution = trim($request->institution);
+        $record->address = trim($request->address);
+        $record->certificate = trim($request->certificate);
+        $record->date = trim($request->date);
         $record->save();
 
         return redirect()->back()->with('success', 'Done!');
@@ -431,8 +434,8 @@ class MemberSelfProfileController extends Controller
         ]);
         $skill = new MemberSkill();
         $skill->username = $member->username;
-        $skill->skill = $request->skill;
-        $skill->description = $request->description;
+        $skill->skill = trim($request->skill);
+        $skill->description = trim($request->description);
         $skill->save();
 
         return redirect()->back()->with('success', 'Done!');
@@ -466,7 +469,197 @@ class MemberSelfProfileController extends Controller
         $skill->delete();
         return redirect()->back()->with('success', 'Done!');
     }
-    public function myBusiness(){
+    public function myBusiness()
+    {
+        $member = Auth::user();
 
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myBusiness', compact('data'));
+    }
+    public function addNewBusinessSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'business' => 'required',
+            'address' => 'required',
+            'position' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'nullable',
+        ]);
+
+
+        $record = new MemberEmploymentAndBusiness();
+        $record->username = $member->username;
+        $record->business = trim($request->business);
+        $record->address = trim($request->address);
+        $record->position = trim($request->position);
+        $record->start_date = $request->start_date;
+        $record->end_date = $request->end_date;
+        $record->save();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editNewBusinessSubmit($id, Request $request)
+    {
+        $request->validate([
+            'business' => 'required',
+            'address' => 'required',
+            'position' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'nullable',
+        ]);
+
+        $member = Auth::user();
+
+        $record = MemberEmploymentAndBusiness::where('id', $id)->where('username', $member->username)->first();
+        if (!$record) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $record->update([
+            'business' => trim($request->business),
+            'address' => trim($request->address),
+            'position' => trim($request->position),
+            'start_date' => trim($request->start_date),
+            'end_date' => trim($request->end_date),
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deleteBusinessRecordSubmit($id)
+    {
+        $member = Auth::user();
+
+        $record = MemberEmploymentAndBusiness::where('id', $id)->where('username', $member->username)->first();
+        if (!$record) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $record->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+
+    public function myLeadershipPosition()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myLeadershipPosition', compact('data'));
+    }
+    public function addLeadershipPositionSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'position' => 'required|string',
+            'organization' => 'required|string',
+            'address' => 'required|string',
+            'is_current' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        $position = new MemberLeadershipPosition();
+        $position->username = $member->username;
+        $position->position = trim($request->position);
+        $position->organization = trim($request->organization);
+        $position->address = trim($request->address);
+        $position->is_current = trim($request->is_current);
+        $position->start_date = trim($request->start_date);
+        $position->end_date = trim($request->end_date);
+        $position->save();
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editLeadershipPositionSubmit($id, Request $request)
+    {
+        $member = Auth::user();
+
+        $position = MemberLeadershipPosition::where('id', $id)->where('username', $member->username)->first();
+        if (!$position) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $position->update([
+            'position' => trim($request->position),
+            'organization' => trim($request->organization),
+            'address' => trim($request->address),
+            'is_current' => trim($request->is_current),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deleteLeadershipPositionSubmit($id)
+    {
+        $member = Auth::user();
+
+        $position = MemberLeadershipPosition::where('id', $id)->where('username', $member->username)->first();
+        if (!$position) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $position->delete();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function myAwards()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myAwards', compact('data'));
+    }
+    public function addAwardSubmit(Request $request)
+    {
+
+        $member = Auth::user();
+
+        $request->validate([
+            'award' => 'required|string',
+            'organization' => 'required|string',
+            'date' => 'required|date',
+        ]);
+        $award = new MemberAward();
+        $award->username = $member->username;
+        $award->award = trim($request->award);
+        $award->organization = trim($request->organization);
+        $award->date = $request->date;
+        $award->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editAwardSubmit($id, Request $request)
+    {
+        $member = Auth::user();
+
+        $request->validate([
+            'award' => 'required|string',
+            'organization' => 'required|string',
+            'date' => 'required|date',
+        ]);
+        $award = MemberAward::where('id', $id)->where('username', $member->username)->first();
+        if (!$award) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $award->update([
+            'award' => trim($request->award),
+            'organization' => trim($request->organization),
+            'date' => trim($request->date),
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function deleteAwardSubmit($id)
+    {
+        $member = Auth::user();
+        $award = MemberAward::where('id', $id)->where('username', $member->username)->first();
+        if (!$award) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $award->delete();
+        return redirect()->back()->with('success', 'Done!');
     }
 }

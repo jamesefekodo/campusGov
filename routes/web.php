@@ -7,6 +7,7 @@ use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
 use Illuminate\Support\Facades\Artisan;
@@ -99,6 +100,19 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/my_profile/skills/{id}/delete', [MemberSelfProfileController::class, 'memberSelfDeleteSkill'])->name('memberSelfDeleteSkill');
 
     Route::get('member/my_profile/business', [MemberSelfProfileController::class, 'myBusiness'])->name('myBusiness');
+    Route::post('member/my_profile/business/add_new', [MemberSelfProfileController::class, 'addNewBusinessSubmit'])->name('addNewBusinessSubmit');
+    Route::put('member/my_profile/business/update/{id}/submit', [MemberSelfProfileController::class, 'editNewBusinessSubmit'])->name('editNewBusinessSubmit');
+    Route::get('member/my_profile/business/delete/{id}', [MemberSelfProfileController::class, 'deleteBusinessRecordSubmit'])->name('deleteBusinessRecordSubmit');
+
+    Route::get('member/my_profile/leadership_positions', [MemberSelfProfileController::class, 'myLeadershipPosition'])->name('myLeadershipPosition');
+    Route::post('member/my_profile/leadership_positions/submit', [MemberSelfProfileController::class, 'addLeadershipPositionSubmit'])->name('addLeadershipPositionSubmit');
+    Route::put('member/my_profile/leadership_positions/edit/{id}/submit', [MemberSelfProfileController::class, 'editLeadershipPositionSubmit'])->name('editLeadershipPositionSubmit');
+    Route::get('member/my_profile/leadership_positions/delete/{id}', [MemberSelfProfileController::class, 'deleteLeadershipPositionSubmit'])->name('deleteLeadershipPositionSubmit');
+
+    Route::get('member/my_profile/awards', [MemberSelfProfileController::class, 'myAwards'])->name('myAwards');
+    Route::post('member/my_profile/awards/add_new/submit', [MemberSelfProfileController::class, 'addAwardSubmit'])->name('addAwardSubmit');
+    Route::put('member/my_profile/awards/edit/{id}/submit', [MemberSelfProfileController::class, 'editAwardSubmit'])->name('editAwardSubmit');
+    Route::get('member/my_profile/awards/delete/{id}', [MemberSelfProfileController::class, 'deleteAwardSubmit'])->name('deleteAwardSubmit');
 });
 
 
@@ -198,20 +212,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     //
 
 
-
-
-
-    //
-
-
-
-
-
-
-
-
-
-
     // basic system configuration
     Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
     Route::put('admin/config/basics/maintenance_mode/update', [SystemConfigurationController::class, 'updateMaintenanceMode'])->name('updateMaintenanceMode');
@@ -236,4 +236,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/config/user_roles/view/{uuid}', [PermissionAccessController::class, 'viewRole'])->name('viewRole');
     Route::put('admin/config/user_roles/update/{uuid}', [PermissionAccessController::class, 'updateRoleSubmit'])->name('updateRoleSubmit');
     Route::get('admin/config/user_roles/delete/{uuid}', [PermissionAccessController::class, 'deleteRole'])->name('deleteRole');
+
+
+    // recognizedSocialMediaPlatforms
+
+    Route::get('admin/media/social_media/recognized_platforms', [SocialMediaController::class, 'recognizedSocialMediaPlatforms'])->name('recognizedSocialMediaPlatforms');
+    Route::get('admin/media/social_media/recognized_platforms/search', [SocialMediaController::class, 'recognizedSocialMediaPlatforms'])->name('recognizedSocialMediaPlatformsSearch');
 });

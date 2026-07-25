@@ -2,6 +2,7 @@
 
 namespace App\Models\Members;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,4 +18,9 @@ class MemberEmploymentAndBusiness extends Model
         'start_date',
         'end_date',
     ];
+
+    public function userProfile()
+    {
+        return $this->belongsTo(User::class, 'username', 'username');
+    }
 }

@@ -68,9 +68,7 @@
                             </div>
                         </div>
                     </a>
-                    <a href="
-                                {{-- {{ route('studentMyProfileeadershipPositions') }} --}}
-                                 ">
+                    <a href="{{ route('myLeadershipPosition') }}">
                         <div class="review-info-card">
                             <div class="review-info-icon">
                                 <i class="fa-solid fa-crown"></i>
@@ -82,9 +80,7 @@
                             </div>
                         </div>
                     </a>
-                    <a href="
-                                {{-- {{ route('studentMyProfileAwards') }} --}}
-                                 ">
+                    <a href="{{ route('myAwards') }}">
                         <div class="review-info-card">
                             <div class="review-info-icon">
                                 <i class="fa-solid fa-trophy"></i>

@@ -69,13 +69,12 @@
             </a><!--//nav-link-->
             <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/social_media') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('recognizedSocialMediaPlatforms') }} --}}
-                             ">Social
-                            Media</a>
-                    </li>
+                    @if (Auth::user()->hasPermission('media_platform.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/social_media') ? 'sidebar-active' : '' }}"
+                                href="{{ route('recognizedSocialMediaPlatforms') }}">Recognized Platforms</a>
+                        </li>
+                    @endif
                     <li class="submenu-item"><a
                             class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/orders/all') ? 'sidebar-active' : '' }}"
                             href="

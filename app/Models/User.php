@@ -6,7 +6,9 @@ namespace App\Models;
 use App\Models\Config\AccessControl\Role;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
+use App\Models\Members\MemberAward;
 use App\Models\Members\MemberEmploymentAndBusiness;
+use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberSkill;
 use Database\Factories\UserFactory;
@@ -170,11 +172,16 @@ class User extends Authenticatable
     {
         return $this->hasMany(MemberSkill::class, 'username', 'username');
     }
-     public function memberEmploymentAndBusiness()
+    public function memberEmploymentAndBusiness()
     {
         return $this->hasMany(MemberEmploymentAndBusiness::class, 'username', 'username');
     }
-
-
-
+    public function memberLeadershipPosition()
+    {
+        return $this->hasMany(MemberLeadershipPosition::class, 'username', 'username');
+    }
+    public function memberAwards()
+    {
+        return $this->hasMany(MemberAward::class, 'username', 'username');
+    }
 }
