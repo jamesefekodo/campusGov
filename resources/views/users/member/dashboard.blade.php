@@ -7,7 +7,7 @@
             <h1 class="app-page-title mb-0">Dashboard</h1>
             <div class="mb-4">
                 <div class="individual-review-card-container">
-                    <div class="col-md-4 individual-review-card text-black">
+                    <div class="col-md-3 individual-review-card text-black">
 
                         {{-- includes --}}
                         @if ($data['member']->photo && file_exists(public_path('assets/uploads/users/members/photo/' . $data['member']->photo)))
@@ -106,7 +106,7 @@
                             @endswitch
                         </p>
                     </div>
-                    <div class="col-md-8 individual-review-card">
+                    <div class="col-md-9 individual-review-card">
                         <div class="my_form_container">
                             <h4 class="block text-center p-1 type-b-page-header">
                                 {{ $data['member']->memberPersonalProfile->first_name ?? '-' }}

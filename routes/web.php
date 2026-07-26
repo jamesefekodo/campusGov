@@ -159,6 +159,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // view members profile
     Route::get('admin/user_management/members/view/{uuid}', [MembersManagementController::class, 'viewMMember'])->name('viewMMember');
+    Route::get('admin/user_management/members/view/personal_info/{uuid}', [MembersManagementController::class, 'viewMemberPersonalProfile'])->name('viewMemberPersonalProfile');
+    Route::get('admin/user_management/members/view/academic_info/{uuid}', [MembersManagementController::class, 'viewMemberAcademicInfo'])->name('viewMemberAcademicInfo');
+
+
+
+
 
 
 

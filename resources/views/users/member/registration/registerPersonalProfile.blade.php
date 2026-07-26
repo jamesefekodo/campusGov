@@ -8,10 +8,10 @@
             <div class="">
 
                 <div class="individual-review-card-container row">
-                    <div class="col-md-2 individual-review-card text-black">
+                    <div class="col-md-3 individual-review-card text-black">
                         @include('users.member.registration.include.sideBar')
                     </div>
-                    <div class="col-md-10 individual-review-card">
+                    <div class="col-md-9 individual-review-card">
                         <div class="col-md-12 m-auto">
                             <div class="my_form_container">
 

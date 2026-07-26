@@ -43,4 +43,8 @@ class MemberPersonalProfile extends Model
     {
         return $this->belongsTo(User::class, 'username', 'username');
     }
+    public function verifiedBy()
+    {
+        return $this->belongsTo(User::class, 'verified_by', 'username');
+    }
 }
