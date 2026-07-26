@@ -166,13 +166,16 @@
                                         </span>
                                     </div>
                                     <hr>
-                                    <div class="d-flex justify-content-end flex-wrap mt-3">
-                                        <a href="{{ route('memberEditPersonalProfile') }}"
-                                            class="btn btn-warning m-1 d-flex align-items-center">
-                                            <i class="fas fa-edit me-2"></i>
-                                            <span>Update</span>
-                                        </a>
-                                    </div>
+
+                                    @if (Auth::user()->hasPermission('member_profile.update'))
+                                        <div class="d-flex justify-content-end flex-wrap mt-3">
+                                            <a href="{{ route('editMemberAcademicInfo', ['uuid' => $data['member']->uuid]) }}"
+                                                class="btn btn-warning m-1 d-flex align-items-center">
+                                                <i class="fas fa-edit me-2"></i>
+                                                <span>Update</span>
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </div>

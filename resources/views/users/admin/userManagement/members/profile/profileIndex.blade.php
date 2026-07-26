@@ -64,9 +64,7 @@
                                     </div>
                                 </a>
                                 <a
-                                    href="
-                                    {{-- {{ route('viewStudentAcademicHistory', ['username' => $data['student']->username]) }} --}}
-                                     ">
+                                    href="{{ route('viewMemberAcademicHistory', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-user-graduate"></i>
@@ -80,9 +78,7 @@
                                 </a>
 
                                 <a
-                                    href="
-                                    {{-- {{ route('viewStudentSkills', ['username' => $data['student']->username]) }} --}}
-                                     ">
+                                    href="{{ route('viewMemberSkills', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-brain"></i>
@@ -95,9 +91,7 @@
                                     </div>
                                 </a>
                                 <a
-                                    href="
-                                    {{-- {{ route('viewStudentBusinessEmployment', ['username' => $data['student']->username]) }} --}}
-                                     ">
+                                    href="{{ route('viewMemberBusiness', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-briefcase"></i>
@@ -110,9 +104,7 @@
                                     </div>
                                 </a>
                                 <a
-                                    href="
-                                    {{-- {{ route('viewStudentLeadershipPositions', ['username' => $data['student']->username]) }} --}}
-                                     ">
+                                    href="{{ route('viewMemberLeadershipPosition', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-crown"></i>
@@ -125,9 +117,7 @@
                                     </div>
                                 </a>
                                 <a
-                                    href="
-                                    {{-- {{ route('viewStudentAwards', ['username' => $data['student']->username]) }} --}}
-                                     ">
+                                    href="{{ route('viewMemberAward', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-trophy"></i>
@@ -139,7 +129,9 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a {{-- href="{{ route('viewStudentSocialMedias', ['username' => $data['student']->username]) }}" --}}>
+                                <a
+                                href="{{ route('viewMemberSocialMediaHandles', ['uuid' => $data['member']->uuid]) }}"
+                                >
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-globe"></i>

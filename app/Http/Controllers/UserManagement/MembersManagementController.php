@@ -702,10 +702,262 @@ class MembersManagementController extends Controller
             return redirect()->back()->with('error', 'Records not found!');
         }
 
-
         $data = [
             'member' => $member,
         ];
         return view('users.admin.userManagement.members.profile.academicInfo', compact('data'));
+    }
+    public function editMemberAcademicInfo($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.update'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $step = 1;
+        $academicStatus = [];
+
+        if (Route::currentRouteName() == 'editMemberAcademicInfoStep2') {
+
+            $step = 2;
+
+            $academicInfo = MemberAcademicInfo::where('username', $member->username)
+                ->first();
+
+
+            if (!$academicInfo) {
+
+                return redirect()
+                    ->back()
+                    ->with('error', 'Please complete academic information first.');
+            }
+
+
+            $program = Program::whereSlug($academicInfo->program)
+                ->firstOrFail();
+
+
+            $programType = ProgramType::whereSlug($academicInfo->program_type)
+                ->first();
+
+
+            $department = Department::whereSlug($academicInfo->department)
+                ->first();
+
+            $academicStatus = academicStatusOptions(
+                $academicInfo->admission_session,
+                $program,
+                $programType,
+                $department
+            );
+
+
+            session([
+                // 'academic_status_options' => $statuses
+                'academicStatus' => $academicStatus
+            ]);
+        }
+
+        $data = [
+            'member' => $member,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+            'academicStatus' => $academicStatus,
+            'step' => $step,
+        ];
+
+        return view('users.admin.userManagement.members.profile.update.editAcademicInfo', compact('data'));
+    }
+
+    public function updateMemberAcademicInfoSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.update'),
+            403
+        );
+        $member = User::where('uuid', $uuid)->first();
+
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        if ($request->step == 1) {
+
+            request()->validate([
+                'program' => 'required|string|exists:programs,slug',
+                'program_type' => 'required|string|exists:program_types,slug',
+                'faculty' => 'required|string|exists:faculties,slug',
+                'department' => 'required|string|exists:departments,slug',
+                'admission_session' => 'required|numeric',
+                'matric_number' => 'required|string',
+            ]);
+
+
+
+            $info = MemberAcademicInfo::updateOrCreate(
+                ['username' => $member->username],
+                [
+                    'username' => $member->username,
+                    'program' => $request->program,
+                    'program_type' => $request->program_type,
+                    'faculty' => $request->faculty,
+                    'department' => $request->department,
+                    'admission_session' => $request->admission_session,
+                    'matric_number' => strtoupper(trim($request->matric_number)),
+                ]
+            );
+            return redirect()->route('editMemberAcademicInfoStep2', ['uuid' => $member->uuid])->with('success', 'Done!');
+        } elseif ($request->step == 2) {
+            request()->validate([
+                'academic_status' => 'required|not_in:unknown',
+                'graduation_session' => 'nullable|numeric',
+            ]);
+            $info = MemberAcademicInfo::where('username', $member->username)->first();
+            if (!$info) {
+                return redirect()->back()->with('error', 'Please fill section one first!');
+            }
+            $info->update([
+                'academic_status' => $request->academic_status,
+                'graduation_session' => $request->graduation_session,
+                'is_verified' => true,
+                'verified_by' => $user->username,
+                'verified_at' => Carbon::now(),
+            ]);
+        }
+
+        return redirect()->route('viewMMember', ['uuid' => $member->uuid])->with('success', 'Done!');
+    }
+    public function viewMemberAcademicHistory($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.academicHistory', compact('data'));
+    }
+    public function viewMemberSkills($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.skills', compact('data'));
+    }
+    public function viewMemberBusiness($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.businessAndEmployment', compact('data'));
+    }
+    public function viewMemberLeadershipPosition($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.leadershipPosition', compact('data'));
+    }
+    public function viewMemberAward($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.awards', compact('data'));
+    }
+    public function viewMemberSocialMediaHandles($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.socialMediaHandles', compact('data'));
     }
 }

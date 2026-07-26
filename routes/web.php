@@ -161,20 +161,16 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/{uuid}', [MembersManagementController::class, 'viewMMember'])->name('viewMMember');
     Route::get('admin/user_management/members/view/personal_info/{uuid}', [MembersManagementController::class, 'viewMemberPersonalProfile'])->name('viewMemberPersonalProfile');
     Route::get('admin/user_management/members/view/academic_info/{uuid}', [MembersManagementController::class, 'viewMemberAcademicInfo'])->name('viewMemberAcademicInfo');
+    Route::get('admin/user_management/members/view/academic_info/edit/{uuid}', [MembersManagementController::class, 'editMemberAcademicInfo'])->name('editMemberAcademicInfo');
+    Route::get('admin/user_management/members/view/academic_info/edit/{uuid}/2', [MembersManagementController::class, 'editMemberAcademicInfo'])->name('editMemberAcademicInfoStep2');
+    Route::put('admin/user_management/members/view/academic_info/update/{uuid}/submit', [MembersManagementController::class, 'updateMemberAcademicInfoSubmit'])->name('updateMemberAcademicInfoSubmit');
 
-
-
-
-
-
-
-
-    //
-
-
-
-
-
+    Route::get('admin/user_management/members/view/academic_history/{uuid}', [MembersManagementController::class, 'viewMemberAcademicHistory'])->name('viewMemberAcademicHistory');
+    Route::get('admin/user_management/members/view/skills/{uuid}', [MembersManagementController::class, 'viewMemberSkills'])->name('viewMemberSkills');
+    Route::get('admin/user_management/members/view/business/{uuid}', [MembersManagementController::class, 'viewMemberBusiness'])->name('viewMemberBusiness');
+    Route::get('admin/user_management/members/view/leadership_position/{uuid}', [MembersManagementController::class, 'viewMemberLeadershipPosition'])->name('viewMemberLeadershipPosition');
+    Route::get('admin/user_management/members/view/awards/{uuid}', [MembersManagementController::class, 'viewMemberAward'])->name('viewMemberAward');
+    Route::get('admin/user_management/members/view/social_media_handles/{uuid}', [MembersManagementController::class, 'viewMemberSocialMediaHandles'])->name('viewMemberSocialMediaHandles');
 
 
 
