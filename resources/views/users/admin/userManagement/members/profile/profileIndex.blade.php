@@ -167,8 +167,16 @@
                         </div>
                     </div>
                     {{-- Back Home --}}
+                    @php
+                        if ($data['member']->memberAcademicInfo->academic_status == 'student') {
+                            $backBtn = route('memberAwaitingVerification');
+                        } else {
+                            $backBtn = route('loginPage');
+                        }
+                    @endphp
+
                     <div class="w-100 justify-content-center text-center my-4 pt-5">
-                        <a class="btn btn-primary" href="{{ route('memberAwaitingVerification') }}">
+                        <a class="btn btn-primary" href="{{ $backBtn }}">
                             <i class="fas fa-chevron-left"></i>
                             Back
                         </a>

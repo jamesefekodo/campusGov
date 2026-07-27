@@ -272,4 +272,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/misconducts/active_cases/view/{uuid}', [MisconductController::class, 'viewMisconductCase'])->name('viewMisconductCase');
     Route::put('admin/misconducts/active_cases/update/{uuid}', [MisconductController::class, 'updateMisconductCaseSubmit'])->name('updateMisconductCaseSubmit');
+
+    Route::get('admin/misconducts/resolved_cases', [MisconductController::class, 'resolvedMisconductCases'])->name('resolvedMisconductCases');
+    Route::get('admin/misconducts/resolved_cases/search', [MisconductController::class, 'resolvedMisconductCases'])->name('resolvedMisconductCasesSearch');
+
+
 });

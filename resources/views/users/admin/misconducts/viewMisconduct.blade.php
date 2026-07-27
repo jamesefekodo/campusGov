@@ -278,8 +278,14 @@
                             </div>
                             {{-- Back Home --}}
                             <div class="w-100 justify-content-center text-center my-4">
-                                <a class="btn btn-primary" href="{{ route('activeMisconductCases') }}"> <i
-                                        class="fas fa-chevron-left"></i>
+                                @php
+                                    $backBtn = route('activeMisconductCases');
+                                    if ($data['misconduct']->status == 'resolved') {
+                                        $backBtn = route('resolvedMisconductCases');
+                                    }
+                                @endphp
+
+                                <a class="btn btn-primary" href="{{ $backBtn }}"> <i class="fas fa-chevron-left"></i>
                                     Back
                                 </a>
 

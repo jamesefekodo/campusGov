@@ -255,4 +255,79 @@ class MisconductController extends Controller
         $misconduct->save();
         return redirect()->back()->with('success', 'Done!');
     }
+    public function resolvedMisconductCases(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('misconducts.read'),
+            403
+        );
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $resolvedMisconducts = '';
+        $totalResolvedMisconducts = 0;
+
+
+        if (Route::currentRouteName() == 'resolvedMisconductCasesSearch') {
+            $searchKey = $request->input('searchKey');
+            $resolvedMisconducts = MemberMisconduct::where('status', '=', 'resolved')->with('memberPersonalProfile')
+                ->where(function ($query) use ($searchKey) {
+                    $query->where('case_id', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('username', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('incident_date', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('report_date', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('reported_by', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('reporter_username', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('misconduct_type', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('description', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('witness_report', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('disciplinary_action', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('status', 'LIKE', '%' . $searchKey . '%');
+                })
+                // category
+                ->orWhereHas('memberPersonalProfile', function ($query) use ($searchKey) {
+                    $query->where('username', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('phone1', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('email1', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('phone2', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('email2', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('first_name', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('middle_name', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('last_name', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('gender', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('nationality', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('state_of_origin', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('lga_of_origin', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('address1', 'LIKE', '%' . $searchKey . '%')
+                        ->orWhere('address2', 'LIKE', '%' . $searchKey . '%');
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate(20)->withQueryString();
+
+            $totalResolvedMisconducts = $resolvedMisconducts->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results: ' . $searchKey;
+        } else {
+            $resolvedMisconducts = MemberMisconduct::where('status', '=', 'resolved')
+                ->orderBy('updated_at', 'desc')
+                ->paginate(20);
+            $totalResolvedMisconducts = $resolvedMisconducts->total();
+            $requestType = 'all';
+            $pageTitle = 'Misconducts (Resolved)';
+        }
+
+        $data = [
+            'misconducts' => $resolvedMisconducts,
+            'totalMisconducts' => $totalResolvedMisconducts,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.misconducts.misconducts', compact('data'));
+    }
 }

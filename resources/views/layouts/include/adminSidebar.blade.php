@@ -149,9 +149,7 @@
                         </li>
                         <li class="submenu-item"><a
                                 class="submenu-link {{ Str::startsWith(request()->path(), 'admin/misconducts/resolved_cases') ? 'sidebar-active' : '' }}"
-                                href="
-                            {{-- {{ route('resolvedMisconductCases') }} --}}
-                             ">Resolved</a>
+                                href="{{ route('resolvedMisconductCases') }}">Resolved</a>
                         </li>
                     </ul>
                 </div>

@@ -1,13 +1,25 @@
 @extends('layouts.userLayout')
 @section('title', $data['pageTitle'])
 
+@php
+    $searchRoute = route('activeMisconductCasesSearch');
+    $navBackRoute = route('activeMisconductCases');
+    $showAddBtn = true;
+
+    if (in_array(Route::currentRouteName(), ['resolvedMisconductCases', 'resolvedMisconductCasesSearch'])) {
+        $searchRoute = route('resolvedMisconductCasesSearch');
+        $navBackRoute = route('resolvedMisconductCases');
+        $showAddBtn = false;
+    }
+@endphp
+
 @section('content')
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if (Auth::user()->hasPermission('roles.create'))
+            @if (Auth::user()->hasPermission('roles.create') && $showAddBtn == true)
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
@@ -29,7 +41,7 @@
 
                         <div class="table_head_item col-md-4">
                             <div class="custom_search">
-                                <form type="GET" action="{{ route('activeMisconductCasesSearch') }}">
+                                <form type="GET" action="{{ $searchRoute }}">
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
@@ -242,7 +254,7 @@
                                                 @break
 
                                                 @case('search')
-                                                    <a class="btn btn-success" href="{{ route('activeMisconductCases') }}"> <i
+                                                    <a class="btn btn-success" href="{{ $navBackRoute }}"> <i
                                                             class="fas fa-chevron-left"></i>
                                                         Back
                                                     </a>
