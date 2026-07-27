@@ -128,35 +128,35 @@
                 </ul>
             </div>
         </li><!--//nav-item-->
-        <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/misconducts') ? 'sidebar-active-section' : '' }}"
-                href="#" data-bs-toggle="collapse" data-bs-target="#submenu-7" aria-expanded="false"
-                aria-controls="submenu-7">
-                <span class="nav-icon">
-                    <i class="fas fa-gavel"></i>
-                </span>
-                <span class="nav-link-text">Misconducts</span>
-                <span class="submenu-arrow">
-                    <i class="fas fa-chevron-down bi"></i>
-                </span><!--//submenu-arrow-->
-            </a><!--//nav-link-->
-            <div id="submenu-7" class="collapse submenu submenu-7" data-bs-parent="#menu-accordion">
-                <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/misconducts/active_cases') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('activeMisconductCases') }} --}}
-                             ">Active</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/misconducts/resolved_cases') ? 'sidebar-active' : '' }}"
-                            href="
+        @if (Auth::user()->hasPermission('misconducts.read'))
+            <li class="nav-item has-submenu">
+                <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/misconducts') ? 'sidebar-active-section' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#submenu-7" aria-expanded="false"
+                    aria-controls="submenu-7">
+                    <span class="nav-icon">
+                        <i class="fas fa-gavel"></i>
+                    </span>
+                    <span class="nav-link-text">Misconducts</span>
+                    <span class="submenu-arrow">
+                        <i class="fas fa-chevron-down bi"></i>
+                    </span><!--//submenu-arrow-->
+                </a><!--//nav-link-->
+                <div id="submenu-7" class="collapse submenu submenu-7" data-bs-parent="#menu-accordion">
+                    <ul class="submenu-list list-unstyled">
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/misconducts/active_cases') ? 'sidebar-active' : '' }}"
+                                href="{{ route('activeMisconductCases') }}">Active</a>
+                        </li>
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/misconducts/resolved_cases') ? 'sidebar-active' : '' }}"
+                                href="
                             {{-- {{ route('resolvedMisconductCases') }} --}}
                              ">Resolved</a>
-                    </li>
-                </ul>
-            </div>
-        </li><!--//nav-item-->
+                        </li>
+                    </ul>
+                </div>
+            </li><!--//nav-item-->
+        @endif
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/elections') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-9" aria-expanded="false"

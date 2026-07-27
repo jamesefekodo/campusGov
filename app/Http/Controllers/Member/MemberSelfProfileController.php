@@ -722,4 +722,14 @@ class MemberSelfProfileController extends Controller
         $media->delete();
         return redirect()->back()->with('success', 'Done!');
     }
+
+    public function myMisconducts()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.member.myProfile.myMisconducts', compact('data'));
+    }
 }

@@ -12,6 +12,7 @@ use App\Models\Members\MemberEmploymentAndBusiness;
 use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberSkill;
+use App\Models\Misconduct\MemberMisconduct;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -67,9 +68,9 @@ class User extends Authenticatable
     // uuid
     protected static function booted(): void
     {
-        static::creating(function ($program) {
-            if (empty($program->uuid)) {
-                $program->uuid = 'user-Y' . now()->format('Y') .
+        static::creating(function ($user) {
+            if (empty($user->uuid)) {
+                $user->uuid = 'user-Y' . now()->format('Y') .
                     '-M' . now()->format('m') .
                     '-' . Str::uuid();
             }
@@ -185,8 +186,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(MemberAward::class, 'username', 'username');
     }
-      public function memberSocialMediaHandle()
+    public function memberSocialMediaHandle()
     {
         return $this->hasMany(MemberSocialMediaHandle::class, 'username', 'username');
+    }
+     public function memberMisconducts()
+    {
+        return $this->hasMany(MemberMisconduct::class, 'username', 'username');
     }
 }

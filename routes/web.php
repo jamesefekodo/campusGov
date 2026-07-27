@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
+use App\Http\Controllers\Misconduct\MisconductController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -119,6 +120,9 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::put('member/my_profile/social_media_handles/edit/{id}/submit', [MemberSelfProfileController::class, 'editSocialMediaHandleSubmit'])->name('editSocialMediaHandleSubmit');
     Route::get('member/my_profile/social_media_handles/delete/{id}', [MemberSelfProfileController::class, 'employeeDeleteSocialMediaHandleSubmit'])->name('employeeDeleteSocialMediaHandleSubmit');
 
+    Route::get('member/my_profile/misconducts', [MemberSelfProfileController::class, 'myMisconducts'])->name('myMisconducts');
+
+
 
     //
 });
@@ -171,6 +175,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/leadership_position/{uuid}', [MembersManagementController::class, 'viewMemberLeadershipPosition'])->name('viewMemberLeadershipPosition');
     Route::get('admin/user_management/members/view/awards/{uuid}', [MembersManagementController::class, 'viewMemberAward'])->name('viewMemberAward');
     Route::get('admin/user_management/members/view/social_media_handles/{uuid}', [MembersManagementController::class, 'viewMemberSocialMediaHandles'])->name('viewMemberSocialMediaHandles');
+    Route::get('admin/user_management/members/view/misconducts/{uuid}', [MembersManagementController::class, 'viewMemberMisconducts'])->name('viewMemberMisconducts');
+
 
 
 
@@ -259,4 +265,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/media/social_media/recognized_platforms/add_new/submit', [SocialMediaController::class, 'addRecognizedSocialMediaPlatform'])->name('addRecognizedSocialMediaPlatform');
     Route::put('admin/media/social_media/recognized_platforms/edit/{slug}/submit', [SocialMediaController::class, 'editRecognizedSocialMediaPlatform'])->name('editRecognizedSocialMediaPlatform');
     Route::get('admin/media/social_media/recognized_platforms/delete/{slug}', [SocialMediaController::class, 'deletePlatform'])->name('deletePlatform');
+
+    Route::get('admin/misconducts/active_cases', [MisconductController::class, 'activeMisconductCases'])->name('activeMisconductCases');
+    Route::get('admin/misconducts/active_cases/search', [MisconductController::class, 'activeMisconductCases'])->name('activeMisconductCasesSearch');
+    Route::post('admin/misconducts/active_cases/submit', [MisconductController::class, 'addNewMisconductSubmit'])->name('addNewMisconductSubmit');
+
+    Route::get('admin/misconducts/active_cases/view/{uuid}', [MisconductController::class, 'viewMisconductCase'])->name('viewMisconductCase');
+    Route::put('admin/misconducts/active_cases/update/{uuid}', [MisconductController::class, 'updateMisconductCaseSubmit'])->name('updateMisconductCaseSubmit');
 });

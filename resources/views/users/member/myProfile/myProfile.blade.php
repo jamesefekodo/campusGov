@@ -108,9 +108,7 @@
                         </div>
                     </a>
                     <a
-                        href="
-                                    {{-- {{ route('studentMyProfileMisconducts') }} --}}
-                                     ">
+                        href="{{ route('myMisconducts') }}">
                         <div class="review-info-card">
                             <div class="review-info-icon">
                                 <i class="fa-solid fa-gavel "></i>

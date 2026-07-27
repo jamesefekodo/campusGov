@@ -960,4 +960,24 @@ class MembersManagementController extends Controller
         ];
         return view('users.admin.userManagement.members.profile.socialMediaHandles', compact('data'));
     }
+    public function viewMemberMisconducts($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.misconducts', compact('data'));
+    }
 }

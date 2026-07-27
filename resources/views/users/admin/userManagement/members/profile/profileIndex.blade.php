@@ -63,8 +63,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                    href="{{ route('viewMemberAcademicHistory', ['uuid' => $data['member']->uuid]) }}">
+                                <a href="{{ route('viewMemberAcademicHistory', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-user-graduate"></i>
@@ -77,8 +76,7 @@
                                     </div>
                                 </a>
 
-                                <a
-                                    href="{{ route('viewMemberSkills', ['uuid' => $data['member']->uuid]) }}">
+                                <a href="{{ route('viewMemberSkills', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-brain"></i>
@@ -90,8 +88,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                    href="{{ route('viewMemberBusiness', ['uuid' => $data['member']->uuid]) }}">
+                                <a href="{{ route('viewMemberBusiness', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-briefcase"></i>
@@ -103,8 +100,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                    href="{{ route('viewMemberLeadershipPosition', ['uuid' => $data['member']->uuid]) }}">
+                                <a href="{{ route('viewMemberLeadershipPosition', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-crown"></i>
@@ -116,8 +112,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                    href="{{ route('viewMemberAward', ['uuid' => $data['member']->uuid]) }}">
+                                <a href="{{ route('viewMemberAward', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-trophy"></i>
@@ -129,9 +124,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a
-                                href="{{ route('viewMemberSocialMediaHandles', ['uuid' => $data['member']->uuid]) }}"
-                                >
+                                <a href="{{ route('viewMemberSocialMediaHandles', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-globe"></i>
@@ -155,7 +148,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a {{-- href="{{ route('viewStudentMisconducts', ['username' => $data['student']->username]) }}" --}}>
+                                <a href="{{ route('viewMemberMisconducts', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fa-solid fa-gavel "></i>
