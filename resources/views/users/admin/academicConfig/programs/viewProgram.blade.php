@@ -114,7 +114,7 @@
                                             Program Types :
                                         </span> <span class="small">(full-time/part-time/odl...)</span>
                                         @if ($data['program']->programTypes->isNotEmpty())
-                                            <div class="px-3 pt-3">
+                                            <div class="px-3 pt-3 table-responsive">
                                                 <table class="table">
                                                     @foreach ($data['program']->programTypes as $type)
                                                         <tbody>
@@ -170,6 +170,7 @@
                                                 </div>
                                             </div>
                                         @endif
+                                        @include('users.admin.academicConfig.programs.include.createNewProgramTypeModal')
                                         {{-- program types endss --}}
                                         <hr>
                                         {{-- program duration overrides starts --}}
@@ -177,7 +178,7 @@
                                             Program Duration Overrides :
                                         </span>
                                         @if ($data['program']->durationOverrides->isNotEmpty())
-                                            <div class="px-3 pt-3">
+                                            <div class="px-3 pt-3 table-responsive">
                                                 <table class="table">
                                                     @foreach ($data['program']->durationOverrides as $duration)
                                                         <tbody>

@@ -200,13 +200,13 @@
             $financeNotifications = countPendingPaymentMethodUpdates() + 0;
         @endphp --}}
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/payments') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/finance') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-4" aria-expanded="false"
                 aria-controls="submenu-4">
                 <span class="nav-icon">
                     <i class="fas fa-credit-card"></i>
                 </span>
-                <span class="nav-link-text">Payment &nbsp;
+                <span class="nav-link-text">Finance &nbsp;
                     {{-- @if ($financeNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
                             style="font-size: 11px">{{ $financeNotifications }}</span>
@@ -225,21 +225,14 @@
                             {{-- {{ route('paymentTransactionsHome') }} --}}
                              ">Transactions</a>
                     </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/payments/settings') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('paymentSettingsPaymentMethods') }} --}}
+                    @if (Auth::user()->hasPermission('manage_payment_settings'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/settings') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{ route('manualPaymentMethods') }}
                             ">Settings</a>
-                    </li>
-
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/payments/payment_methods') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('adminPaymentSettingsPaymentMethods') }} --}}
-                             ">Payment
-                            Methods
-                        </a>
-                    </li>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->

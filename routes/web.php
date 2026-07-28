@@ -6,6 +6,7 @@ use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
@@ -277,4 +278,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/misconducts/resolved_cases/search', [MisconductController::class, 'resolvedMisconductCases'])->name('resolvedMisconductCasesSearch');
 
 
+    // payment settings
+    // payment methods
+    Route::get('admin/finance/settings/payment_methods/manual', [PaymentSettingsController::class, 'manualPaymentMethods'])->name('manualPaymentMethods');
+    Route::post('admin/finance/settings/payment_methods/manual/bank_accounts/add_new', [PaymentSettingsController::class, 'addNewBankAccountSubmit'])->name('addNewBankAccountSubmit');
+    Route::put('admin/finance/settings/payment_methods/manual/bank_accounts/edit/{id}', [PaymentSettingsController::class, 'updateBankAccount'])->name('updateBankAccount');
 });

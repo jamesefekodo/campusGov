@@ -518,8 +518,8 @@ a.sub-menu {
         flex: 1;
     }
 } */
-.app-page-title{
-    margin: 10px;
+.app-page-title {
+    margin: 5px;
 }
 .table_title {
     font-size: 20px;
@@ -875,7 +875,7 @@ a.sub-menu {
 
 .individual-review-card {
     flex: 1;
-    margin: 5px;
+    margin: 5px 0;
 }
 
 @media (max-width: 768px) {

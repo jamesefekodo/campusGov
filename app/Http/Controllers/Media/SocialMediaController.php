@@ -60,6 +60,13 @@ class SocialMediaController extends Controller
 
     public function addRecognizedSocialMediaPlatform(Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('media_platform.create'),
+            403
+        );
         request()->validate([
             'logo' => 'required|image|mimes:jpeg,jpg,png,webp|max:200',
             'name' => 'required|string',
@@ -88,6 +95,13 @@ class SocialMediaController extends Controller
     }
     public function editRecognizedSocialMediaPlatform($slug, Request $request)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('media_platform.update'),
+            403
+        );
         request()->validate([
             'logo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:200',
             'name' => 'required|string',
@@ -123,6 +137,13 @@ class SocialMediaController extends Controller
     }
     public function deletePlatform($slug)
     {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('media_platform.delete'),
+            403
+        );
         $platform = RecognizedSocialMediaPlatform::where('slug', $slug)->first();
         if (!$platform) {
             return redirect()->back()->with('error', 'No records found!');
