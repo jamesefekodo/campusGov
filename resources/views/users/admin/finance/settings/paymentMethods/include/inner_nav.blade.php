@@ -6,10 +6,10 @@
                 {{ Str::startsWith(request()->path(), 'admin/finance/settings/payment_methods') ? 'inner_nav_active' : '' }}">
                 Payment Methods</div>
         </a>
-        <a href="#">
+        <a href="{{ route('taxes') }}">
             <div
                 class="inner_nav_menu
-                {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
+                {{ Str::startsWith(request()->path(), 'admin/finance/settings/taxes') ? 'inner_nav_active' : '' }}">
                 Taxes</div>
         </a>
 

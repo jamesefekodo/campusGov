@@ -280,6 +280,28 @@
                                                             </p>
                                                         </div>
                                                         <div class="mb-4 col-md-6">
+                                                            <label class="form-label">Institute Name<span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control text-center"
+                                                                name="school_name"
+                                                                value="{{ $data['basicSystemSetting']->school_name }}"
+                                                                required>
+                                                            <p class="text-danger">{{ $errors->first('school_name') }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="mb-4 col-md-4">
+                                                            <label class="form-label">Institute Acronym<span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control text-center"
+                                                                name="school_acronym"
+                                                                value="{{ $data['basicSystemSetting']->school_acronym }}"
+                                                                required>
+                                                            <p class="text-danger">
+                                                                {{ $errors->first('school_acronym') }}
+                                                            </p>
+                                                        </div>
+
+                                                        <div class="mb-4 col-md-4">
                                                             <label class="form-label">Is the institution a
                                                                 polytechnic?<span class="text-danger">*</span></label>
                                                             <select class="form-select text-center" name="is_polytechnic"
@@ -305,28 +327,17 @@
                                                                 {{ $errors->first('is_polytechnic') }}
                                                             </p>
                                                         </div>
+                                                         <div class="mb-4 col-md-4">
+                                                            <label class="form-label">Founding Year<span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="number" class="form-control text-center"
+                                                                name="school_founding_year"
+                                                                value="{{ $data['basicSystemSetting']->school_founding_year }}"
+                                                                required>
+                                                            <p class="text-danger">{{ $errors->first('school_founding_year') }}
+                                                            </p>
+                                                        </div>
 
-                                                        <div class="mb-4 col-md-6">
-                                                            <label class="form-label">Institute Name<span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control text-center"
-                                                                name="school_name"
-                                                                value="{{ $data['basicSystemSetting']->school_name }}"
-                                                                required>
-                                                            <p class="text-danger">{{ $errors->first('school_name') }}
-                                                            </p>
-                                                        </div>
-                                                        <div class="mb-4 col-md-6">
-                                                            <label class="form-label">Institute Acronym<span
-                                                                    class="text-danger">*</span></label>
-                                                            <input type="text" class="form-control text-center"
-                                                                name="school_acronym"
-                                                                value="{{ $data['basicSystemSetting']->school_acronym }}"
-                                                                required>
-                                                            <p class="text-danger">
-                                                                {{ $errors->first('school_acronym') }}
-                                                            </p>
-                                                        </div>
                                                     </div>
                                                     @php
                                                         $colors = [

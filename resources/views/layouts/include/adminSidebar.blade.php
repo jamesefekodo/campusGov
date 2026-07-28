@@ -225,6 +225,14 @@
                             {{-- {{ route('paymentTransactionsHome') }} --}}
                              ">Transactions</a>
                     </li>
+                    @if (Auth::user()->hasPermission('dues.create'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/dues') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{ route('associationDues') }}
+                            ">Dues</a>
+                        </li>
+                    @endif
                     @if (Auth::user()->hasPermission('manage_payment_settings'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/settings') ? 'sidebar-active' : '' }}"

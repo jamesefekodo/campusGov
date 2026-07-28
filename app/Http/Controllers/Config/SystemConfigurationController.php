@@ -198,8 +198,8 @@ class SystemConfigurationController extends Controller
             'primary_colour' => 'nullable',
             'secondary_colour' => 'nullable',
             'tertiary_colour' => 'nullable',
-            'is_polytechnic' => 'required'
-
+            'is_polytechnic' => 'required',
+            'school_founding_year' => 'required',
         ]);
 
         $basicSystemSetting->association_name = trim($request->association_name);
@@ -213,8 +213,7 @@ class SystemConfigurationController extends Controller
         $basicSystemSetting->secondary_colour = $request->secondary_colour;
         $basicSystemSetting->tertiary_colour = $request->tertiary_colour;
         $basicSystemSetting->is_polytechnic = $request->is_polytechnic;
-
-
+        $basicSystemSetting->school_founding_year = trim($request->school_founding_year);
 
         if ($request->hasFile('association_logo')) {
 

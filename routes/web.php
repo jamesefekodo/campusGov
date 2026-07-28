@@ -6,6 +6,7 @@ use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Finance\AssociationDueController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
@@ -288,4 +289,13 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/settings/payment_methods/electronic', [PaymentSettingsController::class, 'electronicPaymentMethods'])->name('electronicPaymentMethods');
     Route::get('admin/finance/settings/payment_methods/electronic/view/{uuid}', [PaymentSettingsController::class, 'viewElectronicPaymentMethod'])->name('viewElectronicPaymentMethod');
     Route::put('admin/finance/settings/payment_methods/electronic/update/{id}', [PaymentSettingsController::class, 'updateElectronicPaymentApiConfig'])->name('updateElectronicPaymentApiConfig');
+    Route::get('admin/finance/settings/taxes', [PaymentSettingsController::class, 'taxes'])->name('taxes');
+    Route::post('admin/finance/settings/taxes/add_new/submit', [PaymentSettingsController::class, 'addNewTaxSubmit'])->name('addNewTaxSubmit');
+    Route::put('admin/finance/settings/taxes/edit/{uuid}', [PaymentSettingsController::class, 'editTaxSubmit'])->name('editTaxSubmit');
+
+
+    Route::get('admin/finance/settings/payment_methods/dues', [AssociationDueController::class, 'associationDues'])->name('associationDues');    Route::get('admin/finance/settings/payment_methods/dues/search', [AssociationDueController::class, 'associationDues'])->name('associationDuesSearch');
+
+
+    //
 });

@@ -35,7 +35,7 @@ return new class extends Migration
             $table->text('secondary_colour')->nullable();
             $table->text('tertiary_colour')->nullable();
             $table->text('footer_plus')->nullable();
-
+            $table->integer('school_founding_year');
             $table->timestamps();
         });
     }

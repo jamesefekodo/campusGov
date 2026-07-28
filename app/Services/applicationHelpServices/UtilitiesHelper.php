@@ -80,6 +80,13 @@ if (!function_exists('basicSystemInfo')) {
     }
 }
 
+if (!function_exists('schoolFoundingYear')) {
+    function schoolFoundingYear()
+    {
+        return (int) (BasicSystemSetting::first()?->school_founding_year ?? 2000);
+    }
+}
+
 if (!function_exists('faculties')) {
     function faculties()
     {

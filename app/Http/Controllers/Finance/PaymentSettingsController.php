@@ -7,6 +7,7 @@ use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentConfig;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
+use App\Models\Finance\Settings\Tax;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -165,6 +166,7 @@ class PaymentSettingsController extends Controller
         if (!$config) {
             return redirect()->back()->with('error', 'Records not found.');
         }
+
         $config->update(
             [
                 'client_id' => $request->client_id,
@@ -188,6 +190,79 @@ class PaymentSettingsController extends Controller
             ]);
         }
 
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function taxes()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('manage_payment_settings'),
+            403
+        );
+
+        $taxes = Tax::orderBy('tax_name')->get();
+
+        $data = [
+            'taxes' => $taxes,
+        ];
+        return view('users.admin.finance.settings.taxes.taxes', compact('data'));
+    }
+    public function addNewTaxSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('manage_payment_settings'),
+            403
+        );
+
+        $request->validate([
+            'tax_name' => 'required|unique:taxes,tax_name',
+            'tax_method' => 'required',
+            'tax_rate' => 'required',
+        ]);
+
+        Tax::create(
+            [
+                'tax_name' => trim($request->tax_name),
+                'tax_method' => trim($request->tax_method),
+                'tax_rate' => trim($request->tax_rate),
+            ]
+        );
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editTaxSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('manage_payment_settings'),
+            403
+        );
+        $tax = Tax::where('uuid', $uuid)->first();
+        if (!$tax) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $request->validate([
+            'tax_name' => 'required|unique:taxes,tax_name,' . $tax->id,
+            'tax_method' => 'required',
+            'tax_rate' => 'required',
+            'is_active' => 'required',
+        ]);
+
+
+
+        $tax->update([
+            'tax_name' => $request->tax_name,
+            'tax_method' => $request->tax_method,
+            'tax_rate' => $request->tax_rate,
+            'is_active' => $request->is_active,
+        ]);
         return redirect()->back()->with('success', 'Done!');
     }
 }
