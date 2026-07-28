@@ -190,7 +190,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(MemberSocialMediaHandle::class, 'username', 'username');
     }
-     public function memberMisconducts()
+    public function memberMisconducts()
     {
         return $this->hasMany(MemberMisconduct::class, 'username', 'username');
     }

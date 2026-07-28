@@ -23,14 +23,11 @@
                     </div>
                     <div class="col-md-12 m-auto">
                         <div class="my_form_container pb-4 px-3 pt-2">
-                            <h5 class="text-bold text-black">
-                                Title
-                            </h5>
-                            {{-- ################################################################ --}}
+
                             @livewire('manual-payment-methods-toggle')
-                            {{-- ################################################################# --}}
+
                             @if ($data['manualMethodSetting']->bank_transfer)
-                                <div class="d-flex align-items-center">
+                                <div class="d-flex align-items-center mt-4">
                                     <hr class="flex-grow-1">
                                     <span class="mx-2 text-black">Bank Accounts
                                     </span>
@@ -62,8 +59,9 @@
                                                             </span>
                                                             <a href="javascript:void(0)"
                                                                 class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm"
-                                                                data-toggle="modal" data-target="#changeIsPaidBreakModal"
-                                                                {{-- data-url="{{ route('companyRemoveShiftScheduleStep', ['uuid' => $step->uuid]) }}" --}} style="cursor: pointer;">
+                                                                data-toggle="modal"
+                                                                data-url="{{ route('removeBankAccount', ['id' => $account->id]) }}"
+                                                                style="cursor: pointer;">
                                                                 <i class="fas fa-trash me-1"></i>Remove
                                                             </a>
                                                         </td>
@@ -90,7 +88,11 @@
                                         </div>
                                     @endif
                                     @include('users.admin.finance.settings.paymentMethods.include.addNewBankAccountModal')
-                                    @include('users.admin.finance.settings.paymentMethods.include.editBankAccountModal')
+                                    @if ($data['bankAccounts']->isNotEmpty())
+                                        @foreach ($data['bankAccounts'] as $account)
+                                            @include('users.admin.finance.settings.paymentMethods.include.editBankAccountModal')
+                                        @endforeach
+                                    @endif
 
                                 </div>
                             @endif
@@ -103,7 +105,44 @@
                 </div>
             </div>
 
+            <script>
+                document.addEventListener('click', function(e) {
+                    // Find the closest element with the .delete-confirm class
+                    const btn = e.target.closest('.delete-confirm');
 
+                    if (btn) {
+                        e.preventDefault();
+                        const url = btn.getAttribute('data-url');
+
+
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "Remove this bank account",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            buttonsStyling: false,
+
+                            customClass: {
+                                confirmButton: 'btn btn-danger mx-2',
+                                cancelButton: 'btn btn-secondary mx-2'
+                            },
+                            confirmButtonText: "Yes, Remove",
+                            cancelButtonText: "Cancel",
+                            background: '#ffffff',
+                            color: '#000000',
+                            showLoaderOnConfirm: true,
+                            preConfirm: () => {
+                                Swal.showLoading();
+                                return true;
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = url;
+                            }
+                        });
+                    }
+                });
+            </script>
 
 
 

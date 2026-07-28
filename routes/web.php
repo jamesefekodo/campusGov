@@ -283,4 +283,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/settings/payment_methods/manual', [PaymentSettingsController::class, 'manualPaymentMethods'])->name('manualPaymentMethods');
     Route::post('admin/finance/settings/payment_methods/manual/bank_accounts/add_new', [PaymentSettingsController::class, 'addNewBankAccountSubmit'])->name('addNewBankAccountSubmit');
     Route::put('admin/finance/settings/payment_methods/manual/bank_accounts/edit/{id}', [PaymentSettingsController::class, 'updateBankAccount'])->name('updateBankAccount');
+    Route::get('admin/finance/settings/payment_methods/manual/bank_accounts/remove/{id}', [PaymentSettingsController::class, 'removeBankAccount'])->name('removeBankAccount');
+
+    Route::get('admin/finance/settings/payment_methods/electronic', [PaymentSettingsController::class, 'electronicPaymentMethods'])->name('electronicPaymentMethods');
+    Route::get('admin/finance/settings/payment_methods/electronic/view/{uuid}', [PaymentSettingsController::class, 'viewElectronicPaymentMethod'])->name('viewElectronicPaymentMethod');
+    Route::put('admin/finance/settings/payment_methods/electronic/update/{id}', [PaymentSettingsController::class, 'updateElectronicPaymentApiConfig'])->name('updateElectronicPaymentApiConfig');
 });

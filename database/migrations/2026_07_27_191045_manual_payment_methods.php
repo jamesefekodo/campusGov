@@ -16,6 +16,7 @@ return new class extends Migration
             $table->boolean('cash')->default(true);
             $table->boolean('bank_transfer')->default(true);
             $table->boolean('cheque')->default(true);
+            $table->boolean('allow_manual_dues')->default(true);
             $table->timestamps();
         });
     }

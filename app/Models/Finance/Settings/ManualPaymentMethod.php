@@ -13,6 +13,7 @@ class ManualPaymentMethod extends Model
         'cash',
         'bank_transfer',
         'cheque',
+        'allow_manual_dues',
     ];
 
     // cast attributes
@@ -22,6 +23,7 @@ class ManualPaymentMethod extends Model
             'cash' => 'boolean',
             'bank_transfer' => 'boolean',
             'cheque' => 'boolean',
+            'allow_manual_dues' => 'boolean',
         ];
     }
 }
