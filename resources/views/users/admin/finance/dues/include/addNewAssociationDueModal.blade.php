@@ -15,7 +15,7 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('addNewRoleSubmit') }}"
+                    <form class="form my_form" method="POST" action="{{ route('addNewAssociationDueSubmit') }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
@@ -32,7 +32,7 @@
                                 <p style="color: red">
                                     {{ $errors->first('description') }}</p>
                             </div>
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-6">
                                 <label for="amount">Amount (₦)<span class="text-red">*</span></label>
                                 <input type="number" class="form-control" name="amount" value="{{ old('amount') }}"
                                     required>
@@ -42,7 +42,7 @@
 
                             <div class="form-group col-md-6">
                                 <label for="academic_year">Academic Year: <span class="text-red">*</span></label>
-                                <select name="admission_session" class="form-control" required>
+                                <select name="academic_year" class="form-control" required>
                                     <option value="" disabled selected>Select</option>
                                     @php
                                         $startYear = schoolFoundingYear();

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->integer('academic_year')->nullable();
             // $table->string('academic_level');
-            $table->year('year');
+            // $table->year('year');
             $table->timestamps();
         });
     }

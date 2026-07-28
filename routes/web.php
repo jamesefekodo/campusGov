@@ -294,7 +294,13 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/finance/settings/taxes/edit/{uuid}', [PaymentSettingsController::class, 'editTaxSubmit'])->name('editTaxSubmit');
 
 
-    Route::get('admin/finance/settings/payment_methods/dues', [AssociationDueController::class, 'associationDues'])->name('associationDues');    Route::get('admin/finance/settings/payment_methods/dues/search', [AssociationDueController::class, 'associationDues'])->name('associationDuesSearch');
+    Route::get('admin/finance/dues', [AssociationDueController::class, 'associationDues'])->name('associationDues');
+    Route::get('admin/finance/dues/search', [AssociationDueController::class, 'associationDues'])->name('associationDuesSearch');
+    Route::post('admin/finance/dues/add_new/submit', [AssociationDueController::class, 'addNewAssociationDueSubmit'])->name('addNewAssociationDueSubmit');
+    Route::get('admin/finance/dues/view/{uuid}', [AssociationDueController::class, 'viewDue'])->name('viewDue');
+
+
+
 
 
     //

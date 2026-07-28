@@ -102,7 +102,7 @@
                                                         <select name="admission_session" class="form-control">
                                                             <option value="" disabled selected>Select</option>
                                                             @php
-                                                                $startYear = 2007;
+                                                                $startYear = schoolFoundingYear();
                                                                 $endYear = date('Y');
                                                             @endphp
 
@@ -175,7 +175,7 @@
                                                             </option>
 
 
-                                                            @for ($year = date('Y'); $year >= 2007; $year--)
+                                                            @for ($year = date('Y'); $year >= schoolFoundingYear(); $year--)
                                                                 <option value="{{ $year }}"
                                                                     {{ old('graduation_session', $data['member']->memberAcademicInfo?->graduation_session) == $year ? 'selected' : '' }}>
                                                                     {{ $year }}/{{ $year + 1 }}

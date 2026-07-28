@@ -10,7 +10,8 @@
             @if (Auth::user()->hasPermission('roles.create'))
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
-                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewAssociationDueModal">
+                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
+                            data-target="#addNewAssociationDueModal">
                             <i class="fas fa-plus"></i> New Due</button>
                     </div>
                 </div>
@@ -79,22 +80,41 @@
                                                 </tr>
                                             @else
                                                 <tbody>
-                                                    {{-- @foreach ($data['roles'] as $role)
+                                                    @foreach ($data['dues'] as $due)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start">
-                                                                {{ $role->name }}
+                                                                {{ $due->title }}
                                                             </td>
-                                                            <td class="text-start">
-                                                                {{ $role->description }}
+                                                            <td class="">
+                                                                {{ $due->academic_year }}/{{ $due->academic_year + 1 }}
+                                                                Academic Session
+                                                            </td>
+                                                            <td>
+                                                                ₦{{ number_format($due->amount, 2) }}
+                                                            </td>
+                                                            <td>
+                                                                @switch($due->is_active)
+                                                                    @case(true)
+                                                                        <span class="badge bg-success-subtle text-success">
+                                                                            Active
+                                                                        </span>
+                                                                    @break
+
+                                                                    @default
+                                                                        <span class="badge bg-danger-subtle text-danger">
+                                                                            Inactive
+                                                                        </span>
+                                                                @endswitch
                                                             </td>
 
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewRole', ['uuid' => $role->uuid]) }}">View</a>
+                                                                    href="{{ route('viewDue', ['uuid' => $due->uuid]) }}"
+                                                                    >View</a>
                                                             </td>
                                                         </tr>
-                                                    @endforeach --}}
+                                                    @endforeach
                                                 </tbody>
                                             @endif
                                         </table>
