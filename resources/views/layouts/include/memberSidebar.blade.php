@@ -124,9 +124,7 @@
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/dues') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('studentSelfDues') }} --}}
-                             ">Dues</a>
+                            href="{{ route('myAssociationDues') }}">Dues</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/transactions') ? 'sidebar-active' : '' }}"

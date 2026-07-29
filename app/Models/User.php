@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
 use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
@@ -194,5 +195,40 @@ class User extends Authenticatable
     public function memberMisconducts()
     {
         return $this->hasMany(MemberMisconduct::class, 'username', 'username');
+    }
+    public function paymentTransactions()
+    {
+        return $this->hasMany(PaymentTransaction::class, 'registered_payer', 'username');
+    }
+
+    public function pendingPaymentTransactions()
+    {
+        return $this->paymentTransactions()
+            ->where(function ($query) {
+                $query->where('payment_status', 'pending')
+                    ->orWhere('approval_status', 'pending');
+            });
+    }
+
+    public function successfulPaymentTransactions()
+    {
+        return $this->paymentTransactions()
+            ->where('approval_status', 'approved');
+    }
+
+
+    // for specific dues
+    public function successfulPaymentForDue($dueId)
+    {
+        return $this->successfulPaymentTransactions()
+            ->where('due_id', $dueId)
+            ->first();
+    }
+
+    public function pendingPaymentForDue($dueId)
+    {
+        return $this->pendingPaymentTransactions()
+            ->where('due_id', $dueId)
+            ->first();
     }
 }

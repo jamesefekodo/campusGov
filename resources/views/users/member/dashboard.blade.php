@@ -443,12 +443,32 @@
                                                         @endif
 
                                                         <hr>
-                                                        {{-- pay now start --}}
-                                                        @php
-                                                            $collapseId = 'payNowSection-' . $due->id;
-                                                        @endphp
-                                                        @include('users.member.dues.include.payDueNowModal')
-                                                        {{-- pay now end --}}
+
+
+                                                        @if ($transaction = $data['member']->successfulPaymentForDue($due->fee_id))
+                                                            <div class="d-flex justify-content-end align-items-center">
+                                                                <a href="{{ route('printPaymentReceipt', $transaction->uuid) }}"
+                                                                    class="btn btn-success">
+                                                                    <i class="fas fa-print me-1"></i>
+                                                                    Print Receipt
+                                                                </a>
+                                                            </div>
+                                                        @elseif ($data['member']->pendingPaymentForDue($due->fee_id))
+                                                            <div class="d-flex justify-content-end align-items-center">
+
+                                                                <button type="button" class="btn btn-warning" disabled>
+                                                                    <i class="fas fa-clock me-1"></i>
+                                                                    Pending Approval
+                                                                </button>
+                                                            </div>
+                                                        @else
+                                                            {{-- Pay Now --}}
+                                                            @php
+                                                                $collapseId = 'payNowSection-' . $due->id;
+                                                            @endphp
+
+                                                            @include('users.member.dues.include.payDueNowModal')
+                                                        @endif
                                                     </div>
 
                                                 </div>
@@ -460,8 +480,7 @@
                                                 <div class="card border-0 shadow-sm">
                                                     <div class="card-body text-center py-5">
                                                         <p class="text-muted mb-0">
-                                                            No dues available for the current academic year.
-                                                        </p>
+                                                            There are no dues applicable to your membership period. </p>
                                                     </div>
                                                 </div>
                                             </div>

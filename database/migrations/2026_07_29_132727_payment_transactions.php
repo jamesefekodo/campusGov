@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->string('payment_transaction_id')->unique();
                 $table->string('service_provider_id')->nullable();
                 $table->string('paystack_reference')->nullable();
-                $table->string('payment_type')->default('electronic');
+                $table->string('payment_mode')->default('electronic');
                 $table->string('registered_payer')->nullable(); // Foreign
                 $table->string('non_registered_payer')->nullable();
                 $table->string('payment_purpose');
@@ -36,7 +36,8 @@ return new class extends Migration
 
                 $table->text('taxes_paid')->nullable();
                 $table->string('electronic_payment_method')->nullable(); // foreign
-                $table->unsignedBigInteger('manual_payment_method')->nullable();
+                $table->string('manual_payment_method')->nullable();
+                $table->string('photo')->nullable();
                 $table->string('payment_status')->default('waiting');
                 $table->dateTime('paid_at');
                 $table->string('approval_status');

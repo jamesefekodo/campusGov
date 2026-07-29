@@ -732,4 +732,14 @@ class MemberSelfProfileController extends Controller
         ];
         return view('users.member.myProfile.myMisconducts', compact('data'));
     }
+    public function myAssociationDues()
+    {
+        $member = Auth::user();
+
+        $data = [
+            'member' => $member,
+        ];
+
+        return view('users.member.dues.dues', compact('data'));
+    }
 }
