@@ -1294,7 +1294,7 @@ class AcademicConfigController extends Controller
         }
         $type->update(
             [
-                'name' => $request->name,
+                'type_name' => $request->name,
                 'is_active' => $request->is_active,
             ]
         );

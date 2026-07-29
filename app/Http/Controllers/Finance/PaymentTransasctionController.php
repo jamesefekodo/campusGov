@@ -3,12 +3,15 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use Carbon\Carbon;
+use Faker\Provider\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
 class PaymentTransasctionController extends Controller
@@ -206,5 +209,188 @@ class PaymentTransasctionController extends Controller
 
         $transaction->save();
         return redirect()->back()->with('success', 'Saved!');
+    }
+    public function paymentTransactions(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $transactions = '';
+        $totalTransactions = 0;
+
+
+        if (Route::currentRouteName() == 'paymentTransactionsSearch') {
+            $searchKey = $request->input('searchKey');
+            $transactions = PaymentTransaction::with([
+                'due' => function ($query) use ($searchKey) {
+                    $query->where('title', 'like', "%$searchKey%")
+                        ->orWhere('description', 'like', "%$searchKey%");
+                },
+                'registeredPayer' => function ($query) use ($searchKey) {
+                    $query->where('phone1', 'like', "%$searchKey%")
+                        ->orWhere('email1', 'like', "%$searchKey%")
+                        ->orWhere('phone2', 'like', "%$searchKey%")
+                        ->orWhere('email2', 'like', "%$searchKey%")
+                        ->orWhere('first_name', 'like', "%$searchKey%")
+                        ->orWhere('middle_name', 'like', "%$searchKey%")
+                        ->orWhere('last_name', 'like', "%$searchKey%")
+                        ->orWhere('gender', 'like', "%$searchKey%")
+                        ->orWhere('nationality', 'like', "%$searchKey%")
+                        ->orWhere('state_of_origin', 'like', "%$searchKey%")
+                        ->orWhere('lga_of_origin', 'like', "%$searchKey%");
+                }
+            ])
+                ->where(function ($query) use ($searchKey) {
+                    $query->where('payment_transaction_id', 'like', "%$searchKey%")
+                        ->orWhere('service_provider_id', 'like', "%$searchKey%")
+                        ->orWhere('paystack_reference', 'like', "%$searchKey%")
+                        ->orWhere('payment_mode', 'like', "%$searchKey%")
+                        ->orWhere('registered_payer', 'like', "%$searchKey%")
+                        ->orWhere('non_registered_payer', 'like', "%$searchKey%")
+                        ->orWhere('payment_purpose', 'like', "%$searchKey%")
+                        ->orWhere('electronic_payment_method', 'like', "%$searchKey%")
+                        ->orWhere('manual_payment_method', 'like', "%$searchKey%")
+                        ->orWhere('payment_status', 'like', "%$searchKey%")
+                        ->orWhere('approval_status', 'like', "%$searchKey%");
+                })
+                ->orWhereHas('due', function ($query) use ($searchKey) {
+                    $query->where('title', 'like', "%$searchKey%")
+                        ->orWhere('description', 'like', "%$searchKey%");
+                })
+                ->orWhereHas('registeredPayer', function ($query) use ($searchKey) {
+                    $query->where('phone1', 'like', "%$searchKey%")
+                        ->orWhere('email1', 'like', "%$searchKey%")
+                        ->orWhere('phone2', 'like', "%$searchKey%")
+                        ->orWhere('email2', 'like', "%$searchKey%")
+                        ->orWhere('first_name', 'like', "%$searchKey%")
+                        ->orWhere('middle_name', 'like', "%$searchKey%")
+                        ->orWhere('last_name', 'like', "%$searchKey%")
+                        ->orWhere('gender', 'like', "%$searchKey%")
+                        ->orWhere('nationality', 'like', "%$searchKey%")
+                        ->orWhere('state_of_origin', 'like', "%$searchKey%")
+                        ->orWhere('lga_of_origin', 'like', "%$searchKey%");
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalTransactions = $transactions->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $transactions = PaymentTransaction::orderBy('updated_at', 'desc')->paginate(20);
+            $totalTransactions = PaymentTransaction::count();
+            $requestType = 'all';
+            $pageTitle = 'Payment Transactions';
+        }
+
+        $data = [
+            'transactions' => $transactions,
+            'totalTransactions' => $totalTransactions,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.finance.transactions.paymentTransactions', compact('data'));
+    }
+    public function viewPaymentTransaction($payment_transaction_id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $transaction = PaymentTransaction::where('payment_transaction_id', $payment_transaction_id)->first();
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $data = [
+            'transaction' => $transaction,
+        ];
+        return view('users.admin.finance.transactions.viewPaymentTransaction', compact('data'));
+    }
+    public function processManualPaymentTransaction($payment_transaction_id, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.update'),
+            403
+        );
+
+        $transaction = PaymentTransaction::where('payment_transaction_id', $payment_transaction_id)->first();
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $request->validate([
+            'approval_status' => 'required|in:approved,declined',
+        ]);
+
+        $user = Auth::user();
+
+        $paymentStatus = $request->approval_status === 'approved'
+            ? 'successful'
+            : 'declined';
+
+        $transaction->update([
+            'amount_settled' => $request->approval_status === 'approved'
+                ? $transaction->amount_paid
+                : 0,
+            'payment_status' => $paymentStatus,
+            'approval_status' => $request->approval_status,
+            'approved_by' => $user->username,
+            'approved_at' => now(),
+        ]);
+
+        $settings = BasicSystemSetting::first();
+
+        if ($request->approval_status === 'approved') {
+
+            // Only add the money once
+            if ($transaction->balance_update_status === 'pending') {
+
+                $settings->increment(
+                    'account_balance',
+                    $transaction->amount_paid
+                );
+
+                $transaction->update([
+                    'amount_settled' => $transaction->amount_paid,
+                    'balance_update_status' => 'done',
+                ]);
+            }
+        } else {
+
+            // If approval was reversed after the balance had already been updated
+            if ($transaction->balance_update_status === 'done') {
+
+                $settings->decrement(
+                    'account_balance',
+                    $transaction->amount_paid
+                );
+            }
+
+            $transaction->update([
+                'amount_settled' => 0,
+                'balance_update_status' => 'cancelled',
+            ]);
+        }
+        return redirect()->back()->with('success', 'Done!');
     }
 }

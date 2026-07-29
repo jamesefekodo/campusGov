@@ -171,7 +171,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     // view members profile
-    Route::get('admin/user_management/members/view/{uuid}', [MembersManagementController::class, 'viewMMember'])->name('viewMMember');
+    Route::get('admin/user_management/members/view/{uuid}', [MembersManagementController::class, 'viewMember'])->name('viewMember');
     Route::get('admin/user_management/members/view/personal_info/{uuid}', [MembersManagementController::class, 'viewMemberPersonalProfile'])->name('viewMemberPersonalProfile');
     Route::get('admin/user_management/members/view/academic_info/{uuid}', [MembersManagementController::class, 'viewMemberAcademicInfo'])->name('viewMemberAcademicInfo');
     Route::get('admin/user_management/members/view/academic_info/edit/{uuid}', [MembersManagementController::class, 'editMemberAcademicInfo'])->name('editMemberAcademicInfo');
@@ -311,4 +311,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/finance/dues/variation/create/submit/{uuid}', [AssociationDueController::class, 'createAssociationDueVariation'])->name('createAssociationDueVariation');
     Route::put('admin/finance/dues/variation/edit/submit/{id}', [AssociationDueController::class, 'editAssociationDueVariation'])->name('editAssociationDueVariation');
     Route::get('admin/finance/dues/variation/delet/{id}', [AssociationDueController::class, 'removeAssociationVariation'])->name('removeAssociationVariation');
+
+    // transactions
+    Route::get('admin/finance/transactions', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactions');
+    Route::get('admin/finance/transactions/search', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactionsSearch');
+    Route::get('admin/finance/transactions/view/{payment_transaction_id}', [PaymentTransasctionController::class, 'viewPaymentTransaction'])->name('viewPaymentTransaction');
+    Route::put('admin/finance/transactions/manuak/process/{payment_transaction_id}', [PaymentTransasctionController::class, 'processManualPaymentTransaction'])->name('processManualPaymentTransaction');
 });

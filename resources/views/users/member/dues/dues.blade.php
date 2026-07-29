@@ -123,7 +123,8 @@
 
                                                 @if ($transaction = $data['member']->successfulPaymentForDue($due->fee_id))
                                                     <div class="d-flex justify-content-end align-items-center">
-                                                        <a href="{{ route('printPaymentReceipt', $transaction->uuid) }}"
+                                                        <a
+                                                        {{-- href="{{ route('printPaymentReceipt', $transaction->uuid) }}" --}}
                                                             class="btn btn-success">
                                                             <i class="fas fa-print me-1"></i>
                                                             Print Receipt

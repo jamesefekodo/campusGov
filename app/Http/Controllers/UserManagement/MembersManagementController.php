@@ -647,7 +647,7 @@ class MembersManagementController extends Controller
         return redirect()->route('memberAwaitingVerification')->with('success', 'Done!');
     }
 
-    public function viewMMember($uuid)
+    public function viewMember($uuid)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();

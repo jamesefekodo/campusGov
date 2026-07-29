@@ -20,7 +20,11 @@ return new class extends Migration
                 $table->string('paystack_reference')->nullable();
                 $table->string('payment_mode')->default('electronic');
                 $table->string('registered_payer')->nullable(); // Foreign
+
                 $table->string('non_registered_payer')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('email')->nullable();
+
                 $table->string('payment_purpose');
                 $table->string('due_id')->nullable(); // Foreign
                 $table->string('invoice_id')->nullable(); // Foreign
@@ -42,7 +46,7 @@ return new class extends Migration
                 $table->dateTime('paid_at');
                 $table->string('approval_status');
                 $table->string('balance_update_status')->nullable()->default('pending');
-                $table->string('approved_by')->nullable();
+                $table->string('approved_by')->nullable(); // foreign
                 $table->dateTime('approved_at')->nullable();
                 $table->timestamps();
 
@@ -53,6 +57,12 @@ return new class extends Migration
                     ->references('username')
                     ->on('users')
                     ->onUpdate('cascade');
+
+                $table->foreign('approved_by')
+                    ->references('username')
+                    ->on('users')
+                    ->onUpdate('cascade');
+
 
                 $table->foreign('electronic_payment_method')
                     ->references('slug')

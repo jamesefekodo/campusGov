@@ -2,6 +2,9 @@
 
 namespace App\Models\Finance\Transactions;
 
+use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Members\MemberPersonalProfile;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,6 +19,8 @@ class PaymentTransaction extends Model
         'payment_mode',
         'registered_payer',
         'non_registered_payer',
+        'phone',
+        'email',
         'payment_purpose',
         'due_id',
         'invoice_id',
@@ -37,16 +42,28 @@ class PaymentTransaction extends Model
         'balance_update_status',
         'approved_by',
         'approved_at',
+
     ];
+
+    public function due()
+    {
+        return $this->belongsTo(AssociationDue::class, 'due_id', 'fee_id');
+    }
+
+    public function registeredPayer()
+    {
+        return $this->belongsTo(User::class, 'registered_payer', 'username');
+    }
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by', 'username');
+    }
 
     // public function associationProfile()
     // {
     //     return $this->belongsTo(AssociationProfile::class, 'association', 'username');
     // }
-    // public function theStudent()
-    // {
-    //     return $this->belongsTo(StudentPersonalProfile::class, 'registered_payer', 'username');
-    // }
+
     // public function theStudentAcademicInfo()
     // {
     //     return $this->belongsTo(StudentAcademicInfo::class, 'registered_payer', 'username');

@@ -6,6 +6,7 @@ use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ManualPaymentMethod;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -382,5 +383,28 @@ if (!function_exists('activeBankAccounts')) {
     function activeBankAccounts()
     {
         return BankAccount::where('is_active', true)->orderBy('account_name')->get();
+    }
+}
+
+
+// check member level at the time when due is created
+if (!function_exists('studentLevelAtDue')) {
+    function studentLevelAtDue($academic, $due): int
+    {
+        if (!$academic || !$due || !$academic->admission_session) {
+            return 1;
+        }
+
+        return ($due->academic_year - (int) $academic->admission_session) + 1;
+    }
+}
+
+
+if (!function_exists('totalPendingPaymentTransactions')) {
+    function totalPendingPaymentTransactions()
+    {
+        return PaymentTransaction::where('payment_status', 'pending')
+            ->orWhere('approval_status', 'pending')
+            ->count();
     }
 }

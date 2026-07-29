@@ -196,9 +196,9 @@
             </div>
         </li><!--//nav-item-->
 
-        {{-- @php
-            $financeNotifications = countPendingPaymentMethodUpdates() + 0;
-        @endphp --}}
+        @php
+            $financeNotifications = totalPendingPaymentTransactions() + 0;
+        @endphp
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/finance') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-4" aria-expanded="false"
@@ -207,10 +207,10 @@
                     <i class="fas fa-credit-card"></i>
                 </span>
                 <span class="nav-link-text">Finance &nbsp;
-                    {{-- @if ($financeNotifications > 0)
+                    @if ($financeNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
                             style="font-size: 11px">{{ $financeNotifications }}</span>
-                    @endif --}}
+                    @endif
                 </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
@@ -219,12 +219,18 @@
 
             <div id="submenu-4" class="collapse submenu submenu-4" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/payments/transactions') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('paymentTransactionsHome') }} --}}
-                             ">Transactions</a>
-                    </li>
+                    @if (Auth::user()->hasPermission('transactions.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/transactions') ? 'sidebar-active' : '' }}"
+                                href="{{ route('paymentTransactions') }}">Transactions &nbsp;
+                                @if (totalPendingPaymentTransactions() > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ totalPendingPaymentTransactions() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                     @if (Auth::user()->hasPermission('dues.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/dues') ? 'sidebar-active' : '' }}"

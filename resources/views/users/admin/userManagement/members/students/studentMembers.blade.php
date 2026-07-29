@@ -200,7 +200,7 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewMMember', ['uuid' => $member->userProfile->uuid]) }}">
+                                                                    href="{{ route('viewMember', ['uuid' => $member->userProfile->uuid]) }}">
                                                                     <i class="fas fa-eye me-2"></i>
                                                                     View</a>
                                                             </td>
