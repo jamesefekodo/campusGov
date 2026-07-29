@@ -168,8 +168,8 @@ class AssociationDueController extends Controller
             'admission_session' => [
                 'nullable',
                 'integer',
-                'min:' . (($due->academic_year - 1) - 10),
-                'max:' . ($due->academic_year - 1),
+                'min:' . $due->academic_year,
+                'max:' . ($due->academic_year + 10),
                 'required_without_all:program_slug,program_type_slug',
             ],
 
@@ -246,7 +246,8 @@ class AssociationDueController extends Controller
             'admission_session.required_without_all' => 'Please specify at least one of Admission Session, Program, or Program Type.',
             'program_slug.required_without_all' => 'Please specify at least one of Admission Session, Program, or Program Type.',
             'program_type_slug.required_without_all' => 'Please specify at least one of Admission Session, Program, or Program Type.',
-            'admission_session.max' => 'The admission session cannot be more than 10 years after the due academic year/session.',
+            'admission_session.min' => 'The selected admission session is too old. It cannot be more than 10 academic sessions before the due academic session.',
+            'admission_session.max' => 'The admission session cannot be later than the due academic session. The latest eligible admission session is the session immediately preceding the due academic session.',
         ]);
 
         $variation->update([

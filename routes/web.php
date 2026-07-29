@@ -8,6 +8,7 @@ use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Finance\AssociationDueController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
+use App\Http\Controllers\Finance\PaymentTransasctionController;
 use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
@@ -125,8 +126,10 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/my_profile/misconducts', [MemberSelfProfileController::class, 'myMisconducts'])->name('myMisconducts');
 
 
+    Route::post('member/association_dues/{uuid}', [PaymentTransasctionController::class, 'memberPayAssociationDue'])->name('memberPayAssociationDue');
 
     //
+
 });
 
 

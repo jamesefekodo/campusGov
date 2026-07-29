@@ -59,42 +59,27 @@
                                 $user = Auth::user();
                                 $profileRoute = 'adminDashboard';
                                 $image = asset('system/images/default_profile_pic.webp');
+
                                 if (getUserType() == 'root' || getUserType() == 'admin') {
                                     $profileRoute = 'adminDashboard';
-                                    $image = asset('system/images/logo.webp');
+                                    $image = associationLogo();
                                 }
-                                if (
-                                    getUserType() == 'association' &&
-                                    getCurrentAssociation() &&
-                                    file_exists(
-                                        public_path(
-                                            'assets/uploads/users/associations/logo/' .
-                                                getCurrentAssociation()->passport,
-                                        ),
-                                    )
-                                ) {
-                                    $profileRoute = 'associationSelfProfile';
-                                    $image = asset(
-                                        'assets/uploads/users/associations/logo/' . getCurrentAssociation()->passport,
-                                    );
-                                }
-                                if (
-                                    getUserType() == 'student' &&
-                                    $user->passport &&
-                                    file_exists(
-                                        public_path('assets/uploads/users/students/passport/' . $user->passport),
-                                    )
-                                ) {
-                                    $profileRoute = 'studentViewSelfProfile';
-                                    $image = asset(
-                                        'assets/uploads/users/students/passport/' . $user->passport,
-                                    );
+
+                                if (getUserType() == 'member') {
+                                    $profileRoute = 'memberViewSelfProfile';
+
+                                    if (
+                                        $user->photo &&
+                                        file_exists(public_path('assets/uploads/users/members/photo/' . $user->photo))
+                                    ) {
+                                        $image = asset('assets/uploads/users/members/photo/' . $user->photo);
+                                    }
                                 }
                             @endphp
 
 
 
-                            <img src="{{ $image }}" alt="{{ $user->name }}" width="30px">
+                            <img src="{{ $image }}" alt="{{ $user->username }}" width="30px">
 
 
 
@@ -112,7 +97,7 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item"
+                            <li class="bg-red text-white"><a class="dropdown-item text-white"
                                     href="
                                 {{ route('logoutRequest') }}
                                  ">Logout</a>

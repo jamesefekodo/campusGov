@@ -33,6 +33,7 @@ class BasicSystemSetting extends Model
         'tertiary_color',
         'footer_plus',
         'school_founding_year',
+        'account_balance',
     ];
 
     // caset attributes

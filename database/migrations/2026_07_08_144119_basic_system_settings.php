@@ -36,6 +36,7 @@ return new class extends Migration
             $table->text('tertiary_colour')->nullable();
             $table->text('footer_plus')->nullable();
             $table->integer('school_founding_year');
+            $table->decimal('account_balance', 15, 2)->default(0);
             $table->timestamps();
         });
     }

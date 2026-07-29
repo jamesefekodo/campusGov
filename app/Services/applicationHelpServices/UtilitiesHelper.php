@@ -4,6 +4,8 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Finance\Settings\BankAccount;
+use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -365,5 +367,20 @@ if (!function_exists('countMemberProfilesAwaitingVerification')) {
         return User::where('account_type', 2)
             ->where('account_status', 1)
             ->count();
+    }
+}
+
+
+if (!function_exists('manualPaymentConfig')) {
+    function manualPaymentConfig()
+    {
+        return ManualPaymentMethod::first();
+    }
+}
+
+if (!function_exists('activeBankAccounts')) {
+    function activeBankAccounts()
+    {
+        return BankAccount::where('is_active', true)->orderBy('account_name')->get();
     }
 }

@@ -337,9 +337,9 @@
 
                                     <hr class="m-3">
                                     <h5 class="font-weight-bold text-decoration-underline">Association Dues</h5>
-                                    <div class="card-body p-4 row col-md-12">
+                                    <div class="card-body p-1 row col-md-12">
                                         @forelse($data['member']->memberAcademicInfo->associationDues() as $due)
-                                            <div class="col-md-12 mb-3">
+                                            <div class="col-md-12 mb-4">
                                                 <div class="card shadow-sm border-0">
 
                                                     {{-- Header --}}
@@ -443,29 +443,12 @@
                                                         @endif
 
                                                         <hr>
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <div
-                                                                    class="d-flex flex-wrap align-items-center justify-content-end gap-2">
-
-                                                                    <button type="button" class="btn btn-warning me-3">
-                                                                        <i class="fas fa-user-shield me-1"></i>
-                                                                        Grant Exemption
-                                                                    </button>
-
-                                                                    <span class="fw-semibold text-muted">
-                                                                        Already Paid?
-                                                                    </span>
-
-                                                                    <button type="button" class="btn btn-primary">
-                                                                        <i class="fas fa-receipt me-1"></i>
-                                                                        Regularize Payment
-                                                                    </button>
-
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
+                                                        {{-- pay now start --}}
+                                                        @php
+                                                            $collapseId = 'payNowSection-' . $due->id;
+                                                        @endphp
+                                                        @include('users.member.dues.include.payDueNowModal')
+                                                        {{-- pay now end --}}
                                                     </div>
 
                                                 </div>

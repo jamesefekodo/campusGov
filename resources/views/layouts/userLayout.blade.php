@@ -91,60 +91,11 @@
                                 <img class="logo-icon logo-sidebar me-2" src="{{ associationLogo() }}" alt="logo">
                             </div>
                             <div class="zone-header-item">
-                                <span class="logo-text logo_header_text">{{ basicSystemInfo()->association_acronym ?? config('app.name') }}</span>
+                                <span
+                                    class="logo-text logo_header_text">{{ basicSystemInfo()->association_acronym ?? config('app.name') }}</span>
                             </div>
                         </a>
 
-                        {{-- @switch(getUserType())
-                            @case('root')
-                            @case('admin')
-                                <a href="{{ url('/') }}" class="zone-header">
-                                    <div class="zone-header-item">
-                                        <img class="logo-icon me-2" src="{{ asset('system/images/logo.webp') }}" alt="logo">
-                                    </div>
-                                    <div class="zone-header-item">
-                                        <span class="logo-text">{{ config('app.name') }}</span>
-                                    </div>
-                                </a>
-                            @break
-
-                            @case('association')
-                                @php
-                                    $user = Auth::user();
-                                    $associationLogo = asset('system/images/logo_placeholder.png');
-                                    if (
-                                        $user->passport &&
-                                        file_exists(
-                                            public_path('assets/uploads/users/associations/logo/' . $user->passport),
-                                        )
-                                    ) {
-                                        $associationLogo = asset(
-                                            'assets/uploads/users/associations/logo/' . $user->passport,
-                                        );
-                                    }
-                                @endphp
-                                <a href="{{ url('/') }}" class="zone-header">
-                                    <div class="zone-header-item">
-                                        <img class="logo-icon me-2" src="{{ $associationLogo }}" alt="logo">
-                                    </div>
-                                    <div class="zone-header-item">
-                                        <span class="logo-text">{{ $user->associationProfile->acronym }}
-                                            (OGITECH)</span>
-                                    </div>
-                                </a>
-                            @break
-
-                            @default
-                                <a href="{{ url('/') }}" class="zone-header">
-                                    <div class="zone-header-item">
-                                        <img class="logo-icon me-2" src="{{ asset('system/images/logo.webp') }}"
-                                            alt="logo">
-                                    </div>
-                                    <div class="zone-header-item">
-                                        <span class="logo-text">{{ config('app.name') }}</span>
-                                    </div>
-                                </a>
-                        @endswitch --}}
                         <hr>
 
                     </div><!--//app-branding-->
