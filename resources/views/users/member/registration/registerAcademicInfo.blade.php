@@ -103,7 +103,7 @@
                                                             <option value="" disabled selected>Select</option>
                                                             @php
                                                                 $startYear = schoolFoundingYear();
-                                                                $endYear = date('Y');
+                                                                $endYear = currentAcademicYear();
                                                             @endphp
 
                                                             @for ($year = $endYear; $year >= $startYear; $year--)
