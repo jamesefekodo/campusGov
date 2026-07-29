@@ -179,6 +179,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/social_media_handles/{uuid}', [MembersManagementController::class, 'viewMemberSocialMediaHandles'])->name('viewMemberSocialMediaHandles');
     Route::get('admin/user_management/members/view/misconducts/{uuid}', [MembersManagementController::class, 'viewMemberMisconducts'])->name('viewMemberMisconducts');
 
+    Route::get('admin/user_management/members/view/association_dues/{uuid}', [MembersManagementController::class, 'viewMemberAssociationDues'])->name('viewMemberAssociationDues');
 
 
 
@@ -298,10 +299,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/dues/search', [AssociationDueController::class, 'associationDues'])->name('associationDuesSearch');
     Route::post('admin/finance/dues/add_new/submit', [AssociationDueController::class, 'addNewAssociationDueSubmit'])->name('addNewAssociationDueSubmit');
     Route::get('admin/finance/dues/view/{uuid}', [AssociationDueController::class, 'viewDue'])->name('viewDue');
+    Route::put('admin/finance/dues/edit/{uuid}', [AssociationDueController::class, 'editAssociationDueSubmit'])->name('editAssociationDueSubmit');
 
-
-
-
-
-    //
+    Route::post('admin/finance/dues/variation/create/submit/{uuid}', [AssociationDueController::class, 'createAssociationDueVariation'])->name('createAssociationDueVariation');
+    Route::put('admin/finance/dues/variation/edit/submit/{id}', [AssociationDueController::class, 'editAssociationDueVariation'])->name('editAssociationDueVariation');
+    Route::get('admin/finance/dues/variation/delet/{id}', [AssociationDueController::class, 'removeAssociationVariation'])->name('removeAssociationVariation');
 });

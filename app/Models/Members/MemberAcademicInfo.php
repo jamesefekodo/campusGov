@@ -6,6 +6,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -101,6 +102,59 @@ class MemberAcademicInfo extends Model
                         ]);
                     }
                 }
+            });
+    }
+
+    public function associationDues()
+    {
+        if (
+            !$this->theProgram ||
+            !isStillWithinProgramDuration(
+                $this->admission_session,
+                $this->theProgram,
+                $this->programType,
+                $this->theDepartment
+            )
+        ) {
+            return collect();
+        }
+
+        return AssociationDue::with('variations')
+            ->where('is_active', true)
+            ->whereBetween('academic_year', [
+                (int) $this->admission_session,
+                currentAcademicYear(),
+            ])
+            ->get()
+            ->map(function ($due) {
+
+                $variation = $due->variations
+                    ->sortByDesc(function ($variation) {
+                        return (!is_null($variation->admission_session)) * 4 +
+                            (!is_null($variation->program_slug)) * 2 +
+                            (!is_null($variation->program_type_slug));
+                    }) // nubers as weight
+                    ->first(function ($variation) {
+                        return (
+                            is_null($variation->admission_session) ||
+                            $variation->admission_session == $this->admission_session
+                        )
+                            &&
+                            (
+                                is_null($variation->program_slug) ||
+                                $variation->program_slug == $this->program
+                            )
+                            &&
+                            (
+                                is_null($variation->program_type_slug) ||
+                                $variation->program_type_slug == $this->program_type
+                            );
+                    });
+
+                $due->payable_amount = $variation?->amount ?? $due->amount;
+                $due->matchedVariation = $variation;
+
+                return $due;
             });
     }
 }

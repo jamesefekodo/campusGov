@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;

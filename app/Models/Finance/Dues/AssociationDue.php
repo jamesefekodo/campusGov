@@ -39,4 +39,9 @@ class AssociationDue extends Model
             }
         });
     }
+
+    public function variations()
+    {
+        return $this->hasMany(AssociationDueVariation::class, 'due_id', 'fee_id');
+    }
 }

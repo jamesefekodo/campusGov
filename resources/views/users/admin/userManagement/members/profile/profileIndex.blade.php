@@ -136,6 +136,18 @@
                                         </div>
                                     </div>
                                 </a>
+                                <a href="{{ route('viewMemberAssociationDues', ['uuid' => $data['member']->uuid]) }}">
+                                    <div class="review-info-card">
+                                        <div class="review-info-icon">
+                                            <i class="fas fa-hand-holding-usd"></i>
+                                        </div>
+                                        <div class="review-info-content">
+                                            <p class="review-card-info-title">
+                                                Association Dues
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
                                 <a href="#">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
@@ -169,7 +181,7 @@
                     {{-- Back Home --}}
                     @php
                         if ($data['member']->memberAcademicInfo->academic_status == 'student') {
-                            $backBtn = route('memberAwaitingVerification');
+                            $backBtn = route('studentMembers');
                         } else {
                             $backBtn = route('loginPage');
                         }

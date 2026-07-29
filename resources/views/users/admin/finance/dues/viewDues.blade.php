@@ -69,7 +69,7 @@
                                                 <div class="col-md-6 p-1">
                                                     <span style="font-weight: bold">Variations:</span>
                                                     <span class="text-black">
-                                                        0
+                                                        {{ $data['due']->variations->count() }}
                                                     </span>
                                                 </div>
                                             </div>
@@ -77,16 +77,17 @@
                                         </div>
 
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            {{-- @if (Auth::user()->hasPermission('policy.update')) --}}
-                                            <button class="btn btn-warning m-1 d-flex align-items-center"
-                                                data-toggle="modal" data-target="#editPolicyModal">
-                                                <i class="fas fa-edit me-2"></i>
-                                                <span>Update</span>
-                                            </button>
-                                            {{-- @endif --}}
+                                            @if (Auth::user()->hasPermission('dues.update'))
+                                                <button class="btn btn-warning m-1 d-flex align-items-center"
+                                                    data-toggle="modal" data-target="#editAssociationDueModal">
+                                                    <i class="fas fa-edit me-2"></i>
+                                                    <span>Update</span>
+                                                </button>
+                                            @endif
 
 
                                         </div>
+                                        @include('users.admin.finance.dues.include.editAssociationDueModal')
 
                                         <div class="d-flex align-items-center mt-4">
                                             <hr class="flex-grow-1">
@@ -98,32 +99,53 @@
                                         <div class="px-3 pt-3 table-responsive">
                                             <table class="table">
                                                 <tbody>
-                                                    @if ($data['due']->isNotEmpty())
-                                                        @foreach ($data['due'] as $account)
+                                                    @if ($data['due']->variations->isNotEmpty())
+                                                        @foreach ($data['due']->variations as $variation)
                                                             <tr class="text-black">
                                                                 <th class="" scope="row">{{ $loop->iteration }}
                                                                 </th>
-                                                                <td class="">
-                                                                    {{ $account->account_number }}
                                                                 </td>
                                                                 <td class="">
-                                                                    {{ $account->account_name }}
+                                                                    @if ($variation->admission_session)
+                                                                        {{ $variation->admission_session }}/{{ $variation->admission_session + 1 }}
+                                                                        -
+                                                                        @php
+                                                                            $year =
+                                                                                $data['due']->academic_year -
+                                                                                $variation->admission_session +
+                                                                                1;
+                                                                        @endphp
+
+                                                                        @if ($year == 1)
+                                                                            (Freshers)
+                                                                        @else
+                                                                            (Year {{ $year }})
+                                                                        @endif
+                                                                    @else
+                                                                        All members who were active students during the
+                                                                        academic session.
+                                                                    @endif
                                                                 </td>
                                                                 <td class="">
-                                                                    {{ $account->bank }}
+                                                                    {{ optional($variation->program)->name ?? 'All Programs' }}
+                                                                    -
+                                                                    {{ optional($variation->programType)->type_name ?? 'All Program Types' }}
+                                                                </td>
+                                                                <td class="">
+                                                                    ₦{{ number_format($variation->amount, 2) }}
                                                                 </td>
                                                                 <td class="flex-wrap">
                                                                     <span
                                                                         class="badge bg-blue text-white pe-2 ps-3 py-2 rounded-3"
                                                                         data-toggle="modal"
-                                                                        data-target="#editBankAccountModal_{{ $account->id }}"
+                                                                        data-target="#editAssociationDueVsriationModal_{{ $variation->id }}"
                                                                         style="cursor: pointer;">
                                                                         <i class="fas fa-edit me-1"></i>Edit
                                                                     </span>
                                                                     <a href="javascript:void(0)"
                                                                         class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm"
                                                                         data-toggle="modal"
-                                                                        data-url="{{ route('removeBankAccount', ['id' => $account->id]) }}"
+                                                                        data-url="{{ route('removeAssociationVariation', ['id' => $variation->id]) }}"
                                                                         style="cursor: pointer;">
                                                                         <i class="fas fa-trash me-1"></i>Remove
                                                                     </a>
@@ -145,15 +167,16 @@
                                                 <div class="d-flex justify-content-center">
                                                     <div class="m-1">
                                                         <button class="btn btn-primary btn-sm table_btn" data-toggle="modal"
-                                                            data-target="#addNewBankAccountModal">
-                                                            <i class="fas fa-plus"></i> Add New Bank Account</button>
+                                                            data-target="#addNewDueVariationModal">
+                                                            <i class="fas fa-plus"></i> Add New Variation</button>
                                                     </div>
                                                 </div>
                                             @endif
-                                            @include('users.admin.finance.settings.paymentMethods.include.addNewBankAccountModal')
-                                            @if ($data['bankAccounts']->isNotEmpty())
-                                                @foreach ($data['bankAccounts'] as $account)
-                                                    @include('users.admin.finance.settings.paymentMethods.include.editBankAccountModal')
+                                            @include('users.admin.finance.dues.include.addNewDueVariationModal')
+
+                                            @if ($data['due']->variations->isNotEmpty())
+                                                @foreach ($data['due']->variations as $variation)
+                                                    @include('users.admin.finance.dues.include.editAssociationDueVariationModal')
                                                 @endforeach
                                             @endif
 
@@ -176,6 +199,35 @@
                 </div>
             </div>
 
+
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.delete-confirm').forEach(button => {
+                        button.addEventListener('click', function() {
+
+                            const url = this.dataset.url;
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: "This policy will be permanently deleted.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Yes, delete it!',
+                                cancelButtonText: 'Cancel',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = url;
+                                }
+                            });
+
+                        });
+                    });
+                });
+            </script>
 
         </div><!--//container-fluid-->
     </div><!--//app-content-->

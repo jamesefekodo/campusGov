@@ -19,6 +19,7 @@ return new class extends Migration
                 $table->year('admission_session')->nullable();
                 $table->string('program_slug')->nullable();
                 $table->string('program_type_slug')->nullable();
+                $table->decimal('amount', 10, 2);
                 $table->timestamps();
 
 

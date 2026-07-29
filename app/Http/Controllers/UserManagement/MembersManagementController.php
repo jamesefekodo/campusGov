@@ -980,4 +980,24 @@ class MembersManagementController extends Controller
         ];
         return view('users.admin.userManagement.members.profile.misconducts', compact('data'));
     }
+    public function viewMemberAssociationDues($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'member' => $member,
+        ];
+        return view('users.admin.userManagement.members.profile.associationDues', compact('data'));
+    }
 }
