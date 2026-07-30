@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('program_duration_overrides', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
 
             $table->string('program_slug');
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->foreign('program_slug')->references('slug')->on('programs')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('program_type_slug')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('department_slug')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

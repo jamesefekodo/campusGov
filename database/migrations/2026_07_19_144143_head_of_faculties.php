@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('head_of_faculties', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
             $table->string('faculty'); // Foreign
             $table->string('name');
@@ -28,6 +29,7 @@ return new class extends Migration
 
 
             $table->foreign('faculty')->references('slug')->on('faculties')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
 
             // Indexing
             $table->index('name');

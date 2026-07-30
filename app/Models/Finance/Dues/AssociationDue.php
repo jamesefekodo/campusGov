@@ -2,16 +2,19 @@
 
 namespace App\Models\Finance\Dues;
 
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class AssociationDue extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'association_dues';
     protected $fillable = [
         'uuid',
+        'tenant_id',
         'fee_id',
         'title',
         'description',

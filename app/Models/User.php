@@ -15,6 +15,8 @@ use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberSkill;
 use App\Models\Misconduct\MemberMisconduct;
+use App\Models\Tenancy\Tenant;
+use App\Models\Traits\BelongsToTenant;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -35,6 +37,7 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
+    use BelongsToTenant;
     protected $fillable = [
         'uuid',
         'username',
@@ -77,6 +80,12 @@ class User extends Authenticatable
                     '-' . Str::uuid();
             }
         });
+    }
+
+    // tenant
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
 

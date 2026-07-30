@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_academic_infos', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username')->unique(); // Foreign
             $table->string('academic_status')->default('unknown'); // student, extra_year, alumni, withdrawn, suspended, expelled, unkown
             $table->string('program')->nullable(); // Foreign
@@ -34,6 +35,7 @@ return new class extends Migration
             $table->foreign('faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('department')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('verified_by')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

@@ -2,14 +2,17 @@
 
 namespace App\Models\Config;
 
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BasicSystemSetting extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'basic_system_settings';
     protected $fillable = [
+        'tenant_id',
         'current_academic_year',
         'maintenance_mode',
         'association_name',

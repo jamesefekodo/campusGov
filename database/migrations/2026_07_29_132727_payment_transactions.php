@@ -15,6 +15,8 @@ return new class extends Migration
             'payment_transactions',
             function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('tenant_id')->nullable();
+
                 $table->string('payment_transaction_id')->unique();
                 $table->string('service_provider_id')->nullable();
                 $table->string('paystack_reference')->nullable();
@@ -73,6 +75,8 @@ return new class extends Migration
                     ->references('fee_id')
                     ->on('association_dues')
                     ->onUpdate('cascade');
+                $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
+
 
 
                 // $table->foreign('invoice_id')

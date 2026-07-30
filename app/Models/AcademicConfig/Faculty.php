@@ -4,16 +4,19 @@ namespace App\Models\AcademicConfig;
 
 use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\HeadOfFaculty;
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Faculty extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'faculties';
     protected $fillable = [
         'uuid',
+        'tenant_id',
         'slug',
         'name',
         'acronym',

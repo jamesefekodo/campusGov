@@ -22,6 +22,11 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
+    public function unknownTenant()
+    {
+        return 'Unknown tenant';
+    }
+
     public function redirectToUserDashboard($accountType)
     {
         switch ($accountType) {

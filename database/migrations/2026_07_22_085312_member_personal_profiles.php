@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_personal_profiles', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username')->unique(); // Foreign
             $table->string('phone1'); // Foreign
             $table->string('email1'); // Foreign
@@ -38,6 +39,7 @@ return new class extends Migration
             $table->foreign('verified_by')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('phone1')->references('phone')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('email1')->references('email')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

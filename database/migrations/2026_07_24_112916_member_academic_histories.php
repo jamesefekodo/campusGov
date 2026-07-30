@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_academic_histories', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign key
             $table->string('institution')->nullable();
             $table->string('address')->nullable();
@@ -29,6 +30,7 @@ return new class extends Migration
 
             // index
             $table->index('username');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

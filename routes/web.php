@@ -32,6 +32,12 @@ Route::get('/fetch-departments', [AcademicConfigController::class, 'fetchDepartm
     ->name('fetchDepartments');
 
 // basic/general routes
+
+Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('unknownTenant');
+
+
+
+
 Route::middleware(['authenticationMiddlewares'])->group(function () {
 
     Route::get('/', function () {

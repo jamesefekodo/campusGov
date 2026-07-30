@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_awards', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign key, NOT unique
             $table->string('award')->nullable();
             $table->string('organization')->nullable();
@@ -25,6 +26,7 @@ return new class extends Migration
                 ->references('username')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
 
             // index
             $table->index('username');

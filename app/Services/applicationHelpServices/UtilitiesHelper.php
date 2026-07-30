@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 
+
 if (!function_exists('getUserType')) {
     function getUserType()
     {
@@ -29,12 +30,41 @@ if (!function_exists('getUserType')) {
     }
 }
 
+if (!function_exists('tenant')) {
+    function tenant()
+    {
+        return app()->bound('tenant')
+            ? app('tenant')
+            : null;
+    }
+}
+
+if (!function_exists('tenantId')) {
+    function tenantId()
+    {
+        return tenant()?->id;
+    }
+}
+
+if (!function_exists('basicSystemInfo')) {
+    function basicSystemInfo()
+    {
+        if (!app()->bound('tenant')) {
+            return null;
+        }
+
+        return BasicSystemSetting::where(
+            'tenant_id',
+            app('tenant')->id
+        )->first();
+    }
+}
 
 
 if (!function_exists('associationLogo')) {
     function associationLogo()
     {
-        $defaultSettings = BasicSystemSetting::first();
+        $defaultSettings = basicSystemInfo();
 
         if (
             $defaultSettings &&
@@ -57,7 +87,7 @@ if (!function_exists('associationLogo')) {
 if (!function_exists('schoolLogo')) {
     function schoolLogo()
     {
-        $defaultSettings = BasicSystemSetting::first();
+        $defaultSettings = basicSystemInfo();
 
         if (
             $defaultSettings &&
@@ -77,17 +107,11 @@ if (!function_exists('schoolLogo')) {
     }
 }
 
-if (!function_exists('basicSystemInfo')) {
-    function basicSystemInfo()
-    {
-        return BasicSystemSetting::first();
-    }
-}
 
 if (!function_exists('schoolFoundingYear')) {
     function schoolFoundingYear()
     {
-        return (int) (BasicSystemSetting::first()?->school_founding_year ?? 2000);
+        return (int) (basicSystemInfo()?->school_founding_year ?? 2000);
     }
 }
 
@@ -105,77 +129,7 @@ if (!function_exists('departments')) {
     }
 }
 
-// if (!function_exists('currentLevel')) {
-//     function currentLevel($program, int $currentLevel): string
-//     {
-//         $value = match ($program->numbering) {
-//             'roman'    => toRoman($currentLevel),
-//             'weighted' => $currentLevel * $program->increment,
-//             default    => $currentLevel,
-//         };
 
-//         return str_replace('{value}', $value, $program->level_format);
-//     }
-// }
-
-// if (!function_exists('toRoman')) {
-//     function toRoman(int $number): string
-//     {
-//         $map = [
-//             1000 => 'M',
-//             900  => 'CM',
-//             500  => 'D',
-//             400  => 'CD',
-//             100  => 'C',
-//             90   => 'XC',
-//             50   => 'L',
-//             40   => 'XL',
-//             10   => 'X',
-//             9    => 'IX',
-//             5    => 'V',
-//             4    => 'IV',
-//             1    => 'I',
-//         ];
-
-//         $result = '';
-
-//         foreach ($map as $value => $roman) {
-//             while ($number >= $value) {
-//                 $result .= $roman;
-//                 $number -= $value;
-//             }
-//         }
-
-//         return $result;
-//     }
-// }
-
-// usage
-// getLevel($program, 1); // ND I
-// getLevel($program, 2); // ND II
-// getLevel($program, 3); // ND III
-
-// getLevel($bscProgram, 1); // 100L
-// getLevel($bscProgram, 2); // 200L
-
-// getLevel($mscProgram, 2); // MSc II
-// if (!function_exists('isStillWithinProgramDuration')) {
-//     //   Check if student is still within normal program years
-//     function isStillWithinProgramDuration($admissionSession, $program, $programType = null, $department = null): bool
-//     {
-//         if (!$admissionSession || !$program) return true;
-
-//         $duration = getProgramDuration($program, $programType, $department);
-
-//         // Extract year from admission session (e.g., "2022/2023" → 2022)
-//         $startYear = (int) explode('/', $admissionSession)[0];
-//         $currentYear = now()->year;
-
-//         $yearsElapsed = $currentYear - $startYear;
-
-//         return $yearsElapsed < $duration;
-//     }
-// }
 
 if (!function_exists('currentLevel')) {
     function currentLevel($program, int $currentLevel): string
@@ -415,3 +369,4 @@ if (!function_exists('totalPendingPaymentTransactions')) {
             ->count();
     }
 }
+

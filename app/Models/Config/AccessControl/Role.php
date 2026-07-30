@@ -3,6 +3,7 @@
 namespace App\Models\Config\AccessControl;
 
 use App\Models\Config\AccessControl\Permission;
+use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,12 +11,14 @@ use Illuminate\Support\Str;
 
 class Role extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
+    protected $table = 'roles';
     protected $fillable = [
+        'tenant_id',
         'uuid',
         'name',
         'description',
-        'is_active'
     ];
 
     // cast attributes

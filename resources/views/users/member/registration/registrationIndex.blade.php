@@ -28,9 +28,9 @@
                                 </span></p>
                             <p class="">
                                 <span style="font-weight: bold">
-                                    @if ($data['member']->memberAcademicInfo?->academic_status == 'student')
+                                    @if ($data['member']?->memberAcademicInfo?->academic_status == 'student')
                                         Current Level:
-                                    @elseif($data['member']->memberAcademicInfo?->academic_status == 'alumni')
+                                    @elseif($data['member']?->memberAcademicInfo?->academic_status == 'alumni')
                                         Graduation Session:
                                     @else
                                         Status:

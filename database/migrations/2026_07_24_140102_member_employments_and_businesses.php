@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_employments_and_businesses', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign key,
             $table->string('business')->nullable();
             $table->string('address')->nullable();
@@ -27,6 +28,7 @@ return new class extends Migration
                 ->references('username')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
 
             // index
             $table->index('username');

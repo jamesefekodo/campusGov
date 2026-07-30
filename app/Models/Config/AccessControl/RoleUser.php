@@ -2,21 +2,20 @@
 
 namespace App\Models\Config\AccessControl;
 
-use App\Models\Config\AccessControl\Role;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-
-class User extends Authenticatable
+class RoleUser extends Model
 {
-    public function roles()
-    {
-        return $this->belongsToMany(
-            Role::class,
-            'role_users'
-        );
-    }
+    protected $table = 'role_users';
+
+    public $timestamps = false;
+
+    protected $fillable = [
+        'tenant_id',
+        'user_id',
+        'role_id',
+    ];
+
 
     public function permissions()
     {
@@ -28,3 +27,4 @@ class User extends Authenticatable
             ->unique('id');
     }
 }
+

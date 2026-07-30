@@ -3,16 +3,19 @@
 namespace App\Models\Finance\Settings;
 
 use App\Models\Finance\Settings\ElectronicPaymentConfig;
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class ElectronicPaymentMethod extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'electronic_payment_methods';
     protected $fillable = [
         'uuid',
+        'tenant_id',
         'slug',
         'name',
         'logo',
@@ -20,7 +23,7 @@ class ElectronicPaymentMethod extends Model
         'is_active',
     ];
 
-     protected static function booted(): void
+    protected static function booted(): void
     {
         static::creating(function ($user) {
             if (empty($user->uuid)) {

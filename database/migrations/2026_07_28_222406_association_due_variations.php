@@ -15,6 +15,7 @@ return new class extends Migration
             'association_due_variations',
             function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('tenant_id')->nullable();
                 $table->string('due_id'); //foreign
                 $table->year('admission_session')->nullable();
                 $table->string('program_slug')->nullable();
@@ -29,6 +30,7 @@ return new class extends Migration
                     ->onUpdate('cascade');
                 $table->foreign('program_slug')->references('slug')->on('programs')->onUpdate('cascade')->onDelete('cascade');
                 $table->foreign('program_type_slug')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
+                $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
             }
         );
     }

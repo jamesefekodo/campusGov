@@ -15,6 +15,7 @@ return new class extends Migration
             'electronic_payment_config',
             function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('tenant_id')->nullable();
                 $table->string('payment_method'); //foreign
                 $table->string('client_id')->nullable();
                 $table->string('public_key')->nullable();
@@ -29,6 +30,7 @@ return new class extends Migration
                     ->references('slug')
                     ->on('electronic_payment_methods')
                     ->onUpdate('cascade');
+                $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
             }
         );
     }

@@ -11,15 +11,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create(
+        Schema::create(
             'bank_accounts',
             function (Blueprint $table) {
                 $table->id();
+                $table->unsignedBigInteger('tenant_id')->nullable();
                 $table->string('account_number');
                 $table->string('account_name');
                 $table->string('bank');
                 $table->boolean('is_active')->default(true);
                 $table->timestamps();
+
+
+
+                $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
             }
         );
     }

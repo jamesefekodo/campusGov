@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('association_dues', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
+
             $table->string('uuid'); // Foreign
             $table->string('fee_id')->unique();
             $table->string('title');
@@ -23,6 +25,9 @@ return new class extends Migration
             // $table->string('academic_level');
             // $table->year('year');
             $table->timestamps();
+
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

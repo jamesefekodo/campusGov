@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('programs', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
+            $table->unsignedBigInteger('tenant_id')->nullable();
+
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('short_name');
@@ -37,6 +39,9 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->string('award'); // ND, HND, BSc, MSc, PGD, PhD
             $table->timestamps();
+
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

@@ -4,16 +4,19 @@ namespace App\Models\Finance\Transactions;
 
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class PaymentTransaction extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'payment_transactions';
     protected $fillable = [
         'payment_transaction_id',
+        'tenant_id',
         'service_provider_id',
         'paystack_reference',
         'payment_mode',

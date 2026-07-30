@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('system_policies', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('slug')->unique();
             $table->string('title');
             $table->longText('policy_statement');
@@ -22,6 +23,9 @@ return new class extends Migration
             $table->date('published_on')->nullable();
             $table->date('updated_on')->nullable();
             $table->timestamps();
+
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

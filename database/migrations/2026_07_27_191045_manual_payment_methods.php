@@ -13,11 +13,16 @@ return new class extends Migration
     {
         Schema::create('manual_payment_methods', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->boolean('cash')->default(true);
             $table->boolean('bank_transfer')->default(true);
             $table->boolean('cheque')->default(true);
             $table->boolean('allow_manual_dues')->default(true);
             $table->timestamps();
+
+
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

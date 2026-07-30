@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('faculties', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
             $table->string('slug')->unique();
             $table->string('name');
@@ -21,6 +22,10 @@ return new class extends Migration
             $table->longText('description');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+
+
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

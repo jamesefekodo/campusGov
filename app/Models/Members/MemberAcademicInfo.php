@@ -8,16 +8,18 @@ use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MemberAcademicInfo extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'member_academic_infos';
     protected $fillable = [
-
+        'tenant_id',
         'username',
         'academic_status',
         'program',

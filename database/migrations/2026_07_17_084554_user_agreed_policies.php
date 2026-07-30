@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_agreed_policies', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign
             $table->string('policy'); // Foreign
             $table->string('agreement_status');
@@ -23,6 +24,7 @@ return new class extends Migration
             // Foreign Field
             $table->foreign('username')->references('username')->on('users')->onUpdate('cascade');
             $table->foreign('policy')->references('slug')->on('system_policies')->onUpdate('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

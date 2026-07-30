@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('member_misconducts', function (Blueprint $table) {
             $table->id();
             $table->string('uuid')->unique();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign
             $table->string('case_id')->unique();
             $table->date('incident_date');
@@ -33,6 +34,7 @@ return new class extends Migration
 
             $table->foreign('username')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('reporter_username')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

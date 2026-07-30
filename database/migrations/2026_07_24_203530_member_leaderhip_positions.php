@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_leaderhip_positions', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign key
             $table->string('organization')->nullable();
             $table->integer('is_current')->default(0);
@@ -28,6 +29,7 @@ return new class extends Migration
                 ->references('username')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
 
             // index
             $table->index('username');

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('member_social_media_handles', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username'); // Foreign
             $table->string('platform'); // Foreign
             $table->string('handle');
@@ -23,6 +24,7 @@ return new class extends Migration
 
             $table->foreign('username')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('platform')->references('slug')->on('recognized_social_media_platforms')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

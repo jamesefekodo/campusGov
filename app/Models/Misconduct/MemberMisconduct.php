@@ -3,6 +3,7 @@
 namespace App\Models\Misconduct;
 
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,10 +11,12 @@ use Illuminate\Support\Str;
 
 class MemberMisconduct extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'member_misconducts';
     protected $fillable = [
         'uuid',
+        'tenant_id',
         'username',
         'case_id',
         'incident_date',

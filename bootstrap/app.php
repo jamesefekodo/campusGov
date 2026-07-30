@@ -5,6 +5,7 @@ use App\Http\Middleware\AuthenticationMiddleware;
 use App\Http\Middleware\PermissionMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\StudentMiddleware;
+use App\Http\Middleware\Tenancy\DetectTenant;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $tenancy = DetectTenant::class;
         $authMiddleware = AuthenticationMiddleware::class;
         $adminMiddleware = AdminMiddleware::class;
         $studentMiddleware = StudentMiddleware::class;
@@ -24,10 +26,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $permissionMiddleware = PermissionMiddleware::class;
 
 
-
         // Authentication
         $middleware->appendToGroup('authenticationMiddlewares', [
             $authMiddleware,
+            $tenancy,
         ]);
 
         // Admin

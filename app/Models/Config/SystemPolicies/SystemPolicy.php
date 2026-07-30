@@ -3,16 +3,19 @@
 namespace App\Models\Config\SystemPolicies;
 
 use App\Models\Config\SystemPolicies\UserAgreedPolicy;
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class SystemPolicy extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'system_policies';
     protected $fillable = [
         'slug',
+        'tenant_id',
         'title',
         'policy_statement',
         'applicable_to_member',

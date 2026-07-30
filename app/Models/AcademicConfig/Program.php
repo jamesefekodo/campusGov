@@ -2,16 +2,19 @@
 
 namespace App\Models\AcademicConfig;
 
+use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class Program extends Model
 {
+    use BelongsToTenant;
     use HasFactory;
     protected $table = 'programs';
     protected $fillable = [
         'uuid',
+        'tenant_id',
         'slug',
         'name',
         'short_name',
