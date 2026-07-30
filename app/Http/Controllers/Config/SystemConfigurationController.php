@@ -24,13 +24,16 @@ class SystemConfigurationController extends Controller
             $user->hasPermission('basic_system_config.read'),
             403
         );
+        $basicSystemSetting = basicSystemInfo();
 
         Artisan::call('config:clear');
 
         $appName = env('APP_NAME', '');
         $appUrl = env('APP_URL', 'http://localhost');
+
         $timezone = env('APP_TIMEZONE', 'Etc/GMT');
         $timezones = DateTimeZone::listIdentifiers();
+
 
         usort($timezones, function ($a, $b) {
             $offsetA = (new DateTime('now', new DateTimeZone($a)))->getOffset();
@@ -55,7 +58,6 @@ class SystemConfigurationController extends Controller
         $MAIL_ENCRYPTION = env('MAIL_ENCRYPTION', '');
         $MAIL_FROM_ADDRESS = env('MAIL_FROM_ADDRESS', '');
 
-        $basicSystemSetting = BasicSystemSetting::first();
 
         $data = [
             'appName' => $appName,
@@ -183,9 +185,9 @@ class SystemConfigurationController extends Controller
 
 
         $request->validate([
-            'APP_NAME' => 'required|string',
-            'APP_URL' => 'required|string',
-            'timezone' => 'required|string',
+            // 'APP_NAME' => 'required|string',
+            // 'APP_URL' => 'required|string',
+            // 'timezone' => 'required|string',
             'association_name' => 'required|string',
             'association_acronym' => 'required|string',
             'association_slogan' => 'required|string',
@@ -214,6 +216,7 @@ class SystemConfigurationController extends Controller
         $basicSystemSetting->tertiary_colour = $request->tertiary_colour;
         $basicSystemSetting->is_polytechnic = $request->is_polytechnic;
         $basicSystemSetting->school_founding_year = trim($request->school_founding_year);
+
 
         if ($request->hasFile('association_logo')) {
 
@@ -456,22 +459,24 @@ class SystemConfigurationController extends Controller
         $basicSystemSetting->save();
 
 
-        $data = [
-            'APP_NAME' => $request->APP_NAME,
-            'APP_TIMEZONE' => $request->timezone,
-            'APP_URL' => $request->APP_URL,
-        ];
+        // $data = [
+        //     'APP_NAME' => $request->APP_NAME,
+        //     'APP_TIMEZONE' => $request->timezone,
+        //     'APP_URL' => $request->APP_URL,
+        // ];
 
 
-        if ($this->updateEnv($data)) {
-            // Clear the cached configuration to apply the changes immediately
-            Artisan::call('config:clear');
-            Artisan::call('config:cache');
+        // if ($this->updateEnv($data)) {
+        //     // Clear the cached configuration to apply the changes immediately
+        //     Artisan::call('config:clear');
+        //     Artisan::call('config:cache');
 
-            return redirect()->back()->with('success', 'Updated Successfully!');
-        } else {
-            return redirect()->back()->with('error', 'Update Failed!');
-        }
+        //     return redirect()->back()->with('success', 'Updated Successfully!');
+        // } else {
+        //     return redirect()->back()->with('error', 'Update Failed!');
+        // }
+
+        return redirect()->back()->with('success', 'Updated Successfully!');
     }
     public function updateEmailConfigSubmit(Request $request)
     {

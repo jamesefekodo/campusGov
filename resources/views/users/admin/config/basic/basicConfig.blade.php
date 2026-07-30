@@ -9,7 +9,7 @@
                     <div class="individual-review-card-container">
                         <div class="col-md-12 individual-review-card">
                             <div class="col-md-12 m-auto">
-                                <div class="my_form_container">
+                                <div class="my_form_container pb-5">
                                     <h4 class="block text-center py-2 text-uppercase type-b-page-header">
                                         Basic System Configuration
                                     </h4>
@@ -153,7 +153,7 @@
                                                     @csrf
                                                     @method('PUT')
                                                     <div class="row">
-                                                        <div class="mb-4 col-md-4">
+                                                        {{-- <div class="mb-4 col-md-4">
                                                             <label class="form-label">App Name <span
                                                                     class="text-danger">*</span></label>
                                                             <input type="text" class="form-control text-center"
@@ -171,7 +171,7 @@
                                                         </div>
                                                         <div class="form-group col-md-4">
                                                             <label>Timezone <span class="text-danger">*</span></label>
-                                                            <select class="form-select" name="timezone" required>
+                                                            <select class="form-select" name="timezone" disabled required>
                                                                 @foreach ($data['timezones'] as $timezone)
                                                                     @php
                                                                         $dateTime = new \DateTime(
@@ -190,7 +190,7 @@
                                                             </select>
                                                             <p class="text-danger">{{ $errors->first('timezone') }}
 
-                                                        </div>
+                                                        </div> --}}
                                                         <div class="mb-4 col-md-4">
                                                             <label class="form-label">Association Name<span
                                                                     class="text-danger">*</span></label>
@@ -221,6 +221,24 @@
                                                                 required>
                                                             <p class="text-danger">
                                                                 {{ $errors->first('association_slogan') }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="mb-4 col-md-6">
+                                                            <label class="form-label">Custom Domain <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control text-center"
+                                                                name="domain" value="{{ tenant()->domain }}" disabled>
+                                                            <p class="text-danger">{{ $errors->first('domain') }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="mb-4 col-md-6">
+                                                            <label class="form-label">Primary Domain <span
+                                                                    class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control text-center"
+                                                                name="subdomain"
+                                                                value="{{ tenant()->subdomain }}.{{ parse_url(config('app.url'), PHP_URL_HOST) }}"
+                                                                disabled>
+                                                            <p class="text-danger">{{ $errors->first('subdomain') }}
                                                             </p>
                                                         </div>
                                                         <div class="form-group col-md-12">
@@ -327,14 +345,15 @@
                                                                 {{ $errors->first('is_polytechnic') }}
                                                             </p>
                                                         </div>
-                                                         <div class="mb-4 col-md-4">
+                                                        <div class="mb-4 col-md-4">
                                                             <label class="form-label">Founding Year<span
                                                                     class="text-danger">*</span></label>
                                                             <input type="number" class="form-control text-center"
                                                                 name="school_founding_year"
                                                                 value="{{ $data['basicSystemSetting']->school_founding_year }}"
                                                                 required>
-                                                            <p class="text-danger">{{ $errors->first('school_founding_year') }}
+                                                            <p class="text-danger">
+                                                                {{ $errors->first('school_founding_year') }}
                                                             </p>
                                                         </div>
 
@@ -638,7 +657,7 @@
                                         {{-- system info end --}}
 
                                         {{-- email setup start --}}
-                                        <div class="col-md-6 p-1">
+                                        {{-- <div class="col-md-6 p-1">
                                             <div class="card stretch-full shadow-sm border-0">
 
                                                 <div class="card-header p-0 border-0">
@@ -741,7 +760,7 @@
                                                 </form>
 
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         {{-- email setup ends --}}
                                     </div>
 
