@@ -128,9 +128,7 @@
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/transactions') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('studentSelfPaymentTransactions') }} --}}
-                             ">Transactions</a>
+                            href="{{ route('myPaymentTransactions') }}">Transactions</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/invoices') ? 'sidebar-active' : '' }}"

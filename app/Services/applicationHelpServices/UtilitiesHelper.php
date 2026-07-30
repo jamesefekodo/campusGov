@@ -5,6 +5,7 @@ use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Settings\BankAccount;
+use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\User;
@@ -386,6 +387,12 @@ if (!function_exists('activeBankAccounts')) {
     }
 }
 
+if (!function_exists('electronicsPaymentMethods')) {
+    function electronicsPaymentMethods()
+    {
+        return ElectronicPaymentMethod::where('is_active', true)->get();
+    }
+}
 
 // check member level at the time when due is created
 if (!function_exists('studentLevelAtDue')) {

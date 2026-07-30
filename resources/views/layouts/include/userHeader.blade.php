@@ -31,6 +31,12 @@
                     </div> --}}
                     <!--//app-utility-item-->
                     <div class="app-utility-item">
+
+                        @if (in_array(getUserType(), ['root', 'admin']) && optional(Auth::user())->admin_privilege)
+                            ₦{{ number_format(basicSystemInfo()->account_balance, 2) }}
+                        @endif
+                    </div><!--//app-utility-item-->
+                    <div class="app-utility-item">
                         @switch(getUserType())
                             @case('association')
                             @case('association_admin')

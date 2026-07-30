@@ -99,11 +99,13 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('memberPayAssociationDue', ['uuid' => $due->uuid]) }}"
+                    <form class="form my_form" method="POST"
+                        action="{{ route('memberPayAssociationDue', ['uuid' => $due->uuid]) }}"
                         enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-3">
+                            <input type="hidden" name="mode" value="manual">
 
                             <label class="form-label fw-bold">
                                 Select Manual Payment Method
@@ -235,7 +237,8 @@
                                                     </p>
 
                                                     <p class="mb-0">
-                                                        <strong>Account Number: </strong><span class="fs-4 fw-bold text-blue">
+                                                        <strong>Account Number: </strong><span
+                                                            class="fs-4 fw-bold text-blue">
                                                             {{ $account->account_number }}
                                                         </span>
 
@@ -407,3 +410,103 @@
 </div>
 
 {{-- offline modal ends --}}
+
+
+{{-- electronic payent start --}}
+<div class="modal fade" id="electronicPaymentModal-{{ $due->id }}" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header modal_header" style="width: 100%">
+                <h4 class="modal-title block text-white text-center p-1" id="exampleModalLongTitle">
+                    Pay Now</h4>
+                <h4>
+                    <button type="button" class="bg-red text-white mt-1 p-2" data-bs-dismiss="modal"
+                        aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div class="modal_form_wrapper pb-4">
+
+                    {{-- <div class="card-body"> --}}
+                    <form class="form my_form" method="POST"
+                        action="{{ route('memberPayAssociationDue', ['uuid' => $due->uuid]) }}"
+                        enctype="multipart/form-data">
+                        @csrf
+
+                        <input type="hidden" name="mode" value="electronic">
+
+
+                        <div class="mb-4">
+
+                            <label class="form-label fw-bold">
+                                Select Electronic Payment Method
+                            </label>
+
+                            <div class="row">
+
+                                @foreach (electronicsPaymentMethods() as $method)
+                                    <div class="col-lg-4 col-md-6 mb-3 electronic-payment-option">
+
+                                        <input type="radio"
+                                            id="electronic-payment-method-{{ $due->id }}-{{ $method->slug }}"
+                                            name="electronic_payment_method" value="{{ $method->slug }}" required>
+
+                                        <label
+                                            for="electronic-payment-method-{{ $due->id }}-{{ $method->slug }}">
+
+                                            <div class="electronic-payment-logo">
+
+                                                @if ($method->logo)
+                                                    <img src="{{ asset('system/images/paymentMethods/logo/' . $method->logo) }}"
+                                                        class="img-fluid" alt="{{ $method->name }}">
+                                                @else
+                                                    <i class="fas fa-credit-card fa-3x"></i>
+                                                @endif
+
+                                            </div>
+
+                                            <h5 class="mt-3">
+                                                {{ $method->name }}
+                                            </h5>
+
+                                            <p>
+                                                Instant confirmation after successful payment.
+                                            </p>
+
+                                            <span class="electronic-payment-selected">
+                                                <i class="fas fa-check"></i>
+                                            </span>
+
+                                        </label>
+
+                                    </div>
+                                @endforeach
+
+                            </div>
+
+                        </div>
+                        <hr>
+
+                        <button type="submit" class="green-button submit-btn">
+                            <span class="btn-text">
+                                Submit
+                            </span>
+
+                            <span class="btn-loading" style="display:none;">
+                                <i class="fas fa-spinner fa-spin"></i> Processing...
+                            </span>
+                        </button>
+                    </form>
+                    {{-- </div> --}}
+
+
+                </div> <!-- Close modal_form_wrapper -->
+            </div>
+
+        </div>
+    </div>
+</div>
+{{-- electronic payment end --}}

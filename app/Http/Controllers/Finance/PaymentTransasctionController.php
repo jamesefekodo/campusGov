@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Finance\Settings\Tax;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use Carbon\Carbon;
 use Faker\Provider\Payment;
@@ -18,11 +19,6 @@ class PaymentTransasctionController extends Controller
 {
     public function memberPayAssociationDue($uuid, Request $request)
     {
-
-        $request->validate([
-            'manual_payment_method' => 'required|in:cash,bank_transfer,cheque',
-            'proof' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3145728',
-        ]);
         $member = Auth::user();
 
 
@@ -73,141 +69,192 @@ class PaymentTransasctionController extends Controller
             $transactionId = 'pymt-' . now()->format('mYds') . '-' . random_int(100000000, 999999999);
         } while (PaymentTransaction::where('payment_transaction_id', $transactionId)->exists());
 
-        $transaction = new PaymentTransaction();
-        $transaction->payment_transaction_id = $transactionId;
-        $transaction->payment_mode = 'manual';
-        $transaction->registered_payer = $member->username;
-        $transaction->payment_purpose = 'association_due';
-        $transaction->due_id = $due->fee_id;
-        $transaction->amount_payable = $due->payable_amount;
-        $transaction->amount_paid = $due->payable_amount;
-        $transaction->manual_payment_method = $request->manual_payment_method;
-        $transaction->payment_status = 'pending';
-        $transaction->approval_status = 'pending';
-        $transaction->paid_at = Carbon::now();
+
+
+        // for manual payment
+        if ($request->mode == 'manual') {
+            $request->validate([
+                'manual_payment_method' => 'required|in:cash,bank_transfer,cheque',
+                'proof' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3145728',
+            ]);
+
+
+            $transaction = new PaymentTransaction();
+            $transaction->payment_transaction_id = $transactionId;
+            $transaction->payment_mode = 'manual';
+            $transaction->registered_payer = $member->username;
+            $transaction->payment_purpose = 'association_due';
+            $transaction->due_id = $due->fee_id;
+            $transaction->amount_payable = $due->payable_amount;
+            $transaction->amount_paid = $due->payable_amount;
+            $transaction->manual_payment_method = $request->manual_payment_method;
+            $transaction->payment_status = 'pending';
+            $transaction->approval_status = 'pending';
+            $transaction->paid_at = Carbon::now();
 
 
 
-        if ($request->hasFile('proof')) {
+            if ($request->hasFile('proof')) {
 
-            $file = $request->file('proof');
-            $mime = $file->getMimeType();
-            $ext  = strtolower($file->getClientOriginalExtension());
+                $file = $request->file('proof');
+                $mime = $file->getMimeType();
+                $ext  = strtolower($file->getClientOriginalExtension());
 
-            $uploadPath = public_path('assets/uploads/paymentTransactions/proof');
-            File::ensureDirectoryExists($uploadPath);
+                $uploadPath = public_path('assets/uploads/paymentTransactions/proof');
+                File::ensureDirectoryExists($uploadPath);
 
-            // Base filename
-            $baseName = strtolower($transactionId);
+                // Base filename
+                $baseName = strtolower($transactionId);
 
-            $baseName = Str::of($baseName)
-                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
-                ->trim('_')
-                ->toString();
-            $fallbackName = $baseName . '.' . $ext;
-            $counter = 1;
+                $baseName = Str::of($baseName)
+                    ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                    ->trim('_')
+                    ->toString();
+                $fallbackName = $baseName . '.' . $ext;
+                $counter = 1;
 
-            // Delete existing file(s) with same base name regardless of extension
-            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
-                if (file_exists($existingFile)) {
-                    unlink($existingFile);
+                // Delete existing file(s) with same base name regardless of extension
+                foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+                    if (file_exists($existingFile)) {
+                        unlink($existingFile);
+                    }
                 }
-            }
 
-            // Avoid overwriting existing files
-            while (file_exists($uploadPath . '/' . $fallbackName)) {
-                $fallbackName = $baseName . '-' . $counter . '.' . $ext;
-                $counter++;
-            }
+                // Avoid overwriting existing files
+                while (file_exists($uploadPath . '/' . $fallbackName)) {
+                    $fallbackName = $baseName . '-' . $counter . '.' . $ext;
+                    $counter++;
+                }
 
-            $fallbackPath = $uploadPath . '/' . $fallbackName;
+                $fallbackPath = $uploadPath . '/' . $fallbackName;
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | GD + WebP processing
             |--------------------------------------------------------------------------
             */
-            $processed = false;
+                $processed = false;
 
-            if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
+                if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
 
-                $tmp = $file->getPathname();
+                    $tmp = $file->getPathname();
 
-                $src = match ($mime) {
-                    'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmp) : null,
-                    'image/png'  => function_exists('imagecreatefrompng')  ? @imagecreatefrompng($tmp)  : null,
-                    'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : null,
-                    default => null,
-                };
+                    $src = match ($mime) {
+                        'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmp) : null,
+                        'image/png'  => function_exists('imagecreatefrompng')  ? @imagecreatefrompng($tmp)  : null,
+                        'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : null,
+                        default => null,
+                    };
 
-                if ($src) {
-                    $width  = imagesx($src);
-                    $height = imagesy($src);
+                    if ($src) {
+                        $width  = imagesx($src);
+                        $height = imagesy($src);
 
-                    // Resize if needed
-                    $maxSize = 800;
-                    $scale = min(1, $maxSize / max($width, $height));
+                        // Resize if needed
+                        $maxSize = 800;
+                        $scale = min(1, $maxSize / max($width, $height));
 
-                    if ($scale < 1) {
-                        $newW = (int)($width * $scale);
-                        $newH = (int)($height * $scale);
-                        $dst = imagecreatetruecolor($newW, $newH);
+                        if ($scale < 1) {
+                            $newW = (int)($width * $scale);
+                            $newH = (int)($height * $scale);
+                            $dst = imagecreatetruecolor($newW, $newH);
 
-                        // Preserve transparency
-                        imagealphablending($dst, false);
-                        imagesavealpha($dst, true);
-                        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
-                        imagefill($dst, 0, 0, $transparent);
+                            // Preserve transparency
+                            imagealphablending($dst, false);
+                            imagesavealpha($dst, true);
+                            $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                            imagefill($dst, 0, 0, $transparent);
 
-                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $width, $height);
-                        imagedestroy($src);
-                        $src = $dst;
-                    }
-
-                    // WebP conversion with quality loop
-                    $webpName = $baseName . '.webp';
-                    $webpCounter = 1;
-                    $webpPath = $uploadPath . '/' . $webpName;
-
-                    while (file_exists($webpPath)) {
-                        $webpName = $baseName . '-' . $webpCounter . '.webp';
-                        $webpPath = $uploadPath . '/' . $webpName;
-                        $webpCounter++;
-                    }
-
-                    $quality = 90;
-                    do {
-                        imagewebp($src, $webpPath, $quality);
-                        clearstatcache();
-
-                        if (filesize($webpPath) <= 1048576) {
-                            $processed = true;
-                            $transaction->photo = $webpName;
+                            imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $width, $height);
                             imagedestroy($src);
-                            break;
+                            $src = $dst;
                         }
 
-                        $quality -= 5;
-                    } while ($quality >= 40);
+                        // WebP conversion with quality loop
+                        $webpName = $baseName . '.webp';
+                        $webpCounter = 1;
+                        $webpPath = $uploadPath . '/' . $webpName;
 
-                    if (!$processed) {
-                        @unlink($webpPath);
+                        while (file_exists($webpPath)) {
+                            $webpName = $baseName . '-' . $webpCounter . '.webp';
+                            $webpPath = $uploadPath . '/' . $webpName;
+                            $webpCounter++;
+                        }
+
+                        $quality = 90;
+                        do {
+                            imagewebp($src, $webpPath, $quality);
+                            clearstatcache();
+
+                            if (filesize($webpPath) <= 1048576) {
+                                $processed = true;
+                                $transaction->photo = $webpName;
+                                imagedestroy($src);
+                                break;
+                            }
+
+                            $quality -= 5;
+                        } while ($quality >= 40);
+
+                        if (!$processed) {
+                            @unlink($webpPath);
+                        }
                     }
                 }
-            }
 
-            /*
+                /*
             |--------------------------------------------------------------------------
             | Fallback: move original file
             |--------------------------------------------------------------------------
             */
-            if (!$processed) {
-                $file->move($uploadPath, $fallbackName);
-                $transaction->photo = $fallbackName;
+                if (!$processed) {
+                    $file->move($uploadPath, $fallbackName);
+                    $transaction->photo = $fallbackName;
+                }
             }
+
+            $transaction->save();
+        } elseif ($request->mode == 'electronic') {
+            $request->validate([
+                'electronic_payment_method' => 'required|exists:electronic_payment_methods,slug',
+            ]);
+
+            // Taxes
+            $taxes = Tax::where('is_active', true)->orderBy('tax_name')->get();
+            $totalTax = 0;
+            if ($taxes) {
+                $taxesPaid = '';
+                foreach ($taxes as $tax) {
+                    $taxAmount = 0; // Initialize tax amount for each tax.
+
+                    // Concatenate tax details.
+                    $taxesPaid .= '**' . $tax->tax_name . ' (' . $tax->tax_method . '-' . $tax->tax_rate . ')';
+
+                    // Calculate tax amount based on the method.
+                    if ($tax->tax_method === 'percentage') {
+                        $taxAmount = ($tax->tax_rate / 100) * $due->payable_amount;
+                    } elseif ($tax->tax_method === 'fixed_amount') {
+                        $taxAmount = $tax->tax_rate;
+                    }
+
+                    $totalTax += $taxAmount; // Add to total tax.
+                    $taxesPaid .= ': ₦' . number_format($taxAmount, 2) . "\n"; // Add tax amount to the concatenated string.
+                }
+            }
+
+            $totalDueAndTax = $due->amount + $totalTax;
+            // get personal profile
+            $personalProfile = $member->memberPersonalProfile;
+            if (!$personalProfile) {
+                return redirect()->back()->with('error', 'Personal profile not found!');
+            }
+
+            dd($request->all());
+            // pasyack processing start
+            // if()
         }
 
-        $transaction->save();
+
         return redirect()->back()->with('success', 'Saved!');
     }
     public function paymentTransactions(Request $request)
@@ -346,7 +393,7 @@ class PaymentTransasctionController extends Controller
 
         $paymentStatus = $request->approval_status === 'approved'
             ? 'successful'
-            : 'declined';
+            : 'failed';
 
         $transaction->update([
             'amount_settled' => $request->approval_status === 'approved'
@@ -360,37 +407,30 @@ class PaymentTransasctionController extends Controller
 
         $settings = BasicSystemSetting::first();
 
-        if ($request->approval_status === 'approved') {
+        $wasBalanceUpdated = $transaction->balance_update_status === 'done';
+        $shouldBalanceBeUpdated = $request->approval_status === 'approved';
 
-            // Only add the money once
-            if ($transaction->balance_update_status === 'pending') {
 
-                $settings->increment(
-                    'account_balance',
-                    $transaction->amount_paid
-                );
+        if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
 
-                $transaction->update([
-                    'amount_settled' => $transaction->amount_paid,
-                    'balance_update_status' => 'done',
-                ]);
-            }
-        } else {
+            // Money has never been added, but should now be added.
+            $settings->increment('account_balance', $transaction->amount_paid);
 
-            // If approval was reversed after the balance had already been updated
-            if ($transaction->balance_update_status === 'done') {
+            $transaction->update([
+                'amount_settled' => $transaction->amount_paid,
+                'balance_update_status' => 'done',
+            ]);
+        } elseif ($wasBalanceUpdated && !$shouldBalanceBeUpdated) {
 
-                $settings->decrement(
-                    'account_balance',
-                    $transaction->amount_paid
-                );
-            }
+            // Money was previously added but should now be removed.
+            $settings->decrement('account_balance', $transaction->amount_paid);
 
             $transaction->update([
                 'amount_settled' => 0,
                 'balance_update_status' => 'cancelled',
             ]);
         }
+
         return redirect()->back()->with('success', 'Done!');
     }
 }

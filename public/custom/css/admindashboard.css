@@ -1777,3 +1777,127 @@ body.modal-open {
     }
 }
 /* manual payment options end */
+
+/* electronic payment method start */
+/* ===========================
+   Electronic Payment Options
+=========================== */
+
+.electronic-payment-option input[type="radio"] {
+    display: none;
+}
+
+.electronic-payment-option label {
+    position: relative;
+
+    display: block;
+
+    height: 100%;
+
+    padding: 25px;
+
+    border: 2px solid rgba(0, 0, 0, 0.08);
+
+    border-radius: 14px;
+
+    cursor: pointer;
+
+    background: #fff;
+
+    transition: 0.25s;
+
+    text-align: center;
+}
+
+.electronic-payment-option label:hover {
+    border-color: var(--system-primary);
+
+    transform: translateY(-4px);
+
+    box-shadow: 0 12px 28px
+        color-mix(in srgb, var(--system-primary) 20%, transparent);
+}
+
+.electronic-payment-logo {
+    height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+.electronic-payment-logo img {
+    max-height: 65px;
+
+    max-width: 180px;
+
+    object-fit: contain;
+}
+
+.electronic-payment-option h5 {
+    margin-top: 18px;
+
+    font-weight: 700;
+}
+
+.electronic-payment-option p {
+    color: #6c757d;
+
+    margin-bottom: 0;
+}
+
+.electronic-payment-selected {
+    position: absolute;
+
+    top: 15px;
+
+    right: 15px;
+
+    width: 34px;
+
+    height: 34px;
+
+    border-radius: 50%;
+
+    background: var(--system-primary);
+
+    color: #fff;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    opacity: 0;
+
+    transform: scale(0.5);
+
+    transition: 0.25s;
+}
+
+.electronic-payment-option input:checked + label {
+    border-color: var(--system-primary);
+
+    background: color-mix(in srgb, var(--system-primary) 8%, white);
+
+    box-shadow: 0 14px 32px
+        color-mix(in srgb, var(--system-primary) 25%, transparent);
+}
+
+.electronic-payment-option input:checked + label .electronic-payment-selected {
+    opacity: 1;
+
+    transform: scale(1);
+}
+
+.electronic-payment-option input:checked + label .electronic-payment-logo {
+    transform: scale(1.05);
+}
+
+.electronic-payment-option input:focus + label {
+    outline: 3px solid color-mix(in srgb, var(--system-primary) 25%, white);
+}
+/* electronic payment method end */

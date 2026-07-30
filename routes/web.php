@@ -127,10 +127,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
     // payment
     Route::get('student/payment/dues', [MemberSelfProfileController::class, 'myAssociationDues'])->name('myAssociationDues');
-
-
-
-
+    Route::get('student/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
 
 
     Route::post('member/association_dues/{uuid}', [PaymentTransasctionController::class, 'memberPayAssociationDue'])->name('memberPayAssociationDue');
