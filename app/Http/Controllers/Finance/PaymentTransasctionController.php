@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Finance;
 use App\Http\Controllers\Controller;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\Tax;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use Carbon\Carbon;
@@ -12,6 +13,7 @@ use Faker\Provider\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 
@@ -66,7 +68,7 @@ class PaymentTransasctionController extends Controller
         }
 
         do {
-            $transactionId = 'pymt-' . now()->format('mYds') . '-' . random_int(100000000, 999999999);
+            $transactionId = 'pymt-' . now()->format('mYds') . '-' . tenant()->id . random_int(100000000, 999999999);
         } while (PaymentTransaction::where('payment_transaction_id', $transactionId)->exists());
 
 
@@ -222,6 +224,7 @@ class PaymentTransasctionController extends Controller
             // Taxes
             $taxes = Tax::where('is_active', true)->orderBy('tax_name')->get();
             $totalTax = 0;
+            $taxesPaid = '';
             if ($taxes) {
                 $taxesPaid = '';
                 foreach ($taxes as $tax) {
@@ -242,15 +245,64 @@ class PaymentTransasctionController extends Controller
                 }
             }
 
-            $totalDueAndTax = $due->amount + $totalTax;
+            $totalDueAndTax = $due->payable_amount + $totalTax;
             // get personal profile
             $personalProfile = $member->memberPersonalProfile;
             if (!$personalProfile) {
                 return redirect()->back()->with('error', 'Personal profile not found!');
             }
 
-            dd($request->all());
             // pasyack processing start
+            if ($request->electronic_payment_method == 'paystack') {
+                $pastackSettings = ElectronicPaymentMethod::where('slug', $request->electronic_payment_method)->where('is_active', true)->first();
+                if (!$pastackSettings) {
+                    return redirect()->back()->with('error', 'Paystack method not found!');
+                }
+                $paystackApi = $pastackSettings->defaultApi;
+                if (!$paystackApi) {
+                    return redirect()->back()->with('error', 'Paystack method not found!');
+                }
+
+                $secretKey = $paystackApi->secret_key;
+                $amount = $totalDueAndTax * 100; // Convert to kobo
+                $email = $personalProfile->email1;
+
+                $data = [
+                    'transaction_id' => $transactionId,
+                    'reciept_number' => $transactionId,
+                    'email' => $email,
+                    'amount' => $amount,
+                    'callback_url' => route('paystackPaymentCallback', ['transaction_id' => $transactionId]),
+                ];
+
+                $response = Http::withToken($secretKey)
+                    ->post('https://api.paystack.co/transaction/initialize', $data);
+
+                if ($response->successful()) {
+                    $responseData = $response->json();
+                    $transaction = new PaymentTransaction();
+                    $transaction->payment_transaction_id = $transactionId; // Local reference
+                    $transaction->payment_mode = 'electronic';
+                    $transaction->payment_purpose = 'association_due';
+                    $transaction->due_id = $due->fee_id;
+                    $transaction->amount_payable = $due->payable_amount;
+                    $transaction->registered_payer = $personalProfile->username;
+                    $transaction->amount_paid = $totalDueAndTax;
+                    $transaction->total_tax = $totalTax;
+                    $transaction->taxes_paid = $taxesPaid;
+                    $transaction->electronic_payment_method = $pastackSettings->slug;
+                    $transaction->payment_status = 'pending';
+                    $transaction->approval_status = 'pending';
+                    $transaction->paid_at = Carbon::now();
+                    $transaction->save();
+
+                    return redirect()->away($responseData['data']['authorization_url']);
+                }
+
+                return redirect()->back()->with('error', 'Failed!');
+            }
+            // pasyack processing end
+
             // if()
         }
 
@@ -370,6 +422,30 @@ class PaymentTransasctionController extends Controller
         ];
         return view('users.admin.finance.transactions.viewPaymentTransaction', compact('data'));
     }
+    public function updatePaystackRefNumber($payment_transaction_id, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.update'),
+            403
+        );
+
+        $request->validate([
+            'paystack_reference' => 'required|string',
+        ]);
+
+        $transaction = PaymentTransaction::where('payment_transaction_id', $payment_transaction_id)->where('payment_mode', 'electronic')->where('electronic_payment_method', 'paystack')->first();
+        if (!$transaction) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $transaction->update([
+            'paystack_reference' => $request->paystack_reference,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
     public function processManualPaymentTransaction($payment_transaction_id, Request $request)
     {
         /** @var \App\Models\User $user */
@@ -405,7 +481,7 @@ class PaymentTransasctionController extends Controller
             'approved_at' => now(),
         ]);
 
-        $settings = BasicSystemSetting::first();
+        $settings = basicSystemInfo();
 
         $wasBalanceUpdated = $transaction->balance_update_status === 'done';
         $shouldBalanceBeUpdated = $request->approval_status === 'approved';
@@ -431,6 +507,93 @@ class PaymentTransasctionController extends Controller
             ]);
         }
 
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function paystackPaymentCallback(Request $request, $transaction_id)
+    {
+        $paymentTransaction = PaymentTransaction::where('payment_transaction_id', $transaction_id)->first();
+        if (!$paymentTransaction) {
+            return redirect()->back()->with('error', 'Payment transaction not found!');
+        }
+
+        // basic system settings manual definition start
+        $settings = BasicSystemSetting::where('tenant_id', $paymentTransaction->tenant_id)->first();
+        // basic system settings manual definition end
+
+
+        $pastackSettings = ElectronicPaymentMethod::where('slug', $paymentTransaction->electronic_payment_method)->where('is_active', true)->first();
+        if (!$pastackSettings) {
+            return redirect()->back()->with('error', 'Paystack method not found!');
+        }
+        $paystackApi = $pastackSettings->defaultApi;
+        if (!$paystackApi) {
+            return redirect()->back()->with('error', 'Paystack method not found!');
+        }
+
+        $secretKey = $paystackApi->secret_key;
+        $reference = $request->query('reference');
+        $response = Http::withToken($secretKey)
+            ->get("https://api.paystack.co/transaction/verify/{$reference}");
+
+        // dd($response->json()['data']);
+        if ($response->successful()) {
+
+            $responseData = $response->json()['data'];
+
+            if ($responseData['status'] === 'success') {
+
+                if ($paymentTransaction) {
+                    $paymentTransaction->service_provider_id = $responseData['id'];
+                    $paymentTransaction->paystack_reference = $responseData['reference'];
+                    $paymentTransaction->amount_paid = round($responseData['amount'] / 100, 2);
+                    $paymentTransaction->service_charge = round($responseData['fees'] / 100, 2);
+                    $paymentTransaction->amount_settled = round($paymentTransaction->amount_paid - $paymentTransaction->service_charge, 2);
+                    $paymentTransaction->payment_status = 'successful';
+                    $paymentTransaction->approval_status = 'approved';
+                    $paymentTransaction->approved_at = Carbon::now();
+                    $paymentTransaction->approved_by = null;
+                    $paymentTransaction->save();
+
+
+
+                    $wasBalanceUpdated = $paymentTransaction->balance_update_status === 'done';
+                    $shouldBalanceBeUpdated = $paymentTransaction->approval_status === 'approved';
+
+                    if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
+
+                        // Money has never been added, but should now be added.
+                        $settings->increment('account_balance', $paymentTransaction->amount_settled);
+
+                        $paymentTransaction->update([
+                            'balance_update_status' => 'done',
+                        ]);
+                    } elseif ($wasBalanceUpdated && !$shouldBalanceBeUpdated) {
+
+                        // Money was previously added but should now be removed.
+                        $settings->decrement('account_balance', $paymentTransaction->amount_settled);
+
+                        $paymentTransaction->update([
+                            'balance_update_status' => 'cancelled',
+                        ]);
+                    }
+                }
+            } else {
+                $paymentTransaction->payment_status = $responseData['status'];
+                $paymentTransaction->approval_status = 'declined';
+                $paymentTransaction->approved_by = null;
+                $paymentTransaction->approved_at = Carbon::now();
+                $paymentTransaction->save();
+                return redirect()->back();
+            }
+        } else {
+            $paymentTransaction->payment_status = 'failed';
+            $paymentTransaction->approval_status = 'declined';
+            $paymentTransaction->approved_by = null;
+            $paymentTransaction->approved_at = Carbon::now();
+            $paymentTransaction->save();
+
+            return redirect()->back()->with('error', 'Verification failed');
+        }
         return redirect()->back()->with('success', 'Done!');
     }
 }

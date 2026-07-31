@@ -35,6 +35,10 @@ Route::get('/fetch-departments', [AcademicConfigController::class, 'fetchDepartm
 
 Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('unknownTenant');
 
+// payment rollback
+Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionController::class, 'paystackPaymentCallback'])->name('paystackPaymentCallback');
+
+
 
 
 
@@ -319,5 +323,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/transactions', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactions');
     Route::get('admin/finance/transactions/search', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactionsSearch');
     Route::get('admin/finance/transactions/view/{payment_transaction_id}', [PaymentTransasctionController::class, 'viewPaymentTransaction'])->name('viewPaymentTransaction');
-    Route::put('admin/finance/transactions/manuak/process/{payment_transaction_id}', [PaymentTransasctionController::class, 'processManualPaymentTransaction'])->name('processManualPaymentTransaction');
+    Route::put('admin/finance/transactions/manual/process/{payment_transaction_id}', [PaymentTransasctionController::class, 'processManualPaymentTransaction'])->name('processManualPaymentTransaction');
+    Route::put('admin/finance/transactions/electronic/paystack/trans_ref/{payment_transaction_id}', [PaymentTransasctionController::class, 'updatePaystackRefNumber'])->name('updatePaystackRefNumber');
 });

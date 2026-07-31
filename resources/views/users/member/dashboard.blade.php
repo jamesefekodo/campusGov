@@ -447,9 +447,7 @@
 
                                                         @if ($transaction = $data['member']->successfulPaymentForDue($due->fee_id))
                                                             <div class="d-flex justify-content-end align-items-center">
-                                                                <a
-                                                                {{-- href="{{ route('printPaymentReceipt', $transaction->uuid) }}" --}}
-                                                                    class="btn btn-success">
+                                                                <a {{-- href="{{ route('printPaymentReceipt', $transaction->uuid) }}" --}} class="btn btn-success">
                                                                     <i class="fas fa-print me-1"></i>
                                                                     Print Receipt
                                                                 </a>
@@ -461,6 +459,45 @@
                                                                     <i class="fas fa-clock me-1"></i>
                                                                     Pending Approval
                                                                 </button>
+
+                                                                {{-- refresh status start --}}
+                                                                @php
+                                                                    $transaction = $data['member']->pendingPaymentForDue($due->fee_id);
+                                                                @endphp
+                                                                @if ($transaction->payment_status !== 'successful')
+                                                                    @switch($transaction->electronic_payment_method)
+                                                                        @case('flutterwave')
+                                                                            {{-- <form
+                                                                                action="{{ route('associationFlutterwavePaymentCallback') }}"
+                                                                                method="GET" class="d-inline">
+                                                                                @csrf
+                                                                                <input type="hidden" name="transaction_id"
+                                                                                    value="{{ $transaction->service_provider_id }}">
+                                                                                <input type="hidden" name="tx_ref"
+                                                                                    value="{{ $transaction->payment_transaction_id }}">
+                                                                                <button type="submit"
+                                                                                    class="border-0 bg-transparent p-0 fs-3"><i
+                                                                                        class="fa-solid fa-rotate-right text-danger"></i></button>
+                                                                            </form> --}}
+                                                                        @break
+
+                                                                        @case('paystack')
+                                                                            <form
+                                                                                action="{{ route('paystackPaymentCallback', ['transaction_id' => $transaction->payment_transaction_id]) }}"
+                                                                                method="GET" class="d-inline">
+                                                                                @csrf
+                                                                                <input type="hidden" name="reference"
+                                                                                    value="{{ $transaction->paystack_reference }}">
+                                                                                <button type="submit"
+                                                                                    class="border-0 bg-transparent p-0 fs-3"><i
+                                                                                        class="fa-solid fa-rotate-right text-danger"></i></button>
+                                                                            </form>
+                                                                        @break
+
+                                                                        @default
+                                                                    @endswitch
+                                                                @endif
+                                                                {{-- refresh status end --}}
                                                             </div>
                                                         @else
                                                             {{-- Pay Now --}}
@@ -475,19 +512,19 @@
                                                 </div>
                                             </div>
 
-                                        @empty
+                                            @empty
 
-                                            <div class="col-12">
-                                                <div class="card border-0 shadow-sm">
-                                                    <div class="card-body text-center py-5">
-                                                        <p class="text-muted mb-0">
-                                                            There are no dues applicable to your membership period. </p>
+                                                <div class="col-12">
+                                                    <div class="card border-0 shadow-sm">
+                                                        <div class="card-body text-center py-5">
+                                                            <p class="text-muted mb-0">
+                                                                There are no dues applicable to your membership period. </p>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        @endforelse
-                                    </div>
-                                    {{-- <div class="col-md-12">
+                                            @endforelse
+                                        </div>
+                                        {{-- <div class="col-md-12">
                                             @if ($data['facultyAssociationMemberships']->count() > 0)
                                                 @foreach ($data['facultyAssociationMemberships'] as $facultyAssociation)
                                                     <p class="text-black"> * {{ $facultyAssociation->name }}
@@ -511,22 +548,22 @@
                                                 @endforeach
                                             @endif
                                         </div> --}}
+                                    </div>
                                 </div>
+
+
                             </div>
-
-
                         </div>
                     </div>
+
+
                 </div>
 
 
-            </div>
+                {{-- modals starts here --}}
+                {{-- @include('users.students.profile.include.updateAcademicLevelModal') --}}
+                {{-- modals ends here --}}
 
-
-            {{-- modals starts here --}}
-            {{-- @include('users.students.profile.include.updateAcademicLevelModal') --}}
-            {{-- modals ends here --}}
-
-        </div><!--//container-fluid-->
-    </div><!--//app-content-->
-@endsection
+            </div><!--//container-fluid-->
+        </div><!--//app-content-->
+    @endsection

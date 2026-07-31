@@ -181,6 +181,17 @@
                                             </span>
                                         </span>
                                     </div>
+                                     <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Service Provider Key/Id/Ref:</span>
+                                        <span class="text-black">
+                                            @if ($data['transaction']->service_provider_id)
+                                            {{ $data['transaction']->service_provider_id }}
+                                            @endif
+                                             @if ($data['transaction']->paystack_reference)
+                                            {{ $data['transaction']->paystack_reference }}
+                                            @endif
+                                        </span>
+                                    </div>
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Status:</span>
                                         <span class="text-black">
@@ -230,30 +241,31 @@
                                                                     value="{{ $data['transaction']->service_provider_id }}">
                                                                 <input type="hidden" name="tx_ref"
                                                                     value="{{ $data['transaction']->payment_transaction_id }}">
-                                                                <button type="submit" class="border-0 bg-transparent p-0"><i
-                                                                        class="fa-solid fa-rotate-right btn btn-warning"></i></button>
+                                                                <button type="submit" class="border-0 bg-transparent p-0 fs-3"><i
+                                                                        class="fa-solid fa-rotate-right btn btn-danger"></i></button>
                                                             </form> --}}
                                                         @break
 
                                                         @case('paystack')
-                                                            {{-- <form
-                                                                action="{{ route('associationPaystackPaymentCallback', ['transaction_id' => $data['transaction']->payment_transaction_id]) }}"
+                                                            <form
+                                                                action="{{ route('paystackPaymentCallback', ['transaction_id' => $data['transaction']->payment_transaction_id]) }}"
                                                                 method="GET" class="d-inline">
                                                                 @csrf
                                                                 <input type="hidden" name="reference"
                                                                     value="{{ $data['transaction']->paystack_reference }}">
-                                                                <button type="submit" class="border-0 bg-transparent p-0"><i
-                                                                        class="fa-solid fa-rotate-right btn btn-warning"></i></button>
-                                                            </form> --}}
+                                                                <button type="submit" class="border-0 bg-transparent p-0 fs-3"><i
+                                                                        class="fa-solid fa-rotate-right btn btn-danger"></i></button>
+                                                            </form>
 
                                                             {{-- Update paystack reference number start --}}
 
-                                                            <a class="badge bg-blue text-white" data-toggle="modal"
-                                                                data-target="#updatePastackReferenceModal">Update Reference
+                                                            <a class="badge bg-blue text-white p-1" data-toggle="modal"
+                                                                data-target="#updatePastackReferenceModal"
+                                                                style="cursor: pointer;">Update Reference
                                                                 Number</a>
 
                                                             {{-- Update paystack reference number end --}}
-                                                            {{-- @include('users.associations.finance/obligatoryFees.paymentTransactions.include.updatePastackReferenceModal') --}}
+                                                            @include('users.admin.finance.transactions.include.updatePastackReferenceModal')
                                                         @break
 
                                                         @default
@@ -283,7 +295,9 @@
                                                         @if ($canReverse)
                                                             <div class="d-flex align-items-center gap-2">
 
-                                                                <button type="button" class="btn btn-danger m-1" data-toggle="modal" data-target="#processManualPaymentModal">
+                                                                <button type="button" class="btn btn-danger m-1"
+                                                                    data-toggle="modal"
+                                                                    data-target="#processManualPaymentModal">
                                                                     <i class="fas fa-undo-alt me-1"></i>
                                                                     Change Status
                                                                 </button>
@@ -296,7 +310,8 @@
                                                             </div>
                                                         @endif
                                                     @else
-                                                        <button type="button" class="btn btn-success m-1" data-toggle="modal" data-target="#processManualPaymentModal">
+                                                        <button type="button" class="btn btn-success m-1"
+                                                            data-toggle="modal" data-target="#processManualPaymentModal">
                                                             <i class="fas fa-check-circle me-1"></i>
                                                             Process Payment
                                                         </button>

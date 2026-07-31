@@ -229,8 +229,8 @@
                                                                         @break
 
                                                                         @case('paystack')
-                                                                            {{-- <form
-                                                                                action="{{ route('associationPaystackPaymentCallback', ['transaction_id' => $transaction->payment_transaction_id]) }}"
+                                                                            <form
+                                                                                action="{{ route('paystackPaymentCallback', ['transaction_id' => $transaction->payment_transaction_id]) }}"
                                                                                 method="GET" class="d-inline">
                                                                                 @csrf
                                                                                 <input type="hidden" name="reference"
@@ -238,7 +238,7 @@
                                                                                 <button type="submit"
                                                                                     class="border-0 bg-transparent p-0"><i
                                                                                         class="fa-solid fa-rotate-right text-primary"></i></button>
-                                                                            </form> --}}
+                                                                            </form>
                                                                         @break
 
                                                                         @default
