@@ -10,8 +10,10 @@
                     <div class="col-md-3 individual-review-card text-black mx-2">
 
                         {{-- includes --}}
-                        @if ($data['member']->photo && file_exists(public_path('assets/uploads/users/members/photo/' . $data['member']->photo)))
-                            <img src="{{ asset('assets/uploads/users/members/photo/' . $data['member']->photo) }}"
+                        @if (
+                            $data['member']->photo &&
+                                file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
+                            <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo) }}"
                                 alt="{{ $data['member']->username }}" class="img-fluid w-100">
                         @else
                             <img src="{{ asset('system/images/default_profile_pic.webp') }}" alt="Default Picture"
@@ -462,13 +464,15 @@
 
                                                                 {{-- refresh status start --}}
                                                                 @php
-                                                                    $transaction = $data['member']->pendingPaymentForDue($due->fee_id);
+                                                                    $transaction = $data[
+                                                                        'member'
+                                                                    ]->pendingPaymentForDue($due->fee_id);
                                                                 @endphp
                                                                 @if ($transaction->payment_status !== 'successful')
                                                                     @switch($transaction->electronic_payment_method)
                                                                         @case('flutterwave')
-                                                                            {{-- <form
-                                                                                action="{{ route('associationFlutterwavePaymentCallback') }}"
+                                                                            <form
+                                                                                action="{{ route('flutterwavePaymentCallback') }}"
                                                                                 method="GET" class="d-inline">
                                                                                 @csrf
                                                                                 <input type="hidden" name="transaction_id"
@@ -478,7 +482,7 @@
                                                                                 <button type="submit"
                                                                                     class="border-0 bg-transparent p-0 fs-3"><i
                                                                                         class="fa-solid fa-rotate-right text-danger"></i></button>
-                                                                            </form> --}}
+                                                                            </form>
                                                                         @break
 
                                                                         @case('paystack')

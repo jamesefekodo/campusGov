@@ -192,7 +192,7 @@
                                                     </a>
 
                                                     <button type="submit" class="green-button flex-grow-1">
-                                                        Verify
+                                                        Submit
                                                     </button>
                                                 </div>
                                             @break

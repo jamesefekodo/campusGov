@@ -69,7 +69,7 @@
                     </div>
                     {{-- Back Home --}}
                     <div class="w-100 justify-content-center text-center my-4 pt-5">
-                        <a class="btn btn-primary" href="{{ route('viewMMember', ['uuid' => $data['member']->uuid]) }}">
+                        <a class="btn btn-primary" href="{{ route('viewMember', ['uuid' => $data['member']->uuid]) }}">
                             <i class="fas fa-chevron-left"></i>
                             Back
                         </a>

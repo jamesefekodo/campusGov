@@ -162,6 +162,11 @@
 
                                                     {{ $methods[$data['transaction']->manual_payment_method] ?? ucfirst(str_replace('_', ' ', $data['transaction']->manual_payment_method)) }}
                                                 @endif
+                                                @if ($data['transaction']->payment_mode == 'electronic')
+                                                    <span class="text-capitalize">
+                                                        {{ $data['transaction']->electronic_payment_method }}
+                                                    </span>
+                                                @endif
                                             </span>
                                         </span>
                                     </div>
@@ -181,14 +186,14 @@
                                             </span>
                                         </span>
                                     </div>
-                                     <div class="col-md-6 p-1">
+                                    <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Service Provider Key/Id/Ref:</span>
                                         <span class="text-black">
                                             @if ($data['transaction']->service_provider_id)
-                                            {{ $data['transaction']->service_provider_id }}
+                                                {{ $data['transaction']->service_provider_id }}
                                             @endif
-                                             @if ($data['transaction']->paystack_reference)
-                                            {{ $data['transaction']->paystack_reference }}
+                                            @if ($data['transaction']->paystack_reference)
+                                                {{ $data['transaction']->paystack_reference }}
                                             @endif
                                         </span>
                                     </div>
@@ -234,7 +239,7 @@
                                                 @if ($data['transaction']->payment_status !== 'successful')
                                                     @switch($data['transaction']->electronic_payment_method)
                                                         @case('flutterwave')
-                                                            {{-- <form action="{{ route('associationFlutterwavePaymentCallback') }}"
+                                                            <form action="{{ route('flutterwavePaymentCallback') }}"
                                                                 method="GET" class="d-inline">
                                                                 @csrf
                                                                 <input type="hidden" name="transaction_id"
@@ -243,7 +248,7 @@
                                                                     value="{{ $data['transaction']->payment_transaction_id }}">
                                                                 <button type="submit" class="border-0 bg-transparent p-0 fs-3"><i
                                                                         class="fa-solid fa-rotate-right btn btn-danger"></i></button>
-                                                            </form> --}}
+                                                            </form>
                                                         @break
 
                                                         @case('paystack')

@@ -123,8 +123,10 @@ class MembersManagementController extends Controller
             $requestType = 'search';
             $pageTitle = 'Search Results :: ' . $searchKey;
         } else {
-            $members = MemberAcademicInfo::where('academic_status', 'student')
-                ->whereHas('userProfile', function ($query) {
+            $members = MemberAcademicInfo::
+            // where('academic_status', 'student')
+            //     ->
+                whereHas('userProfile', function ($query) {
                     $query->where('account_status', 2);
                 })
                 ->paginate(50);
@@ -387,7 +389,7 @@ class MembersManagementController extends Controller
 
 
 
-        $hasExistingPhoto = !empty($member->photo) && file_exists(public_path('assets/uploads/users/members/photo/' . $member->photo));
+        $hasExistingPhoto = !empty($member->photo) && file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $member->photo));
 
         request()->validate([
             // 'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:300',
@@ -443,7 +445,7 @@ class MembersManagementController extends Controller
         if ($request->filled('photo_cropped')) {
             // Delete existing photo if it exists
             if (!empty($profile->userProfile->photo)) {
-                $oldPath = public_path('assets/uploads/users/members/photo/' . $member->photo);
+                $oldPath = public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $member->photo);
                 if (file_exists($oldPath)) {
                     @unlink($oldPath);
                 }
@@ -455,7 +457,7 @@ class MembersManagementController extends Controller
 
             $filename = $profile->userProfile->username . uniqid() . '.jpg';
 
-            $path = public_path('assets/uploads/users/members/photo/' . $filename);
+            $path = public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $filename);
 
             file_put_contents($path, $decoded);
 
@@ -838,7 +840,7 @@ class MembersManagementController extends Controller
             ]);
         }
 
-        return redirect()->route('viewMMember', ['uuid' => $member->uuid])->with('success', 'Done!');
+        return redirect()->route('viewMember', ['uuid' => $member->uuid])->with('success', 'Done!');
     }
     public function viewMemberAcademicHistory($uuid, Request $request)
     {

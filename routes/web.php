@@ -37,6 +37,8 @@ Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('un
 
 // payment rollback
 Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionController::class, 'paystackPaymentCallback'])->name('paystackPaymentCallback');
+Route::get('/callback/with_flutterwave', [PaymentTransasctionController::class, 'flutterwavePaymentCallback'])->name('flutterwavePaymentCallback');
+
 
 
 
@@ -45,7 +47,8 @@ Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionContr
 Route::middleware(['authenticationMiddlewares'])->group(function () {
 
     Route::get('/', function () {
-        return redirect()->route('homepage');
+        // return redirect()->route('homepage');
+        return redirect()->route('loginPage');
     });
     Route::get('/home', [FrontendController::class, 'homepage'])->name('homepage');
 

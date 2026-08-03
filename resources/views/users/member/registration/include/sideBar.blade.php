@@ -1,5 +1,5 @@
-@if ($data['member']->photo && file_exists(public_path('assets/uploads/users/members/photo/' . $data['member']->photo)))
-    <img src="{{ asset('assets/uploads/users/members/photo/' . $data['member']->photo) }}"
+@if ($data['member']->photo && file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
+    <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo) }}"
         alt="{{ $data['member']->username }}" class="img-fluid w-100">
 @else
     <img src="{{ asset('system/images/default_profile_pic.webp') }}" alt="Default Picture" class="img-fluid w-100">
@@ -24,7 +24,7 @@
 </p>
 <p class="m-0">
     <span style="font-weight: bold">
-        Level
+        Level:
     </span>
     @php
         $data['member'] = $data['member']->memberAcademicInfo;

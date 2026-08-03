@@ -7,7 +7,7 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if ($data['operationalLevel'] !== 'department' && !departments()->exists())
+            @if ($data['operationalLevel'] !== 'department' || !departments()->exists())
                 @if (Auth::user()->hasPermission('department.create'))
                     <div class="d-flex justify-content-end">
                         <div class="m-1">
@@ -57,7 +57,7 @@
                                                     <th scope="col" class="table_header">
                                                         Department
                                                     </th>
-                                                     <th scope="col" class="table_header">
+                                                    <th scope="col" class="table_header">
                                                         Faculty
                                                     </th>
                                                     <th scope="col" class="table_header">

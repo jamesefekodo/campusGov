@@ -437,20 +437,25 @@
 
                                                     @php
                                                         $associationLogo = asset('system/images/logo_placeholder.png');
-
                                                         if (
                                                             !empty($data['basicSystemSetting']->association_logo) &&
                                                             file_exists(
                                                                 public_path(
-                                                                    'system/images/' .
+                                                                    'assets/tenant_' .
+                                                                        tenant()->id .
+                                                                        '/uploads/tenantProfile/' .
                                                                         $data['basicSystemSetting']->association_logo,
                                                                 ),
                                                             )
                                                         ) {
                                                             $associationLogo = asset(
-                                                                'system/images/' .
+                                                                'assets/tenant_' .
+                                                                    tenant()->id .
+                                                                    '/uploads/tenantProfile/' .
                                                                     $data['basicSystemSetting']->association_logo,
                                                             );
+
+                                                            // /home/transcend/laravelApps/campusgov/public/assets/tenant_1/uploads/tenantProfile/
                                                         }
 
                                                         $schoolLogo = asset('system/images/logo_placeholder.png');
@@ -459,13 +464,17 @@
                                                             !empty($data['basicSystemSetting']->school_logo) &&
                                                             file_exists(
                                                                 public_path(
-                                                                    'system/images/' .
+                                                                    'assets/tenant_' .
+                                                                        tenant()->id .
+                                                                        '/uploads/tenantProfile/' .
                                                                         $data['basicSystemSetting']->school_logo,
                                                                 ),
                                                             )
                                                         ) {
                                                             $schoolLogo = asset(
-                                                                'system/images/' .
+                                                                'assets/tenant_' .
+                                                                    tenant()->id .
+                                                                    '/uploads/tenantProfile/' .
                                                                     $data['basicSystemSetting']->school_logo,
                                                             );
                                                         }

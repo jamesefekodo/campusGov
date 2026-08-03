@@ -23,15 +23,6 @@ return new class extends Migration
 
             $table->primary(['role_id', 'permission_id']);
 
-
-            $table->foreignId('role_id')
-                ->constrained()
-                ->cascadeOnDelete();
-
-            $table->foreignId('permission_id')
-                ->constrained()
-                ->cascadeOnDelete();
-
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }

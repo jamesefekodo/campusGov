@@ -58,6 +58,9 @@
                                                         Date
                                                     </th>
                                                     <th scope="col" class="table_header">
+                                                        Method
+                                                    </th>
+                                                    <th scope="col" class="table_header">
                                                         Status
                                                     </th>
                                                     <th scope="col" class="table_header">
@@ -68,7 +71,7 @@
 
                                             @if ($data['transactions']->isEmpty())
                                                 <tr>
-                                                    <td colspan="8" class="text-center">
+                                                    <td colspan="9" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -176,6 +179,24 @@
                                                                 {{ \Carbon\Carbon::parse($transaction->paid_at)->format('l, d F, Y h:i A') }}
                                                             </td>
                                                             <td>
+                                                                @if ($transaction->payment_mode == 'manual')
+                                                                    @php
+                                                                        $methods = [
+                                                                            'cash' => 'Cash',
+                                                                            'bank_transfer' => 'Bank Transfer/Deposit',
+                                                                            'cheque' => 'Cheque',
+                                                                        ];
+                                                                    @endphp
+
+                                                                    {{ $methods[$transaction->manual_payment_method] ?? ucfirst(str_replace('_', ' ', $transaction->manual_payment_method)) }}
+                                                                @endif
+                                                                @if ($transaction->payment_mode == 'electronic')
+                                                                    <span class="text-capitalize">
+                                                                        {{ $transaction->electronic_payment_method }}
+                                                                    </span>
+                                                                @endif
+                                                            </td>
+                                                            <td>
                                                                 @switch($transaction->payment_status)
                                                                     @case('successful')
                                                                         <span class="badge bg-green text-white">Successful</span>
@@ -214,8 +235,8 @@
                                                                 @if ($transaction->payment_status !== 'successful')
                                                                     @switch($transaction->electronic_payment_method)
                                                                         @case('flutterwave')
-                                                                            {{-- <form
-                                                                                action="{{ route('associationFlutterwavePaymentCallback') }}"
+                                                                            <form
+                                                                                action="{{ route('flutterwavePaymentCallback') }}"
                                                                                 method="GET" class="d-inline">
                                                                                 @csrf
                                                                                 <input type="hidden" name="transaction_id"
@@ -225,7 +246,7 @@
                                                                                 <button type="submit"
                                                                                     class="border-0 bg-transparent p-0"><i
                                                                                         class="fa-solid fa-rotate-right text-primary"></i></button>
-                                                                            </form> --}}
+                                                                            </form>
                                                                         @break
 
                                                                         @case('paystack')

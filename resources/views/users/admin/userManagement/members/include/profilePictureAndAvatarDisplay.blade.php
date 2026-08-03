@@ -2,7 +2,10 @@
      $initials = '';
 
      if ($user->memberPersonalProfile->first_name && $user->memberPersonalProfile->last_name) {
-         $initials = strtoupper(substr($user->memberPersonalProfile->first_name, 0, 1) . substr($user->memberPersonalProfile->last_name, 0, 1));
+         $initials = strtoupper(
+             substr($user->memberPersonalProfile->first_name, 0, 1) .
+                 substr($user->memberPersonalProfile->last_name, 0, 1),
+         );
      } elseif ($user->username) {
          $initials = strtoupper(substr($user->username, 0, 1));
      } else {
@@ -25,18 +28,21 @@
      ];
 
      // Pick color based on employee id or name so it stays consistent
-     $colorIndex = crc32($user->memberPersonalProfile->first_name . $user->memberPersonalProfile->last_name) % count($colors);
+     $colorIndex =
+         crc32($user->memberPersonalProfile->first_name . $user->memberPersonalProfile->last_name) % count($colors);
      $colorIndex = abs($colorIndex); // ensure positive
      $color = $colors[$colorIndex];
 
-     $initials = strtoupper(substr($user->memberPersonalProfile->first_name, 0, 1) . substr($user->memberPersonalProfile->last_name, 0, 1));
+     $initials = strtoupper(
+         substr($user->memberPersonalProfile->first_name, 0, 1) . substr($user->memberPersonalProfile->last_name, 0, 1),
+     );
  @endphp
 
 
 
  @if ($user->photo)
-     <img src="{{ asset('assets/uploads/users/members/photo/' . $user->photo) }}" class="rounded-circle border"
-         width="38" height="38" style="object-fit: cover;">
+     <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo) }}"
+         class="rounded-circle border" width="38" height="38" style="object-fit: cover;">
  @else
      <div class="avatar-initials"
          style="background: linear-gradient(135deg, {{ $color[0] }} 0%, {{ $color[1] }} 100%)">

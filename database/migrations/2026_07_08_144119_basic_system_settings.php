@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('basic_system_settings', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('tenant_id')->unique()->nullable();
+            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->integer('current_academic_year');
             $table->boolean('maintenance_mode')->default(false);
             $table->text('association_name')->nullable();
@@ -40,11 +40,7 @@ return new class extends Migration
             $table->decimal('account_balance', 15, 2)->default(0);
             $table->timestamps();
 
-            $table->foreign('tenant_id')
-                ->references('id')
-                ->on('tenants')
-                ->onUpdate('set null')
-                ->onDelete('set null');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

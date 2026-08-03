@@ -20,12 +20,12 @@
                                             $data['member']->photo &&
                                             file_exists(
                                                 public_path(
-                                                    'assets/uploads/users/members/photo/' . $data['member']->photo,
+                                                    'assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo,
                                                 ),
                                             )
                                         ) {
                                             $image = asset(
-                                                'assets/uploads/users/members/photo/' . $data['member']->photo,
+                                                'assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo,
                                             );
                                         }
                                     @endphp
@@ -116,7 +116,7 @@
 
                                                     if ($data['member']->photo) {
                                                         $imagePlaceholder = asset(
-                                                            'assets/uploads/users/members/photo/' .
+                                                            'assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' .
                                                                 $data['member']->photo,
                                                         );
                                                     }

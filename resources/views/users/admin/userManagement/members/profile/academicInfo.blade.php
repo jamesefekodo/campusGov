@@ -42,7 +42,7 @@
 
                                             @if ($academic?->academic_status == 'student')
 
-                                                {{ currentLevel($academic->theProgram, studentCurrentLevel($academic)) }}
+                                                {{ currentLevel($academic?->theProgram, studentCurrentLevel($academic)) }}
                                             @elseif($academic?->academic_status == 'alumni')
                                                 {{ $academic->graduation_session
                                                     ? $academic->graduation_session . '/' . ($academic->graduation_session + 1)
@@ -93,11 +93,11 @@
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Program:</span>
                                         <span class="text-black">
-                                            {{ $data['member']->memberAcademicInfo->theProgram->name }}
-                                            @if ($data['member']->memberAcademicInfo->theProgram->short_name)
-                                                ({{ $data['member']->memberAcademicInfo->theProgram->short_name }})
+                                            {{ $data['member']->memberAcademicInfo?->theProgram?->name }}
+                                            @if ($data['member']->memberAcademicInfo?->theProgram?->short_name)
+                                                ({{ $data['member']->memberAcademicInfo?->theProgram?->short_name }})
                                             @endif
-                                            - {{ $data['member']->memberAcademicInfo->programType->type_name }}
+                                            - {{ $data['member']->memberAcademicInfo?->programType?->type_name }}
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
@@ -123,7 +123,7 @@
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Department:</span>
                                         <span class="text-black">
-                                            {{ $data['member']->memberAcademicInfo->theDepartment->name }}
+                                            {{ $data['member']->memberAcademicInfo?->theDepartment?->name }}
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
@@ -182,7 +182,7 @@
                     </div>
                     {{-- Back Home --}}
                     <div class="w-100 justify-content-center text-center my-4 pt-5">
-                        <a class="btn btn-primary" href="{{ route('viewMMember', ['uuid' => $data['member']->uuid]) }}">
+                        <a class="btn btn-primary" href="{{ route('viewMember', ['uuid' => $data['member']->uuid]) }}">
                             <i class="fas fa-chevron-left"></i>
                             Back
                         </a>

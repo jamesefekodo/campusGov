@@ -60,7 +60,6 @@ if (!function_exists('basicSystemInfo')) {
     }
 }
 
-
 if (!function_exists('associationLogo')) {
     function associationLogo()
     {
@@ -71,12 +70,12 @@ if (!function_exists('associationLogo')) {
             $defaultSettings->association_logo &&
             file_exists(
                 public_path(
-                    'system/images/' .
+                    'assets/tenant_' . tenant()->id . '/uploads/tenantProfile/' .
                         $defaultSettings->association_logo,
                 ),
             )
         ) {
-            $logo = asset('system/images/' . $defaultSettings->association_logo);
+            $logo = asset('assets/tenant_' . tenant()->id . '/uploads/tenantProfile/' . $defaultSettings->association_logo);
         } else {
             $logo = asset('system/images/transcend_logo.webp');
         }
@@ -94,12 +93,12 @@ if (!function_exists('schoolLogo')) {
             $defaultSettings->school_logo &&
             file_exists(
                 public_path(
-                    'system/images/' .
+                    'assets/tenant_' . tenant()->id . '/uploads/tenantProfile/' .
                         $defaultSettings->school_logo,
                 ),
             )
         ) {
-            $logo = asset('system/images/' . $defaultSettings->school_logo);
+            $logo = asset('assets/tenant_' . tenant()->id . '/uploads/tenantProfile/' . $defaultSettings->school_logo);
         } else {
             $logo = asset('system/images/transcend_logo.webp');
         }
@@ -369,4 +368,3 @@ if (!function_exists('totalPendingPaymentTransactions')) {
             ->count();
     }
 }
-

@@ -102,42 +102,6 @@
 
                                                 </div>
                                             </div>
-                                            {{-- <div class="col-md-12 row">
-                                            <p class="m-1 p-0">
-                                                <span class="text-mute">
-                                                    Name:
-                                                </span>
-                                                <span class="text-black">
-                                                    {{ $data['role']->name }}
-                                                </span>
-                                            </p>
-                                            <p class="m-1 p-0">
-                                                <span class="text-mute">
-                                                    Description:
-                                                </span>
-                                                <span class="text-black">
-                                                    {{ $data['role']->description }}
-                                                </span>
-                                            </p>
-                                        </div>
-                                        <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            @if (Auth::user()->hasPermission('roles.update'))
-                                                <button class="btn btn-warning m-1 d-flex align-items-center"
-                                                    data-toggle="modal" data-target="#updateRoleModal">
-                                                    <i class="fas fa-edit me-2"></i>
-                                                    <span>Update</span>
-                                                </button>
-                                            @endif
-
-                                            @if (Auth::user()->hasPermission('roles.delete'))
-                                                <button type="button"
-                                                    class="btn btn-danger m-1 d-flex align-items-center delete-role"
-                                                    data-url="{{ route('deleteRole', ['uuid' => $data['role']->uuid]) }}">
-                                                    <i class="fas fa-trash me-2"></i>
-                                                    <span>Delete</span>
-                                                </button>
-                                            @endif
-                                        </div> --}}
 
 
                                         </div>

@@ -28,7 +28,7 @@
 
                                                 if ($data['member']->photo) {
                                                     $imagePlaceholder = asset(
-                                                        'assets/uploads/users/members/photo/' . $data['member']->photo,
+                                                        'assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo,
                                                     );
                                                 }
                                             @endphp

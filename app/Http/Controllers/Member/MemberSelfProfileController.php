@@ -46,7 +46,7 @@ class MemberSelfProfileController extends Controller
     {
         $member = Auth::user();
 
-        $hasExistingPhoto = !empty($member->photo) && file_exists(public_path('assets/uploads/users/members/photo/' . $member->photo));
+        $hasExistingPhoto = !empty($member->photo) && file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $member->photo));
 
         request()->validate([
             // 'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:300',
@@ -99,7 +99,7 @@ class MemberSelfProfileController extends Controller
         if ($request->filled('photo_cropped')) {
             // Delete existing photo if it exists
             if (!empty($profile->userProfile->photo)) {
-                $oldPath = public_path('assets/uploads/users/members/photo/' . $member->photo);
+                $oldPath = public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $member->photo);
                 if (file_exists($oldPath)) {
                     @unlink($oldPath);
                 }
@@ -111,7 +111,7 @@ class MemberSelfProfileController extends Controller
 
             $filename = $profile->userProfile->username . uniqid() . '.jpg';
 
-            $path = public_path('assets/uploads/users/members/photo/' . $filename);
+            $path = public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $filename);
 
             file_put_contents($path, $decoded);
 

@@ -10,7 +10,13 @@
             <div
                 class="inner_nav_menu
                 {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
-                Non-Students</div>
+                Others</div>
+        </a>
+        <a href="#">
+            <div
+                class="inner_nav_menu
+                {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
+                Aw. Registration</div>
         </a>
         <a href="#">
             <div

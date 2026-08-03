@@ -5,7 +5,7 @@
     </p>
 
     <p>
-        Thank you for registering on the {{ basicSystemInfo()->association_name }} Member Portal. Your registration has been
+        Thank you for registering on {{ basicSystemInfo()->association_acronym ?? config('app.name') }} Member Portal. Your registration has been
         received successfully.
     </p>
     <p>

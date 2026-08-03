@@ -8,8 +8,8 @@
                 <div class="user_page_container mb-5">
                     <div class="col-md-12 row d-flex justify-content-center align-items-center">
                         <div class="col md-5 d-flex justify-content-center align-items-center">
-                            @if ($data['member']->photo && file_exists(public_path('assets/uploads/users/members/photo/' . $data['member']->photo)))
-                                <img src="{{ asset('assets/uploads/users/members/photo/' . $data['member']->photo) }}"
+                            @if ($data['member']->photo && file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
+                                <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo) }}"
                                     style="max-width: 200px" alt="{{ $data['member']->username }}">
                             @else
                                 <img src="{{ asset('system/images/default_profile_pic.webp') }}" alt="Default Picture"

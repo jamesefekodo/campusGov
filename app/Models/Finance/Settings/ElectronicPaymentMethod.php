@@ -3,14 +3,12 @@
 namespace App\Models\Finance\Settings;
 
 use App\Models\Finance\Settings\ElectronicPaymentConfig;
-use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class ElectronicPaymentMethod extends Model
 {
-    use BelongsToTenant;
     use HasFactory;
     protected $table = 'electronic_payment_methods';
     protected $fillable = [

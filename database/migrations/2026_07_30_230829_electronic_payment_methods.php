@@ -13,18 +13,12 @@ return new class extends Migration
     {
         Schema::create('electronic_payment_methods', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
             $table->string('slug')->unique();
             $table->string('name')->unique();
             $table->string('logo');
-            $table->bigInteger('default_api');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
-
-
-            $table->foreign('default_api')->references('id')->on('electronic_payment_config')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

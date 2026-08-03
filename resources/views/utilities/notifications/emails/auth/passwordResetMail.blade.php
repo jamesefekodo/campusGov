@@ -4,7 +4,7 @@
         Hello,
     </p>
     <p>
-        You have requested us to send a link to reset the password of your {{ config('app.name') }} account. Please
+        You have requested us to send a link to reset the password of your {{ basicSystemInfo()->association_acronym ?? config('app.name') }} account. Please
         click the link below to continue.
     </p>
     <p class="mailLink">

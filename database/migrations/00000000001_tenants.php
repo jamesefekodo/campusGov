@@ -14,8 +14,6 @@ return new class extends Migration
         Schema::create('tenants', function (Blueprint $table) {
 
             $table->id();
-            $table->unsignedBigInteger('tenant_id')->nullable();
-
             $table->uuid('uuid')->unique();
 
             // Basic Information
@@ -24,8 +22,6 @@ return new class extends Migration
             $table->string('code')->nullable()->unique();
 
             // Branding
-            $table->string('logo')->nullable();
-            $table->string('favicon')->nullable();
 
             // Contact
             $table->string('email')->nullable();
@@ -51,10 +47,6 @@ return new class extends Migration
             $table->longText('description')->nullable();
 
             $table->timestamps();
-
-
-
-            $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }
 

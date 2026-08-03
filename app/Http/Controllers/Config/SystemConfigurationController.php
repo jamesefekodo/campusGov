@@ -224,7 +224,7 @@ class SystemConfigurationController extends Controller
             $mime = $file->getMimeType();
             $ext  = strtolower($file->getClientOriginalExtension());
 
-            $uploadPath = public_path('system/images');
+            $uploadPath = public_path('assets/tenant_' . tenant()->id . '/uploads/tenantProfile');
             File::ensureDirectoryExists($uploadPath);
 
             // Base filename
@@ -343,7 +343,7 @@ class SystemConfigurationController extends Controller
             $mime2 = $file2->getMimeType();
             $ext2  = strtolower($file2->getClientOriginalExtension());
 
-            $uploadPath2 = public_path('system/images');
+            $uploadPath2 = public_path('assets/tenant_'.tenant()->id . '/uploads/tenantProfile');
             File::ensureDirectoryExists($uploadPath2);
 
             // Base filename

@@ -8,8 +8,10 @@
                 <div class="user_page_container mb-5">
                     <div class="col-md-12 row d-flex justify-content-center align-items-center">
                         <div class="col md-5 d-flex justify-content-center align-items-center">
-                            @if ($data['member']->photo && file_exists(public_path('assets/uploads/users/members/photo/' . $data['member']->photo)))
-                                <img src="{{ asset('assets/uploads/users/members/photo/' . $data['member']->photo) }}"
+                            @if (
+                                $data['member']->photo &&
+                                    file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
+                                <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo) }}"
                                     style="max-width: 200px" alt="{{ $data['member']->username }}">
                             @else
                                 <img src="{{ asset('system/images/default_profile_pic.webp') }}" alt="Default Picture"
@@ -28,33 +30,35 @@
                                 </span></p>
                             <p class="">
                                 <span style="font-weight: bold">
-                                    @if ($data['member']->memberAcademicInfo?->academic_status == 'student')
-                                        Current Level:
-                                    @elseif($data['member']->memberAcademicInfo?->academic_status == 'alumni')
-                                        Graduation Session:
+                                    Level:
+                                </span>
+
+                                @php
+                                    $data['member'] = $data['member']->memberAcademicInfo;
+                                @endphp
+
+                                <span style="font-weight: bold">
+                                    @if ($data['member']?->academic_status == 'student')
+                                        {{-- Current Level: --}}
+                                    @elseif($data['member']?->academic_status == 'alumni')
+                                        Graduated -
                                     @else
                                         Status:
                                     @endif
                                 </span>
 
-                                @php
-                                    $academic = $data['member']->memberAcademicInfo;
-                                @endphp
+                                @if ($data['member']?->academic_status == 'student')
 
-
-                                @if ($academic?->academic_status == 'student')
-
-                                    {{ currentLevel(
-                                        \App\Models\AcademicConfig\Program::whereSlug($academic->program)->first(),
-                                        now()->year - (int) explode('/', $academic->admission_session)[0] + 1,
-                                    ) }}
-                                @elseif($academic?->academic_status == 'alumni')
-                                    {{ $academic->graduation_session ?? '-' }}
+                                    {{ currentLevel($data['member']->theProgram, studentCurrentLevel($data['member'])) }}
+                                @elseif($data['member']?->academic_status == 'alumni')
+                                    {{ $data['member']->graduation_session
+                                        ? $data['member']->graduation_session . '/' . ($data['member']->graduation_session + 1)
+                                        : '-' }}
                                 @else
-                                    {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
+                                    {{ ucfirst(str_replace('_', ' ', $data['member']?->academic_status ?? '-')) }}
 
-                                    @if ($academic?->graduation_session)
-                                        ({{ $academic->graduation_session }})
+                                    @if ($data['member']?->graduation_session)
+                                        ({{ $data['member']->graduation_session }}/{{ $data['member']->graduation_session + 1 }})
                                     @endif
 
                                 @endif
