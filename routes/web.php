@@ -157,6 +157,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // students
     Route::get('admin/user_management/members/students', [MembersManagementController::class, 'studentMembers'])->name('studentMembers');
     Route::get('admin/user_management/members/students/search', [MembersManagementController::class, 'studentMembers'])->name('studentMembersSearch');
+    Route::get('admin/user_management/members/students/filter', [MembersManagementController::class, 'studentMembers'])->name('filterStudentMembers');
+
+
 
 
     Route::put('admin/user_management/members/verification/return_for_correction/{uuid}', [MembersManagementController::class, 'updateBasicAccountInfo'])->name('updateBasicAccountInfo');

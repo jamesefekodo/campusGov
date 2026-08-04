@@ -209,7 +209,7 @@
                 {{-- Back Home --}}
                 <div class="w-100 justify-content-center text-center my-4 pt-5">
                     <a class="btn btn-primary"
-                        href="{{ route('viewMemberAwaitingVerificationIndex', ['uuid' => $data['member']->uuid]) }}">
+                        href="{{ route('viewMember', ['uuid' => $data['member']->uuid]) }}">
                         <i class="fas fa-chevron-left"></i>
                         Back
                     </a>

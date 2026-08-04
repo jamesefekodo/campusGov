@@ -107,25 +107,29 @@ class MemberAcademicInfo extends Model
             });
     }
 
+
     public function associationDues()
     {
-        if (
-            !$this->theProgram ||
-            !isStillWithinProgramDuration(
-                $this->admission_session,
-                $this->theProgram,
-                $this->programType,
-                $this->theDepartment
-            )
-        ) {
+        if (!$this->theProgram) {
             return collect();
         }
+        $endAcademicYear = isStillWithinProgramDuration(
+            $this->admission_session,
+            $this->theProgram,
+            $this->programType,
+            $this->theDepartment
+        )
+            ? currentAcademicYear()
+            : (
+                (int) $this->admission_session +
+                (int) $this->theProgram->duration - 1
+            );
 
         return AssociationDue::with('variations')
             ->where('is_active', true)
             ->whereBetween('academic_year', [
                 (int) $this->admission_session,
-                currentAcademicYear(),
+                $endAcademicYear,
             ])
             ->get()
             ->map(function ($due) {
@@ -135,7 +139,7 @@ class MemberAcademicInfo extends Model
                         return (!is_null($variation->admission_session)) * 4 +
                             (!is_null($variation->program_slug)) * 2 +
                             (!is_null($variation->program_type_slug));
-                    }) // nubers as weight
+                    })
                     ->first(function ($variation) {
                         return (
                             is_null($variation->admission_session) ||

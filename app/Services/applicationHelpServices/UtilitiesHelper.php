@@ -11,6 +11,7 @@ use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 
 
 
@@ -366,5 +367,23 @@ if (!function_exists('totalPendingPaymentTransactions')) {
         return PaymentTransaction::where('payment_status', 'pending')
             ->orWhere('approval_status', 'pending')
             ->count();
+    }
+}
+
+if (!function_exists('highestProgramDuration')) {
+    function highestProgramDuration(): int
+    {
+        return DB::query()
+            ->fromSub(function ($query) {
+                $query->select('duration')
+                    ->from('programs')
+                    ->where('is_active', true)
+                    ->unionAll(
+                        DB::table('program_duration_overrides')
+                            ->select('duration')
+                            ->where('is_active', true)
+                    );
+            }, 'durations')
+            ->max('duration') ?? 0;
     }
 }

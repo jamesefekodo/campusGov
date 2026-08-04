@@ -34,6 +34,12 @@ class MembersManagementController extends Controller
         $pageTitle = '';
         $members = '';
         $totalMembers = 0;
+        $selectedProgram = $request->input('program', null);
+        $selectedProgramType = $request->input('program_type', null);
+        $selectedFaculty = $request->input('faculty', null);
+        $selectedDepartment = $request->input('department', null);
+        $selectedLevel = $request->input('level', null);
+        $selectedGender = $request->input('gender', null);
 
 
         if (Route::currentRouteName() == 'studentMembersSearch') {
@@ -122,13 +128,67 @@ class MembersManagementController extends Controller
             $totalMembers = $members->total();
             $requestType = 'search';
             $pageTitle = 'Search Results :: ' . $searchKey;
-        } else {
-            $members = MemberAcademicInfo::
-            // where('academic_status', 'student')
-            //     ->
-                whereHas('userProfile', function ($query) {
+        } elseif (Route::currentRouteName() == 'filterStudentMembers') {
+            $targettedAdmissionYear = currentAcademicYear() - $selectedLevel + 1;
+
+
+            $members = MemberAcademicInfo::query()
+                ->where('member_academic_infos.academic_status', 'student')
+
+                ->whereHas('userProfile', function ($query) {
                     $query->where('account_status', 2);
                 })
+
+                ->when(!empty($selectedProgram) && $selectedProgram !== 'all', function ($query) use ($selectedProgram) {
+                    $query->where('program', $selectedProgram);
+                })
+
+                ->when(!empty($selectedProgramType) && $selectedProgramType !== 'all', function ($query) use ($selectedProgramType) {
+                    $query->where('program_type', $selectedProgramType);
+                })
+
+                ->when(!empty($selectedFaculty) && $selectedFaculty !== 'all', function ($query) use ($selectedFaculty) {
+                    $query->where('faculty', $selectedFaculty);
+                })
+
+                ->when(!empty($selectedDepartment) && $selectedDepartment !== 'all', function ($query) use ($selectedDepartment) {
+                    $query->where('department', $selectedDepartment);
+                })
+
+                ->when(!empty($selectedLevel), function ($query) use ($targettedAdmissionYear) {
+                    $query->where('admission_session', $targettedAdmissionYear);
+                })
+
+                ->when(!empty($selectedGender) && $selectedGender !== 'all', function ($query) use ($selectedGender) {
+                    $query->whereHas('personalProfile', function ($q) use ($selectedGender) {
+                        $q->where('gender', $selectedGender);
+                    });
+                })
+
+                ->orderBy(
+                    MemberPersonalProfile::select('first_name')
+                        ->whereColumn(
+                            'member_personal_profiles.username',
+                            'member_academic_infos.username'
+                        )
+                        ->limit(1)
+                )
+
+                ->paginate(50);
+
+                $totalMembers = $members->total();
+            $requestType = 'filter';
+            $pageTitle = 'Student Members  :: Filtered Results';
+        } else {
+            $members = MemberAcademicInfo::where('academic_status', 'student')
+                ->whereHas('userProfile', function ($query) {
+                    $query->where('account_status', 2);
+                })
+                ->orderBy(
+                    MemberPersonalProfile::select('first_name')
+                        ->whereColumn('member_personal_profiles.username', 'member_academic_infos.username')
+                        ->limit(1)
+                )
                 ->paginate(50);
             $totalMembers = MemberAcademicInfo::where('academic_status', 'student')->count();
             $requestType = 'all';
@@ -141,6 +201,14 @@ class MembersManagementController extends Controller
             'requestType' => $requestType,
             'searchKey' => $searchKey,
             'pageTitle' => $pageTitle,
+            'activePrograms' => Program::where('is_active', true)->orderBy('name')->get(),
+            'selectedProgram' => $selectedProgram ?? null,
+            'selectedProgramType' => $selectedProgramType ?? null,
+            'activeFaculties' => Faculty::where('is_active', true)->orderBy('name')->get(),
+            'selectedFaculty' => $selectedFaculty ?? null,
+            'selectedDepartment' => $selectedDepartment ?? null,
+            'selectedLevel' => $selectedLevel ?? null,
+            'selectedGender' => $selectedGender ?? null,
         ];
 
 

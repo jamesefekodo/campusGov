@@ -14,6 +14,9 @@
                         <div class="table_head_item col-md-8">
                             <div class="table_title">
                                 {{ $data['pageTitle'] }}
+
+                                <span class="ms-5 text-white-60 fs-7"><i class="fa fa-filter" data-toggle="modal"
+                                        data-target="#filterStudentMembersModal"></i></span>
                             </div>
                         </div>
 
@@ -32,6 +35,9 @@
                             </div>
                         </div>
                     </div>
+                    {{-- filter modal start --}}
+                    @include('users.admin.userManagement.members.students.include.filterStudentMembersModal')
+                    {{-- filter modal end --}}
                     <div class="col-md-12 m-auto">
                         <div class="my_form_container">
                             <div class=" pb-4">
@@ -138,8 +144,7 @@
                                                             </td>
                                                             <td>
                                                                 @php
-                                                                    $academicInfo =
-                                                                        $member;
+                                                                    $academicInfo = $member;
                                                                 @endphp
 
                                                                 <span style="font-weight: bold">

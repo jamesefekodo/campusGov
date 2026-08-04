@@ -44,7 +44,7 @@
 
             <span style="font-weight: bold">
                 @if ($academic?->academic_status == 'student')
-                    Current Level:
+                    {{-- Current Level: --}}
                 @elseif($academic?->academic_status == 'alumni')
                     Graduated:
                 @else
