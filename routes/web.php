@@ -87,6 +87,12 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(function () {
     Route::get('member/dashboard', [DashboardController::class, 'dashboard'])->name('memberDashboard');
 
+    // force to update academic status if unknown
+    Route::get('member/update_academic_status', [MemberSelfProfileController::class, 'memberUpdateAcademicStatus'])->name('memberUpdateAcademicStatus');
+    Route::get('member/update_academic_status/2', [MemberSelfProfileController::class, 'memberUpdateAcademicStatus'])->name('memberUpdateAcademicStatusStep2');
+    Route::put('member/update_academic_status/submit', [MemberSelfProfileController::class, 'memberUpdateAcademicStatusSubmit'])->name('memberUpdateAcademicStatusSubmit');
+
+
     // profile setup
     Route::get('member/account_setup', [MemberSelfProfileController::class, 'studentAccountSetup'])->name('studentAccountSetup');
     Route::get('member/account_setup/personal_profile', [MemberSelfProfileController::class, 'memberCreatePersonalProfile'])->name('memberCreatePersonalProfile');
@@ -158,6 +164,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/students', [MembersManagementController::class, 'studentMembers'])->name('studentMembers');
     Route::get('admin/user_management/members/students/search', [MembersManagementController::class, 'studentMembers'])->name('studentMembersSearch');
     Route::get('admin/user_management/members/students/filter', [MembersManagementController::class, 'studentMembers'])->name('filterStudentMembers');
+
+    Route::get('admin/user_management/members/non_students', [MembersManagementController::class, 'nonStudentMembers'])->name('nonStudentMembers');
+    Route::get('admin/user_management/members/non_students/search', [MembersManagementController::class, 'nonStudentMembers'])->name('nonStudentMembersSearch');
+    Route::get('admin/user_management/members/non_students/filter', [MembersManagementController::class, 'nonStudentMembers'])->name('filterNonStudentMembers');
 
 
 

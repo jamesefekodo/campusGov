@@ -24,6 +24,115 @@ use Illuminate\Validation\Rule;
 
 class MemberSelfProfileController extends Controller
 {
+    public function memberUpdateAcademicStatus()
+    {
+        $member = Auth::user();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $step = 1;
+        $academicStatus = [];
+
+        if (Route::currentRouteName() == 'memberUpdateAcademicStatusStep2') {
+            $step = 2;
+
+            $academicInfo = MemberAcademicInfo::where('username', $member->username)
+                ->first();
+
+
+            if (!$academicInfo) {
+
+                return redirect()
+                    ->back()
+                    ->with('error', 'Please complete academic information first.');
+            }
+
+
+            $program = Program::whereSlug($academicInfo->program)
+                ->firstOrFail();
+
+
+            $programType = ProgramType::whereSlug($academicInfo->program_type)
+                ->first();
+
+
+            $department = Department::whereSlug($academicInfo->department)
+                ->first();
+
+            $academicStatus = academicStatusOptions(
+                $academicInfo->admission_session,
+                $program,
+                $programType,
+                $department
+            );
+
+
+            session([
+                // 'academic_status_options' => $statuses
+                'academicStatus' => $academicStatus
+            ]);
+        }
+
+        $data = [
+            'member' => $member,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+            'step' => $step,
+            'academicStatus' => $academicStatus,
+        ];
+
+        return view('users.member.registration.forceUpdateAcademicInfo', compact('data'));
+    }
+    public function memberUpdateAcademicStatusSubmit(Request $request)
+    {
+        $member = Auth::user();
+
+        if ($request->step == 1) {
+
+            request()->validate([
+                'program' => 'required|string|exists:programs,slug',
+                'program_type' => 'required|string|exists:program_types,slug',
+                'faculty' => 'required|string|exists:faculties,slug',
+                'department' => 'required|string|exists:departments,slug',
+                'admission_session' => 'required|numeric',
+                'matric_number' => 'required|string',
+            ]);
+
+
+
+            $info = MemberAcademicInfo::updateOrCreate(
+                ['username' => $member->username],
+                [
+                    'username' => $member->username,
+                    'program' => $request->program,
+                    'program_type' => $request->program_type,
+                    'faculty' => $request->faculty,
+                    'department' => $request->department,
+                    'admission_session' => $request->admission_session,
+                    'matric_number' => strtoupper(trim($request->matric_number)),
+                ]
+            );
+            return redirect()->route('memberUpdateAcademicStatusStep2')->with('success', 'Done!');
+        } elseif ($request->step == 2) {
+            request()->validate([
+                'academic_status' => 'required|not_in:unknown',
+                'graduation_session' => 'nullable|numeric',
+            ]);
+            $info = MemberAcademicInfo::where('username', $member->username)->first();
+            if (!$info) {
+                return redirect()->back()->with('error', 'Please fill section one first!');
+            }
+            $info->update([
+                'academic_status' => $request->academic_status,
+                'graduation_session' => $request->graduation_session,
+                'is_verified' => true,
+            ]);
+        }
+        return redirect()->route('memberDashboard')->with('success', 'Done!');
+    }
     public function studentAccountSetup()
     {
         $member = Auth::user();

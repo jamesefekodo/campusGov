@@ -76,6 +76,11 @@ class AuthenticationMiddleware
 
             $disabledAccountStatus = 'waiting';
 
+            $requireAcademicStatusUpdate = 'waiting';
+            if ($accountType !== 2) {
+                $requireAcademicStatusUpdate = 'cleared';
+            }
+
 
             // Maintenance mode
             if ($maintenanceModeLock === true) {
@@ -301,6 +306,30 @@ class AuthenticationMiddleware
                     }
                 } else {
                     $disabledAccountStatus = 'cleared';
+                }
+            }
+
+            // Require Academic Status Update
+            // Reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'cleared' &&
+                $profileSetupStatus === 'cleared' &&
+                $awaitingVerificationStatus === 'cleared' &&
+                $disabledAccountStatus === 'cleared'
+            ) {
+                if ($accountType === 2 && $user->memberAcademicInfo && $user->memberAcademicInfo->academic_status === 'unknown') {
+                    if (
+                        !Route::is('memberUpdateAcademicStatus')
+                        && !Route::is('logoutRequest')
+                        && !Route::is('memberUpdateAcademicStatusStep2')
+                        && !Route::is('memberUpdateAcademicStatusSubmit')
+                    ) {
+                        return redirect()->route('memberUpdateAcademicStatus');
+                    }
                 }
             }
         }

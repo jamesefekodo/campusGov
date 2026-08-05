@@ -182,6 +182,8 @@
                     @php
                         if ($data['member']->memberAcademicInfo->academic_status == 'student') {
                             $backBtn = route('studentMembers');
+                        } elseif($data['member']->memberAcademicInfo->academic_status !== 'student'){
+                            $backBtn = route('nonStudentMembers');
                         } else {
                             $backBtn = route('loginPage');
                         }

@@ -176,7 +176,7 @@ class MembersManagementController extends Controller
 
                 ->paginate(50);
 
-                $totalMembers = $members->total();
+            $totalMembers = $members->total();
             $requestType = 'filter';
             $pageTitle = 'Student Members  :: Filtered Results';
         } else {
@@ -209,6 +209,218 @@ class MembersManagementController extends Controller
             'selectedDepartment' => $selectedDepartment ?? null,
             'selectedLevel' => $selectedLevel ?? null,
             'selectedGender' => $selectedGender ?? null,
+        ];
+
+
+        return view('users.admin.userManagement.members.students.studentMembers', compact('data'));
+    }
+    public function nonStudentMembers(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $members = '';
+        $totalMembers = 0;
+        $selectedProgram = $request->input('program', null);
+        $selectedProgramType = $request->input('program_type', null);
+        $selectedFaculty = $request->input('faculty', null);
+        $selectedDepartment = $request->input('department', null);
+        $selectedLevel = $request->input('level', null);
+        $selectedGender = $request->input('gender', null);
+        $selectedAcademicStatus = $request->input('academic_status', null);
+        $selectedAdmissionSession = $request->input('admission_session', null);
+        $selectedGraduationSession = $request->input('graduation_session', null);
+
+
+        if (Route::currentRouteName() == 'nonStudentMembersSearch') {
+            $searchKey = $request->input('searchKey');
+
+            $members = MemberAcademicInfo::query()
+                ->where('member_academic_infos.academic_status', '!=', 'student')
+                ->whereHas('userProfile', function ($query) {
+                    $query->where('account_status', 2);
+                })
+                ->with([
+                    'userProfile',
+                    'personalProfile',
+                    'theProgram',
+                    'theDepartment',
+                    'programType'
+                ])
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    // Split the input into individual words (example., "james", "oghenekevwe", "efekodo")
+                    $terms = explode(' ', trim($searchKey));
+
+                    $query->where(function ($q) use ($terms) {
+                        foreach ($terms as $term) {
+                            if (empty($term)) continue;
+                            $keyword = "%{$term}%";
+
+                            $q->where(function ($subQuery) use ($keyword) {
+                                // Search on MemberAcademicInfo table (fully qualified to prevent ambiguity)
+                                $subQuery->where('member_academic_infos.username', 'like', $keyword)
+                                    ->orWhere('member_academic_infos.academic_status', 'like', $keyword)
+                                    ->orWhere('member_academic_infos.matric_number', 'like', $keyword)
+
+                                    // userProfile relationship
+                                    ->orWhereHas('userProfile', function ($uq) use ($keyword) {
+                                        $uq->where('phone', 'like', $keyword)
+                                            ->orWhere('email', 'like', $keyword);
+                                    })
+
+                                    // personalProfile relationship
+                                    ->orWhereHas('personalProfile', function ($pq) use ($keyword) {
+                                        $pq->where('first_name', 'like', $keyword)
+                                            ->orWhere('middle_name', 'like', $keyword)
+                                            ->orWhere('last_name', 'like', $keyword)
+                                            ->orWhere('phone1', 'like', $keyword)
+                                            ->orWhere('email1', 'like', $keyword)
+                                            ->orWhere('phone2', 'like', $keyword)
+                                            ->orWhere('email2', 'like', $keyword)
+                                            ->orWhere('gender', 'like', $keyword)
+                                            ->orWhere('dob', 'like', $keyword)
+                                            ->orWhere('nationality', 'like', $keyword)
+                                            ->orWhere('state_of_origin', 'like', $keyword)
+                                            ->orWhere('lga_of_origin', 'like', $keyword)
+                                            ->orWhere('address1', 'like', $keyword)
+                                            ->orWhere('address2', 'like', $keyword);
+                                    })
+
+                                    // theProgram relationship
+                                    ->orWhereHas('theProgram', function ($prq) use ($keyword) {
+                                        $prq->where('name', 'like', $keyword)
+                                            ->orWhere('short_name', 'like', $keyword)
+                                            ->orWhere('level_format', 'like', $keyword)
+                                            ->orWhere('award', 'like', $keyword);
+                                    })
+
+                                    // theDepartment relationship
+                                    ->orWhereHas('theDepartment', function ($dq) use ($keyword) {
+                                        $dq->where('name', 'like', $keyword)
+                                            ->orWhere('description', 'like', $keyword);
+                                    })
+
+                                    // programType relationship
+                                    ->orWhereHas('programType', function ($ptq) use ($keyword) {
+                                        $ptq->where('type_name', 'like', $keyword);
+                                    });
+                            });
+                        }
+                    });
+                })
+                // Explicit join with member_personal_profiles table for sorting
+                ->join('member_personal_profiles', 'member_academic_infos.username', '=', 'member_personal_profiles.username')
+                ->orderBy('member_personal_profiles.first_name', 'asc')
+                ->select('member_academic_infos.*') // Prevent column name collisions from the join
+                ->paginate(50)
+                ->withQueryString();
+
+            $totalMembers = $members->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } elseif (Route::currentRouteName() == 'filterNonStudentMembers') {
+
+            $members = MemberAcademicInfo::query()
+                ->where('member_academic_infos.academic_status', '!=', 'student')
+
+                ->whereHas('userProfile', function ($query) {
+                    $query->where('account_status', 2);
+                })
+
+                ->when(!empty($selectedAcademicStatus) && $selectedAcademicStatus !== 'all', function ($query) use ($selectedAcademicStatus) {
+                    $query->where('academic_status', $selectedAcademicStatus);
+                })
+
+                ->when(!empty($selectedProgram) && $selectedProgram !== 'all', function ($query) use ($selectedProgram) {
+                    $query->where('program', $selectedProgram);
+                })
+
+                ->when(!empty($selectedProgramType) && $selectedProgramType !== 'all', function ($query) use ($selectedProgramType) {
+                    $query->where('program_type', $selectedProgramType);
+                })
+
+                ->when(!empty($selectedFaculty) && $selectedFaculty !== 'all', function ($query) use ($selectedFaculty) {
+                    $query->where('faculty', $selectedFaculty);
+                })
+
+                ->when(!empty($selectedDepartment) && $selectedDepartment !== 'all', function ($query) use ($selectedDepartment) {
+                    $query->where('department', $selectedDepartment);
+                })
+
+                ->when(!empty($selectedAdmissionSession) && $selectedAdmissionSession !== 'all', function ($query) use ($selectedAdmissionSession) {
+                    $query->where('admission_session', $selectedAdmissionSession);
+                })
+
+                ->when(!empty($selectedGraduationSession) && $selectedGraduationSession !== 'all', function ($query) use ($selectedGraduationSession) {
+                    $query->where('graduation_session', $selectedGraduationSession);
+                })
+
+                ->when(!empty($selectedLevel) && $selectedLevel !== 'all', function ($query) use ($selectedLevel) {
+                    $query->where('current_level', $selectedLevel);
+                })
+
+                ->when(!empty($selectedGender) && $selectedGender !== 'all', function ($query) use ($selectedGender) {
+                    $query->whereHas('personalProfile', function ($q) use ($selectedGender) {
+                        $q->where('gender', $selectedGender);
+                    });
+                })
+
+                ->orderBy(
+                    MemberPersonalProfile::select('first_name')
+                        ->whereColumn(
+                            'member_personal_profiles.username',
+                            'member_academic_infos.username'
+                        )
+                        ->limit(1)
+                )
+
+                ->paginate(50);
+
+            $totalMembers = $members->total();
+            $requestType = 'filter';
+            $pageTitle = 'Non-Student Members  :: Filtered Results';
+        } else {
+            $members = MemberAcademicInfo::where('academic_status', '!=', 'student')
+                ->whereHas('userProfile', function ($query) {
+                    $query->where('account_status', 2);
+                })
+                ->orderBy(
+                    MemberPersonalProfile::select('first_name')
+                        ->whereColumn('member_personal_profiles.username', 'member_academic_infos.username')
+                        ->limit(1)
+                )
+                ->paginate(50);
+            $totalMembers = MemberAcademicInfo::where('academic_status', '!=', 'student')->count();
+            $requestType = 'all';
+            $pageTitle = 'Non-Student Members';
+        }
+
+        $data = [
+            'members' => $members,
+            'totalMembers' => $totalMembers,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+            'activePrograms' => Program::where('is_active', true)->orderBy('name')->get(),
+            'selectedProgram' => $selectedProgram ?? null,
+            'selectedProgramType' => $selectedProgramType ?? null,
+            'activeFaculties' => Faculty::where('is_active', true)->orderBy('name')->get(),
+            'selectedFaculty' => $selectedFaculty ?? null,
+            'selectedDepartment' => $selectedDepartment ?? null,
+            'selectedLevel' => $selectedLevel ?? null,
+            'selectedGender' => $selectedGender ?? null,
+            'selectedAcademicStatus' => $selectedAcademicStatus ?? null,
+            'selectedAdmissionSession' => $selectedAdmissionSession ?? null,
+            'selectedGraduationSession' => $selectedGraduationSession ?? null,
         ];
 
 

@@ -1,6 +1,21 @@
 @extends('layouts.userLayout')
 @section('title', $data['pageTitle'])
 
+
+@php
+    if (request()->routeIs('nonStudentMembers', 'nonStudentMembersSearch', 'filterNonStudentMembers')) {
+        $searchRoute = route('nonStudentMembersSearch');
+        $filterRoute = route('filterNonStudentMembers');
+        $backRoute = route('nonStudentMembers');
+        $filterModalSelector = 'filterNonStudentMembersModal';
+    } else {
+        $searchRoute = route('studentMembersSearch');
+        $filterRoute = route('filterStudentMembers');
+        $backRoute = route('studentMembers');
+        $filterModalSelector = 'filterStudentMembersModal';
+    }
+@endphp
+
 @section('content')
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
@@ -16,13 +31,13 @@
                                 {{ $data['pageTitle'] }}
 
                                 <span class="ms-5 text-white-60 fs-7"><i class="fa fa-filter" data-toggle="modal"
-                                        data-target="#filterStudentMembersModal"></i></span>
+                                        data-target="#{{ $filterModalSelector }}"></i></span>
                             </div>
                         </div>
 
                         <div class="table_head_item col-md-4">
                             <div class="custom_search">
-                                <form type="GET" action="{{ route('studentMembersSearch') }}">
+                                <form type="GET" action="{{ $searchRoute }}">
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
@@ -35,8 +50,14 @@
                             </div>
                         </div>
                     </div>
+
+
                     {{-- filter modal start --}}
-                    @include('users.admin.userManagement.members.students.include.filterStudentMembersModal')
+                    @if ($filterModalSelector == 'filterNonStudentMembersModal')
+                        @include('users.admin.userManagement.members.students.include.filterNonStudentMembersModal')
+                    @else
+                        @include('users.admin.userManagement.members.students.include.filterStudentMembersModal')
+                    @endif
                     {{-- filter modal end --}}
                     <div class="col-md-12 m-auto">
                         <div class="my_form_container">
@@ -229,7 +250,7 @@
                                                     @break
 
                                                     @case('search')
-                                                        <a class="btn btn-success" href="{{ route('studentMembers') }}"> <i
+                                                        <a class="btn btn-success" href="{{ $backRoute }}"> <i
                                                                 class="fas fa-chevron-left"></i>
                                                             Back
                                                         </a>

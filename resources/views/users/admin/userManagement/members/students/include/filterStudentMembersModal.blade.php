@@ -1,10 +1,17 @@
-<div class="modal fade" id="filterStudentMembersModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
+<div class="modal fade" id="{{ $filterModalSelector }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
     aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
-            <div class="modal-header modal_header" style="width: 100%">
+            {{-- <div class="modal-header modal_header" style="width: 100%">
                 <h4 class="modal-title block text-white text-center p-1" id="exampleModalLongTitle">
-                    Filter Student Members</h4>
+                    Filter</h4>
+                <h4>
+                    <button type="button" class="bg-red text-white mt-1 p-2" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </h4>
+            </div> --}}
+            <div class="d-flex justify-content-end m-1">
                 <h4>
                     <button type="button" class="bg-red text-white mt-1 p-2" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -15,7 +22,7 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="GET" action="{{ route('filterStudentMembers') }}"
+                    <form class="form my_form" method="GET" action="{{ $filterRoute }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
