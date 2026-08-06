@@ -27,13 +27,13 @@
         @endif
 
 
-        <a href="#">
+        <a href="{{ route('memberAwaitingRegistration') }}">
             <div
                 class="inner_nav_menu
                 {{ Str::startsWith(request()->path(), 'admin/user_management/members/awaiting_registration') ? 'inner_nav_active' : '' }}">
-                Aw. Registration</div>
+                Pre-Registration</div>
         </a>
-        <a href="#">
+        <a href="{{ route('inActiveUserAccounts') }}">
             <div
                 class="inner_nav_menu
                 {{ Str::startsWith(request()->path(), 'admin/user_management/members/inactive') ? 'inner_nav_active' : '' }}">

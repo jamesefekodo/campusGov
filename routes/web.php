@@ -160,6 +160,18 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     // user management
+    Route::get('admin/user_management/members/disable_user/{uuid}', [MembersManagementController::class, 'disableUserAccount'])->name('disableUserAccount');
+    Route::get('admin/user_management/members/re_enable_user/{uuid}', [MembersManagementController::class, 'reEnableUserAccount'])->name('reEnableUserAccount');
+
+
+    Route::get('admin/user_management/members/inactive_users', [MembersManagementController::class, 'inActiveUserAccounts'])->name('inActiveUserAccounts');
+    Route::get('admin/user_management/members/inactive_users/search', [MembersManagementController::class, 'inActiveUserAccounts'])->name('inActiveUserAccountsSearch');
+
+    // memberAwaitingRegistration - account created but incomplete registration or not yet submitted for verification
+    Route::get('admin/user_management/members/awaiting_registration', [MembersManagementController::class, 'memberAwaitingRegistration'])->name('memberAwaitingRegistration');
+    Route::get('admin/user_management/members/awaiting_registration/search', [MembersManagementController::class, 'memberAwaitingRegistration'])->name('memberAwaitingRegistrationSearch');
+
+
     // students
     Route::get('admin/user_management/members/students', [MembersManagementController::class, 'studentMembers'])->name('studentMembers');
     Route::get('admin/user_management/members/students/search', [MembersManagementController::class, 'studentMembers'])->name('studentMembersSearch');

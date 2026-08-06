@@ -18,15 +18,15 @@
     </h2>
     <p class="m-0"><span style="font-weight: bold">Matric No:</span>
         <span class="text-uppercase">
-            {{ $data['member']->memberAcademicInfo->matric_number }}
+            {{ $data['member']?->memberAcademicInfo?->matric_number }}
         </span>
     </p>
     <p class="m-0"><span style="font-weight: bold">Department:</span>
         {{ $data['member']?->memberAcademicInfo?->theDepartment?->name }}
     </p>
     <p class="m-0"><span style="font-weight: bold">Program:</span>
-        {{ $data['member']?->memberAcademicInfo->theProgram?->name }} @if ($data['member']->memberAcademicInfo->theProgram?->short_name)
-            ({{ $data['member']->memberAcademicInfo->theProgram?->short_name }})
+        {{ $data['member']?->memberAcademicInfo?->theProgram?->name }} @if ($data['member']?->memberAcademicInfo?->theProgram?->short_name)
+            ({{ $data['member']?->memberAcademicInfo?->theProgram?->short_name }})
         @endif
     </p>
     <p class="m-0"><span style="font-weight: bold">Duration:</span>

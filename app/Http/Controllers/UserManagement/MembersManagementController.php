@@ -18,6 +18,153 @@ use Illuminate\Validation\Rule;
 
 class MembersManagementController extends Controller
 {
+    public function disableUserAccount()
+    {
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.update'),
+            403
+        );
+
+        $uuid = request()->route('uuid');
+        $user = User::where('uuid', $uuid)->firstOrFail();
+
+        if ($user->account_status === 3) {
+            return redirect()->back()->with('error', 'User account is already disabled.');
+        }
+
+        $user->account_status = 3;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User account has been disabled successfully.');
+    }
+    public function reEnableUserAccount($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.update'),
+            403
+        );
+
+        $uuid = request()->route('uuid');
+        $user = User::where('uuid', $uuid)->firstOrFail();
+
+        if ($user->account_status !== 3) {
+            return redirect()->back()->with('error', 'Only disabled accounts can be activated.');
+        }
+
+        $user->account_status = 0;
+        $user->save();
+
+        return redirect()->back()->with('success', 'User account has been activated successfully.');
+    }
+    public function memberAwaitingRegistration(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $users = '';
+        $totalUsers = 0;
+
+
+        if (Route::currentRouteName() == 'memberAwaitingRegistrationSearch') {
+            $searchKey = $request->input('searchKey');
+
+            $users = User::query()
+                ->where('account_type', 2)->where('account_status', 0)
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    $query->where(function ($q) use ($searchKey) {
+                        $q->where('username', 'like', "%{$searchKey}%")
+                            ->orWhere('email', 'like', "%{$searchKey}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate(50)
+                ->withQueryString();
+
+            $totalUsers = $users->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $users = User::where('account_type', 2)->where('account_status', 0)->orderBy('updated_at', 'desc')->paginate(50);
+            $totalUsers = $users->total();
+            $requestType = 'all';
+            $pageTitle = 'Members Awaiting Registration';
+        }
+        $data = [
+            'users' => $users,
+            'totalUsers' => $totalUsers,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+        return view('users.admin.userManagement.members.awaitingRegistration', compact('data'));
+    }
+    public function inActiveUserAccounts(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $users = '';
+        $totalUsers = 0;
+
+
+        if (Route::currentRouteName() == 'inActiveUserAccountsSearch') {
+            $searchKey = $request->input('searchKey');
+
+            $users = User::query()
+                ->where('account_type', 2)->where('account_status', 3)
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    $query->where(function ($q) use ($searchKey) {
+                        $q->where('username', 'like', "%{$searchKey}%")
+                            ->orWhere('email', 'like', "%{$searchKey}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate(50)
+                ->withQueryString();
+
+            $totalUsers = $users->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $users = User::where('account_type', 2)->where('account_status', 3)->orderBy('updated_at', 'desc')->paginate(50);
+            $totalUsers = $users->total();
+            $requestType = 'all';
+            $pageTitle = 'Inactive User Accounts';
+        }
+        $data = [
+            'users' => $users,
+            'totalUsers' => $totalUsers,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+        return view('users.admin.userManagement.members.awaitingRegistration', compact('data'));
+    }
     public function studentMembers(Request $request)
     {
         /** @var \App\Models\User $user */

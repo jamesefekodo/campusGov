@@ -180,9 +180,9 @@
                     </div>
                     {{-- Back Home --}}
                     @php
-                        if ($data['member']->memberAcademicInfo->academic_status == 'student') {
+                        if ($data['member']?->memberAcademicInfo?->academic_status == 'student') {
                             $backBtn = route('studentMembers');
-                        } elseif($data['member']->memberAcademicInfo->academic_status !== 'student'){
+                        } elseif($data['member']?->memberAcademicInfo?->academic_status !== 'student'){
                             $backBtn = route('nonStudentMembers');
                         } else {
                             $backBtn = route('loginPage');

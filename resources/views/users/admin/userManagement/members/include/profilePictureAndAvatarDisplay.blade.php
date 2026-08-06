@@ -1,13 +1,13 @@
  @php
      $initials = '';
 
-     if ($user->memberPersonalProfile->first_name && $user->memberPersonalProfile->last_name) {
+     if ($user?->memberPersonalProfile?->first_name && $user?->memberPersonalProfile?->last_name) {
          $initials = strtoupper(
-             substr($user->memberPersonalProfile->first_name, 0, 1) .
-                 substr($user->memberPersonalProfile->last_name, 0, 1),
+             substr($user?->memberPersonalProfile?->first_name, 0, 1) .
+                 substr($user?->memberPersonalProfile?->last_name, 0, 1),
          );
-     } elseif ($user->username) {
-         $initials = strtoupper(substr($user->username, 0, 1));
+     } elseif ($user?->username) {
+         $initials = strtoupper(substr($user?->username, 0, 1));
      } else {
          $initials = 'U';
      }
@@ -28,19 +28,25 @@
      ];
 
      // Pick color based on employee id or name so it stays consistent
-     $colorIndex =
-         crc32($user->memberPersonalProfile->first_name . $user->memberPersonalProfile->last_name) % count($colors);
-     $colorIndex = abs($colorIndex); // ensure positive
-     $color = $colors[$colorIndex];
+     if ($profile = $user?->memberPersonalProfile) {
+         $initials = strtoupper(substr($profile->first_name, 0, 1) . substr($profile->last_name, 0, 1));
 
-     $initials = strtoupper(
-         substr($user->memberPersonalProfile->first_name, 0, 1) . substr($user->memberPersonalProfile->last_name, 0, 1),
-     );
+         $hashSource = $profile->first_name . $profile->last_name;
+     } else {
+         $initials = strtoupper(substr($user?->username ?? 'U', 0, 1));
+
+         $hashSource = $user?->username ?? 'unknown';
+     }
+
+     $colorIndex = abs(crc32($hashSource)) % count($colors);
+     $color = $colors[$colorIndex];
  @endphp
 
 
 
- @if ($user->photo)
+ @if (
+     $user->photo &&
+         file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo)))
      <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo) }}"
          class="rounded-circle border" width="38" height="38" style="object-fit: cover;">
  @else
