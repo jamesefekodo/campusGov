@@ -138,13 +138,70 @@ class PaymentSettingsController extends Controller
             return redirect()->back()->with('error', 'Records not found.');
         }
 
+        $config = ElectronicPaymentConfig::where('payment_method', $method->slug)
+            ->where('tenant_id', $user->tenant_id)
+            ->first();
+        if (!$config) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
         $data = [
             'method' => $method,
+            'config' => $config,
         ];
 
         return view('users.admin.finance.settings.paymentMethods.viewElectronicMethod', compact('data'));
     }
     public function updateElectronicPaymentApiConfig($id, Request $request)
+    {
+        // replaced with createUpdateElectronicPaymentApiConfig method for multitenancy
+        // /** @var \App\Models\User $user */
+        // $user = Auth::user();
+
+        // abort_unless(
+        //     $user->hasPermission('manage_payment_settings'),
+        //     403
+        // );
+        // $request->validate([
+        //     'client_id' => 'nullable',
+        //     'public_key' => 'nullable',
+        //     'secret_key' => 'nullable',
+        //     'encryption_key' => 'nullable',
+        //     'is_active' => 'required',
+        //     'default_status' => 'nullable',
+        // ]);
+
+        // $config = ElectronicPaymentConfig::where('id', $id)->first();
+        // if (!$config) {
+        //     return redirect()->back()->with('error', 'Records not found.');
+        // }
+
+        // $config->update(
+        //     [
+        //         'client_id' => $request->client_id,
+        //         'public_key' => $request->public_key,
+        //         'secret_key' => $request->secret_key,
+        //         'encryption_key' => $request->encryption_key,
+        //         'is_active' => $request->is_active,
+        //     ]
+        // );
+
+        // if ($request->filled('default_status') && $request->default_status == 'default' && $config->paymentMethod && $config->paymentMethod->default_api !== $config->id && $config->is_active == true && $config->paymentMethod->apiConfigs->count() > 1) {
+        //     $config->paymentMethod->update([
+        //         'default_api' => $config->id,
+        //     ]);
+        // }
+
+
+        // if ($config->paymentMethod->defaultApi->is_active !== true) {
+        //     $config->paymentMethod->defaultApi->update([
+        //         'is_active' => true,
+        //     ]);
+        // }
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function createUpdateElectronicPaymentApiConfig($uuid, Request $request)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
@@ -159,15 +216,18 @@ class PaymentSettingsController extends Controller
             'secret_key' => 'nullable',
             'encryption_key' => 'nullable',
             'is_active' => 'required',
-            'default_status' => 'nullable',
         ]);
 
-        $config = ElectronicPaymentConfig::where('id', $id)->first();
-        if (!$config) {
+        $method = ElectronicPaymentMethod::where('uuid', $uuid)->first();
+        if (!$method) {
             return redirect()->back()->with('error', 'Records not found.');
         }
 
-        $config->update(
+        $config = ElectronicPaymentConfig::updateOrCreate(
+            [
+                'payment_method' => $method->slug,
+                'tenant_id' => $user->tenant_id,
+            ],
             [
                 'client_id' => $request->client_id,
                 'public_key' => $request->public_key,
@@ -176,20 +236,6 @@ class PaymentSettingsController extends Controller
                 'is_active' => $request->is_active,
             ]
         );
-
-        if ($request->filled('default_status') && $request->default_status == 'default' && $config->paymentMethod && $config->paymentMethod->default_api !== $config->id && $config->is_active == true && $config->paymentMethod->apiConfigs->count() > 1) {
-            $config->paymentMethod->update([
-                'default_api' => $config->id,
-            ]);
-        }
-
-
-        if ($config->paymentMethod->defaultApi->is_active !== true) {
-            $config->paymentMethod->defaultApi->update([
-                'is_active' => true,
-            ]);
-        }
-
         return redirect()->back()->with('success', 'Done!');
     }
     public function taxes()

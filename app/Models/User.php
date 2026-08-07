@@ -13,6 +13,7 @@ use App\Models\Members\MemberAward;
 use App\Models\Members\MemberEmploymentAndBusiness;
 use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\Members\MemberSkill;
 use App\Models\Misconduct\MemberMisconduct;
 use App\Models\Tenancy\Tenant;
@@ -239,5 +240,10 @@ class User extends Authenticatable
         return $this->pendingPaymentTransactions()
             ->where('due_id', $dueId)
             ->first();
+    }
+
+    public function reAdmissionRequests()
+    {
+        return $this->hasMany(MemberReAdmissionApplication::class, 'username', 'username');
     }
 }

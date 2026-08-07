@@ -1,7 +1,12 @@
 @extends('layouts.emailLayout')
 @section('content')
     <p>
-        Hello,
+        @if ($user->memberPersonalProfile)
+            Hello
+            {{ $user->memberPersonalProfile->first_name }}
+        @else
+            Hello
+        @endif,
     </p>
 
     <p>

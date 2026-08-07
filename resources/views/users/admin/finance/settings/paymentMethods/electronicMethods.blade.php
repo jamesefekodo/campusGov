@@ -8,6 +8,7 @@
                 @include('users.admin.finance.settings.paymentMethods.include.inner_nav')
             </div>
 
+
             <div class="individual-review-card-container row">
                 <div class="col-md-1 individual-review-card text-black">
                     {{-- sidde menu --}}
@@ -69,22 +70,42 @@
                                                                 @endif
                                                             </td>
                                                             <td class="">
-                                                                @switch($method->is_active)
-                                                                    @case(true)
-                                                                        <span class="badge bg-success-subtle text-success">
-                                                                            Active
-                                                                        </span>
-                                                                    @break
+                                                                @if ($method->apiConfig)
+                                                                    @switch($method->apiConfig->is_active)
+                                                                        @case(true)
+                                                                            <span class="badge bg-success-subtle text-success">
+                                                                                Active
+                                                                            </span>
+                                                                        @break
 
-                                                                    @default
-                                                                        <span class="badge bg-danger-subtle text-danger">
-                                                                            Active
-                                                                        </span>
-                                                                @endswitch
+                                                                        @default
+                                                                            <span class="badge bg-danger-subtle text-danger">
+                                                                                Inactive
+                                                                            </span>
+                                                                    @endswitch
+                                                                @else
+                                                                    <span class="badge bg-danger-subtle text-danger">
+                                                                        Not-Available
+                                                                    </span>
+                                                                @endif
                                                             </td>
                                                             <td>
-                                                                <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewElectronicPaymentMethod', ['uuid' => $method->uuid]) }}">View</a>
+                                                                {{-- <a class="btn btn-primary btn-sm {{ $method->apiConfig ? '' : 'disabled' }}"
+                                                                    href="{{ $method->apiConfig ? route('viewElectronicPaymentMethod', ['uuid' => $method->uuid]) : '#' }}"
+                                                                    @unless ($method->apiConfig) aria-disabled="true" tabindex="-1" @endunless>
+                                                                    View
+                                                                </a> --}}
+                                                                <div class="m-1">
+                                                                    <button
+                                                                        class="btn {{ $method->apiConfig ? 'btn-primary' : 'btn-success' }} btn-sm table_btn"
+                                                                        data-toggle="modal"
+                                                                        data-target="#addNewElectronicPaymentMethodModal_{{ $method->id }}">
+                                                                        <i
+                                                                            class="fas {{ $method->apiConfig ? 'fa-edit' : 'fa-plus' }}"></i>
+                                                                        {{ $method->apiConfig ? 'Update' : 'Create' }}
+                                                                    </button>
+                                                                </div>
+
                                                             </td>
                                                         </tr>
                                                     @endforeach
@@ -106,6 +127,14 @@
             </div>
 
 
+            {{-- modal start --}}
+            @if ($data['electronicPaymentMethods']->isNotEmpty())
+                @foreach ($data['electronicPaymentMethods'] as $method)
+                    @include('users.admin.finance.settings.paymentMethods.include.addNewElectronicsPaymentMethodModal')
+                @endforeach
+            @endif
+
+            {{-- modal end --}}
         </div>
     </div><!--//app-content-->
 @endsection

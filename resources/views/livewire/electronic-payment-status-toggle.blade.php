@@ -6,7 +6,8 @@
         </div>
     @endif
 
-    <div wire:click="toggle" style="cursor:pointer; display:inline-flex; align-items:center; gap:10px;">
+    {{-- <div wire:click="toggle" style="cursor:pointer; display:inline-flex; align-items:center; gap:10px;"> --}}
+        <div style="display:inline-flex; align-items:center; gap:10px; opacity:.6; cursor:not-allowed; pointer-events:none;">
 
         {{-- Switch --}}
         <div style="

@@ -11,7 +11,7 @@
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewProgramModal">
-                            <i class="fas fa-plus"></i> New Faculty</button>
+                            <i class="fas fa-plus"></i> New Program</button>
                     </div>
                 </div>
                 @include('users.admin.academicConfig.programs.include.addNewProgramModal')

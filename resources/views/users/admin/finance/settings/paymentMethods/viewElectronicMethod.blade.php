@@ -1,4 +1,4 @@
-@extends('layouts.userLayout')
+{{-- @extends('layouts.userLayout')
 @section('title', $data['method']->name)
 @section('content')
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
@@ -107,7 +107,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                {{-- Back Home --}}
+                                Back Home
                                 <div class="w-100 justify-content-center text-center my-4">
                                     <a class="btn btn-primary" href="{{ route('electronicPaymentMethods') }}"> <i
                                             class="fas fa-chevron-left"></i>
@@ -124,4 +124,4 @@
 
             </div><!--//container-fluid-->
         </div><!--//app-content-->
-    @endsection
+    @endsection --}}

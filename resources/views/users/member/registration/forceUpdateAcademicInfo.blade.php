@@ -1,6 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', 'Update ' . ($data['member']->memberPersonalProfile?->first_name ?? $data['member']->username) . ' ' .
-    ($data['member']->memberPersonalProfile?->last_name ?? ''))
+@section('title', 'Update Academic Info')
 @section('content')
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
         <div class="container-fluid">

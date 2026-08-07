@@ -8,6 +8,7 @@ use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -322,6 +323,14 @@ if (!function_exists('countMemberProfilesAwaitingVerification')) {
     {
         return User::where('account_type', 2)
             ->where('account_status', 1)
+            ->count();
+    }
+}
+
+if (!function_exists('countPendingReAdmissionRequests')) {
+    function countPendingReAdmissionRequests()
+    {
+        return MemberReAdmissionApplication::where('status', 'pending')
             ->count();
     }
 }

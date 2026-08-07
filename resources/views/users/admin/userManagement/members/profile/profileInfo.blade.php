@@ -123,6 +123,10 @@
                                             {{ \Carbon\Carbon::parse($data['member']?->memberPersonalProfile?->verified_at)->format('l, d F Y \a\t h:i A') }}
                                         </span>
                                     </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Login Mfa:</span>
+                                        @livewire('user-mfa-toggle', ['userId' => $data['member']->id])
+                                    </div>
 
                                 </div>
                             </div>

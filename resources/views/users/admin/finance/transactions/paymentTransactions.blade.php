@@ -127,7 +127,7 @@
                                                                 @endswitch
                                                             </td>
                                                             <td class="text-start">
-                                                                ₦{{ number_format($transaction->amount_paid, 2) }}
+                                                                ₦{{ number_format($transaction->amount_payable, 2) }}
                                                             </td>
                                                             <td class="text-start">
                                                                 @if ($transaction->registeredPayer)

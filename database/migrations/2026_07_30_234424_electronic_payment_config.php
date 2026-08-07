@@ -21,7 +21,7 @@ return new class extends Migration
                 $table->string('public_key')->nullable();
                 $table->string('secret_key')->nullable();
                 $table->string('encryption_key')->nullable();
-                $table->string('version');
+                $table->string('version')->nullable();
                 $table->boolean('is_active')->default(false);
                 $table->timestamps();
 

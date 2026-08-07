@@ -19,7 +19,7 @@
                 </span>
                 <span class="nav-link-text">Users &nbsp;
                     @php
-                        $usersNotifications = countMemberProfilesAwaitingVerification() + 0;
+                        $usersNotifications = countMemberProfilesAwaitingVerification() + countPendingReAdmissionRequests();
                     @endphp
                     @if ($usersNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
@@ -37,10 +37,10 @@
                                 class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/members') ? 'sidebar-active' : '' }}"
                                 href="{{ route('studentMembers') }}">Members
                                 &nbsp;
-                                @if (countMemberProfilesAwaitingVerification() > 0)
+                                @if (countMemberProfilesAwaitingVerification() + countPendingReAdmissionRequests() > 0)
                                     <span
                                         class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                        style="font-size: 11px">{{ countMemberProfilesAwaitingVerification() }}</span>
+                                        style="font-size: 11px">{{ countMemberProfilesAwaitingVerification() + countPendingReAdmissionRequests() }}</span>
                                 @endif
                             </a>
                         </li>

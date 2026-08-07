@@ -13,7 +13,6 @@ class ElectronicPaymentMethod extends Model
     protected $table = 'electronic_payment_methods';
     protected $fillable = [
         'uuid',
-        'tenant_id',
         'slug',
         'name',
         'logo',
@@ -40,13 +39,13 @@ class ElectronicPaymentMethod extends Model
         ];
     }
 
-    public function apiConfigs()
+    public function apiConfig()
     {
-        return $this->hasMany(ElectronicPaymentConfig::class, 'payment_method', 'slug');
+        return $this->belongsTo(ElectronicPaymentConfig::class, 'slug', 'payment_method');
     }
 
-    public function defaultApi()
-    {
-        return $this->belongsTo(ElectronicPaymentConfig::class, 'default_api', 'id');
-    }
+    // public function defaultApi()
+    // {
+    //     return $this->belongsTo(ElectronicPaymentConfig::class, 'default_api', 'id');
+    // }
 }

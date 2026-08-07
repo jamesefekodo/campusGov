@@ -210,7 +210,14 @@
                                             @endswitch
                                         </span>
                                     </p>
+                                    <p class="m-0">
+                                        {{-- Login Mfa: @livewire('user-mfa-toggle', ['userId' => $data['member']->id]) --}}
 
+                                    </p>
+                                    <div class="p-1">
+                                        <span style="font-weight: bold">Login Mfa:</span>
+                                        @livewire('user-mfa-toggle', ['userId' => $data['member']->id])
+                                    </div>
                                 </div>
                                 <hr class="m-3">
                                 <h5 class="font-weight-bold text-decoration-underline">Academic Info</h5>
@@ -337,222 +344,111 @@
                                 </div>
                                 <div class="col-md-12">
 
-                                    <hr class="m-3">
-                                    <h5 class="font-weight-bold text-decoration-underline">Association Dues</h5>
-                                    <div class="card-body p-1 row col-md-12">
-                                        @forelse($data['member']->memberAcademicInfo->associationDues() as $due)
-                                            <div class="col-md-12 mb-4">
-                                                <div class="card shadow-sm border-0">
+                                    @php
+                                        $academicInfo = $data['member']->memberAcademicInfo;
 
-                                                    {{-- Header --}}
-                                                    <div
-                                                        class="card-header bg-blue text-white d-flex justify-content-between align-items-center">
-                                                        <h5 class="mb-0 text-white">
-                                                            {{ $due->title }}
-                                                        </h5>
+                                        $academicStatus = $academicInfo?->academic_status;
 
-                                                        <span class="badge bg-light text-dark">
-                                                            {{ $due->academic_year }}/{{ $due->academic_year + 1 }}
-                                                        </span>
-                                                    </div>
+                                        $statusMessage = match ($academicStatus) {
+                                            'alumni' => 'You previously completed your',
+                                            'withdrawn'
+                                                => 'Your admission was previously withdrawn while you were enrolled in',
+                                            'expelled' => 'You were previously expelled from',
+                                            default => 'You were previously enrolled in',
+                                        };
 
-                                                    {{-- Body --}}
-                                                    <div class="card-body">
+                                        // ##########################
+                                        $outstandingDue = null;
 
-                                                        @if ($due->description)
-                                                            <p class="text-muted mb-4">
-                                                                {{ $due->description }}
-                                                            </p>
-                                                        @endif
+                                        foreach ($data['member']->memberAcademicInfo->associationDues() as $due) {
+                                            $transaction = $data['member']->successfulPaymentForDue($due->fee_id);
 
-                                                        <div class="row">
+                                            if (!$transaction) {
+                                                $outstandingDue = $due;
+                                                break;
+                                            }
+                                        }
+                                    @endphp
 
-                                                            <div class="col-md-4 mb-3">
-                                                                <small class="text-muted d-block">Amount Payable</small>
-                                                                <h4 class="mb-0 text-success">
-                                                                    ₦{{ number_format($due->payable_amount, 2) }}
-                                                                </h4>
-                                                            </div>
+                                    @if (in_array($academicInfo?->academic_status, ['alumni', 'withdrawn', 'expelled']))
+                                        <div class="alert alert-info">
+                                            <h5 class="alert-heading">
+                                                <i class="fas fa-user-graduate me-2"></i>
+                                                Are you returning for a new program?
+                                            </h5>
+                                            @if ($outstandingDue)
+                                                <h4 class="text-danger m-2 mt-3">
+                                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                                    Please pay all your outstanding dues before applying for re-admission.
+                                                </h4>
+                                            @else
+                                                <p>
+                                                    @if ($academicStatus === 'alumni')
+                                                        You previously completed your
+                                                        <strong>{{ $academicInfo?->theProgram?->award }}</strong>
+                                                        in
+                                                        <strong>{{ $academicInfo?->theDepartment?->name }}</strong>
+                                                        during the
+                                                        <strong>
+                                                            {{ $academicInfo?->graduation_session }}/{{ $academicInfo?->graduation_session + 1 }}
+                                                        </strong>
+                                                        academic session.
+                                                    @elseif ($academicStatus === 'withdrawn')
+                                                        Your admission was previously withdrawn while you were enrolled in
+                                                        <strong>{{ $academicInfo?->theProgram?->award }}</strong>
+                                                        in
+                                                        <strong>{{ $academicInfo?->theDepartment?->name }}</strong>
+                                                        during the
+                                                        <strong>
+                                                            {{ $academicInfo?->admission_session }}/{{ $academicInfo?->admission_session + 1 }}
+                                                        </strong>
+                                                        academic session.
+                                                    @elseif ($academicStatus === 'expelled')
+                                                        You were previously expelled from
+                                                        <strong>{{ $academicInfo?->theProgram?->award }}</strong>
+                                                        in
+                                                        <strong>{{ $academicInfo?->theDepartment?->name }}</strong>
+                                                        during the
+                                                        <strong>
+                                                            {{ $academicInfo?->admission_session }}/{{ $academicInfo?->admission_session + 1 }}
+                                                        </strong>
+                                                        academic session.
+                                                    @endif
+                                                </p>
 
-                                                            {{-- <div class="col-md-4 mb-3">
-                                                                <small class="text-muted d-block">Default Amount</small>
-                                                                ₦{{ number_format($due->amount, 2) }}
-                                                            </div> --}}
+                                                <p>
+                                                    If you are returning to begin a new program, you may apply for
+                                                    readmission.
+                                                    Click the button below to submit your application. Your account will be
+                                                    updated
+                                                    after your application has been reviewed and approved.
+                                                </p>
 
-                                                            <div class="col-md-4 mb-3">
-                                                                <small class="text-muted d-block">Variation Applied</small>
+                                                <hr>
+                                                @php
+                                                    $hasNotSubmittedApplication = $data[
+                                                        'member'
+                                                    ]->reAdmissionRequests->contains('status', 'awaiting_submission');
+                                                    $hasPendingApplication = $data[
+                                                        'member'
+                                                    ]->reAdmissionRequests->contains('status', 'pending');
+                                                @endphp
 
-                                                                @if ($due->matchedVariation)
-                                                                    <span class="badge bg-success">
-                                                                        Yes
-                                                                    </span>
-                                                                @else
-                                                                    <span class="badge bg-secondary">
-                                                                        No
-                                                                    </span>
-                                                                @endif
-                                                            </div>
+                                                @if ($hasPendingApplication)
+                                                    <p class="fs-3 text-bold text-center"> <i class="fas fa-info-circle me-2"></i>
+                                                        You have a pending request that is currently under review.
+                                                    </p>
+                                                @else
+                                                    <a href="{{ route('memberApplyForReAdmission') }}"
+                                                        class="btn {{ $hasNotSubmittedApplication ? 'btn-warning' : 'btn-primary' }}">
+                                                        <i class="fas fa-file-alt me-2"></i>
+                                                        {{ $hasNotSubmittedApplication ? 'Continue Application' : 'Apply for Readmission' }}
+                                                    </a>
+                                                @endif
 
-                                                        </div>
-
-                                                        @if ($due->matchedVariation)
-                                                            <hr>
-
-                                                            <h6 class="mb-3">
-                                                                Applied Variation
-                                                            </h6>
-
-                                                            <div class="row">
-
-                                                                <div class="col-md-4">
-                                                                    <strong>Admission Session</strong><br>
-
-                                                                    @if ($due->matchedVariation?->admission_session)
-                                                                        {{ $due->matchedVariation->admission_session }}/{{ $due->matchedVariation->admission_session + 1 }}
-
-                                                                        @php
-                                                                            $year =
-                                                                                $due->academic_year -
-                                                                                $due->matchedVariation
-                                                                                    ->admission_session +
-                                                                                1;
-                                                                        @endphp
-
-                                                                        -
-                                                                        @if ($year == 1)
-                                                                            (Freshers)
-                                                                        @else
-                                                                            (Year {{ $year }})
-                                                                        @endif
-                                                                    @else
-                                                                        All
-                                                                    @endif
-                                                                </div>
-
-                                                                <div class="col-md-4">
-                                                                    <strong>Program</strong><br>
-
-                                                                    {{ $due->matchedVariation->program?->name ?? 'All' }}
-                                                                </div>
-
-                                                                <div class="col-md-4">
-                                                                    <strong>Program Type</strong><br>
-
-                                                                    {{ $due->matchedVariation->programType?->type_name ?? 'All' }}
-                                                                </div>
-
-                                                            </div>
-                                                        @endif
-
-                                                        <hr>
-
-
-                                                        @if ($transaction = $data['member']->successfulPaymentForDue($due->fee_id))
-                                                            <div class="d-flex justify-content-end align-items-center">
-                                                                <a {{-- href="{{ route('printPaymentReceipt', $transaction->uuid) }}" --}} class="btn btn-success">
-                                                                    <i class="fas fa-print me-1"></i>
-                                                                    Print Receipt
-                                                                </a>
-                                                            </div>
-                                                        @elseif ($data['member']->pendingPaymentForDue($due->fee_id))
-                                                            <div class="d-flex justify-content-end align-items-center">
-
-                                                                <button type="button" class="btn btn-warning" disabled>
-                                                                    <i class="fas fa-clock me-1"></i>
-                                                                    Pending Approval
-                                                                </button>
-
-                                                                {{-- refresh status start --}}
-                                                                @php
-                                                                    $transaction = $data[
-                                                                        'member'
-                                                                    ]->pendingPaymentForDue($due->fee_id);
-                                                                @endphp
-                                                                @if ($transaction->payment_status !== 'successful')
-                                                                    @switch($transaction->electronic_payment_method)
-                                                                        @case('flutterwave')
-                                                                            <form
-                                                                                action="{{ route('flutterwavePaymentCallback') }}"
-                                                                                method="GET" class="d-inline">
-                                                                                @csrf
-                                                                                <input type="hidden" name="transaction_id"
-                                                                                    value="{{ $transaction->service_provider_id }}">
-                                                                                <input type="hidden" name="tx_ref"
-                                                                                    value="{{ $transaction->payment_transaction_id }}">
-                                                                                <button type="submit"
-                                                                                    class="border-0 bg-transparent p-0 fs-3"><i
-                                                                                        class="fa-solid fa-rotate-right text-danger"></i></button>
-                                                                            </form>
-                                                                        @break
-
-                                                                        @case('paystack')
-                                                                            <form
-                                                                                action="{{ route('paystackPaymentCallback', ['transaction_id' => $transaction->payment_transaction_id]) }}"
-                                                                                method="GET" class="d-inline">
-                                                                                @csrf
-                                                                                <input type="hidden" name="reference"
-                                                                                    value="{{ $transaction->paystack_reference }}">
-                                                                                <button type="submit"
-                                                                                    class="border-0 bg-transparent p-0 fs-3"><i
-                                                                                        class="fa-solid fa-rotate-right text-danger"></i></button>
-                                                                            </form>
-                                                                        @break
-
-                                                                        @default
-                                                                    @endswitch
-                                                                @endif
-                                                                {{-- refresh status end --}}
-                                                            </div>
-                                                        @else
-                                                            {{-- Pay Now --}}
-                                                            @php
-                                                                $collapseId = 'payNowSection-' . $due->id;
-                                                            @endphp
-
-                                                            @include('users.member.dues.include.payDueNowModal')
-                                                        @endif
-                                                    </div>
-
-                                                </div>
-                                            </div>
-
-                                            @empty
-
-                                                <div class="col-12">
-                                                    <div class="card border-0 shadow-sm">
-                                                        <div class="card-body text-center py-5">
-                                                            <p class="text-muted mb-0">
-                                                                There are no dues applicable to your membership period. </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforelse
+                                            @endif
                                         </div>
-                                        {{-- <div class="col-md-12">
-                                            @if ($data['facultyAssociationMemberships']->count() > 0)
-                                                @foreach ($data['facultyAssociationMemberships'] as $facultyAssociation)
-                                                    <p class="text-black"> * {{ $facultyAssociation->name }}
-                                                        ({{ $facultyAssociation->acronym }})
-                                                        <a href="{{ route('studentViewAssociation', ['username' => $facultyAssociation->username]) }}"
-                                                            class="btn btn-primary btn-sm ms-2">
-                                                            <i class="fas fa-chevron-right"></i>
-                                                        </a>
-                                                    </p>
-                                                @endforeach
-                                            @endif
-                                            @if ($data['departmentalAssociationMemberships']->count() > 0)
-                                                @foreach ($data['departmentalAssociationMemberships'] as $departmentAssociation)
-                                                    <p class="text-black">
-                                                        * {{ $departmentAssociation->name }}
-                                                        ({{ $departmentAssociation->acronym }})
-                                                        <a href="{{ route('studentViewAssociation', ['username' => $departmentAssociation->username]) }}" class="btn btn-primary btn-sm ms-2">
-                                                            <i class="fas fa-chevron-right"></i>
-                                                        </a>
-                                                    </p>
-                                                @endforeach
-                                            @endif
-                                        </div> --}}
-                                    </div>
+                                    @endif
                                 </div>
 
 

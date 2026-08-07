@@ -989,7 +989,11 @@ class MembersManagementController extends Controller
                 'faculty' => 'required|string|exists:faculties,slug',
                 'department' => 'required|string|exists:departments,slug',
                 'admission_session' => 'required|numeric',
-                'matric_number' => 'required|string',
+                'matric_number' => [
+                    'required',
+                    'string',
+                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                ],
             ]);
 
 
@@ -1231,7 +1235,11 @@ class MembersManagementController extends Controller
                 'faculty' => 'required|string|exists:faculties,slug',
                 'department' => 'required|string|exists:departments,slug',
                 'admission_session' => 'required|numeric',
-                'matric_number' => 'required|string',
+                'matric_number' => [
+                    'required',
+                    'string',
+                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                ],
             ]);
 
 

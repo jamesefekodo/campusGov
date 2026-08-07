@@ -258,7 +258,7 @@ class PaymentTransasctionController extends Controller
                 if (!$pastackSettings) {
                     return redirect()->back()->with('error', 'Paystack method not found!');
                 }
-                $paystackApi = $pastackSettings->defaultApi;
+                $paystackApi = $pastackSettings->apiConfig;
                 if (!$paystackApi) {
                     return redirect()->back()->with('error', 'Paystack method not found!');
                 }
@@ -307,73 +307,61 @@ class PaymentTransasctionController extends Controller
                 if (!$flutterwaveSettings) {
                     return redirect()->back()->with('error', 'Flutterwave method not found!');
                 }
-                $flutterwaveApi = $flutterwaveSettings->defaultApi;
+                $flutterwaveApi = $flutterwaveSettings->apiConfig;
                 if (!$flutterwaveApi) {
                     return redirect()->back()->with('error', 'Flutterwave config not found!');
                 }
 
-                // flutterwave version v4 start
-                if ($flutterwaveApi->version == 'v4') {
+                $secretKey = $flutterwaveApi->secret_key;
 
+                $data = [
+                    'tx_ref' => $transactionId,
+                    'amount' => $totalDueAndTax,
+                    'currency' => 'NGN',
+                    'redirect_url' => route('flutterwavePaymentCallback'),
+                    'customer' => [
+                        'email' => $personalProfile->email1,
+                        'phone_number' => $personalProfile->phone1,
+                        'name' => $personalProfile->first_name . ' ' . $personalProfile->middle_name . '' . $personalProfile->last_name,
+                    ],
+                    'customizations' => [
+                        'title' => config('app.name'),
+                        'description' => 'Association Due',
+                        'logo' => associationLogo(),
+                    ],
+                ];
 
-                    dd('fltterwave version 4');
-                }
-                // flutterwave version v4 end
-                // fallback to v3 start
-                else {
-                    $secretKey = $flutterwaveApi->secret_key;
+                // Make API request for payment
+                $response = Http::withToken($secretKey)
+                    ->post('https://api.flutterwave.com/v3/payments', $data);
 
-                    $data = [
-                        'tx_ref' => $transactionId,
-                        'amount' => $totalDueAndTax,
-                        'currency' => 'NGN',
-                        'redirect_url' => route('flutterwavePaymentCallback'),
-                        'customer' => [
-                            'email' => $personalProfile->email1,
-                            'phone_number' => $personalProfile->phone1,
-                            'name' => $personalProfile->first_name . ' ' . $personalProfile->middle_name . '' . $personalProfile->last_name,
-                        ],
-                        'customizations' => [
-                            'title' => config('app.name'),
-                            'description' => 'Association Due',
-                            'logo' => associationLogo(),
-                        ],
-                    ];
-
-                    // Make API request for payment
-                    $response = Http::withToken($secretKey)
-                        ->post('https://api.flutterwave.com/v3/payments', $data);
-
-                    if ($response->successful()) {
-                        $responseData = $response->json()['data'];
-                        if (isset($responseData['link'])) {
-                            $transaction = new PaymentTransaction();
-                            $transaction->payment_transaction_id = $transactionId; // Local reference
-                            $transaction->payment_mode = 'electronic';
-                            $transaction->payment_purpose = 'association_due';
-                            $transaction->due_id = $due->fee_id;
-                            $transaction->amount_payable = $due->payable_amount;
-                            $transaction->registered_payer = $personalProfile->username;
-                            $transaction->amount_paid = $totalDueAndTax;
-                            $transaction->total_tax = $totalTax;
-                            $transaction->taxes_paid = $taxesPaid;
-                            $transaction->electronic_payment_method = $flutterwaveSettings->slug;
-                            $transaction->payment_status = 'pending';
-                            $transaction->approval_status = 'pending';
-                            $transaction->paid_at = Carbon::now();
-                            $transaction->save();
-                            return redirect()->away($responseData['link']);
-                        } else {
-                            logger()->error('Invalid Flutterwave response', $response->json());
-                            return redirect()->back()->with('error', 'Unable to initiate payment. Please try again.');
-                        }
+                if ($response->successful()) {
+                    $responseData = $response->json()['data'];
+                    if (isset($responseData['link'])) {
+                        $transaction = new PaymentTransaction();
+                        $transaction->payment_transaction_id = $transactionId; // Local reference
+                        $transaction->payment_mode = 'electronic';
+                        $transaction->payment_purpose = 'association_due';
+                        $transaction->due_id = $due->fee_id;
+                        $transaction->amount_payable = $due->payable_amount;
+                        $transaction->registered_payer = $personalProfile->username;
+                        $transaction->amount_paid = $totalDueAndTax;
+                        $transaction->total_tax = $totalTax;
+                        $transaction->taxes_paid = $taxesPaid;
+                        $transaction->electronic_payment_method = $flutterwaveSettings->slug;
+                        $transaction->payment_status = 'pending';
+                        $transaction->approval_status = 'pending';
+                        $transaction->paid_at = Carbon::now();
+                        $transaction->save();
+                        return redirect()->away($responseData['link']);
                     } else {
-                        logger()->error('Flutterwave API Error', $response->json());
-                        return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
+                        logger()->error('Invalid Flutterwave response', $response->json());
+                        return redirect()->back()->with('error', 'Unable to initiate payment. Please try again.');
                     }
+                } else {
+                    logger()->error('Flutterwave API Error', $response->json());
+                    return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
                 }
-                // fallback to v3 end
-
             }
 
 
@@ -599,9 +587,9 @@ class PaymentTransasctionController extends Controller
         if (!$pastackSettings) {
             return redirect()->back()->with('error', 'Paystack method not found!');
         }
-        $paystackApi = $pastackSettings->defaultApi;
+        $paystackApi = $pastackSettings->apiConfig;
         if (!$paystackApi) {
-            return redirect()->back()->with('error', 'Paystack method not found!');
+            return redirect()->back()->with('error', 'Paystack setup not found!');
         }
 
         $secretKey = $paystackApi->secret_key;
@@ -687,86 +675,74 @@ class PaymentTransasctionController extends Controller
         if (!$flutterwaveSettings) {
             return redirect()->back()->with('error', 'Flutterwave method not found!');
         }
-        $flutterwaveApi = $flutterwaveSettings->defaultApi;
+        $flutterwaveApi = $flutterwaveSettings->apiConfig;
         if (!$flutterwaveApi) {
             return redirect()->back()->with('error', 'Flutterwave config not found!');
         }
 
-        // flutterwave version v4 start
-        if ($flutterwaveApi->version == 'v4') {
-
-
-            dd('fltterwave version 4');
-        }
-        // flutterwave version v4 end
         // fallback to v3 start
-        else {
-            $secretKey = $flutterwaveApi->secret_key;
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $secretKey,  // Add authorization header
-                'Content-Type' => 'application/json',  // Set content type
-                'Accept' => 'application/json',  // Accept JSON response
-            ])
-                ->get("https://api.flutterwave.com/v3/transactions/{$flutterwaveTransactionId}/verify");
+        $secretKey = $flutterwaveApi->secret_key;
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer ' . $secretKey,  // Add authorization header
+            'Content-Type' => 'application/json',  // Set content type
+            'Accept' => 'application/json',  // Accept JSON response
+        ])
+            ->get("https://api.flutterwave.com/v3/transactions/{$flutterwaveTransactionId}/verify");
 
-            // check response status
-            if ($response->successful()) {
-                $responseData = $response->json();  // Decode the response
+        // check response status
+        if ($response->successful()) {
+            $responseData = $response->json();  // Decode the response
+            if (isset($responseData['data']) && $responseData['data']['status'] === 'successful') {
 
-                if (isset($responseData['data']) && $responseData['data']['status'] === 'successful') {
-
-                    $paymentTransaction->service_provider_id = $responseData['data']['id'];
-                    $paymentTransaction->amount_paid = $responseData['data']['amount'];
-                    $paymentTransaction->amount_settled = $responseData['data']['amount_settled'];
-                    $paymentTransaction->service_charge = $responseData['data']['app_fee'];
-                    // $paymentTransaction->payment_status = $responseData['data']['status'];
-                    $paymentTransaction->payment_status = 'successful';
-                    $paymentTransaction->approval_status = 'approved';
-                    $paymentTransaction->approved_by = null;
-                    $paymentTransaction->approved_at = Carbon::now();
-                    $paymentTransaction->save();
+                $paymentTransaction->service_provider_id = $responseData['data']['id'];
+                $paymentTransaction->amount_paid = $responseData['data']['amount'];
+                $paymentTransaction->amount_settled = $responseData['data']['amount_settled'];
+                $paymentTransaction->service_charge = $responseData['data']['app_fee'];
+                // $paymentTransaction->payment_status = $responseData['data']['status'];
+                $paymentTransaction->payment_status = 'successful';
+                $paymentTransaction->approval_status = 'approved';
+                $paymentTransaction->approved_by = null;
+                $paymentTransaction->approved_at = Carbon::now();
+                $paymentTransaction->save();
 
 
 
-                    $wasBalanceUpdated = $paymentTransaction->balance_update_status === 'done';
-                    $shouldBalanceBeUpdated = $paymentTransaction->approval_status === 'approved';
+                $wasBalanceUpdated = $paymentTransaction->balance_update_status === 'done';
+                $shouldBalanceBeUpdated = $paymentTransaction->approval_status === 'approved';
 
-                    if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
+                if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
 
-                        // Money has never been added, but should now be added.
-                        $settings->increment('account_balance', $paymentTransaction->amount_settled);
+                    // Money has never been added, but should now be added.
+                    $settings->increment('account_balance', $paymentTransaction->amount_settled);
 
-                        $paymentTransaction->update([
-                            'balance_update_status' => 'done',
-                        ]);
-                    } elseif ($wasBalanceUpdated && !$shouldBalanceBeUpdated) {
+                    $paymentTransaction->update([
+                        'balance_update_status' => 'done',
+                    ]);
+                } elseif ($wasBalanceUpdated && !$shouldBalanceBeUpdated) {
 
-                        // Money was previously added but should now be removed.
-                        $settings->decrement('account_balance', $paymentTransaction->amount_settled);
+                    // Money was previously added but should now be removed.
+                    $settings->decrement('account_balance', $paymentTransaction->amount_settled);
 
-                        $paymentTransaction->update([
-                            'balance_update_status' => 'cancelled',
-                        ]);
-                    }
-                    return redirect()->back();
-                } else {
-                    if ($responseData && $responseData['data'] && $responseData['data']['id']) {
-                        $paymentTransaction->service_provider_id = $responseData['data']['id'];
-                    }
-                    $paymentTransaction->payment_status = 'failed';
-                    $paymentTransaction->approval_status = 'declined';
-                    $paymentTransaction->approved_by = null;
-                    $paymentTransaction->approved_at = Carbon::now();
-                    $paymentTransaction->save();
-                    return redirect()->back();
+                    $paymentTransaction->update([
+                        'balance_update_status' => 'cancelled',
+                    ]);
                 }
-                # code...
+                return redirect()->back();
             } else {
-                return redirect()->back()->with('error', 'Verification failed.');
+                if ($responseData && $responseData['data'] && $responseData['data']['id']) {
+                    $paymentTransaction->service_provider_id = $responseData['data']['id'];
+                }
+                $paymentTransaction->payment_status = 'failed';
+                $paymentTransaction->approval_status = 'declined';
+                $paymentTransaction->approved_by = null;
+                $paymentTransaction->approved_at = Carbon::now();
+                $paymentTransaction->save();
+                return redirect()->back();
             }
+            return redirect()->back();
+        } else {
+            return redirect()->back()->with('error', 'Verification failed.');
         }
         return redirect()->back();
-
-        // fallback to v4 enmd
     }
 }

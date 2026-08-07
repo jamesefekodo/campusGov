@@ -92,6 +92,11 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/update_academic_status/2', [MemberSelfProfileController::class, 'memberUpdateAcademicStatus'])->name('memberUpdateAcademicStatusStep2');
     Route::put('member/update_academic_status/submit', [MemberSelfProfileController::class, 'memberUpdateAcademicStatusSubmit'])->name('memberUpdateAcademicStatusSubmit');
 
+    // apply for re-admission
+    Route::get('member/apply_for_re_admission', [MemberSelfProfileController::class, 'memberApplyForReAdmission'])->name('memberApplyForReAdmission');
+    Route::put('member/update_academic_status/submit', [MemberSelfProfileController::class, 'memberApplyForReAdmissionSubmit'])->name('memberApplyForReAdmissionSubmit');
+
+
 
     // profile setup
     Route::get('member/account_setup', [MemberSelfProfileController::class, 'studentAccountSetup'])->name('studentAccountSetup');
@@ -332,6 +337,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/settings/payment_methods/electronic', [PaymentSettingsController::class, 'electronicPaymentMethods'])->name('electronicPaymentMethods');
     Route::get('admin/finance/settings/payment_methods/electronic/view/{uuid}', [PaymentSettingsController::class, 'viewElectronicPaymentMethod'])->name('viewElectronicPaymentMethod');
     Route::put('admin/finance/settings/payment_methods/electronic/update/{id}', [PaymentSettingsController::class, 'updateElectronicPaymentApiConfig'])->name('updateElectronicPaymentApiConfig');
+
+    Route::post('admin/finance/settings/payment_methods/electronic/create_update/{uuid}', [PaymentSettingsController::class, 'createUpdateElectronicPaymentApiConfig'])->name('createUpdateElectronicPaymentApiConfig');
+
     Route::get('admin/finance/settings/taxes', [PaymentSettingsController::class, 'taxes'])->name('taxes');
     Route::post('admin/finance/settings/taxes/add_new/submit', [PaymentSettingsController::class, 'addNewTaxSubmit'])->name('addNewTaxSubmit');
     Route::put('admin/finance/settings/taxes/edit/{uuid}', [PaymentSettingsController::class, 'editTaxSubmit'])->name('editTaxSubmit');

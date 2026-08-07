@@ -17,7 +17,7 @@
 
                     <button type="submit" class="submit-btn">
                         <span class="btn-text">
-                            Send Password Reset Link
+                            Submit
                         </span>
 
                         <span class="btn-loading" style="display:none;">

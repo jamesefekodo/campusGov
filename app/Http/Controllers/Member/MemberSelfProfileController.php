@@ -15,6 +15,7 @@ use App\Models\Members\MemberAward;
 use App\Models\Members\MemberEmploymentAndBusiness;
 use App\Models\Members\MemberLeadershipPosition;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\Members\MemberSkill;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -24,6 +25,110 @@ use Illuminate\Validation\Rule;
 
 class MemberSelfProfileController extends Controller
 {
+    public function memberApplyForReAdmission()
+    {
+        $user = Auth::user();
+        $member = User::where('username', $user->username)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $academicInfo = $member->memberAcademicInfo;
+        $academicStatus = $academicInfo?->academic_status;
+
+        // check accademic info
+        if (!in_array($academicStatus, ['alumni', 'withdrawn', 'expelled'])) {
+            return redirect()->back()->with(
+                'error',
+                'You are not eligible to apply for re-admission!'
+            );
+        }
+
+        // ##########################
+        // check outstanding dues
+        $outstandingDue = null;
+
+        foreach ($member->memberAcademicInfo->associationDues() as $due) {
+            $transaction = $member->successfulPaymentForDue($due->fee_id);
+        }
+        // Check outstanding dues
+        foreach ($member->memberAcademicInfo->associationDues() as $due) {
+            $transaction = $member->successfulPaymentForDue($due->fee_id);
+
+            if (!$transaction) {
+                return redirect()->back()->with(
+                    'error',
+                    'Please pay all your outstanding dues before applying for re-admission.'
+                );
+            }
+        }
+        ############################
+
+        // check for existing application
+        $existingApplication = MemberReAdmissionApplication::where('username', $member->username)
+            ->where('status', 'pending')
+            ->first();
+        if ($existingApplication) {
+            return redirect()->back()->with(
+                'error',
+                'You already have a pending re-admission application.'
+            );
+        }
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $step = 1;
+
+        $reAdmissionRequest = MemberReAdmissionApplication::firstOrCreate(
+            [
+                'username' => $member->username,
+                'status' => 'awaiting_submission',
+            ]
+        );
+
+
+        $data = [
+            'member' => $member,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+            'step' => $step,
+            'reAdmissionRequest' => $reAdmissionRequest,
+        ];
+
+        return view('users.member.registration.reAdmissionApplication', compact('data'));
+    }
+    public function memberApplyForReAdmissionSubmit(Request $request)
+    {
+        $member = Auth::user();
+        request()->validate([
+            'program' => 'required|string|exists:programs,slug',
+            'program_type' => 'required|string|exists:program_types,slug',
+            'faculty' => 'required|string|exists:faculties,slug',
+            'department' => 'required|string|exists:departments,slug',
+            'admission_session' => 'required|numeric',
+            'matric_number' => [
+                'required',
+                'string',
+                'unique:member_academic_infos,matric_number',
+            ],
+        ]);
+
+        $reAdmissionRequest = MemberReAdmissionApplication::where('username', $member->username)->where('status', 'awaiting_submission')->first();
+        if (!$reAdmissionRequest) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $reAdmissionRequest->update([
+            'program' => $request->program,
+            'program_type' => $request->program_type,
+            'faculty' => $request->faculty,
+            'department' => $request->department,
+            'admission_session' => $request->admission_session,
+            'matric_number' => strtoupper(trim($request->matric_number)),
+            'academic_status' => $request->academic_status,
+            'status' => 'pending',
+        ]);
+
+        return redirect()->route('memberDashboard')->with('success', 'Done!');
+    }
     public function memberUpdateAcademicStatus()
     {
         $member = Auth::user();
@@ -98,7 +203,11 @@ class MemberSelfProfileController extends Controller
                 'faculty' => 'required|string|exists:faculties,slug',
                 'department' => 'required|string|exists:departments,slug',
                 'admission_session' => 'required|numeric',
-                'matric_number' => 'required|string',
+                'matric_number' => [
+                    'required',
+                    'string',
+                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                ],
             ]);
 
 
