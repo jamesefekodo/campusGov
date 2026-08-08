@@ -94,7 +94,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
     // apply for re-admission
     Route::get('member/apply_for_re_admission', [MemberSelfProfileController::class, 'memberApplyForReAdmission'])->name('memberApplyForReAdmission');
-    Route::put('member/update_academic_status/submit', [MemberSelfProfileController::class, 'memberApplyForReAdmissionSubmit'])->name('memberApplyForReAdmissionSubmit');
+    Route::post('member/update_academic_status/submit', [MemberSelfProfileController::class, 'memberApplyForReAdmissionSubmit'])->name('memberApplyForReAdmissionSubmit');
 
 
 
@@ -190,6 +190,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     Route::put('admin/user_management/members/verification/return_for_correction/{uuid}', [MembersManagementController::class, 'updateBasicAccountInfo'])->name('updateBasicAccountInfo');
+
+    // re admission requests
+    Route::get('admin/user_management/members/re_admission_requests', [MembersManagementController::class, 'reAdmissionRequests'])->name('reAdmissionRequests');
+    Route::get('admin/user_management/members/re_admission_requests/search', [MembersManagementController::class, 'reAdmissionRequests'])->name('reAdmissionRequestsSearch');
+
 
 
     // awaiting verification

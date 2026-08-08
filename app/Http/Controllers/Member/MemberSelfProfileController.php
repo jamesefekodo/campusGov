@@ -75,22 +75,13 @@ class MemberSelfProfileController extends Controller
         }
         $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
         $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
-        $step = 1;
 
-        $reAdmissionRequest = MemberReAdmissionApplication::firstOrCreate(
-            [
-                'username' => $member->username,
-                'status' => 'awaiting_submission',
-            ]
-        );
 
 
         $data = [
             'member' => $member,
             'activeProgram' => $activeProgram,
             'activeFaculties' => $activeFaculties,
-            'step' => $step,
-            'reAdmissionRequest' => $reAdmissionRequest,
         ];
 
         return view('users.member.registration.reAdmissionApplication', compact('data'));
@@ -111,18 +102,30 @@ class MemberSelfProfileController extends Controller
             ],
         ]);
 
-        $reAdmissionRequest = MemberReAdmissionApplication::where('username', $member->username)->where('status', 'awaiting_submission')->first();
-        if (!$reAdmissionRequest) {
-            return redirect()->back()->with('error', 'Records not found!');
+        $previousAcademicInfo = MemberAcademicInfo::where('username', $member->username)->first();
+        if (!$previousAcademicInfo) {
+            return redirect()->back()->with('error', 'Academic Info Not Found!');
         }
 
-        $reAdmissionRequest->update([
-            'program' => $request->program,
-            'program_type' => $request->program_type,
-            'faculty' => $request->faculty,
-            'department' => $request->department,
-            'admission_session' => $request->admission_session,
-            'matric_number' => strtoupper(trim($request->matric_number)),
+        MemberReAdmissionApplication::create([
+            'username' => $member->username,
+            'previous_program' => $previousAcademicInfo->program,
+            'previous_program_type' => $previousAcademicInfo->program_type,
+            'previous_faculty' => $previousAcademicInfo->faculty,
+            'previous_department' => $previousAcademicInfo->department,
+            'previous_admission_session' => $previousAcademicInfo->admission_session,
+            'previous_graduation_session' => $previousAcademicInfo->graduation_session,
+            'previous_matric_number' => $previousAcademicInfo->matric_number,
+            'previous_academic_status' => $previousAcademicInfo->academic_status,
+
+
+            'new_program' => $request->program,
+            'new_program_type' => $request->program_type,
+            'new_faculty' => $request->faculty,
+            'new_department' => $request->department,
+            'new_admission_session' => $request->admission_session,
+            'new_matric_number' => strtoupper(trim($request->matric_number)),
+
             'academic_status' => $request->academic_status,
             'status' => 'pending',
         ]);

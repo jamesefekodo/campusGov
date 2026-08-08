@@ -26,9 +26,9 @@
             </a>
         @endif
           @if (Auth::user()->hasPermission('verify_users'))
-            <a href="{{ route('memberAwaitingVerification') }}">
+            <a href="{{ route('reAdmissionRequests') }}">
                 <div
-                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/user_management/members/verification') ? 'inner_nav_active' : '' }}">
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/user_management/members/re_admission_requests') ? 'inner_nav_active' : '' }}">
                     Re-Admission
                     @if (countPendingReAdmissionRequests() > 0)
                         &nbsp;

@@ -21,6 +21,7 @@ class MemberAcademicInfo extends Model
     protected $fillable = [
         'tenant_id',
         'username',
+        'previous_academic_status',
         'academic_status',
         'program',
         'program_type',

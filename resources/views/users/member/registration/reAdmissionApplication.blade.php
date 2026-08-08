@@ -153,7 +153,6 @@
                                         action="{{ route('memberApplyForReAdmissionSubmit') }}"
                                         enctype="multipart/form-data">
                                         @csrf
-                                        @method('PUT')
 
                                         <div class="row">
                                             <div class="form-group col-md-4">
@@ -167,7 +166,7 @@
 
                                                     @foreach ($data['activeProgram'] as $program)
                                                         <option value="{{ $program->slug }}"
-                                                            {{ old('program', $data['reAdmissionRequest']?->program) == $program->slug ? 'selected' : '' }}>
+                                                            {{ old('program') == $program->slug ? 'selected' : '' }}>
                                                             {{ $program->name }}
                                                         </option>
                                                     @endforeach
@@ -200,7 +199,7 @@
 
                                                     @foreach ($data['activeFaculties'] as $faculty)
                                                         <option value="{{ $faculty->slug }}"
-                                                            {{ old('faculty', $data['reAdmissionRequest']?->faculty) == $faculty->slug ? 'selected' : '' }}>
+                                                            {{ old('faculty') == $faculty->slug ? 'selected' : '' }}>
                                                             {{ $faculty->name }}
                                                         </option>
                                                     @endforeach
@@ -236,8 +235,7 @@
 
                                                     @for ($year = $endYear; $year >= $startYear; $year--)
                                                         <option value="{{ $year }}"
-                                                            {{ isset($data['reAdmissionRequest']?->admission_session) &&
-                                                            $data['reAdmissionRequest']?->admission_session == "$year"
+                                                            {{ old('admission_session') == "$year"
                                                                 ? 'selected'
                                                                 : '' }}>
                                                             {{ $year }}/{{ $year + 1 }}
@@ -251,7 +249,7 @@
                                                         class="text-red">*</span>:</label>
                                                 <input type="text" class="form-control text-uppercase"
                                                     name="matric_number"
-                                                    value="{{ old('matric_number', $data['reAdmissionRequest']?->matric_number) }}"
+                                                    value="{{ old('matric_number') }}"
                                                     required>
                                                 <p style="color: red">{{ $errors->first('matric_number') }}</p>
                                             </div>
@@ -289,7 +287,7 @@
                 if (!programSelect || !programTypeSelect) return;
 
                 const selectedProgramType =
-                    "{{ old('program_type', $data['reAdmissionRequest']?->program_type) }}";
+                    "{{ old('program_type') }}";
 
                 function loadProgramTypes(programSlug, selected = '') {
 
@@ -350,7 +348,7 @@
 
                 if (!facultySelect || !departmentSelect) return;
 
-                const selectedDepartment = "{{ old('department', $data['reAdmissionRequest']?->department) }}";
+                const selectedDepartment = "{{ old('department') }}";
 
                 function loadDepartments(facultySlug, selected = '') {
 

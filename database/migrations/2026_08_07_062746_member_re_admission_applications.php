@@ -13,15 +13,27 @@ return new class extends Migration
     {
         Schema::create('member_re_admission_applications', function (Blueprint $table) {
             $table->id();
+            $table->string('uuid')->unique();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username')->unique(); // Foreign
-            $table->string('program')->nullable(); // Foreign
-            $table->string('program_type')->nullable(); // Foreign
-            $table->string('faculty')->nullable(); // Foreign
-            $table->string('department')->nullable(); // Foreign
-            $table->year('admission_session')->nullable();
-            $table->year('graduation_session')->nullable();
-            $table->string('matric_number')->nullable();
+            $table->string('previous_academic_status')->unique();
+            //  previous
+            $table->string('previous_program')->nullable(); // Foreign
+            $table->string('previous_program_type')->nullable(); // Foreign
+            $table->string('previous_faculty')->nullable(); // Foreign
+            $table->string('previous_department')->nullable(); // Foreign
+            $table->year('previous_admission_session')->nullable();
+            $table->year('previous_graduation_session')->nullable();
+            $table->string('previous_matric_number')->nullable();
+
+            // new
+            $table->string('new_program')->nullable(); // Foreign
+            $table->string('new_program_type')->nullable(); // Foreign
+            $table->string('new_faculty')->nullable(); // Foreign
+            $table->string('new_department')->nullable(); // Foreign
+            $table->year('new_admission_session')->nullable();
+            $table->string('new_matric_number')->nullable();
+
             $table->string('status')->default('pending');
             $table->string('processed_by')->nullable(); // Foreign
             $table->dateTime('processed_at')->nullable();
@@ -29,11 +41,18 @@ return new class extends Migration
 
 
             $table->foreign('username')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreign('program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
-            $table->foreign('program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
-            $table->foreign('faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
-            $table->foreign('department')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
+
+            $table->foreign('previous_program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('previous_program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('previous_faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('previous_department')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('processed_by')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
+
+            $table->foreign('new_program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('new_program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('new_faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('new_department')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
+
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
         });
     }

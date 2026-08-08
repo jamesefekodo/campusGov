@@ -9,6 +9,7 @@ use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -572,6 +573,132 @@ class MembersManagementController extends Controller
 
 
         return view('users.admin.userManagement.members.students.studentMembers', compact('data'));
+    }
+    public function reAdmissionRequests(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('verify_users'),
+            403
+        );
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $reAdmissionRequests = '';
+        $totalReAdmissionRequests = 0;
+
+
+        if (Route::currentRouteName() == 'reAdmissionRequestsSearch') {
+            $searchKey = $request->input('searchKey');
+
+            $reAdmissionRequests = MemberReAdmissionApplication::query()
+                ->where('status', '!=', 'awaiting_submission')
+                ->with([
+                    'userProfile',
+                    'personalProfile',
+                    'theProgram',
+                    'theDepartment',
+                    'programType',
+                ])
+                ->when($searchKey, function ($query) use ($searchKey) {
+
+                    // Split the input into individual words
+                    // e.g. "james efekodo" → ["james", "efekodo"]
+                    $terms = explode(' ', trim($searchKey));
+
+                    $query->where(function ($q) use ($terms) {
+
+                        foreach ($terms as $term) {
+
+                            if (empty($term)) {
+                                continue;
+                            }
+
+                            $keyword = "%{$term}%";
+
+                            $q->where(function ($subQuery) use ($keyword) {
+
+                                // Main application/member fields
+                                $subQuery
+                                    ->where('username', 'like', $keyword)
+                                    ->orWhere('status', 'like', $keyword)
+
+                                    // User profile
+                                    ->orWhereHas('userProfile', function ($uq) use ($keyword) {
+                                        $uq->where('phone', 'like', $keyword)
+                                            ->orWhere('email', 'like', $keyword);
+                                    })
+
+                                    // Personal profile
+                                    ->orWhereHas('personalProfile', function ($pq) use ($keyword) {
+                                        $pq->where('first_name', 'like', $keyword)
+                                            ->orWhere('middle_name', 'like', $keyword)
+                                            ->orWhere('last_name', 'like', $keyword)
+                                            ->orWhere('phone1', 'like', $keyword)
+                                            ->orWhere('email1', 'like', $keyword)
+                                            ->orWhere('phone2', 'like', $keyword)
+                                            ->orWhere('email2', 'like', $keyword)
+                                            ->orWhere('gender', 'like', $keyword)
+                                            ->orWhere('dob', 'like', $keyword)
+                                            ->orWhere('nationality', 'like', $keyword)
+                                            ->orWhere('state_of_origin', 'like', $keyword)
+                                            ->orWhere('lga_of_origin', 'like', $keyword)
+                                            ->orWhere('address1', 'like', $keyword)
+                                            ->orWhere('address2', 'like', $keyword);
+                                    })
+
+                                    // Program
+                                    ->orWhereHas('theProgram', function ($prq) use ($keyword) {
+                                        $prq->where('name', 'like', $keyword)
+                                            ->orWhere('short_name', 'like', $keyword)
+                                            ->orWhere('level_format', 'like', $keyword)
+                                            ->orWhere('award', 'like', $keyword);
+                                    })
+
+                                    // Department
+                                    ->orWhereHas('theDepartment', function ($dq) use ($keyword) {
+                                        $dq->where('name', 'like', $keyword)
+                                            ->orWhere('description', 'like', $keyword);
+                                    })
+
+                                    // Program type
+                                    ->orWhereHas('programType', function ($ptq) use ($keyword) {
+                                        $ptq->where('type_name', 'like', $keyword);
+                                    });
+                            });
+                        }
+                    });
+                })
+                ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(50)
+                ->withQueryString();
+
+            $totalReAdmissionRequests = $reAdmissionRequests->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $reAdmissionRequests = MemberReAdmissionApplication::where('status', '!=', 'awaiting_submission')
+                ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(50);
+            $totalReAdmissionRequests = $reAdmissionRequests->count();
+            $requestType = 'all';
+            $pageTitle = 'Re-Admission Request';
+        }
+
+        $data = [
+            'reAdmissionRequests' => $reAdmissionRequests,
+            'totalReAdmissionRequests' => $totalReAdmissionRequests,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.userManagement.reAdmission.reAdmissionRequests', compact('data'));
     }
     public function memberAwaitingVerification(Request $request)
     {
