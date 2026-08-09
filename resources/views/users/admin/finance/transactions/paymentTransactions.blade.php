@@ -5,7 +5,7 @@
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
             <div class="navigation">
-                {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
+                @include('users.admin.finance.transactions.include.inner_nav')
             </div>
 
             <div class="individual-review-card-container">

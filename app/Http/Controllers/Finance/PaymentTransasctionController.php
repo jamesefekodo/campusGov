@@ -7,6 +7,7 @@ use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\Tax;
+use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use Carbon\Carbon;
 use Faker\Provider\Payment;
@@ -30,12 +31,24 @@ class PaymentTransasctionController extends Controller
             return redirect()->back()->with('error', 'Association due not found.');
         }
 
-        $memberDue = $member->memberAcademicInfo
+        $academicInfo = $member->memberAcademicInfo;
+
+        $memberDue = $academicInfo
             ->associationDues()
             ->firstWhere('uuid', $uuid);
 
         if (!$memberDue) {
-            return redirect()->back()->with('error', 'This due does not apply to your account.');
+            $memberDue = $academicInfo
+                ->pastProgramsAssociationDues()
+                ->flatten(1)
+                ->firstWhere('uuid', $uuid);
+        }
+
+        if (!$memberDue) {
+            return redirect()->back()->with(
+                'error',
+                'This due does not apply to your account.'
+            );
         }
 
         $due = $memberDue;
@@ -68,7 +81,7 @@ class PaymentTransasctionController extends Controller
         }
 
         do {
-            $transactionId = 'pymt-' . now()->format('mYds') . '-' . tenant()->id . random_int(100000000, 999999999);
+            $transactionId = 'pymt-' . now()->format('Ymds') . '-' . tenant()->id . random_int(100000000, 999999999);
         } while (PaymentTransaction::where('payment_transaction_id', $transactionId)->exists());
 
 
@@ -102,7 +115,7 @@ class PaymentTransasctionController extends Controller
                 $mime = $file->getMimeType();
                 $ext  = strtolower($file->getClientOriginalExtension());
 
-                $uploadPath = public_path('assets/uploads/paymentTransactions/proof');
+                $uploadPath = public_path('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof');
                 File::ensureDirectoryExists($uploadPath);
 
                 // Base filename
@@ -744,5 +757,87 @@ class PaymentTransasctionController extends Controller
             return redirect()->back()->with('error', 'Verification failed.');
         }
         return redirect()->back();
+    }
+    public function paymentRegularizationRequests(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $regularizations = '';
+        $totalRegularizations = 0;
+
+
+        if (Route::currentRouteName() == 'paymentRegularizationRequestsSearch') {
+            $searchKey = $request->input('searchKey');
+            $regularizations = PaymentRegularization::with([
+                'due',
+                'personalProfile',
+            ])
+                ->when($searchKey, function ($query) use ($searchKey) {
+
+                    $keyword = "%{$searchKey}%";
+
+                    $query->where(function ($q) use ($keyword) {
+
+                        // PaymentRegularization fields
+                        $q->where('description', 'like', $keyword)
+                            ->orWhere('remarks', 'like', $keyword)
+
+                            // Due
+                            ->orWhereHas('due', function ($dueQuery) use ($keyword) {
+                                $dueQuery->where('title', 'like', $keyword)
+                                    ->orWhere('description', 'like', $keyword);
+                            })
+
+                            // Personal profile
+                            ->orWhereHas('personalProfile', function ($profileQuery) use ($keyword) {
+                                $profileQuery->where('phone1', 'like', $keyword)
+                                    ->orWhere('email1', 'like', $keyword)
+                                    ->orWhere('phone2', 'like', $keyword)
+                                    ->orWhere('email2', 'like', $keyword)
+                                    ->orWhere('first_name', 'like', $keyword)
+                                    ->orWhere('middle_name', 'like', $keyword)
+                                    ->orWhere('last_name', 'like', $keyword)
+                                    ->orWhere('gender', 'like', $keyword)
+                                    ->orWhere('nationality', 'like', $keyword)
+                                    ->orWhere('state_of_origin', 'like', $keyword)
+                                    ->orWhere('lga_of_origin', 'like', $keyword);
+                            });
+                    });
+                })
+                ->orderByRaw("CASE WHEN approval_status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalRegularizations = $regularizations->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $regularizations = PaymentRegularization::query()
+                ->orderByRaw("CASE WHEN approval_status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(20);
+            $totalRegularizations = PaymentRegularization::count();
+            $requestType = 'all';
+            $pageTitle = 'Payment Regularization';
+        }
+        $data = [
+            'regularizations' => $regularizations,
+            'totalRegularizations' => $totalRegularizations,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.finance.regularizations.regularizations', compact('data'));
     }
 }

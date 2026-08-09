@@ -3,13 +3,8 @@
 
 
 @php
-    if (request()->routeIs('inActiveUserAccounts', 'inActiveUserAccountsSearch')) {
-        $searchRoute = route('inActiveUserAccountsSearch');
-        $backRoute = route('inActiveUserAccounts');
-    } else {
-        $searchRoute = route('memberAwaitingRegistrationSearch');
-        $backRoute = route('memberAwaitingRegistration');
-    }
+    $searchRoute = route('reAdmissionRequestsSearch');
+    $backRoute = route('reAdmissionRequests');
 @endphp
 
 @section('content')
@@ -206,7 +201,8 @@
                                                             </td>
 
                                                             <td>
-                                                                <a class="btn btn-primary btn-sm" {{-- href="{{ route('viewMember', ['uuid' => $request->uuid]) }}" --}}>
+                                                                <a class="btn btn-primary btn-sm"
+                                                                    href="{{ route('viewReAdmissionRequest', ['uuid' => $request->uuid]) }}">
                                                                     <i class="fas fa-eye me-2"></i>
                                                                     View</a>
                                                             </td>

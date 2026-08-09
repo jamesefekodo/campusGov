@@ -244,6 +244,19 @@ class User extends Authenticatable
 
     public function reAdmissionRequests()
     {
-        return $this->hasMany(MemberReAdmissionApplication::class, 'username', 'username');
+        return $this->hasMany(
+            MemberReAdmissionApplication::class,
+            'username',
+            'username'
+        );
+    }
+
+    public function approvedReAdmissions()
+    {
+        return $this->hasMany(
+            MemberReAdmissionApplication::class,
+            'username',
+            'username'
+        )->where('status', 'approved');
     }
 }

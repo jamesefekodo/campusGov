@@ -123,24 +123,38 @@
                                                     <hr>
                                                     <div class="row">
                                                         <div class="col-12">
-                                                            <div
-                                                                class="d-flex flex-wrap align-items-center justify-content-end gap-2">
+                                                            @if ($data['member']->successfulPaymentForDue($due->fee_id))
+                                                                butttn to print reciept
+                                                            @elseif($data['member']->pendingPaymentForDue($due->fee_id))
+                                                                show button to view payment transaction and process
+                                                            @else
+                                                                <div
+                                                                    class="d-flex flex-wrap align-items-center justify-content-end gap-2">
 
-                                                                <button type="button" class="btn btn-warning me-3">
-                                                                    <i class="fas fa-user-shield me-1"></i>
-                                                                    Grant Exemption
-                                                                </button>
+                                                                    <button type="button" class="btn btn-warning me-3">
+                                                                        <i class="fas fa-user-shield me-1"></i>
+                                                                        Grant Exemption
+                                                                    </button>
 
-                                                                <span class="fw-semibold text-muted">
-                                                                    Already Paid?
-                                                                </span>
 
-                                                                <button type="button" class="btn btn-primary">
-                                                                    <i class="fas fa-receipt me-1"></i>
-                                                                    Regularize Payment
-                                                                </button>
+                                                                    @if (Auth::user()->hasPermission('transactions.create'))
+                                                                        <span class="fw-semibold text-muted">
+                                                                            Already Paid?
+                                                                        </span>
 
-                                                            </div>
+                                                                        <button type="button" class="btn btn-primary"
+                                                                            data-toggle="modal"
+                                                                            data-target="#paymentRegularizationModal_{{ $due->fee_id }}">
+                                                                            <i class="fas fa-receipt me-1"></i>
+                                                                            Regularize Payment
+                                                                        </button>
+
+                                                                        @include('users.admin.userManagement.members.profile.include.paymentRegularizationModal')
+                                                                    @endif
+
+                                                                </div>
+                                                            @endif
+
                                                         </div>
                                                     </div>
 
@@ -161,6 +175,15 @@
                                             </div>
                                         </div>
                                     @endforelse
+
+                                    @if ($data['member']->memberAcademicInfo->pastProgramsAssociationDues()->isNotEmpty())
+                                        <hr class="my-5">
+
+                                        <h4 class="mb-4">
+                                            Association Dues from Previous Programmes
+                                        </h4>
+                                        @include('users.admin.userManagement.members.profile.include.associationDuesFromPastPrograms')
+                                    @endif
                                 </div>
                             </div>
                         </div>

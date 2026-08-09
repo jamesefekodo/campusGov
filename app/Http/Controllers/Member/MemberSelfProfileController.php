@@ -98,7 +98,11 @@ class MemberSelfProfileController extends Controller
             'matric_number' => [
                 'required',
                 'string',
-                'unique:member_academic_infos,matric_number',
+                Rule::unique('member_academic_infos', 'matric_number')
+                    ->ignore($member?->memberAcademicInfo?->id)
+                    ->where(function ($query) use ($member) {
+                        $query->where('tenant_id', $member->tenant_id);
+                    }),
             ],
         ]);
 
@@ -209,7 +213,11 @@ class MemberSelfProfileController extends Controller
                 'matric_number' => [
                     'required',
                     'string',
-                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                    Rule::unique('member_academic_infos', 'matric_number')
+                        ->ignore($member?->memberAcademicInfo?->id)
+                        ->where(function ($query) use ($member) {
+                            $query->where('tenant_id', $member->tenant_id);
+                        }),
                 ],
             ]);
 
@@ -427,7 +435,15 @@ class MemberSelfProfileController extends Controller
                 'faculty' => 'required|string|exists:faculties,slug',
                 'department' => 'required|string|exists:departments,slug',
                 'admission_session' => 'required|numeric',
-                'matric_number' => 'required|string',
+                'matric_number' => [
+                    'required',
+                    'string',
+                    Rule::unique('member_academic_infos', 'matric_number')
+                        ->ignore($member?->memberAcademicInfo?->id)
+                        ->where(function ($query) use ($member) {
+                            $query->where('tenant_id', $member->tenant_id);
+                        }),
+                ],
             ]);
 
 

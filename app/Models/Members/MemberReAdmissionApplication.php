@@ -47,9 +47,12 @@ class MemberReAdmissionApplication extends Model
     protected function casts(): array
     {
         return [
-            'is_verified' => 'boolean'
+            'is_verified' => 'boolean',
+            'processed_at' => 'datetime',
+
         ];
     }
+
 
     // uuid
     protected static function booted(): void
@@ -107,5 +110,11 @@ class MemberReAdmissionApplication extends Model
     public function newProgramType()
     {
         return $this->belongsTo(ProgramType::class, 'new_program_type', 'slug');
+    }
+
+
+    public function processedBy()
+    {
+        return $this->belongsTo(User::class, 'processed_by', 'username');
     }
 }

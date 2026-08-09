@@ -19,7 +19,8 @@
                 </span>
                 <span class="nav-link-text">Users &nbsp;
                     @php
-                        $usersNotifications = countMemberProfilesAwaitingVerification() + countPendingReAdmissionRequests();
+                        $usersNotifications =
+                            countMemberProfilesAwaitingVerification() + countPendingReAdmissionRequests();
                     @endphp
                     @if ($usersNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
@@ -69,12 +70,12 @@
             </a><!--//nav-link-->
             <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    @if (Auth::user()->hasPermission('media_platform.read'))
+                    {{-- @if (Auth::user()->hasPermission('media_platform.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/social_media') ? 'sidebar-active' : '' }}"
                                 href="{{ route('recognizedSocialMediaPlatforms') }}">Recognized Platforms</a>
                         </li>
-                    @endif
+                    @endif --}}
                     <li class="submenu-item"><a
                             class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/orders/all') ? 'sidebar-active' : '' }}"
                             href="
@@ -197,7 +198,7 @@
         </li><!--//nav-item-->
 
         @php
-            $financeNotifications = totalPendingPaymentTransactions() + 0;
+            $financeNotifications = totalPendingPaymentTransactions() + totalPendingPaymentRegularizations();
         @endphp
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/finance') ? 'sidebar-active-section' : '' }}"
@@ -223,10 +224,10 @@
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/transactions') ? 'sidebar-active' : '' }}"
                                 href="{{ route('paymentTransactions') }}">Transactions &nbsp;
-                                @if (totalPendingPaymentTransactions() > 0)
+                                @if (totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() > 0)
                                     <span
                                         class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                        style="font-size: 11px">{{ totalPendingPaymentTransactions() }}</span>
+                                        style="font-size: 11px">{{ totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() }}</span>
                                 @endif
                             </a>
                         </li>
@@ -328,9 +329,7 @@
                     @if (Auth::user()->hasPermission('basic_system_config.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
-                                href="
-                            {{ route('configBasicSettings') }}
-                             ">Basics</a>
+                                href="{{ route('configBasicSettings') }}">Basics</a>
                         </li>
                     @endif
                     @if (Auth::user()->hasPermission('roles.read'))

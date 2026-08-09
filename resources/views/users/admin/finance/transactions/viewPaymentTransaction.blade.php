@@ -376,7 +376,7 @@
                                     </div>
                                     @if (
                                         $data['transaction']->photo &&
-                                            file_exists(public_path('assets/uploads/paymentTransactions/proof/' . $data['transaction']->photo)))
+                                            file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof/' . $data['transaction']->photo)))
                                         @php
                                             $proofModalId = 'proofImageModal_' . $data['transaction']->id;
                                         @endphp
@@ -387,7 +387,7 @@
                                             <span class="text-black">
                                                 <span class="text-capitalize">
 
-                                                    <img src="{{ asset('assets/uploads/paymentTransactions/proof/' . $data['transaction']->photo) }}"
+                                                    <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof/' . $data['transaction']->photo) }}"
                                                         alt="Proof of Payment" class="img-thumbnail ms-2"
                                                         style="max-width:150px; cursor: zoom-in;" data-bs-toggle="modal"
                                                         data-bs-target="#{{ $proofModalId }}">
@@ -409,7 +409,7 @@
                                                         </button>
                                                     </div>
 
-                                                    <img src="{{ asset('assets/uploads/paymentTransactions/proof/' . $data['transaction']->photo) }}"
+                                                    <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof/' . $data['transaction']->photo) }}"
                                                         class="img-fluid rounded shadow" alt="Proof of Payment">
 
                                                 </div>

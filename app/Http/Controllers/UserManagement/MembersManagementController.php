@@ -7,6 +7,9 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Finance\Transactions\PaymentRegularization;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberReAdmissionApplication;
@@ -14,7 +17,9 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
 class MembersManagementController extends Controller
@@ -599,9 +604,12 @@ class MembersManagementController extends Controller
                 ->with([
                     'userProfile',
                     'personalProfile',
-                    'theProgram',
-                    'theDepartment',
-                    'programType',
+                    'previousProgram',
+                    'newProgram',
+                    'previousDepartment',
+                    'newDepartment',
+                    'previousProgramType',
+                    'newProgramType',
                 ])
                 ->when($searchKey, function ($query) use ($searchKey) {
 
@@ -651,7 +659,13 @@ class MembersManagementController extends Controller
                                     })
 
                                     // Program
-                                    ->orWhereHas('theProgram', function ($prq) use ($keyword) {
+                                    ->orWhereHas('previousProgram', function ($prq) use ($keyword) {
+                                        $prq->where('name', 'like', $keyword)
+                                            ->orWhere('short_name', 'like', $keyword)
+                                            ->orWhere('level_format', 'like', $keyword)
+                                            ->orWhere('award', 'like', $keyword);
+                                    })
+                                    ->orWhereHas('previousProgram', function ($prq) use ($keyword) {
                                         $prq->where('name', 'like', $keyword)
                                             ->orWhere('short_name', 'like', $keyword)
                                             ->orWhere('level_format', 'like', $keyword)
@@ -659,13 +673,20 @@ class MembersManagementController extends Controller
                                     })
 
                                     // Department
-                                    ->orWhereHas('theDepartment', function ($dq) use ($keyword) {
+                                    ->orWhereHas('previousDepartment', function ($dq) use ($keyword) {
+                                        $dq->where('name', 'like', $keyword)
+                                            ->orWhere('description', 'like', $keyword);
+                                    })
+                                    ->orWhereHas('newDepartment', function ($dq) use ($keyword) {
                                         $dq->where('name', 'like', $keyword)
                                             ->orWhere('description', 'like', $keyword);
                                     })
 
                                     // Program type
-                                    ->orWhereHas('programType', function ($ptq) use ($keyword) {
+                                    ->orWhereHas('previousProgramType', function ($ptq) use ($keyword) {
+                                        $ptq->where('type_name', 'like', $keyword);
+                                    })
+                                    ->orWhereHas('newProgramType', function ($ptq) use ($keyword) {
                                         $ptq->where('type_name', 'like', $keyword);
                                     });
                             });
@@ -699,6 +720,98 @@ class MembersManagementController extends Controller
         ];
 
         return view('users.admin.userManagement.reAdmission.reAdmissionRequests', compact('data'));
+    }
+    public function viewReAdmissionRequest($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('verify_users'),
+            403
+        );
+
+        $request = MemberReAdmissionApplication::where('uuid', $uuid)->first();
+        if (!$request) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+
+        $data = [
+            'request' => $request,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+        ];
+        return view('users.admin.userManagement.reAdmission.viewReAdmissionRequest', compact('data'));
+    }
+    public function processReAdmissionRequestSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('verify_users'),
+            403
+        );
+
+        $reAdmissionRequest = MemberReAdmissionApplication::where('uuid', $uuid)->first();
+        if (!$reAdmissionRequest) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $academicInfo = MemberAcademicInfo::where('username', $reAdmissionRequest->username)->first();
+        if (!$academicInfo) {
+            return redirect()->back()->with('error', 'Academic records not found!');
+        }
+
+        request()->validate([
+            'new_program' => 'required|exists:programs,slug',
+            'new_program_type' => 'required|exists:program_types,slug',
+            'new_faculty' => 'required|exists:faculties,slug',
+            'new_department' => 'required|exists:departments,slug',
+            'new_admission_session' => 'required|numeric',
+            'new_matric_number' => [
+                'required',
+                Rule::unique('member_academic_infos', 'matric_number')
+                    ->where(function ($query) use ($academicInfo) {
+                        $query->where('tenant_id', $academicInfo->tenant_id);
+                    }),
+            ],
+            'status' => 'required|in:approved,declined',
+        ]);
+        // update academic rec0rds
+        if ($request->status == 'approved') {
+            $academicInfo->update(
+                [
+                    'academic_status' => 'student',
+                    'program' => $request->new_program,
+                    'program_type' => $request->new_program_type,
+                    'department' => $request->new_department,
+                    'faculty' => $request->new_faculty,
+                    'admission_session' => trim($request->new_admission_session),
+                    'matric_number' => trim(strtoupper($request->new_matric_number)),
+                    'is_verified' => true,
+                    'verified_by' => Auth::user()->username,
+                    'verified_at' => Carbon::now(),
+                ]
+            );
+        }
+
+        // update request record
+        $reAdmissionRequest->update([
+            'new_program' => $request->new_program,
+            'new_program_type' => $request->new_program_type,
+            'new_faculty' => $request->new_faculty,
+            'new_department' => $request->new_department,
+            'new_admission_session' => trim($request->new_admission_session),
+            'new_matric_number' => trim(strtoupper($request->new_matric_number)),
+            'status' => $request->status,
+            'processed_by' => Auth::user()->username,
+            'processed_at' => Carbon::now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Done!');
     }
     public function memberAwaitingVerification(Request $request)
     {
@@ -1119,7 +1232,11 @@ class MembersManagementController extends Controller
                 'matric_number' => [
                     'required',
                     'string',
-                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                    Rule::unique('member_academic_infos', 'matric_number')
+                        ->ignore($member?->memberAcademicInfo?->id)
+                        ->where(function ($query) use ($member) {
+                            $query->where('tenant_id', $member->tenant_id);
+                        }),
                 ],
             ]);
 
@@ -1365,7 +1482,11 @@ class MembersManagementController extends Controller
                 'matric_number' => [
                     'required',
                     'string',
-                    Rule::unique('member_academic_infos', 'matric_number')->ignore($member?->memberAcademicInfo->id),
+                    Rule::unique('member_academic_infos', 'matric_number')
+                        ->ignore($member?->memberAcademicInfo?->id)
+                        ->where(function ($query) use ($member) {
+                            $query->where('tenant_id', $member->tenant_id);
+                        }),
                 ],
             ]);
 
@@ -1563,5 +1684,249 @@ class MembersManagementController extends Controller
             'member' => $member,
         ];
         return view('users.admin.userManagement.members.profile.associationDues', compact('data'));
+    }
+    public function initiatePaymentRegularization($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.create'),
+            403
+        );
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        request()->validate([
+            'fee_id' => 'required|exists:association_dues,fee_id',
+            'payment_date' => 'required',
+            'amount' => 'required',
+            'payment_method' => 'required',
+            'manual_payment_method' => 'nullable',
+            'bank_account_id' => 'nullable',
+            'electronic_payment_method' => 'nullable',
+            'description' => 'required',
+            'proof_of_payment' => 'nullable',
+        ]);
+
+
+
+
+        $due = AssociationDue::where('fee_id', $request->fee_id)->first();
+
+
+
+        if (!$due) {
+            return redirect()->back()->with('error', 'Association due not found.');
+        }
+
+        $academicInfo = $member->memberAcademicInfo;
+
+        $memberDue = $academicInfo
+            ->associationDues()
+            ->firstWhere('fee_id', $request->fee_id);
+
+        if (!$memberDue) {
+            $memberDue = $academicInfo
+                ->pastProgramsAssociationDues()
+                ->flatten(1)
+                ->firstWhere('fee_id', $request->fee_id);
+        }
+
+        if (!$memberDue) {
+            return redirect()->back()->with(
+                'error',
+                'This due does not apply to your account.'
+            );
+        }
+
+        $due = $memberDue;
+
+
+        // check if it has been paid
+        $alreadyPaid = PaymentTransaction::where('registered_payer', $member->username)->where('due_id', $due->fee_id)->where('approval_status', 'approved')->first();
+
+        if ($alreadyPaid) {
+            return redirect()->back()->with(
+                'error',
+                'This association due has already been paid.'
+            );
+        }
+
+        // check for pending transaction
+        $pendingTransaction = PaymentTransaction::where('registered_payer', $member->username)
+            ->where('due_id', $due->fee_id)
+            ->where(function ($query) {
+                $query->where('payment_status', 'pending')
+                    ->orWhere('approval_status', 'pending');
+            })
+            ->first();
+
+        if ($pendingTransaction) {
+            return redirect()->back()->with(
+                'error',
+                'You already have a pending payment transaction. Please reconfirm it or wait for an administrator to process it before creating another payment.'
+            );
+        }
+
+
+        // check for pending payment regularization
+        $pendingRegularization = PaymentRegularization::where('username', $member->username)->where('due_id', $due->fee_id)->where('approval_status', 'pending')->first();
+
+        if ($pendingRegularization) {
+            return redirect()->back()->with(
+                'error',
+                'A regularization request for this due is already pending.'
+            );
+        }
+
+        do {
+            $regularizationId = 'pymt-regu-' . now()->format('Ymds') . '-' . tenant()->id . random_int(100000000, 999999999);
+        } while (PaymentRegularization::where('regularization_id', $regularizationId)->exists());
+
+        $regularizationRequest = new PaymentRegularization();
+
+        $regularizationRequest->regularization_id = $regularizationId;
+        $regularizationRequest->username = $member->username;
+        $regularizationRequest->due_id = $due->fee_id;
+        $regularizationRequest->amount_paid = $due->payable_amount;
+        $regularizationRequest->bank_account_id = $request->bank_account_id;
+        $regularizationRequest->payment_date = $request->payment_date;
+        $regularizationRequest->electronic_payment_method = $request->electronic_payment_method;
+        $regularizationRequest->manual_payment_method = $request->manual_payment_method;
+        $regularizationRequest->payment_mode = filled($request->electronic_payment_method)
+            ? 'electronic'
+            : 'manual';
+
+        $regularizationRequest->description = $request->description;
+        $regularizationRequest->initiated_by = Auth::user()->username;
+        $regularizationRequest->initiated_at = Carbon::now();
+        $regularizationRequest->approval_status = 'pending';
+
+
+        // 'proof_of_payment' => ,
+
+        if ($request->hasFile('proof_of_payment')) {
+
+            $file = $request->file('proof_of_payment');
+            $mime = $file->getMimeType();
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $uploadPath = public_path('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof');
+            File::ensureDirectoryExists($uploadPath);
+
+            // Base filename
+            $baseName = strtolower($regularizationId);
+
+            $baseName = Str::of($baseName)
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->toString();
+            $fallbackName = $baseName . '.' . $ext;
+            $counter = 1;
+
+            // Delete existing file(s) with same base name regardless of extension
+            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+                if (file_exists($existingFile)) {
+                    unlink($existingFile);
+                }
+            }
+
+            // Avoid overwriting existing files
+            while (file_exists($uploadPath . '/' . $fallbackName)) {
+                $fallbackName = $baseName . '-' . $counter . '.' . $ext;
+                $counter++;
+            }
+
+            $fallbackPath = $uploadPath . '/' . $fallbackName;
+
+            /*
+            |--------------------------------------------------------------------------
+            | GD + WebP processing
+            |--------------------------------------------------------------------------
+            */
+            $processed = false;
+
+            if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
+
+                $tmp = $file->getPathname();
+
+                $src = match ($mime) {
+                    'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmp) : null,
+                    'image/png'  => function_exists('imagecreatefrompng')  ? @imagecreatefrompng($tmp)  : null,
+                    'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : null,
+                    default => null,
+                };
+
+                if ($src) {
+                    $width  = imagesx($src);
+                    $height = imagesy($src);
+
+                    // Resize if needed
+                    $maxSize = 800;
+                    $scale = min(1, $maxSize / max($width, $height));
+
+                    if ($scale < 1) {
+                        $newW = (int)($width * $scale);
+                        $newH = (int)($height * $scale);
+                        $dst = imagecreatetruecolor($newW, $newH);
+
+                        // Preserve transparency
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+                        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                        imagefill($dst, 0, 0, $transparent);
+
+                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $width, $height);
+                        imagedestroy($src);
+                        $src = $dst;
+                    }
+
+                    // WebP conversion with quality loop
+                    $webpName = $baseName . '.webp';
+                    $webpCounter = 1;
+                    $webpPath = $uploadPath . '/' . $webpName;
+
+                    while (file_exists($webpPath)) {
+                        $webpName = $baseName . '-' . $webpCounter . '.webp';
+                        $webpPath = $uploadPath . '/' . $webpName;
+                        $webpCounter++;
+                    }
+
+                    $quality = 90;
+                    do {
+                        imagewebp($src, $webpPath, $quality);
+                        clearstatcache();
+
+                        if (filesize($webpPath) <= 1048576) {
+                            $processed = true;
+                            $regularizationRequest->proof_of_payment = $webpName;
+                            imagedestroy($src);
+                            break;
+                        }
+
+                        $quality -= 5;
+                    } while ($quality >= 40);
+
+                    if (!$processed) {
+                        @unlink($webpPath);
+                    }
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fallback: move original file
+            |--------------------------------------------------------------------------
+            */
+            if (!$processed) {
+                $file->move($uploadPath, $fallbackName);
+                $regularizationRequest->proof_of_payment = $fallbackName;
+            }
+        }
+        $regularizationRequest->save();
+        return redirect()->back()->with('success', 'Done!');
     }
 }

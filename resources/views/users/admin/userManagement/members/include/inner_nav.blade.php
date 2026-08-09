@@ -25,7 +25,7 @@
                 </div>
             </a>
         @endif
-          @if (Auth::user()->hasPermission('verify_users'))
+        @if (Auth::user()->hasPermission('verify_users'))
             <a href="{{ route('reAdmissionRequests') }}">
                 <div
                     class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/user_management/members/re_admission_requests') ? 'inner_nav_active' : '' }}">
@@ -38,19 +38,20 @@
                 </div>
             </a>
         @endif
-
-        <a href="{{ route('memberAwaitingRegistration') }}">
-            <div
-                class="inner_nav_menu
-                {{ Str::startsWith(request()->path(), 'admin/user_management/members/awaiting_registration') ? 'inner_nav_active' : '' }}">
-                Pre-Registration</div>
-        </a>
-        <a href="{{ route('inActiveUserAccounts') }}">
-            <div
-                class="inner_nav_menu
-                {{ Str::startsWith(request()->path(), 'admin/user_management/members/inactive') ? 'inner_nav_active' : '' }}">
-                Inactive</div>
-        </a>
+        @if (Auth::user()->hasPermission('verify_users'))
+            <a href="{{ route('memberAwaitingRegistration') }}">
+                <div
+                    class="inner_nav_menu
+        {{ Str::startsWith(request()->path(), 'admin/user_management/members/awaiting_registration') ? 'inner_nav_active' : '' }}">
+                    Pre-Registration</div>
+            </a>
+            <a href="{{ route('inActiveUserAccounts') }}">
+                <div
+                    class="inner_nav_menu
+        {{ Str::startsWith(request()->path(), 'admin/user_management/members/inactive') ? 'inner_nav_active' : '' }}">
+                    Inactive</div>
+            </a>
+        @endif
 
 
     </div>

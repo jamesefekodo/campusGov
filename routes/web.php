@@ -194,6 +194,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // re admission requests
     Route::get('admin/user_management/members/re_admission_requests', [MembersManagementController::class, 'reAdmissionRequests'])->name('reAdmissionRequests');
     Route::get('admin/user_management/members/re_admission_requests/search', [MembersManagementController::class, 'reAdmissionRequests'])->name('reAdmissionRequestsSearch');
+    Route::get('admin/user_management/members/re_admission_requests/view/{uuid}', [MembersManagementController::class, 'viewReAdmissionRequest'])->name('viewReAdmissionRequest');
+    Route::put('admin/user_management/members/re_admission_requests/process/{uuid}/submit', [MembersManagementController::class, 'processReAdmissionRequestSubmit'])->name('processReAdmissionRequestSubmit');
 
 
 
@@ -232,6 +234,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/misconducts/{uuid}', [MembersManagementController::class, 'viewMemberMisconducts'])->name('viewMemberMisconducts');
 
     Route::get('admin/user_management/members/view/association_dues/{uuid}', [MembersManagementController::class, 'viewMemberAssociationDues'])->name('viewMemberAssociationDues');
+    Route::post('admin/user_management/members/view/association_dues/initiate_regularization/{uuid}', [MembersManagementController::class, 'initiatePaymentRegularization'])->name('initiatePaymentRegularization');
+
 
 
 
@@ -366,4 +370,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/transactions/view/{payment_transaction_id}', [PaymentTransasctionController::class, 'viewPaymentTransaction'])->name('viewPaymentTransaction');
     Route::put('admin/finance/transactions/manual/process/{payment_transaction_id}', [PaymentTransasctionController::class, 'processManualPaymentTransaction'])->name('processManualPaymentTransaction');
     Route::put('admin/finance/transactions/electronic/paystack/trans_ref/{payment_transaction_id}', [PaymentTransasctionController::class, 'updatePaystackRefNumber'])->name('updatePaystackRefNumber');
+
+    Route::get('admin/finance/transaction/regularizations', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequests');
+    Route::get('admin/finance/transaction/regularizations/search', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequestsSearch');
+     Route::get('admin/finance/transaction/regularizations/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentRegularization'])->name('viewPaymentRegularization');
+
+
 });

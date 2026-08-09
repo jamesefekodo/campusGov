@@ -7,6 +7,7 @@ use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
+use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\User;
@@ -265,6 +266,76 @@ if (!function_exists('isStillWithinProgramDuration')) {
     }
 }
 
+if (!function_exists('expectedGraduationSession')) {
+    function expectedGraduationSession(
+        $admissionSession,
+        $program,
+        $programType = null,
+        $department = null
+    ): ?int {
+        if (!$admissionSession || !$program) {
+            return null;
+        }
+
+        $duration = $program->duration;
+
+        $variation = $program->durationOverrides
+            ->sortByDesc(function ($override) {
+                return (!is_null($override->admission_session) ? 8 : 0) +
+                    (!is_null($override->program_type_slug) ? 4 : 0) +
+                    (!is_null($override->department_slug) ? 2 : 0) +
+                    (!is_null($override->program_slug) ? 1 : 0);
+            })
+            ->first(function ($override) use (
+                $admissionSession,
+                $program,
+                $programType,
+                $department
+            ) {
+
+                return (
+                    is_null($override->admission_session) ||
+                    (int) $override->admission_session === (int) $admissionSession
+                )
+                    &&
+                    (
+                        is_null($override->program_slug) ||
+                        $override->program_slug === $program->slug
+                    )
+                    &&
+                    (
+                        is_null($override->program_type_slug) ||
+                        !$programType ||
+                        $override->program_type_slug === $programType->slug
+                    )
+                    &&
+                    (
+                        is_null($override->department_slug) ||
+                        !$department ||
+                        $override->department_slug === $department->slug
+                    );
+            });
+
+        if ($variation?->duration) {
+            $duration = $variation->duration;
+        }
+
+        if (!$duration) {
+            return null;
+        }
+
+        /*
+         * Example:
+         *
+         * Admission: 2024
+         * Duration: 4
+         *
+         * Expected graduation:
+         * 2024 + 4 - 1 = 2027
+         */
+        return (int) $admissionSession + (int) $duration - 1;
+    }
+}
 // academicStatusOptions
 
 if (!function_exists('academicStatusOptions')) {
@@ -358,16 +429,70 @@ if (!function_exists('electronicsPaymentMethods')) {
 }
 
 // check member level at the time when due is created
+// if (!function_exists('studentLevelAtDue')) {
+//     function studentLevelAtDue($academic, $due): int
+//     {
+//         if (!$academic || !$due || !$academic->admission_session) {
+//             return 1;
+//         }
+
+//         return ($due->academic_year - (int) $academic->admission_session) + 1;
+//     }
+// }
+
 if (!function_exists('studentLevelAtDue')) {
     function studentLevelAtDue($academic, $due): int
     {
-        if (!$academic || !$due || !$academic->admission_session) {
+        if (!$academic || !$due) {
             return 1;
         }
 
-        return ($due->academic_year - (int) $academic->admission_session) + 1;
+        /*
+         * Check whether this due belongs to a previous programme.
+         */
+        $pastProgram = $academic->approvedReAdmissions()
+            ->get()
+            ->first(function ($reAdmission) use ($due) {
+
+                return $due->academic_year >=
+                    (int) $reAdmission->previous_admission_session
+
+                    &&
+
+                    $due->academic_year <=
+                    (int) $reAdmission->previous_graduation_session;
+            });
+
+        /*
+         * If the due belongs to a previous programme,
+         * calculate the level using that programme's
+         * admission session.
+         */
+        if ($pastProgram) {
+            return max(
+                1,
+                (int) $due->academic_year -
+                    (int) $pastProgram->previous_admission_session +
+                    1
+            );
+        }
+
+        /*
+         * Otherwise, it is a current-programme due.
+         */
+        if (!$academic->admission_session) {
+            return 1;
+        }
+
+        return max(
+            1,
+            (int) $due->academic_year -
+                (int) $academic->admission_session +
+                1
+        );
     }
 }
+
 
 
 if (!function_exists('totalPendingPaymentTransactions')) {
@@ -378,6 +503,15 @@ if (!function_exists('totalPendingPaymentTransactions')) {
             ->count();
     }
 }
+
+
+if (!function_exists('totalPendingPaymentRegularizations')) {
+    function totalPendingPaymentRegularizations()
+    {
+        return PaymentRegularization::where('approval_status', 'pending')->count();
+    }
+}
+
 
 if (!function_exists('highestProgramDuration')) {
     function highestProgramDuration(): int

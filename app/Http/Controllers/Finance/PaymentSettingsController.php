@@ -8,6 +8,7 @@ use App\Models\Finance\Settings\ElectronicPaymentConfig;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Settings\Tax;
+use App\Models\Finance\Transactions\PaymentRegularization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Contracts\Service\Attribute\Required;
@@ -101,6 +102,16 @@ class PaymentSettingsController extends Controller
         $account = BankAccount::where('id', $id)->first();
         if (!$account) {
             return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        // prevent delete if it has been used for regularixzation
+        if (
+            PaymentRegularization::where('bank_account_id', $account->id)->exists()
+        ) {
+            return redirect()->back()->with(
+                'error',
+                'Cannot be removed because this account has been used for payment regularization.'
+            );
         }
         $account->delete();
         return redirect()->back()->with('success', 'Done!');

@@ -146,8 +146,7 @@
                                                         @if ($transaction->payment_status !== 'successful')
                                                             @switch($transaction->electronic_payment_method)
                                                                 @case('flutterwave')
-                                                                    <form
-                                                                        action="{{ route('flutterwavePaymentCallback') }}"
+                                                                    <form action="{{ route('flutterwavePaymentCallback') }}"
                                                                         method="GET" class="d-inline">
                                                                         @csrf
                                                                         <input type="hidden" name="transaction_id"
@@ -204,6 +203,14 @@
                                         </div>
                                     @endforelse
 
+                                    @if ($data['member']->memberAcademicInfo->pastProgramsAssociationDues()->isNotEmpty())
+                                        <hr class="my-5">
+
+                                        <h4 class="mb-4">
+                                            Association Dues from Previous Programmes
+                                        </h4>
+                                        @include('users.member.dues.include.pastProgramAssociationDues')
+                                    @endif
                                 </div>
                             </div>
                             {{-- Back Home --}}
