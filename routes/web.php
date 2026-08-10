@@ -374,6 +374,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/transaction/regularizations', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequests');
     Route::get('admin/finance/transaction/regularizations/search', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequestsSearch');
      Route::get('admin/finance/transaction/regularizations/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentRegularization'])->name('viewPaymentRegularization');
-
+    Route::put('admin/finance/transaction/regularizations/process/{uuid}', [PaymentTransasctionController::class, 'processPaymentRegularizationSubmit'])->name('processPaymentRegularizationSubmit');
 
 });

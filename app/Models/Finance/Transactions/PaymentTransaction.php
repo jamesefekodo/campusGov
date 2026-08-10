@@ -20,6 +20,7 @@ class PaymentTransaction extends Model
         'service_provider_id',
         'paystack_reference',
         'payment_mode',
+        'payment_type',
         'registered_payer',
         'non_registered_payer',
         'phone',
@@ -62,27 +63,7 @@ class PaymentTransaction extends Model
         return $this->belongsTo(User::class, 'approved_by', 'username');
     }
 
-    // public function associationProfile()
-    // {
-    //     return $this->belongsTo(AssociationProfile::class, 'association', 'username');
-    // }
-
-    // public function theStudentAcademicInfo()
-    // {
-    //     return $this->belongsTo(StudentAcademicInfo::class, 'registered_payer', 'username');
-    // }
-    // public function undergraduateObligatoryDue()
-    // {
-    //     return $this->belongsTo(UndergraduateObligatoryFee::class, 'undergraduate_due_id', 'fee_id');
-    // }
-    // public function backlogDue()
-    // {
-    //     return $this->belongsTo(Pre2025BacklogDue::class, 'backlog_due_id', 'fee_id');
-    // }
-    // public function alumniObligatoryDue()
-    // {
-    //     return $this->belongsTo(AlumniObligatoryFee::class, 'alumni_due_id', 'fee_id');
-    // }
+    
     // public function onlinePaymentMethod()
     // {
     //     return $this->belongsTo(OnlinePaymentMethod::class, 'online_payment_method', 'slug');

@@ -34,6 +34,7 @@ return new class extends Migration
 
                 $table->string('payment_mode')->default('manual');
 
+                $table->boolean('update_balance')->default(true);
 
                 $table->string('initiated_by')->nullable(); // Foreign
                 $table->dateTime('initiated_at')->nullable();

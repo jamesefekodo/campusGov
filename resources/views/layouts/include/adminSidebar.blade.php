@@ -222,7 +222,7 @@
                 <ul class="submenu-list list-unstyled">
                     @if (Auth::user()->hasPermission('transactions.read'))
                         <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/transactions') ? 'sidebar-active' : '' }}"
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/transaction') ? 'sidebar-active' : '' }}"
                                 href="{{ route('paymentTransactions') }}">Transactions &nbsp;
                                 @if (totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() > 0)
                                     <span

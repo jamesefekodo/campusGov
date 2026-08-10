@@ -175,21 +175,21 @@
                                                             </td>
                                                             <td>
                                                                 @switch($regularization->approval_status)
-                                                                    @case('successful')
-                                                                        <span class="badge bg-green text-white">Successful</span>
+                                                                    @case('approved')
+                                                                        <span class="badge bg-success text-white">Approved</span>
                                                                     @break
 
                                                                     @case('failed')
-                                                                        <span class="badge bg-red text-white">Failed</span>
+                                                                        <span class="badge bg-yellow text-black">Pending</span>
                                                                     @break
 
-                                                                    @case('pending')
-                                                                        <span class="badge bg-yellow text-black">Pending</span>
+                                                                    @case('declined')
+                                                                        <span class="badge bg-red text-white">Declined</span>
                                                                     @break
 
                                                                     @default
                                                                         <span
-                                                                            class="badge bg-yellow text-black">{{ $regularization->approval_status }}</span>
+                                                                            class="badge bg-red text-white">{{ $regularization->approval_status }}</span>
                                                                 @endswitch
                                                             </td>
                                                             <td>

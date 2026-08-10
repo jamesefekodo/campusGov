@@ -22,6 +22,7 @@ return new class extends Migration
                 $table->string('paystack_reference')->nullable();
                 $table->string('payment_mode')->default('electronic');
                 $table->string('registered_payer')->nullable(); // Foreign
+                $table->string('payment_type')->nullable();
 
                 $table->string('non_registered_payer')->nullable();
                 $table->string('phone')->nullable();

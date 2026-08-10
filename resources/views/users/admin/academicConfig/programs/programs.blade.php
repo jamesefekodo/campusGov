@@ -58,9 +58,6 @@
                                                         Duration
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Levels
-                                                    </th>
-                                                    <th scope="col" class="table_header">
                                                         Types
                                                     </th>
                                                     <th scope="col" class="table_header">
@@ -77,7 +74,7 @@
 
                                             @if ($data['programs']->isEmpty())
                                                 <tr>
-                                                    <td colspan="8" class="text-center">
+                                                    <td colspan="7" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -95,10 +92,11 @@
                                                                 {{ $program->duration }} Years
                                                             </td>
                                                             <td class="text-center">
-                                                                -
-                                                            </td>
-                                                            <td class="text-center">
-                                                                -
+                                                                @if ($program->programTypes)
+                                                                @foreach ($program->programTypes as $type)
+                                                                    <span class="badge bg-secondary text-white me-2">{{ $type->type_name }}</span>
+                                                                @endforeach
+                                                                @endif
                                                             </td>
                                                             <td class="text-center">
                                                                 {{ $program->award }}

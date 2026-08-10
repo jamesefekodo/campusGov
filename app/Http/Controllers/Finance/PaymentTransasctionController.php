@@ -840,4 +840,142 @@ class PaymentTransasctionController extends Controller
 
         return view('users.admin.finance.regularizations.regularizations', compact('data'));
     }
+    public function viewPaymentRegularization($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $regularization = PaymentRegularization::where('uuid', $uuid)->first();
+        if (!$regularization) {
+            return redirect()->back()->with('error', 'Regularization not found.');
+        }
+
+        $data = [
+            'regularization' => $regularization,
+        ];
+        return view('users.admin.finance.regularizations.viewRegularization', compact('data'));
+    }
+    public function processPaymentRegularizationSubmit($uuid, Request $request)
+    {
+        $paymentTransaction = null;
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.update'),
+            403
+        );
+
+        $regularization = PaymentRegularization::where('uuid', $uuid)->first();
+        if (!$regularization) {
+            return redirect()->back()->with('error', 'Regularization not found.');
+        }
+
+        $request->validate([
+            'approval_status' => 'required|string|in:approved,declined',
+            'update_balance' => 'required|required',
+            'remarks' => 'nullable',
+        ]);
+
+        $currentUser = Auth::user();
+
+        // if ($regularization->initiated_by === $currentUser->username) {
+        //     return redirect()->back()->with(
+        //         'error',
+        //         'You cannot approve a payment regularization request that you initiated. Kindly contact another executive to approve this request.'
+        //     );
+        // }
+
+        $regularization->update([
+            'remarks' => $request->remarks,
+            'processed_by' => Auth::user()->username,
+            'approval_status' => $request->approval_status,
+            'approved_at' => Carbon::now(),
+            'update_balance' => $request->update_balance,
+        ]);
+
+        // only if approved
+        if ($regularization->approval_status == 'approved') {
+            $paymentTransaction = PaymentTransaction::updateOrCreate(
+                [
+                    // Unique attributes used to search for the existing record
+                    'payment_transaction_id' => $regularization->regularization_id,
+                    'tenant_id' => tenant()->id,
+                ],
+                [
+                    'amount' => $regularization->amount,
+                    'status' => 'pending',
+                    'payment_transaction_id' => $regularization->regularization_id,
+                    'payment_mode' => $regularization->payment_mode,
+                    'payment_type' => 'regularization',
+                    'registered_payer' => $regularization->username,
+                    'payment_purpose' => 'association_due',
+                    'due_id' => $regularization->due_id,
+                    'amount_payable' => $regularization->amount_paid,
+                    'amount_paid' => $regularization->amount_paid,
+                    'electronic_payment_method' => $regularization->electronic_payment_method,
+                    'manual_payment_method' => $regularization->manual_payment_method,
+                    'payment_status' => 'successful',
+                    'paid_at' => $regularization->payment_date,
+                    'approval_status' => 'approved',
+                    'photo' => $regularization->proof_of_payment,
+                    'approved_by' => $currentUser->username,
+                    'approved_at' => Carbon::now(),
+                ]
+            );
+        }
+
+
+        $transactionExists = PaymentTransaction::where('payment_transaction_id', $regularization->regularization_id)->where('tenant_id', tenant()->id)->first();
+        if ($transactionExists && $paymentTransaction->approval_status !== 'approved') {
+            $transactionExists->update(
+                [
+                    'payment_status' => 'failed',
+                    'approval_status' => 'declined',
+                ]
+            );
+        }
+
+
+
+        $settings = basicSystemInfo();
+
+        // update balance
+        if (!$paymentTransaction) {
+            $paymentTransaction = $transactionExists;
+        }
+
+        if ($paymentTransaction) {
+            $wasBalanceUpdated = $paymentTransaction->balance_update_status === 'done';
+            $shouldBalanceBeUpdated = $regularization->approval_status === 'approved' && $regularization->update_balance == true;
+            
+            
+            if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
+
+                // Money has never been added, but should now be added.
+                $settings->increment('account_balance', $paymentTransaction->amount_paid);
+
+                $paymentTransaction->update([
+                    'amount_settled' => $paymentTransaction->amount_paid,
+                    'balance_update_status' => 'done',
+                ]);
+            } elseif ($wasBalanceUpdated && !$shouldBalanceBeUpdated) {
+
+                // Money was previously added but should now be removed.
+                $settings->decrement('account_balance', $paymentTransaction->amount_paid);
+
+                $paymentTransaction->update([
+                    'amount_settled' => 0,
+                    'balance_update_status' => 'cancelled',
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'done!');
+    }
 }

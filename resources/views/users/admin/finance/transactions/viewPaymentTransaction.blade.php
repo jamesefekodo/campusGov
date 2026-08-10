@@ -140,6 +140,14 @@
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Payment Type:</span>
+                                        <span class="text-black">
+                                            <span class="text-capitalize">
+                                                {{ $data['transaction']->payment_type }}
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Payment Mode:</span>
                                         <span class="text-black">
                                             <span class="text-capitalize">
