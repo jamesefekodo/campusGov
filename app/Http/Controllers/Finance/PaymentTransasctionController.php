@@ -9,6 +9,7 @@ use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\Tax;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Finance\Transactions\PaymentWaiver;
 use Carbon\Carbon;
 use Faker\Provider\Payment;
 use Illuminate\Http\Request;
@@ -63,6 +64,18 @@ class PaymentTransasctionController extends Controller
                 'This association due has already been paid.'
             );
         }
+
+        // check if waiver exists
+        $waiverExists = PaymentWaiver::where('username', $due->fee_id)->where('due_id', $due->fee_id)->where('approval_status', 'approved')->first();
+        if ($alreadyPaid) {
+            return redirect()->back()->with(
+                'error',
+                'You have been granted a payment waiver for this due by the association.'
+            );
+        }
+
+
+
 
         // check for pending transaction
         $pendingTransaction = PaymentTransaction::where('registered_payer', $member->username)
@@ -376,9 +389,6 @@ class PaymentTransasctionController extends Controller
                     return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
                 }
             }
-
-
-            // if()
         }
 
 
@@ -953,8 +963,8 @@ class PaymentTransasctionController extends Controller
         if ($paymentTransaction) {
             $wasBalanceUpdated = $paymentTransaction->balance_update_status === 'done';
             $shouldBalanceBeUpdated = $regularization->approval_status === 'approved' && $regularization->update_balance == true;
-            
-            
+
+
             if (!$wasBalanceUpdated && $shouldBalanceBeUpdated) {
 
                 // Money has never been added, but should now be added.
@@ -976,6 +986,140 @@ class PaymentTransasctionController extends Controller
             }
         }
 
+        return redirect()->back()->with('success', 'done!');
+    }
+    public function paymentWaiverRequests(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $paymentWaivers = '';
+        $totalPaymentWaivers = 0;
+
+
+        if (Route::currentRouteName() == 'paymentWaiverRequestsSearch') {
+            $searchKey = $request->input('searchKey');
+            $paymentWaivers = PaymentWaiver::with([
+                'due',
+                'personalProfile',
+            ])
+                ->when($searchKey, function ($query) use ($searchKey) {
+
+                    $keyword = "%{$searchKey}%";
+
+                    $query->where(function ($q) use ($keyword) {
+
+                        // PaymentRegularization fields
+                        $q->where('reason', 'like', $keyword)
+
+                            // Due
+                            ->orWhereHas('due', function ($dueQuery) use ($keyword) {
+                                $dueQuery->where('title', 'like', $keyword)
+                                    ->orWhere('description', 'like', $keyword);
+                            })
+
+                            // Personal profile
+                            ->orWhereHas('personalProfile', function ($profileQuery) use ($keyword) {
+                                $profileQuery->where('phone1', 'like', $keyword)
+                                    ->orWhere('email1', 'like', $keyword)
+                                    ->orWhere('phone2', 'like', $keyword)
+                                    ->orWhere('email2', 'like', $keyword)
+                                    ->orWhere('first_name', 'like', $keyword)
+                                    ->orWhere('middle_name', 'like', $keyword)
+                                    ->orWhere('last_name', 'like', $keyword)
+                                    ->orWhere('gender', 'like', $keyword)
+                                    ->orWhere('nationality', 'like', $keyword)
+                                    ->orWhere('state_of_origin', 'like', $keyword)
+                                    ->orWhere('lga_of_origin', 'like', $keyword);
+                            });
+                    });
+                })
+                ->orderByRaw("CASE WHEN approval_status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalPaymentWaivers = $paymentWaivers->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $paymentWaivers = PaymentWaiver::query()
+                ->orderByRaw("CASE WHEN approval_status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByDesc('created_at')
+                ->paginate(20);
+            $totalPaymentWaivers = PaymentWaiver::count();
+            $requestType = 'all';
+            $pageTitle = 'Payment Regularization';
+        }
+        $data = [
+            'paymentWaivers' => $paymentWaivers,
+            'totalPaymentWaivers' => $totalPaymentWaivers,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.admin.finance.paymentWaivers.paymentWaivers', compact('data'));
+    }
+    public function viewPaymentWaiver($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $waiver = PaymentWaiver::where('uuid', $uuid)->first();
+        if (!$waiver) {
+            return redirect()->back()->with('error', 'Waiver not found.');
+        }
+
+        $data = [
+            'waiver' => $waiver,
+        ];
+        return view('users.admin.finance.paymentWaivers.viewPaymentWaiver', compact('data'));
+    }
+    public function processPaymentWaiverSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.update'),
+            403
+        );
+
+        $waiver = PaymentWaiver::where('uuid', $uuid)->first();
+        if (!$waiver) {
+            return redirect()->back()->with('error', 'Waiver not found.');
+        }
+        $request->validate([
+            'approval_status' => 'required|string|in:approved,declined',
+        ]);
+
+        if ($waiver->initiated_by === $waiver->username) {
+            return redirect()->back()->with(
+                'error',
+                'You cannot approve a payment regularization request that you initiated. Kindly contact another executive to approve this request.'
+            );
+        }
+
+        $waiver->update([
+            'approval_status' => $request->approval_status,
+            'processed_by' => Auth::user()->username,
+            'approved_at' => Carbon::now(),
+
+        ]);
         return redirect()->back()->with('success', 'done!');
     }
 }

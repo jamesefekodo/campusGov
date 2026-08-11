@@ -198,7 +198,7 @@
         </li><!--//nav-item-->
 
         @php
-            $financeNotifications = totalPendingPaymentTransactions() + totalPendingPaymentRegularizations();
+            $financeNotifications = totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() + totalPendingPaymentWaiverRequest();
         @endphp
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/finance') ? 'sidebar-active-section' : '' }}"
@@ -224,10 +224,10 @@
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/transaction') ? 'sidebar-active' : '' }}"
                                 href="{{ route('paymentTransactions') }}">Transactions &nbsp;
-                                @if (totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() > 0)
+                                @if (totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() + totalPendingPaymentWaiverRequest() > 0)
                                     <span
                                         class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                        style="font-size: 11px">{{ totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() }}</span>
+                                        style="font-size: 11px">{{ totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() + totalPendingPaymentWaiverRequest() }}</span>
                                 @endif
                             </a>
                         </li>

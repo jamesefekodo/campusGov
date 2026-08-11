@@ -132,11 +132,13 @@
                                                                     class="d-flex flex-wrap align-items-center justify-content-end gap-2">
 
                                                                     @if (Auth::user()->hasPermission('transactions.create'))
-                                                                        <button type="button" class="btn btn-warning me-3">
-                                                                            <i class="fas fa-ban-cash me-1"></i>
-                                                                            Grant Exemption
+                                                                        <button type="button" class="btn btn-warning me-3"
+                                                                            data-toggle="modal"
+                                                                            data-target="#grantPaymentWaiverModal_{{ $due->fee_id }}">
+                                                                            <i class="fas fa-hand-holding-dollar me-1"></i>
+                                                                            Grant Waiver
                                                                         </button>
-                                                                        @include('users.admin.userManagement.members.profile.include.paymentRegularizationModal')
+                                                                        @include('users.admin.userManagement.members.profile.include.grantPaymentWaiverModal')
 
 
 

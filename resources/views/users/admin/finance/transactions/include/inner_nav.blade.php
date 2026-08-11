@@ -27,6 +27,20 @@
                 </div>
             </a>
         @endif
+        @if (Auth::user()->hasPermission('transactions.read'))
+            <a href="{{ route('paymentWaiverRequests') }}">
+                <div
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/finance/transaction/waivers') ? 'inner_nav_active' : '' }}">
+                    Waivers
+                    @if (totalPendingPaymentWaiverRequest() > 0)
+                        &nbsp;
+                        <span class="position-relative translate-middle badge rounded-pill bg-red ml-3 ms-2"
+                            style="font-size: 11px">{{ totalPendingPaymentWaiverRequest() }}</span>
+                    @endif
+                </div>
+            </a>
+        @endif
+        
 
     </div>
 

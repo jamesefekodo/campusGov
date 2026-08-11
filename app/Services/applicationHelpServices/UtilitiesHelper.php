@@ -9,6 +9,7 @@ use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Finance\Transactions\PaymentWaiver;
 use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -509,6 +510,13 @@ if (!function_exists('totalPendingPaymentRegularizations')) {
     function totalPendingPaymentRegularizations()
     {
         return PaymentRegularization::where('approval_status', 'pending')->count();
+    }
+}
+
+if (!function_exists('totalPendingPaymentWaiverRequest')) {
+    function totalPendingPaymentWaiverRequest()
+    {
+        return PaymentWaiver::where('approval_status', 'pending')->count();
     }
 }
 

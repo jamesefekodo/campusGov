@@ -179,7 +179,7 @@
                                                                         <span class="badge bg-success text-white">Approved</span>
                                                                     @break
 
-                                                                    @case('failed')
+                                                                    @case('pending')
                                                                         <span class="badge bg-yellow text-black">Pending</span>
                                                                     @break
 

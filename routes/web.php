@@ -235,6 +235,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/user_management/members/view/association_dues/{uuid}', [MembersManagementController::class, 'viewMemberAssociationDues'])->name('viewMemberAssociationDues');
     Route::post('admin/user_management/members/view/association_dues/initiate_regularization/{uuid}', [MembersManagementController::class, 'initiatePaymentRegularization'])->name('initiatePaymentRegularization');
+    Route::post('admin/user_management/members/view/association_dues/initiate_payment_waiver/{uuid}', [MembersManagementController::class, 'initiatePaymentWaiver'])->name('initiatePaymentWaiver');
+
 
 
 
@@ -376,4 +378,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
      Route::get('admin/finance/transaction/regularizations/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentRegularization'])->name('viewPaymentRegularization');
     Route::put('admin/finance/transaction/regularizations/process/{uuid}', [PaymentTransasctionController::class, 'processPaymentRegularizationSubmit'])->name('processPaymentRegularizationSubmit');
 
+    Route::get('admin/finance/transaction/waivers', [PaymentTransasctionController::class, 'paymentWaiverRequests'])->name('paymentWaiverRequests');
+    Route::get('admin/finance/transaction/waivers/search', [PaymentTransasctionController::class, 'paymentWaiverRequests'])->name('paymentWaiverRequestsSearch');
+    Route::get('admin/finance/transaction/waivers/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentWaiver'])->name('viewPaymentWaiver');
+    Route::put('admin/finance/transaction/waivers/proccess/{uuid}', [PaymentTransasctionController::class, 'processPaymentWaiverSubmit'])->name('processPaymentWaiverSubmit');
 });

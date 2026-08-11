@@ -166,7 +166,7 @@
                                                     @if ($data['regularization']->initiatedBy)
                                                         <a href="{{ route('viewMember', ['uuid' => $data['regularization']->initiatedBy->uuid]) }}"
                                                             target="_blank" class="badge bg-secondary text-white"
-                                                            title="View Approver">
+                                                            title="View Initiator">
                                                             <i class="fas fa-link"></i>
                                                         </a>
                                                     @endif

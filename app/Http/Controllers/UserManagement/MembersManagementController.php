@@ -10,6 +10,7 @@ use App\Models\AcademicConfig\ProgramType;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Finance\Transactions\PaymentWaiver;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberReAdmissionApplication;
@@ -1927,6 +1928,99 @@ class MembersManagementController extends Controller
             }
         }
         $regularizationRequest->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function initiatePaymentWaiver($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.create'),
+            403
+        );
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        request()->validate([
+            'fee_id' => 'required|exists:association_dues,fee_id',
+            'reason' => 'required',
+        ]);
+
+
+
+
+        $due = AssociationDue::where('fee_id', $request->fee_id)->first();
+        if (!$due) {
+            return redirect()->back()->with('error', 'Association due not found.');
+        }
+
+        $academicInfo = $member->memberAcademicInfo;
+
+        $memberDue = $academicInfo
+            ->associationDues()
+            ->firstWhere('fee_id', $request->fee_id);
+
+        if (!$memberDue) {
+            $memberDue = $academicInfo
+                ->pastProgramsAssociationDues()
+                ->flatten(1)
+                ->firstWhere('fee_id', $request->fee_id);
+        }
+
+        if (!$memberDue) {
+            return redirect()->back()->with(
+                'error',
+                'This due does not apply to your account.'
+            );
+        }
+
+        $due = $memberDue;
+
+
+        // check if it has been paid
+        $alreadyPaid = PaymentTransaction::where('registered_payer', $member->username)->where('due_id', $due->fee_id)->where('approval_status', 'approved')->first();
+
+        if ($alreadyPaid) {
+            return redirect()->back()->with(
+                'error',
+                'This association due has already been paid.'
+            );
+        }
+
+        // check for pending transaction
+        $pendingTransaction = PaymentTransaction::where('registered_payer', $member->username)
+            ->where('due_id', $due->fee_id)
+            ->where(function ($query) {
+                $query->where('payment_status', 'pending')
+                    ->orWhere('approval_status', 'pending');
+            })
+            ->first();
+
+        // check for pending waiver request
+        $pendingWaiverRequest = PaymentWaiver::where('username', $member->username)->where('due_id', $due->fee_id)->where('approval_status', 'pending')->first();
+
+        if ($pendingWaiverRequest) {
+            return redirect()->back()->with(
+                'error',
+                'A waiver request for this due is already pending.'
+            );
+        }
+
+         do {
+            $waiverId = 'pymt-waiver-' . now()->format('Ymds') . '-' . tenant()->id . random_int(100000000, 999999999);
+        } while (PaymentWaiver::where('waiver_id', $waiverId)->exists());
+
+        $waiverRequest = new PaymentWaiver();
+        $waiverRequest->waiver_id = $waiverId;
+        $waiverRequest->username = $member->username;
+        $waiverRequest->due_id = $due->fee_id;
+        $waiverRequest->reason = trim($request->reason);
+        $waiverRequest->initiated_by = Auth::user()->username;
+        $waiverRequest->initiated_at = Carbon::now();
+        $waiverRequest->save();
         return redirect()->back()->with('success', 'Done!');
     }
 }

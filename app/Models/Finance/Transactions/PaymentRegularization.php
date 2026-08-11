@@ -39,12 +39,14 @@ class PaymentRegularization extends Model
         'update_balance',
     ];
 
-     protected function casts(): array
+    protected function casts(): array
     {
         return [
             'update_balance' => 'boolean',
+            'approved_at' => 'datetime',
         ];
     }
+
 
     // uuid
     protected static function booted(): void

@@ -18,7 +18,7 @@ class PaymentWaiver extends Model
     protected $fillable = [
         'uuid',
         'tenant_id',
-        'exemption_id',
+        'waiver_id',
         'username',
         'due_id',
         'reason',
@@ -29,6 +29,9 @@ class PaymentWaiver extends Model
         'approved_at',
     ];
 
+    protected $casts = [
+        'approved_at' => 'datetime',
+    ];
 
     // uuid
     protected static function booted(): void
