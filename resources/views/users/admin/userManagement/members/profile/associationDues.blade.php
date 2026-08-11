@@ -131,13 +131,15 @@
                                                                 <div
                                                                     class="d-flex flex-wrap align-items-center justify-content-end gap-2">
 
-                                                                    <button type="button" class="btn btn-warning me-3">
-                                                                        <i class="fas fa-user-shield me-1"></i>
-                                                                        Grant Exemption
-                                                                    </button>
-
-
                                                                     @if (Auth::user()->hasPermission('transactions.create'))
+                                                                        <button type="button" class="btn btn-warning me-3">
+                                                                            <i class="fas fa-ban-cash me-1"></i>
+                                                                            Grant Exemption
+                                                                        </button>
+                                                                        @include('users.admin.userManagement.members.profile.include.paymentRegularizationModal')
+
+
+
                                                                         <span class="fw-semibold text-muted">
                                                                             Already Paid?
                                                                         </span>

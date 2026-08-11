@@ -884,12 +884,12 @@ class PaymentTransasctionController extends Controller
 
         $currentUser = Auth::user();
 
-        // if ($regularization->initiated_by === $currentUser->username) {
-        //     return redirect()->back()->with(
-        //         'error',
-        //         'You cannot approve a payment regularization request that you initiated. Kindly contact another executive to approve this request.'
-        //     );
-        // }
+        if ($regularization->initiated_by === $currentUser->username) {
+            return redirect()->back()->with(
+                'error',
+                'You cannot approve a payment regularization request that you initiated. Kindly contact another executive to approve this request.'
+            );
+        }
 
         $regularization->update([
             'remarks' => $request->remarks,

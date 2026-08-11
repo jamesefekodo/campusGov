@@ -51,7 +51,7 @@ class PaymentRegularization extends Model
     {
         static::creating(function ($model) {
             if (empty($model->uuid)) {
-                $model->uuid = 'uuid-' . date('Ymd') . '-' . Str::uuid();
+                $model->uuid = 'payreg-' . date('Ymd') . '-' . Str::uuid();
             }
         });
     }
