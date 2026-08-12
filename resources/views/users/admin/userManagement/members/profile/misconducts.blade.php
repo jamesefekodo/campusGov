@@ -217,6 +217,16 @@
                                                 </div>
                                             </div>
                                         @endforelse
+                                        @if (Auth::user()->hasPermission('misconducts.create'))
+                                            <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
+                                                    data-target="#addNewMisconductModal">
+                                                    <i class="fas fa-plus"></i> Create New</button>
+                                            </div>
+
+
+                                            @include('users.admin.misconducts.include.addNewMisconductModal')
+                                        @endif
                                     </div>
                                 </div>
                             </div>

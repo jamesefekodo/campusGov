@@ -180,25 +180,29 @@
                     <i class="fas fa-chevron-down bi"></i>
                 </span><!--//submenu-arrow-->
             </a><!--//nav-link-->
-            <div id="submenu-9" class="collapse submenu submenu-9" data-bs-parent="#menu-accordion">
-                <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/elections') || Str::startsWith(request()->path(), 'admin/elections/view') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('allElections') }} --}}
-                             ">Elections
-                            {{-- &nbsp; @if ($totalElectionNotifications > 0)
+
+            @if (Auth::user()->hasPermission('elections.read'))
+                <div id="submenu-9" class="collapse submenu submenu-9" data-bs-parent="#menu-accordion">
+                    <ul class="submenu-list list-unstyled">
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/elections') || Str::startsWith(request()->path(), 'admin/elections/view') ? 'sidebar-active' : '' }}"
+                                href="{{ route('allElections') }}">Elections
+                                {{-- &nbsp; @if ($totalElectionNotifications > 0)
                                 <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
                                     style="font-size: 11px">{{ $totalElectionNotifications }} </span>
                             @endif --}}
-                        </a>
-                    </li>
-                </ul>
-            </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            @endif
         </li><!--//nav-item-->
 
         @php
-            $financeNotifications = totalPendingPaymentTransactions() + totalPendingPaymentRegularizations() + totalPendingPaymentWaiverRequest();
+            $financeNotifications =
+                totalPendingPaymentTransactions() +
+                totalPendingPaymentRegularizations() +
+                totalPendingPaymentWaiverRequest();
         @endphp
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/finance') ? 'sidebar-active-section' : '' }}"

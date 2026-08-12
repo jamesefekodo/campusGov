@@ -24,10 +24,16 @@
                                 <input type="text" class="form-control" value="MISCD-XXXXXXXX-XXXXX" readonly>
                                 <p style="color: red">{{ $errors->first('case_id') }}</p>
                             </div>
+
                             <div class="form-group col-md-6">
                                 <label for="username">Student's Username:<span class="text-red">*</span></label>
-                                <input type="text" class="form-control" name="username" value="{{ old('username') }}"
-                                    required>
+                                @if (Route::currentRouteName() == 'viewMemberMisconducts')
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ $data['member']->username }}" readonly>
+                                @else
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ old('username') }}" required>
+                                @endif
                                 <p style="color: red">{{ $errors->first('username') }}</p>
                             </div>
                             <div class="form-group col-md-6">

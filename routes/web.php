@@ -6,6 +6,7 @@ use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Election\ElectionController;
 use App\Http\Controllers\Finance\AssociationDueController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
@@ -382,4 +383,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/transaction/waivers/search', [PaymentTransasctionController::class, 'paymentWaiverRequests'])->name('paymentWaiverRequestsSearch');
     Route::get('admin/finance/transaction/waivers/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentWaiver'])->name('viewPaymentWaiver');
     Route::put('admin/finance/transaction/waivers/proccess/{uuid}', [PaymentTransasctionController::class, 'processPaymentWaiverSubmit'])->name('processPaymentWaiverSubmit');
+
+    // elections
+    Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
+    Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
+
+
 });

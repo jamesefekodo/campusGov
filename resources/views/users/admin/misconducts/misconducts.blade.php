@@ -19,7 +19,7 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if (Auth::user()->hasPermission('roles.create') && $showAddBtn == true)
+            @if (Auth::user()->hasPermission('misconducts.create') && $showAddBtn == true)
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
