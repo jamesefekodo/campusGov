@@ -181,6 +181,7 @@
                                             @endif
 
                                         </div>
+                                        show button to lead, see, downlioad all successful payment transactions, approved waivers.....
 
 
                                     </div>

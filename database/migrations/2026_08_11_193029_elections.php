@@ -29,11 +29,11 @@ return new class extends Migration
                 $table->dateTime('form_sales_starts');
                 $table->dateTime('form_sales_ends');
 
-                $table->dateTime('screening_starts');
-                $table->dateTime('screening_ends');
+                $table->dateTime('screening_starts')->nullable();
+                $table->dateTime('screening_ends')->nullable();
 
-                $table->dateTime('campaign_starts');
-                $table->dateTime('campaign_ends');
+                $table->dateTime('campaign_starts')->nullable();
+                $table->dateTime('campaign_ends')->nullable();
 
                 $table->dateTime('voting_starts');
                 $table->dateTime('voting_ends');

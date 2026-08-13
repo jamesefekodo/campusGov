@@ -243,7 +243,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
 
-
     // academic config
     // faculties
     Route::get('admin/academic_config/faculties', [AcademicConfigController::class, 'faculties'])->name('faculties');
@@ -387,6 +386,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
+        Route::get('admin/elections/create_new/submit', [ElectionController::class, 'addNewElectionSubmit'])->name('addNewElectionSubmit');
+
+
 
 
 });

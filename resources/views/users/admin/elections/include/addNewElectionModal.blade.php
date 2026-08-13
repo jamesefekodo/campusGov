@@ -15,7 +15,7 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('addNewMisconductSubmit') }}"
+                    <form class="form my_form" method="POST" action="{{ route('addNewElectionSubmit') }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
@@ -32,18 +32,73 @@
                                 <p style="color: red">{{ $errors->first('description') }}</p>
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="voting_method">Voting Method:<span class="text-red">*</span></label>
-                                <select class="form-select" name="voting_method" required>
-                                    <option selected disabled>
-                                        -Select-</option>
+                                <label for="voting_method">
+                                    Voting Method:<span class="text-red">*</span>
+                                </label>
+
+                                <select class="form-select" name="voting_method" id="voting_method" required>
+                                    <option value="" selected disabled>-Select-</option>
+
                                     <option value="standard" {{ old('voting_method') == 'standard' ? 'selected' : '' }}>
-                                        Standard</option>
+                                        Standard
+                                    </option>
+
                                     <option value="monetary" {{ old('voting_method') == 'monetary' ? 'selected' : '' }}>
-                                        Monetary (Public)</option>
+                                        Monetary (Public)
+                                    </option>
                                 </select>
+
                                 <p style="color: red">
-                                    {{ $errors->first('voting_method') }}</p>
+                                    {{ $errors->first('voting_method') }}
+                                </p>
                             </div>
+
+
+                            <div class="form-group col-md-6" id="cost_per_vote_container"
+                                style="{{ old('voting_method') == 'monetary' ? '' : 'display: none;' }}">
+
+                                <label for="cost_per_vote">
+                                    Cost Per Vote:<span class="text-red">*</span>
+                                </label>
+
+                                <input type="number" step="0.01" min="0" class="form-control"
+                                    name="cost_per_vote" id="cost_per_vote" value="{{ old('cost_per_vote') }}"
+                                    {{ old('voting_method') == 'monetary' ? 'required' : '' }}>
+
+                                <p style="color: red">
+                                    {{ $errors->first('cost_per_vote') }}
+                                </p>
+                            </div>
+
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+
+                                    const votingMethod = document.getElementById('voting_method');
+                                    const costContainer = document.getElementById('cost_per_vote_container');
+                                    const costInput = document.getElementById('cost_per_vote');
+
+                                    function toggleCostPerVote() {
+
+                                        if (votingMethod.value === 'monetary') {
+
+                                            costContainer.style.display = 'block';
+                                            costInput.required = true;
+
+                                        } else {
+
+                                            costContainer.style.display = 'none';
+                                            costInput.required = false;
+                                            costInput.value = '';
+                                        }
+                                    }
+
+                                    votingMethod.addEventListener('change', toggleCostPerVote);
+
+                                    // Handle old input after validation failure
+                                    toggleCostPerVote();
+                                });
+                            </script>
                             <div class="form-group col-md-6">
                                 <label for="public_visibility">Public Visibility:<span class="text-red">*</span></label>
                                 <select class="form-select" name="public_visibility" required>
@@ -57,6 +112,11 @@
                                 <p style="color: red">
                                     {{ $errors->first('public_visibility') }}</p>
                             </div>
+                            <div class="d-flex align-items-center mt-2">
+                                <hr class="flex-grow-1">
+                                <span class="mx-2 text-blue">Form Sales Period</span>
+                                <hr class="flex-grow-1">
+                            </div>
                             <div class="form-group col-md-6">
                                 <label for="form_sales_starts">Form Sales Starts<span class="text-red">*</span></label>
                                 <input type="datetime-local" class="form-control" name="form_sales_starts"
@@ -68,6 +128,48 @@
                                 <input type="datetime-local" class="form-control" name="form_sales_ends"
                                     value="{{ old('form_sales_ends') }}" required>
                                 <p style="color: red">{{ $errors->first('form_sales_ends') }}</p>
+                            </div>
+
+                            <div class="d-flex align-items-center mt-2">
+                                <hr class="flex-grow-1">
+                                <span class="mx-2 text-blue">Screening Period</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="screening_starts">Screening Starts</label>
+                                <input type="datetime-local" class="form-control" name="screening_starts"
+                                    value="{{ old('screening_starts') }}">
+                                <p style="color: red">{{ $errors->first('screening_starts') }}</p>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="screening_ends">Screening Ends</label>
+                                <input type="datetime-local" class="form-control" name="screening_ends"
+                                    value="{{ old('screening_ends') }}">
+                                <p style="color: red">{{ $errors->first('screening_ends') }}</p>
+                            </div>
+
+                            <div class="d-flex align-items-center mt-2">
+                                <hr class="flex-grow-1">
+                                <span class="mx-2 text-blue">Screening Period</span>
+                                <hr class="flex-grow-1">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="campaign_starts">Screening Starts</label>
+                                <input type="datetime-local" class="form-control" name="campaign_starts"
+                                    value="{{ old('campaign_starts') }}">
+                                <p style="color: red">{{ $errors->first('campaign_starts') }}</p>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="campaign_ends">Screening Ends</label>
+                                <input type="datetime-local" class="form-control" name="campaign_ends"
+                                    value="{{ old('campaign_ends') }}">
+                                <p style="color: red">{{ $errors->first('campaign_ends') }}</p>
+                            </div>
+
+                            <div class="d-flex align-items-center">
+                                <hr class="flex-grow-1">
+                                <span class="mx-2 text-blue">Voting Period</span>
+                                <hr class="flex-grow-1">
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="voting_starts">Voting Starts<span class="text-red">*</span></label>
