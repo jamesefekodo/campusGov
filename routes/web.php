@@ -375,7 +375,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/finance/transaction/regularizations', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequests');
     Route::get('admin/finance/transaction/regularizations/search', [PaymentTransasctionController::class, 'paymentRegularizationRequests'])->name('paymentRegularizationRequestsSearch');
-     Route::get('admin/finance/transaction/regularizations/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentRegularization'])->name('viewPaymentRegularization');
+    Route::get('admin/finance/transaction/regularizations/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentRegularization'])->name('viewPaymentRegularization');
     Route::put('admin/finance/transaction/regularizations/process/{uuid}', [PaymentTransasctionController::class, 'processPaymentRegularizationSubmit'])->name('processPaymentRegularizationSubmit');
 
     Route::get('admin/finance/transaction/waivers', [PaymentTransasctionController::class, 'paymentWaiverRequests'])->name('paymentWaiverRequests');
@@ -386,9 +386,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
-        Route::get('admin/elections/create_new/submit', [ElectionController::class, 'addNewElectionSubmit'])->name('addNewElectionSubmit');
+    Route::post('admin/elections/create_new/submit', [ElectionController::class, 'addNewElectionSubmit'])->name('addNewElectionSubmit');
+    Route::get('admin/elections/view/{uuid}', [ElectionController::class, 'viewElection'])->name('viewElection');
+    Route::post('admin/elections/qualified_candidate_groups/add_new/{uuid}', [ElectionController::class, 'addNewQualifiedCandidateGroupSubmit'])->name('addNewQualifiedCandidateGroupSubmit');
 
 
-
-
+    
 });

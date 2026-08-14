@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Election;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConfig\Faculty;
+use App\Models\AcademicConfig\Program;
 use App\Models\Elections\Election;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -91,7 +93,7 @@ class ElectionController extends Controller
             ],
 
             'public_visibility' => 'required',
-            'form_sales_starts' => 'required|date',
+            'form_sales_starts' => 'required|date|after:' . now()->addHours(48),
             'form_sales_ends' => 'required|date|after:form_sales_starts',
 
             'screening_starts' => 'nullable|date',
@@ -109,34 +111,66 @@ class ElectionController extends Controller
                 'date',
                 'after:campaign_starts',
             ],
-
+            'academic_session' => 'required|integer|digits:4',
             'voting_starts' => 'required|date|after:form_sales_ends',
             'voting_ends' => 'required|date|after:voting_starts',
         ]);
 
         do {
             $electionId = 'election-' . now()->format('Y') . '-' . tenant()->id . random_int(100000000, 999999999);
-        } while (Election::where('payment_transaction_id', $electionId)->exists());
+        } while (Election::where('election_id', $electionId)->exists());
 
         Election::create([
             'election_id' => $electionId,
             'voting_method' => $request->voting_method,
             'public_visibility' => $request->public_visibility,
             'title' => trim($request->title),
+            'academic_session' => trim($request->academic_session),
             'description' => trim($request->description),
             'status' => 'draft',
             'form_sales_starts' => $request->form_sales_starts,
             'form_sales_ends' => $request->form_sales_ends,
-            'screening_starts' => $request->screening_starts,
-            'screening_ends' => $request->screening_ends,
-            'campaign_starts' => $request->campaign_starts,
-            'campaign_ends' => $request->campaign_ends,
+            'screening_starts' => $request->screening_starts ?? null,
+            'screening_ends' => $request->screening_ends ?? null,
+            'campaign_starts' => $request->campaign_starts ?? null,
+            'campaign_ends' => $request->campaign_ends ?? null,
             'voting_starts' => $request->voting_starts,
             'voting_ends' => $request->voting_ends,
-            'cost_per_vote' => trim($request->cost_per_vote),
+            'cost_per_vote' => trim($request->cost_per_vote) !== ''
+                ? trim($request->cost_per_vote)
+                : null,
             'initiated_by' => Auth::user()->username,
             'initiated_at' => Carbon::now(),
         ]);
         return redirect()->back()->with('success', 'Done!');
+    }
+    public function viewElection($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.read'),
+            403
+        );
+
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+        $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
+        $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
+
+        $data = [
+            'election' => $election,
+            'activeProgram' => $activeProgram,
+            'activeFaculties' => $activeFaculties,
+        ];
+
+        return view('users.admin.elections.viewElection', compact('data'));
+    }
+    public function addNewQualifiedCandidateGroupSubmit(Request $request){
+        
     }
 }

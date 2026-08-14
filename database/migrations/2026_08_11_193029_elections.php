@@ -22,9 +22,10 @@ return new class extends Migration
                 $table->string('voting_method')->nullable('standard');
                 $table->boolean('public_visibility')->default(false);
                 $table->string('title');
+                $table->integer('academic_session');
                 $table->text('description')->nullable();
 
-                $table->string('status')->default('draft'); //  draft, new, registration, screening, campaign, voting, result_pending, completed, cancelled, suspended
+                $table->string('status')->default('draft'); // draft, awaiting_approval new, registration, screening, campaign, voting, result_pending, completed, cancelled, suspended
 
                 $table->dateTime('form_sales_starts');
                 $table->dateTime('form_sales_ends');

@@ -21,7 +21,7 @@
                         <div class="col-md-9 individual-review-card">
                             <div class="my_form_container">
                                 <h4 class="block text-white text-center py-2 type-b-page-header text-capitalize">
-                                    Payment Regularization - <span
+                                    Payment Waiver - <span
                                         class="text-uppercase">{{ strtolower($data['waiver']->waiver_id) }}</span>
                                 </h4>
                                 <div class="card-body p-4 row col-md-12">

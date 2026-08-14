@@ -19,11 +19,30 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="form-group col-md-12">
+                            <div class="form-group col-md-8">
                                 <label for="title">Title: <span class="text-red">*</span></label>
                                 <input type="text" class="form-control" name="title" value="{{ old('title') }}"
                                     required>
                                 <p style="color: red">{{ $errors->first('title') }}</p>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="academic_session">Admission Session<span class="text-red">*</span>:</label>
+                                <select name="academic_session" class="form-control">
+                                    <option value="" disabled selected>Select</option>
+                                    @php
+                                        // $startYear = currentAcademicYear() - highestProgramDuration();
+                                        $startYear = currentAcademicYear();
+                                        $endYear = currentAcademicYear() + 1;
+                                    @endphp
+
+                                    @for ($year = $endYear; $year >= $startYear; $year--)
+                                        <option value="{{ $year }}"
+                                            {{ old('academic_session', currentAcademicYear()) == $year ? 'selected' : '' }}>
+                                            {{ $year }}/{{ $year + 1 }}
+                                        </option>
+                                    @endfor
+                                </select>
+                                <p style="color: red">{{ $errors->first('academic_session') }}</p>
                             </div>
                             <div class="form-group col-md-12">
                                 <label for="description">Description: <span class="text-red">*</span></label>
@@ -39,12 +58,14 @@
                                 <select class="form-select" name="voting_method" id="voting_method" required>
                                     <option value="" selected disabled>-Select-</option>
 
-                                    <option value="standard" {{ old('voting_method') == 'standard' ? 'selected' : '' }}>
+                                    <option value="standard"
+                                        {{ old('voting_method') == 'standard' ? 'selected' : '' }}>
                                         Standard
                                     </option>
 
-                                    <option value="monetary" {{ old('voting_method') == 'monetary' ? 'selected' : '' }}>
-                                        Monetary (Public)
+                                    <option value="monetary"
+                                        {{ old('voting_method') == 'monetary' ? 'selected' : '' }}>
+                                        Monetary
                                     </option>
                                 </select>
 

@@ -2,6 +2,7 @@
 
 namespace App\Models\Elections;
 
+use App\Models\Elections\ElectionGeneralQualifiedCandidateGroup;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +21,7 @@ class Election extends Model
         'voting_method',
         'public_visibility',
         'title',
+        'academic_session',
         'description',
         'status',
         'form_sales_starts',
@@ -60,5 +62,9 @@ class Election extends Model
     public function initiatedBy()
     {
         return $this->belongsTo(User::class, 'initiated_by', 'username');
+    }
+     public function generalCandidateGroups()
+    {
+        return $this->hasMany(ElectionGeneralQualifiedCandidateGroup::class, 'initiated_by', 'username');
     }
 }

@@ -53,16 +53,22 @@
                                                     <th scope="col" style="width: 10px" class="table_header">S/N
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Case ID
+                                                        Election
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Member
+                                                        Description
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Type
+                                                        Voting Method
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Reported On
+                                                        Application Period
+                                                    </th>
+                                                    <th scope="col" class="table_header">
+                                                        Voting Period
+                                                    </th>
+                                                    <th scope="col" class="table_header">
+                                                        Status
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         View
@@ -72,7 +78,7 @@
 
                                             @if ($data['elections']->isEmpty())
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="8" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -84,106 +90,107 @@
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start">
-                                                                <span class="text-uppercase me-2">
-                                                                    {{ $misconduct->case_id }}
-                                                                </span>
+                                                                {{ $election->title }} {{ $election->academic_session .'/'. $election->academic_session +1 }}
+                                                            </td>
+                                                            <td class="text-start">
+                                                                {{ $election->description }}
+                                                            </td>
+                                                            <td class="text-start text-capitalize">
+                                                                {{ $election->voting_method }}
+                                                            </td>
+                                                            <td class="text-start">
+                                                                @php
+                                                                    $formSalesStarts = \Carbon\Carbon::parse(
+                                                                        $election->form_sales_starts,
+                                                                    );
+                                                                    $formSalesEnds = \Carbon\Carbon::parse(
+                                                                        $election->form_sales_ends,
+                                                                    );
+                                                                @endphp
 
-                                                                @switch($misconduct->status)
-                                                                    @case('pending')
-                                                                        <span class="badge bg-gray text-white">Pending</span>
+                                                                {{ $formSalesStarts->format('l, d F, Y') }}
+
+                                                                @if ($formSalesStarts->isSameDay($formSalesEnds))
+                                                                    {{ $formSalesStarts->format('g:i A') }} to
+                                                                    {{ $formSalesEnds->format('g:i A') }}
+                                                                @else
+                                                                    to {{ $formSalesEnds->format('l, d F, Y') }}
+                                                                @endif
+                                                            </td>
+                                                            <td class="text-start">
+                                                                @php
+                                                                    $votingStarts = \Carbon\Carbon::parse(
+                                                                        $election->voting_starts,
+                                                                    );
+                                                                    $votingEnds = \Carbon\Carbon::parse(
+                                                                        $election->voting_ends,
+                                                                    );
+                                                                @endphp
+
+                                                                {{ $votingStarts->format('l, d F, Y') }}
+
+                                                                @if ($votingStarts->isSameDay($votingEnds))
+                                                                    {{ $votingStarts->format('g:i A') }} to
+                                                                    {{ $votingEnds->format('g:i A') }}
+                                                                @else
+                                                                    to {{ $votingEnds->format('l, d F, Y') }}
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                @switch($election->status)
+                                                                    @case('draft')
+                                                                        <span
+                                                                            class="badge bg-secondary-subtle text-secondary">Draft</span>
                                                                     @break
 
-                                                                    @case('under_investigation')
-                                                                        <span class="badge bg-yellow text-black">Under
-                                                                            Investigation</span>
+                                                                    @case('awaiting_approval')
+                                                                        <span class="badge bg-warning-subtle text-warning">Awaiting
+                                                                            Approval</span>
                                                                     @break
 
-                                                                    @case('partially_resolved')
-                                                                        <span class="badge bg-blue text-white">Partially
-                                                                            Resolved</span>
+                                                                    @case('new')
+                                                                        <span
+                                                                            class="badge bg-primary-subtle text-primary">New</span>
                                                                     @break
 
-                                                                    @case('resolved')
-                                                                        <span class="badge bg-green text-white">Resolved</span>
+                                                                    @case('registration')
+                                                                        <span
+                                                                            class="badge bg-primary-subtle text-primary">Registration</span>
+                                                                    @break
+
+                                                                    @case('screening')
+                                                                        <span
+                                                                            class="badge bg-warning-subtle text-warning">Screening</span>
+                                                                    @break
+
+                                                                    @case('campaign')
+                                                                        <span
+                                                                            class="badge bg-warning-subtle text-warning">Campaign</span>
+                                                                    @break
+
+                                                                    @case('completed')
+                                                                        <span
+                                                                            class="badge bg-success-subtle text-success">Completed</span>
+                                                                    @break
+
+                                                                    @case('cancelled')
+                                                                        <span
+                                                                            class="badge bg-danger-subtle text-danger">Cancelled</span>
+                                                                    @break
+
+                                                                    @case('suspended')
+                                                                        <span
+                                                                            class="badge bg-danger-subtle text-danger">Suspended</span>
                                                                     @break
 
                                                                     @default
+                                                                        <span
+                                                                            class="badge bg-danger-subtle text-danger">{{ $election->status }}</span>
                                                                 @endswitch
-                                                            </td>
-                                                            <td class="text-start">
-                                                                -
-                                                            </td>
-                                                            <td class="">
-                                                                @switch($misconduct->misconduct_type)
-                                                                    @case('abuse_of_office')
-                                                                        Abuse of Office
-                                                                    @break
-
-                                                                    @case('bullying')
-                                                                        Bullying
-                                                                    @break
-
-                                                                    @case('conflict_of_interest')
-                                                                        Conflict of Interest
-                                                                    @break
-
-                                                                    @case('cyberbullying')
-                                                                        Cyberbullying
-                                                                    @break
-
-                                                                    @case('financial_misconduct')
-                                                                        Financial Misconduct
-                                                                    @break
-
-                                                                    @case('fighting')
-                                                                        Fighting
-                                                                    @break
-
-                                                                    @case('inciting_unrest')
-                                                                        Inciting Unrest
-                                                                    @break
-
-                                                                    @case('insubordination')
-                                                                        Insubordination
-                                                                    @break
-
-                                                                    @case('misinformation')
-                                                                        Misinformation
-                                                                    @break
-
-                                                                    @case('neglect_of_duties')
-                                                                        Neglect of Duties
-                                                                    @break
-
-                                                                    @case('substance_abuse')
-                                                                        Substance Abuse
-                                                                    @break
-
-                                                                    @case('theft')
-                                                                        Theft
-                                                                    @break
-
-                                                                    @case('unauthorized_meetings')
-                                                                        Unauthorized Meetings
-                                                                    @break
-
-                                                                    @case('vandalism')
-                                                                        Vandalism
-                                                                    @break
-
-                                                                    @case('verbal_abuse')
-                                                                        Verbal Abuse
-                                                                    @break
-
-                                                                    @default
-                                                                @endswitch
-                                                            </td>
-                                                            <td class="text-start">
-                                                                {{ \Carbon\Carbon::parse($misconduct->report_date)->format('l, d F, Y') }}
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewMisconductCase', ['uuid' => $misconduct->uuid]) }}">View</a>
+                                                                    href="{{ route('viewElection', ['uuid' => $election->uuid]) }}">View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
