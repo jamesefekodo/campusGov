@@ -3,6 +3,7 @@
 namespace App\Models\Elections;
 
 use App\Models\Elections\ElectionGeneralQualifiedCandidateGroup;
+use App\Models\Elections\ElectionGeneralQualifiedVoterGroup;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -63,8 +64,13 @@ class Election extends Model
     {
         return $this->belongsTo(User::class, 'initiated_by', 'username');
     }
-     public function generalCandidateGroups()
+
+    public function voterGroups()
     {
-        return $this->hasMany(ElectionGeneralQualifiedCandidateGroup::class, 'initiated_by', 'username');
+        return $this->hasMany(ElectionGeneralQualifiedVoterGroup::class, 'election_id', 'election_id');
+    }
+    public function positions()
+    {
+        return $this->hasMany(ElectionPosition::class, 'election_id', 'election_id');
     }
 }

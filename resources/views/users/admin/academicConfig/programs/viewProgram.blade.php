@@ -98,14 +98,14 @@
                                                 </button>
                                             @endif
 
-                                            @if (Auth::user()->hasPermission('program.delete'))
+                                            {{-- @if (Auth::user()->hasPermission('program.delete'))
                                                 <button type="button"
                                                     class="btn btn-danger m-1 d-flex align-items-center delete-role"
-                                                    {{-- data-url="{{ route('deleteFaculty', ['slug' => $data['policy']->slug]) }}" --}}>
+                                                    data-url="{{ route('deleteFaculty', ['slug' => $data['policy']->slug]) }}">
                                                     <i class="fas fa-trash me-2"></i>
                                                     <span>Delete</span>
                                                 </button>
-                                            @endif
+                                            @endif --}}
 
                                         </div>
 

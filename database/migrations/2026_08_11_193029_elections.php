@@ -25,7 +25,7 @@ return new class extends Migration
                 $table->integer('academic_session');
                 $table->text('description')->nullable();
 
-                $table->string('status')->default('draft'); // draft, awaiting_approval new, registration, screening, campaign, voting, result_pending, completed, cancelled, suspended
+                $table->string('status')->default('draft'); // draft, awaiting_approval, new, registration, screening, campaign, voting, result_pending, completed, cancelled, suspended
 
                 $table->dateTime('form_sales_starts');
                 $table->dateTime('form_sales_ends');

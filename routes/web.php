@@ -388,8 +388,29 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
     Route::post('admin/elections/create_new/submit', [ElectionController::class, 'addNewElectionSubmit'])->name('addNewElectionSubmit');
     Route::get('admin/elections/view/{uuid}', [ElectionController::class, 'viewElection'])->name('viewElection');
-    Route::post('admin/elections/qualified_candidate_groups/add_new/{uuid}', [ElectionController::class, 'addNewQualifiedCandidateGroupSubmit'])->name('addNewQualifiedCandidateGroupSubmit');
+    Route::put('admin/elections/election/update/{uuid}', [ElectionController::class, 'updateElectionSubmit'])->name('updateElectionSubmit');
 
 
-    
+
+
+    Route::post('admin/elections/qualified_voter_groups/add_new/{uuid}', [ElectionController::class, 'addNewQualifiedVoterGroupSubmit'])->name('addNewQualifiedVoterGroupSubmit');
+    Route::get('admin/elections/qualified_voter_groups/remove/{uuid}', [ElectionController::class, 'removeQualifiedVoterGroup'])->name('removeQualifiedVoterGroup');
+    Route::put('admin/elections/qualified_voter_groups/update/submit/{uuid}', [ElectionController::class, 'updateQualifiedVoterGroupSubmit'])->name('updateQualifiedVoterGroupSubmit');
+
+    Route::post('admin/elections/positions/add_new/{uuid}', [ElectionController::class, 'addNewElectionPositionSubmit'])->name('addNewElectionPositionSubmit');
+    Route::post('admin/elections/positions/qualified_candidate_group/add/{uuid}', [ElectionController::class, 'addNewPositionQualifiedCandidateGroupSubmit'])->name('addNewPositionQualifiedCandidateGroupSubmit');
+    Route::put('admin/elections/positions/qualified_candidate_group/update/{uuid}', [ElectionController::class, 'updateQualifiedCandidateGroupSubmit'])->name('updateQualifiedCandidateGroupSubmit');
+    Route::get('admin/elections/positions/qualified_candidate_group/remove/{uuid}', [ElectionController::class, 'removeQualifiedCandidateGroup'])->name('removeQualifiedCandidateGroup');
+    Route::get('admin/elections/submit_for_approval/remove/{uuid}', [ElectionController::class, 'submitElectionForApproval'])->name('submitElectionForApproval');
+    Route::get('admin/elections/concent_and_awareness_form/remove/{uuid}', [ElectionController::class, 'printElectionConcentAwarenessForm'])->name('printElectionConcentAwarenessForm');
+
+
+
+
+    // to be deleted
+
+
+    Route::get('admin/elections/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');
+
+
 });

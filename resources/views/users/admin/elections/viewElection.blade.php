@@ -8,9 +8,10 @@
                 <div class="row">
                     <div class="individual-review-card-container">
                         <div class="col-md-12 individual-review-card">
-                            <div class="my_form_container">
+                            <div class="my_form_container pb-5">
                                 <h4 class="block text-white text-center py-2 type-b-page-header text-capitalize">
-                                    Election - <span class="text-uppercase">{{ strtolower($data['election']->title) }} {{ $data['election']->academic_session .'/'. $data['election']->academic_session +1 }}</span>
+                                    Election - <span class="text-uppercase">{{ strtolower($data['election']->title) }}
+                                        {{ $data['election']->academic_session . '/' . $data['election']->academic_session + 1 }}</span>
                                 </h4>
                                 <div class="card-body p-4 row col-md-12">
                                     <div class="col-md-6 p-1">
@@ -69,7 +70,8 @@
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Title:</span>
                                         <span class="text-black">
-                                            {{ $data['election']->title }} {{ $data['election']->academic_session .'/'. $data['election']->academic_session +1 }}
+                                            {{ $data['election']->title }}
+                                            {{ $data['election']->academic_session . '/' . $data['election']->academic_session + 1 }}
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
@@ -243,38 +245,297 @@
                                         </span>
                                     </div>
 
-                                    <div class="row col-md-12 p-4">
-                                        <div class="col-md-6">
-                                            <h5 class="text-blue text-decoration-underline fw-bold">Qualified Applicant
-                                                Group (General)</h5>
-                                            @if ($data['election']->generalCandidateGroups->isEmpty())
-                                                <h5 class="m-2">
-                                                    All members are qualified applicants, regardless of their program,
-                                                    faculty, or level. <br> <span class="text-danger"> To change this, add a
-                                                        specific set of members using the button
-                                                        below.
-                                                    </span>
+                                    <hr>
+                                    @php
+                                        $showCompletePage = true;
+                                        $showAwaitingVerificationPage = false;
+                                        $showVerificationProcessingMenu = false;
+
+                                        if ($data['election']->status == 'awaiting_approval') {
+                                            if (Auth::user()->hasPermission('elections.approve')) {
+                                                $showVerificationProcessingMenu = true;
+                                            } else {
+                                                $showCompletePage = false;
+                                                $showAwaitingVerificationPage = true;
+                                            }
+                                        }
+                                    @endphp
+
+                                    <div class="alert alert-info m-3" role="alert">
+                                        <h4 class="alert-heading">Pending Approval</h4>
+                                        <p class="my-1">This election is pending approval. Kindly download the consent and awareness form, take it to the relevant stakeholders in the school to obtain their agreement, and afterwards contact an administrator with permission to approve elections for approval on the portal.</p>
+                                        <p class="my-1">
+                                            If there is a need to make any change before approval, please contact an administrator with permission to approve elections for assistance.
+                                        </p>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end flex-wrap mt-3">
+                                        @if (Auth::user()->hasPermission('elections.update'))
+                                            <button class="btn btn-warning m-1 d-flex align-items-center"
+                                                data-toggle="modal" data-target="#editElectionModal">
+                                                <i class="fas fa-edit me-2"></i>
+                                                <span>Update</span>
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    @include('users.admin.elections.include.editElectionModal')
+                                    <div class="row col-md-12">
+                                        <div class="col-md-12 mt-4">
+                                            <h5 class="text-blue text-decoration-underline fw-bold">Qualified Voters
+                                                Group</h5>
+                                            @if ($data['election']->voterGroups->isEmpty())
+                                                <h5 class="m-2 text-center">
+                                                    All members are qualified voters, regardless of their program,
+                                                    faculty, or level. <br> <span class="text-danger"> To change this, add
+                                                        a specific set of members using the button below.
                                                 </h5>
                                             @else
-                                                show items
+                                                <div class="px-3 pt-3 table-responsive">
+                                                    <table class="table">
+                                                        @foreach ($data['election']->voterGroups as $group)
+                                                            <tbody>
+                                                                <tr class="text-black">
+                                                                    <td>
+                                                                        {{ $loop->iteration }}
+                                                                    </td>
+                                                                    <td class="text-start">
+                                                                        @if ($group->theProgram)
+                                                                            {{ $group->theProgram->name }}
+                                                                            ({{ $group->theProgram->short_name }})
+
+                                                                            @if ($group->programType)
+                                                                                {{ $group->programType->type_name }}
+                                                                            @endforelse
+                                                                        @else
+                                                                            All programs
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($group->theFaculty)
+                                                                            {{ $group->theFaculty->name }}
+                                                                            ({{ $group->theFaculty->acronym }})
+                                                                        @else
+                                                                            All Faculties
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($group->theDepartment)
+                                                                            {{ $group->theDepartment->name }}
+                                                                        @else
+                                                                            All Departments
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @if ($group->start_level)
+                                                                            Year {{ $group->start_level }}
+                                                                            @if ($group->end_level)
+                                                                                - Year {{ $group->end_level }}
+                                                                            @endif
+                                                                        @else
+                                                                            All Level
+                                                                        @endif
+                                                                    </td>
+                                                                    <td>
+                                                                        @unless (in_array($data['election']->status, ['completed', 'cancelled', 'suspended']))
+                                                                            @if (Auth::user()->hasPermission('elections.update'))
+                                                                                <span
+                                                                                    class="badge bg-yellow text-black pe-2 ps-3 py-2 m-1 rounded-3"
+                                                                                    data-toggle="modal"
+                                                                                    data-target="#editQualifiedVoterGoupModal_{{ $group->id }}"
+                                                                                    style="cursor: pointer;">
+                                                                                    <i class="fas fa-edit me-1"></i>Update
+                                                                                </span>
+                                                                            @endif
+                                                                            @if (Auth::user()->hasPermission('elections.delete'))
+                                                                                <a href="javascript:void(0)"
+                                                                                    class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-btn m-1"
+                                                                                    data-toggle="modal"
+                                                                                    data-target="#deleteDurationOverride"
+                                                                                    data-url="{{ route('removeQualifiedVoterGroup', ['uuid' => $group->uuid]) }}"
+                                                                                    style="cursor: pointer;">
+                                                                                    <i class="fas fa-trash me-1"></i>Remove
+                                                                                </a>
+                                                                            @endif
+                                                                        @endunless
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        @endforeach
+                                                    </table>
+                                                </div>
                                             @endif
-                                            {{-- generalCandidateGroups --}}
-                                            @if (Auth::user()->hasPermission('elections.read'))
+
+
+                                            @if (Auth::user()->hasPermission('elections.create'))
                                                 <div class="d-flex justify-content-center">
                                                     <div class="m-1">
-                                                        <button class="btn btn-primary btn-sm table_btn" data-toggle="modal"
-                                                            data-target="#addNewQualifiedCandidateGoupModal">
-                                                            <i class="fas fa-plus"></i> Add Applicant Group</button>
+                                                        <button class="btn btn-primary btn-sm table_btn"
+                                                            data-toggle="modal"
+                                                            data-target="#addNewQualifiedVotersGoupModal">
+                                                            <i class="fas fa-plus"></i> Add Voter Group</button>
                                                     </div>
                                                 </div>
                                             @endif
-                                            @include('users.admin.elections.include.addNewQualifiedCandidateGoupModal')
+                                            @include('users.admin.elections.include.addNewQualifiedVotersGoupModal')
+
                                         </div>
-                                        <div class="col-md-6">
-                                            <h5 class="text-blue text-decoration-underline fw-bold">Qualified Voters
-                                                Group</h5>
+                                        <hr>
+
+                                        <div class="col-md-12 mt-4">
+                                            <h5 class="text-blue text-decoration-underline fw-bold">Positions</h5>
+                                            @if ($data['election']->positions->isEmpty())
+                                                <h5 class="m-2 text-center">
+                                                    There are currently no positions. Click the button below to add a new
+                                                    position.
+                                                </h5>
+                                            @else
+                                                <div class="col-md-12">
+                                                    @foreach ($data['election']->positions as $position)
+                                                        <h4> <span
+                                                                class="badge bg-secondary-subtle text-secondary fs-6">{{ $loop->iteration }}</span>
+                                                            {{ $position->position }}</h4>
+                                                        <div class="row text-black text-capitalize mb-5">
+                                                            @include('users.admin.elections.include.addPositionQualifiedCandidateModal')
+                                                            <div class="">
+                                                                <span class="fw-bold text-muted">Description:</span>
+                                                                {{ $position->description }}
+                                                            </div>
+                                                            <div class="">
+                                                                <span class="fw-bold text-muted">Reserved Cand.
+                                                                    Groups:</span>
+                                                                @if ($position->candidateGroups->isEmpty())
+                                                                    <h5 class="m-2 text-center">
+                                                                        All members can apply for this position <br>
+                                                                        <span class="text-danger">
+                                                                            To specify requirements, click the buttons
+                                                                            below.
+                                                                    </h5>
+                                                                @else
+                                                                    <div class="px-3 pt-3 table-responsive">
+                                                                        <table class="table">
+                                                                            @foreach ($position->candidateGroups as $group)
+                                                                                <tbody>
+                                                                                    <tr class="text-black">
+                                                                                        <td>
+                                                                                            {{ $loop->iteration }}
+                                                                                        </td>
+                                                                                        <td class="text-start">
+                                                                                            @if ($group->theProgram)
+                                                                                                {{ $group->theProgram->name }}
+                                                                                                ({{ $group->theProgram->short_name }})
+
+                                                                                                @if ($group->programType)
+                                                                                                    {{ $group->programType->type_name }}
+                                                                                                @endforelse
+                                                                                            @else
+                                                                                                All programs
+                                                                                            @endif
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            @if ($group->theFaculty)
+                                                                                                {{ $group->theFaculty->name }}
+                                                                                                ({{ $group->theFaculty->acronym }})
+                                                                                            @else
+                                                                                                All Faculties
+                                                                                            @endif
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            @if ($group->theDepartment)
+                                                                                                {{ $group->theDepartment->name }}
+                                                                                            @else
+                                                                                                All Departments
+                                                                                            @endif
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            @if ($group->start_level)
+                                                                                                Year
+                                                                                                {{ $group->start_level }}
+                                                                                                @if ($group->end_level)
+                                                                                                    - Year
+                                                                                                    {{ $group->end_level }}
+                                                                                                @endif
+                                                                                            @else
+                                                                                                All Level
+                                                                                            @endif
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            @unless (in_array($data['election']->status, ['completed', 'cancelled', 'suspended']))
+                                                                                                @if (Auth::user()->hasPermission('elections.update'))
+                                                                                                    <span
+                                                                                                        class="badge bg-yellow text-black pe-2 ps-3 py-2 m-1 rounded-3"
+                                                                                                        data-toggle="modal"
+                                                                                                        data-target="#editQualifiedCandidateGoupModal_{{ $group->id }}"
+                                                                                                        style="cursor: pointer;">
+                                                                                                        <i
+                                                                                                            class="fas fa-edit me-1"></i>Update
+                                                                                                    </span>
+                                                                                                @endif
+                                                                                                @if (Auth::user()->hasPermission('elections.delete'))
+                                                                                                    <a href="javascript:void(0)"
+                                                                                                        class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-btn m-1"
+                                                                                                        data-toggle="modal"
+                                                                                                        data-target="#deleteDurationOverride"
+                                                                                                        data-url="{{ route('removeQualifiedCandidateGroup', ['uuid' => $group->uuid]) }}"
+                                                                                                        style="cursor: pointer;">
+                                                                                                        <i
+                                                                                                            class="fas fa-trash me-1"></i>Remove
+                                                                                                    </a>
+                                                                                                @endif
+                                                                                            @endunless
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            @endforeach
+                                                                        </table>
+                                                                    </div>
+                                                                    @foreach ($position->candidateGroups as $group)
+                                                                        @include('users.admin.elections.include.editPositionQualifiedCandidateGoupModal')
+                                                                    @endforeach
+                                                                @endif
+                                                                <div class="d-flex justify-content-end">
+                                                                    <span
+                                                                        class="badge bg-green text-white p-1 fs-6 mx-2 px-2"
+                                                                        data-toggle="modal"
+                                                                        data-target="#addPositionQualifiedCandidateModal_{{ $position->id }}"
+                                                                        style="cursor: pointer;">
+                                                                        <i class="fas fa-plus me-2"></i>Add New Requirement
+                                                                        (qualified candidate group)
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+
+
+                                            @if (Auth::user()->hasPermission('elections.create'))
+                                                <div class="d-flex justify-content-center">
+                                                    <div class="m-1">
+                                                        <button class="btn btn-primary btn-sm table_btn"
+                                                            data-toggle="modal" data-target="#addPositionModal">
+                                                            <i class="fas fa-plus"></i> Add New Position</button>
+                                                    </div>
+                                                </div>
+
+                                                @include('users.admin.elections.include.addPositionModal')
+                                            @endif
+
                                         </div>
                                     </div>
+                                    @if ($data['election']->status == 'draft')
+                                        <a href="{{ route('submitElectionForApproval', ['uuid' => $data['election']->uuid]) }}"
+                                            class="btn btn-block btn-primary mt-5"> <i
+                                                class="fas fa-paper-plane me-2"></i>
+                                           Submit For Approval</a>
+                                    @endif
+                                    @if ($data['election']->status == 'awaiting_approval')
+                                        <a href="{{ route('printElectionConcentAwarenessForm', ['uuid' => $data['election']->uuid]) }}"
+                                            class="btn btn-block btn-danger mt-5"> <i
+                                                class="fas fa-print me-2"></i>
+                                           Print Consent/Awareness Form</a>
+                                    @endif
 
                                 </div>
                             </div>
@@ -293,6 +554,41 @@
 
             </div>
         </div>
+
+        @if ($data['election']->voterGroups->isNotEmpty())
+            @foreach ($data['election']->voterGroups as $group)
+                @include('users.admin.elections.include.editQualifiedVoterGoupModal')
+            @endforeach
+        @endif
+        {{-- script start --}}
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+
+                        const url = this.dataset.url;
+
+                        Swal.fire({
+                            title: 'Are you sure?',
+                            text: "This policy will be permanently deleted.",
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#d33',
+                            cancelButtonColor: '#6c757d',
+                            confirmButtonText: 'Yes, delete it!',
+                            cancelButtonText: 'Cancel',
+                            reverseButtons: true
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = url;
+                            }
+                        });
+
+                    });
+                });
+            });
+        </script>
+        {{-- script end --}}
 
     </div><!--//container-fluid-->
     </div><!--//app-content-->

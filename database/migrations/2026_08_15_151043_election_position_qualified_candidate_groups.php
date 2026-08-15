@@ -12,13 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create(
-            'election_general_candidate_groups',
+            'position_qualified_candidate_groups',
             function (Blueprint $table) {
                 $table->id();
                 $table->string('uuid')->unique();
                 $table->unsignedBigInteger('tenant_id')->nullable(); // foreign
 
                 $table->string('election_id');
+                $table->unsignedBigInteger('position_id')->nullable();
+
 
                 $table->string('program')->nullable(); // Foreign
                 $table->string('program_type')->nullable(); // Foreign
@@ -35,6 +37,7 @@ return new class extends Migration
 
                 $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
                 $table->foreign('election_id')->references('election_id')->on('elections')->onDelete('cascade')->cascadeOnUpdate('cascade');
+                $table->foreign('position_id')->references('id')->on('election_positions')->nullOnDelete()->cascadeOnUpdate();
                 $table->foreign('program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
                 $table->foreign('program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
                 $table->foreign('faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
@@ -48,6 +51,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('election_general_candidate_groups');
+        Schema::dropIfExists('position_qualified_candidate_groups');
     }
 };

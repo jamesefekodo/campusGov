@@ -4,6 +4,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Elections\Election;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
@@ -519,6 +520,14 @@ if (!function_exists('totalPendingPaymentWaiverRequest')) {
         return PaymentWaiver::where('approval_status', 'pending')->count();
     }
 }
+
+if (!function_exists('totalElectionRelatedRequests')) {
+    function totalElectionRelatedRequests()
+    {
+        $mainElection = Election::where('status', 'awaiting_approval')->count();
+    }
+}
+
 
 
 if (!function_exists('highestProgramDuration')) {

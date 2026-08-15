@@ -10,7 +10,7 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    { // pvot table for many-to-many relationship between roles and permissions
+    {
         Schema::create('role_permissions', function (Blueprint $table) {
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->foreignId('role_id')

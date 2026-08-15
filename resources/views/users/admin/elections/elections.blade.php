@@ -5,7 +5,7 @@
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
             <div class="navigation">
-                {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
+                @include('users.admin.elections.include.inner_nav')
             </div>
             @if (Auth::user()->hasPermission('elections.create'))
                 <div class="d-flex justify-content-end">

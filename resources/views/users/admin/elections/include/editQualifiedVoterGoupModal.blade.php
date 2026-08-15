@@ -1,10 +1,10 @@
-<div class="modal fade" id="addNewQualifiedCandidateGoupModal" tabindex="-1" role="dialog"
+<div class="modal fade" id="editQualifiedVoterGoupModal_{{ $group->id }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal_header" style="width: 100%">
                 <h4 class="modal-title block text-white text-center p-1" id="exampleModalLongTitle">
-                    Add New Candidate Group</h4>
+                    Edit Voter Group</h4>
                 <h4>
                     <button type="button" class="bg-red text-white mt-1 p-2" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
@@ -16,23 +16,33 @@
 
                     {{-- <div class="card-body"> --}}
                     <form class="form my_form" method="POST"
-                        action="{{ route('addNewQualifiedCandidateGroupSubmit', ['uuid' => $data['election']->uuid]) }}"
+                        action="{{ route('updateQualifiedVoterGroupSubmit', ['uuid' => $group->uuid]) }}"
                         enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
                         <div class="row">
 
+                            @php
+                                $editVoterGroupId = $group->id;
+
+                                $selectedProgram = old('program', $group->program);
+                                $selectedProgramType = old('program_type', $group->program_type);
+                                $selectedFaculty = old('faculty', $group->faculty);
+                                $selectedDepartment = old('department', $group->department);
+                            @endphp
+
                             <div class="form-group col-md-4">
-                                <label for="addCandidateGroup-program-select">
+                                <label for="editVoterGroup-program-select-{{ $editVoterGroupId }}">
                                     Program <span class="text-red">*</span>
                                 </label>
 
-                                <select class="form-select" id="addCandidateGroup-program-select" name="program"
-                                    required>
-                                    <option value="">- Select -</option>
+                                <select class="form-select" id="editVoterGroup-program-select-{{ $editVoterGroupId }}"
+                                    name="program" required>
+                                    <option value="">- All -</option>
 
                                     @foreach ($data['activeProgram'] as $program)
                                         <option value="{{ $program->slug }}"
-                                            {{ old('program') == $program->slug ? 'selected' : '' }}>
+                                            {{ $selectedProgram == $program->slug ? 'selected' : '' }}>
                                             {{ $program->name }}
                                         </option>
                                     @endforeach
@@ -45,12 +55,13 @@
 
 
                             <div class="form-group col-md-4">
-                                <label for="addCandidateGroup-program-type-select">
+                                <label for="editVoterGroup-program-type-select-{{ $editVoterGroupId }}">
                                     Program Type
                                 </label>
 
-                                <select class="form-select" id="addCandidateGroup-program-type-select"
-                                    name="program_type" disabled>
+                                <select class="form-select"
+                                    id="editVoterGroup-program-type-select-{{ $editVoterGroupId }}" name="program_type"
+                                    disabled>
                                     <option value="">- Select Program First -</option>
                                 </select>
 
@@ -61,20 +72,20 @@
 
 
                             <div class="form-group col-md-4">
-                                <label for="addCandidateGroup-faculty-select">
+                                <label for="editVoterGroup-faculty-select-{{ $editVoterGroupId }}">
                                     Faculty
                                 </label>
 
-                                <select class="form-select" id="addCandidateGroup-faculty-select" name="faculty">
-                                    <option value="">- Select -</option>
+                                <select class="form-select" id="editVoterGroup-faculty-select-{{ $editVoterGroupId }}"
+                                    name="faculty">
+                                    <option value="">- All -</option>
 
                                     @foreach ($data['activeFaculties'] as $faculty)
                                         <option value="{{ $faculty->slug }}"
-                                            {{ old('faculty') == $faculty->slug ? 'selected' : '' }}>
+                                            {{ $selectedFaculty == $faculty->slug ? 'selected' : '' }}>
                                             {{ $faculty->name }}
                                         </option>
                                     @endforeach
-
                                 </select>
 
                                 <p class="text-danger">
@@ -84,11 +95,12 @@
 
 
                             <div class="form-group col-md-4">
-                                <label for="addCandidateGroup-department-select">
+                                <label for="editVoterGroup-department-select-{{ $editVoterGroupId }}">
                                     Department
                                 </label>
 
-                                <select class="form-select" id="addCandidateGroup-department-select" name="department"
+                                <select class="form-select"
+                                    id="editVoterGroup-department-select-{{ $editVoterGroupId }}" name="department"
                                     disabled>
                                     <option value="">- Select Faculty First -</option>
                                 </select>
@@ -104,7 +116,7 @@
                                 </label>
 
                                 <select name="start_level" class="form-control">
-                                    <option value="" selected>Select</option>
+                                    <option value="" selected>All</option>
 
                                     @php
                                         $startingLevel = max(
@@ -117,7 +129,7 @@
 
                                     @for ($level = $startingLevel; $level <= $endingLevel; $level++)
                                         <option value="{{ $level }}"
-                                            {{ old('start_level') == $level ? 'selected' : '' }}>
+                                            {{ $group->start_level == $level ? 'selected' : '' }}>
                                             Year {{ $level }}
                                         </option>
                                     @endfor
@@ -138,7 +150,7 @@
                                     </label>
 
                                     <select name="end_level" class="form-control">
-                                        <option value="" selected>Select</option>
+                                        <option value="" selected>All</option>
 
                                         @php
                                             $startingLevel = max(
@@ -151,7 +163,7 @@
 
                                         @for ($level = $startingLevel; $level <= $endingLevel; $level++)
                                             <option value="{{ $level }}"
-                                                {{ old('end_level') == $level ? 'selected' : '' }}>
+                                                {{ $group->end_level == $level ? 'selected' : '' }}>
                                                 Year {{ $level }}
                                             </option>
                                         @endfor
@@ -183,60 +195,89 @@
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
 
-                            const addCandidateGroupProgramSelect =
-                                document.getElementById('addCandidateGroup-program-select');
+                            const groupId = "{{ $editVoterGroupId }}";
 
-                            const addCandidateGroupProgramTypeSelect =
-                                document.getElementById('addCandidateGroup-program-type-select');
+                            const programSelect =
+                                document.getElementById(
+                                    'editVoterGroup-program-select-' + groupId
+                                );
+
+                            const programTypeSelect =
+                                document.getElementById(
+                                    'editVoterGroup-program-type-select-' + groupId
+                                );
+
+                            const facultySelect =
+                                document.getElementById(
+                                    'editVoterGroup-faculty-select-' + groupId
+                                );
+
+                            const departmentSelect =
+                                document.getElementById(
+                                    'editVoterGroup-department-select-' + groupId
+                                );
 
                             if (
-                                !addCandidateGroupProgramSelect ||
-                                !addCandidateGroupProgramTypeSelect
+                                !programSelect ||
+                                !programTypeSelect ||
+                                !facultySelect ||
+                                !departmentSelect
                             ) {
                                 return;
                             }
 
-                            const addCandidateGroupSelectedProgramType =
-                                @json(old('program_type'));
 
-                            function addCandidateGroupLoadProgramTypes(
+                            const selectedProgramType =
+                                @json($selectedProgramType);
+
+                            const selectedDepartment =
+                                @json($selectedDepartment);
+
+
+                            // =========================
+                            // PROGRAM → PROGRAM TYPE
+                            // =========================
+
+                            function editVoterGroupLoadProgramTypes(
                                 programSlug,
                                 selected = ''
                             ) {
 
                                 if (!programSlug) {
 
-                                    addCandidateGroupProgramTypeSelect.innerHTML =
+                                    programTypeSelect.innerHTML =
                                         '<option value="">- Select Program First -</option>';
 
-                                    addCandidateGroupProgramTypeSelect.disabled = true;
+                                    programTypeSelect.disabled = true;
 
                                     return;
                                 }
 
-                                addCandidateGroupProgramTypeSelect.disabled = true;
+                                programTypeSelect.disabled = true;
 
-                                addCandidateGroupProgramTypeSelect.innerHTML =
+                                programTypeSelect.innerHTML =
                                     '<option value="">Loading...</option>';
+
 
                                 fetch(
                                         "{{ route('fetchProgramTypes') }}?program_slug=" +
                                         encodeURIComponent(programSlug)
                                     )
-                                    .then(res => res.json())
-                                    .then(res => {
+                                    .then(response => response.json())
+                                    .then(response => {
 
-                                        addCandidateGroupProgramTypeSelect.innerHTML =
-                                            '<option value="">- Select -</option>';
+                                        programTypeSelect.innerHTML =
+                                            '<option value="">- All -</option>';
 
-                                        if (res.programTypes.length === 0) {
 
-                                            addCandidateGroupProgramTypeSelect.innerHTML +=
+                                        if (response.programTypes.length === 0) {
+
+                                            programTypeSelect.innerHTML +=
                                                 '<option disabled>No program types found</option>';
 
                                         } else {
 
-                                            res.programTypes.forEach(type => {
+                                            response.programTypes.forEach(type => {
 
                                                 const option =
                                                     document.createElement('option');
@@ -248,13 +289,13 @@
                                                     option.selected = true;
                                                 }
 
-                                                addCandidateGroupProgramTypeSelect
-                                                    .appendChild(option);
+                                                programTypeSelect.appendChild(option);
 
                                             });
+
                                         }
 
-                                        addCandidateGroupProgramTypeSelect.disabled = false;
+                                        programTypeSelect.disabled = false;
 
                                     })
                                     .catch(error => {
@@ -264,79 +305,46 @@
                                             error
                                         );
 
-                                        addCandidateGroupProgramTypeSelect.innerHTML =
+                                        programTypeSelect.innerHTML =
                                             '<option value="">Unable to load program types</option>';
 
-                                        addCandidateGroupProgramTypeSelect.disabled = false;
+                                        programTypeSelect.disabled = false;
 
                                     });
                             }
 
 
-                            addCandidateGroupProgramSelect.addEventListener(
-                                'change',
-                                function() {
+                            programSelect.addEventListener('change', function() {
 
-                                    addCandidateGroupLoadProgramTypes(
-                                        this.value
-                                    );
-
-                                }
-                            );
-
-
-                            // Restore old input after validation failure
-                            if (addCandidateGroupProgramSelect.value) {
-
-                                addCandidateGroupLoadProgramTypes(
-                                    addCandidateGroupProgramSelect.value,
-                                    addCandidateGroupSelectedProgramType
+                                editVoterGroupLoadProgramTypes(
+                                    this.value
                                 );
 
-                            }
-
-                        });
-                    </script>
+                            });
 
 
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
+                            // =========================
+                            // FACULTY → DEPARTMENT
+                            // =========================
 
-                            const addCandidateGroupFacultySelect =
-                                document.getElementById('addCandidateGroup-faculty-select');
-
-                            const addCandidateGroupDepartmentSelect =
-                                document.getElementById('addCandidateGroup-department-select');
-
-                            if (
-                                !addCandidateGroupFacultySelect ||
-                                !addCandidateGroupDepartmentSelect
-                            ) {
-                                return;
-                            }
-
-                            const addCandidateGroupSelectedDepartment =
-                                @json(old('department'));
-
-
-                            function addCandidateGroupLoadDepartments(
+                            function editVoterGroupLoadDepartments(
                                 facultySlug,
                                 selected = ''
                             ) {
 
                                 if (!facultySlug) {
 
-                                    addCandidateGroupDepartmentSelect.innerHTML =
+                                    departmentSelect.innerHTML =
                                         '<option value="">- Select Faculty First -</option>';
 
-                                    addCandidateGroupDepartmentSelect.disabled = true;
+                                    departmentSelect.disabled = true;
 
                                     return;
                                 }
 
-                                addCandidateGroupDepartmentSelect.disabled = true;
+                                departmentSelect.disabled = true;
 
-                                addCandidateGroupDepartmentSelect.innerHTML =
+                                departmentSelect.innerHTML =
                                     '<option value="">Loading...</option>';
 
 
@@ -344,21 +352,21 @@
                                         "{{ route('fetchDepartments') }}?faculty_slug=" +
                                         encodeURIComponent(facultySlug)
                                     )
-                                    .then(res => res.json())
-                                    .then(res => {
+                                    .then(response => response.json())
+                                    .then(response => {
 
-                                        addCandidateGroupDepartmentSelect.innerHTML =
-                                            '<option value="">- Select -</option>';
+                                        departmentSelect.innerHTML =
+                                            '<option value="">- All -</option>';
 
 
-                                        if (res.departments.length === 0) {
+                                        if (response.departments.length === 0) {
 
-                                            addCandidateGroupDepartmentSelect.innerHTML +=
+                                            departmentSelect.innerHTML +=
                                                 '<option disabled>No departments found</option>';
 
                                         } else {
 
-                                            res.departments.forEach(department => {
+                                            response.departments.forEach(department => {
 
                                                 const option =
                                                     document.createElement('option');
@@ -370,14 +378,13 @@
                                                     option.selected = true;
                                                 }
 
-                                                addCandidateGroupDepartmentSelect
-                                                    .appendChild(option);
+                                                departmentSelect.appendChild(option);
 
                                             });
 
                                         }
 
-                                        addCandidateGroupDepartmentSelect.disabled = false;
+                                        departmentSelect.disabled = false;
 
                                     })
                                     .catch(error => {
@@ -387,34 +394,44 @@
                                             error
                                         );
 
-                                        addCandidateGroupDepartmentSelect.innerHTML =
+                                        departmentSelect.innerHTML =
                                             '<option value="">Unable to load departments</option>';
 
-                                        addCandidateGroupDepartmentSelect.disabled = false;
+                                        departmentSelect.disabled = false;
 
                                     });
 
                             }
 
 
-                            addCandidateGroupFacultySelect.addEventListener(
-                                'change',
-                                function() {
+                            facultySelect.addEventListener('change', function() {
 
-                                    addCandidateGroupLoadDepartments(
-                                        this.value
-                                    );
+                                editVoterGroupLoadDepartments(
+                                    this.value
+                                );
 
-                                }
-                            );
+                            });
 
 
-                            // Restore old input after validation failure
-                            if (addCandidateGroupFacultySelect.value) {
+                            // =========================
+                            // INITIAL LOAD
+                            // =========================
 
-                                addCandidateGroupLoadDepartments(
-                                    addCandidateGroupFacultySelect.value,
-                                    addCandidateGroupSelectedDepartment
+                            if (programSelect.value) {
+
+                                editVoterGroupLoadProgramTypes(
+                                    programSelect.value,
+                                    selectedProgramType
+                                );
+
+                            }
+
+
+                            if (facultySelect.value) {
+
+                                editVoterGroupLoadDepartments(
+                                    facultySelect.value,
+                                    selectedDepartment
                                 );
 
                             }

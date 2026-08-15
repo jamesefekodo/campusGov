@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
-    use BelongsToTenant;
+    // use BelongsToTenant;
     use HasFactory;
     protected $table = 'permissions';
     protected $fillable = [
-        'tenant_id',
+        // 'tenant_id',
         'slug',
         'name',
         'module',
