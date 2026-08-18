@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->string('uuid')->unique();
                 $table->unsignedBigInteger('tenant_id')->nullable(); // foreign
 
-                $table->string('election_id');
+                $table->string('election_id'); // foreign
                 $table->unsignedBigInteger('position_id')->nullable();
 
 

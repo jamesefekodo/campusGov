@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('uuid')->unique();
             $table->unsignedBigInteger('tenant_id')->nullable();
-            $table->string('username')->unique(); // Foreign
-            $table->string('previous_academic_status')->unique();
+            $table->string('username'); // Foreign
+            $table->string('previous_academic_status');
             //  previous
             $table->string('previous_program')->nullable(); // Foreign
             $table->string('previous_program_type')->nullable(); // Foreign

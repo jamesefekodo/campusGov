@@ -278,8 +278,8 @@
                                                                     - Select -
                                                                 </option>
 
-                                                                <option value="departnemt"
-                                                                    {{ $data['basicSystemSetting']->operational_level == 'departnemt' ? 'selected' : '' }}>
+                                                                <option value="department"
+                                                                    {{ $data['basicSystemSetting']->operational_level == 'department' ? 'selected' : '' }}>
                                                                     Department
                                                                 </option>
                                                                 <option value="faculty"

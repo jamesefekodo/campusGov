@@ -88,6 +88,39 @@ if (!function_exists('associationLogo')) {
     }
 }
 
+
+if (!function_exists('base64Image')) {
+    function base64Image(string $url): string
+    {
+        if (empty($url)) {
+            return '';
+        }
+
+        $relativePath = parse_url($url, PHP_URL_PATH);
+        $fullPath = public_path(ltrim($relativePath, '/'));
+
+        if (!file_exists($fullPath)) {
+            return '';
+        }
+
+        $ext = strtolower(pathinfo($fullPath, PATHINFO_EXTENSION));
+
+        if ($ext === 'webp' && function_exists('imagecreatefromwebp')) {
+            $img = imagecreatefromwebp($fullPath);
+            ob_start();
+            imagepng($img);
+            $data = ob_get_clean();
+            imagedestroy($img);
+            $type = 'png';
+        } else {
+            $data = file_get_contents($fullPath);
+            $type = $ext ?: 'png';
+        }
+
+        return 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+}
+
 if (!function_exists('schoolLogo')) {
     function schoolLogo()
     {
@@ -521,10 +554,10 @@ if (!function_exists('totalPendingPaymentWaiverRequest')) {
     }
 }
 
-if (!function_exists('totalElectionRelatedRequests')) {
-    function totalElectionRelatedRequests()
+if (!function_exists('totalElectionsAwaitingApproval')) {
+    function totalElectionsAwaitingApproval()
     {
-        $mainElection = Election::where('status', 'awaiting_approval')->count();
+        return Election::where('status', 'awaiting_approval')->count();
     }
 }
 
@@ -545,5 +578,63 @@ if (!function_exists('highestProgramDuration')) {
                     );
             }, 'durations')
             ->max('duration') ?? 0;
+    }
+}
+
+
+// check if student is qualified to apply for a position in an election
+// Check if a student is qualified to apply for a position in an election
+if (!function_exists('canApplyForPosition')) {
+    function canApplyForPosition($student, $position): array
+    {
+        // Academic record required 
+        $academic = $student->memberAcademicInfo;
+        if (!$academic) {
+            return ['qualified' => false, 'message' => 'Academic record not found',];
+        }
+        // General requirement 
+        if ($academic->academic_status !== 'student') {
+            return ['qualified' => false, 'message' => 'Only active students can apply',];
+        }
+        $requirements = $position->candidateGroups;
+        // No requirements = any student qualifies 
+        if ($requirements->isEmpty()) {
+            return ['qualified' => true, 'message' => 'Qualified',];
+        }
+        foreach ($requirements as $requirement) {
+            // Program 
+            if ($requirement->program && $requirement->program !== $academic->program) {
+                continue;
+            }
+            // Program Type 
+            if ($requirement->program_type && $requirement->program_type !== $academic->program_type) {
+                continue;
+            }
+            // Faculty 
+            if ($requirement->faculty && $requirement->faculty !== $academic->faculty) {
+                continue;
+            }
+            // Department 
+            if ($requirement->department && $requirement->department !== $academic->department) {
+                continue;
+            }
+            // Current level 
+            $level = studentCurrentLevel($academic);
+            // Single level requirement 
+            if ($requirement->start_level && !$requirement->end_level) {
+                if ($level != $requirement->start_level) {
+                    continue;
+                }
+            }
+            // Level range requirement 
+            if ($requirement->start_level && $requirement->end_level) {
+                if ($level < $requirement->start_level || $level > $requirement->end_level) {
+                    continue;
+                }
+            }
+            // Student passed this requirement 
+            return ['qualified' => true, 'message' => 'Qualified',];
+        }
+        return ['qualified' => false, 'message' => 'You do not meet the eligibility requirements for this position',];
     }
 }

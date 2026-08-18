@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Election;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\Elections\Election;
@@ -15,6 +16,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
+use Mpdf\Mpdf;
+
 
 class ElectionController extends Controller
 {
@@ -198,7 +201,8 @@ class ElectionController extends Controller
             ],
 
             'public_visibility' => 'required',
-            'form_sales_starts' => 'required|date|after:' . now()->addHours(5),
+            // 'form_sales_starts' => 'required|date|after:' . now()->addHours(5),
+            'form_sales_starts' => 'required|date',
             'form_sales_ends' => 'required|date|after:form_sales_starts',
 
             'screening_starts' => 'nullable|date',
@@ -473,8 +477,9 @@ class ElectionController extends Controller
         return redirect()->back()->with('success', 'Done!');
     }
 
-    public function printElectionConcentAwarenessForm($uuid){
-    /** @var \App\Models\User $user */
+    public function printElectionConsentAwarenessForm($uuid)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -482,7 +487,125 @@ class ElectionController extends Controller
             403
         );
 
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+        $electionSession = $election->academic_session . '/' . $election->academic_session + 1;
+
+
+        ini_set('pcre.backtrack_limit', 10000000);
+        ini_set('max_execution_time', 600);
+        ini_set('memory_limit', '1024M');
+
+
+        $mpdf = new Mpdf([
+            'default_font_size'  => 10,
+            'default_font'       => 'Arial',
+            'margin_left'        => 5,
+            'margin_right'       => 5,
+            'margin_top'         => 10,
+            'margin_bottom'      => 15,
+            'format'             => 'A4',
+            'autoLangToFont'     => true,
+            'autoScriptToLang'   => true,
+            'tempDir'            => storage_path('app/mpdf-temp'),
+        ]);
+
+        $mpdf->setFooter('Page {PAGENO} of {nb} >> Election Consent/Awareness Form : ' . $election->title . ' ' . $electionSession);
+        $mpdf->showImageErrors = true;
+
+        $basicSystemInfo = basicSystemInfo();
+        $faculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
+
+        $onlyFaculty = null;
+        if ($basicSystemInfo->operational_level == 'faculty') {
+            $onlyFaculty = Faculty::where('is_active', true)->first();
+        }
+
+        $onlyDepartment = null;
+        if ($basicSystemInfo->operational_level == 'department') {
+            $onlyDepartment = Department::where('is_active', true)->first();
+        }
+
+        $data = [
+            'election' => $election,
+            'faculties' => $faculties,
+            'departments' => $departments,
+            'basicSystemInfo' => $basicSystemInfo,
+            'onlyFaculty' => $onlyFaculty,
+            'onlyDepartment' => $onlyDepartment,
+
+        ];
+
+        $html = view('printFiles.elections.awarenessAndConsentForm', compact('data'))->render();
+
+        $mpdf->WriteHTML($html); // AddPage() not needed — WriteHTML handles it
+
+        $fileName = 'Election Consent/Awareness Form :' . $election->title . '_' . $electionSession . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+        while (ob_get_level()) ob_end_clean();
+
+        $mpdf->Output($fileName, 'I'); // 'I' for inline, 'D' for download
+        exit;
     }
 
-    public function electionOperationRequests($uuid, Request $request) {}
+    public function electionOperationRequests()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.approve'),
+            403
+        );
+
+        $electionApprovalRequests = Election::where('status', 'awaiting_approval')->orderBy('title')->get();
+
+        $data = [
+            'electionApprovalRequests' => $electionApprovalRequests,
+        ];
+
+        return view('users.admin.elections.electionRequests', compact('data'));
+    }
+    public function approveElectionSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.approve'),
+            403
+        );
+
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $request->validate([
+            'status' => ['required', 'in:approved,declined'],
+        ]);
+
+        if ($request->status === 'approved') {
+            $election->update([
+                'status' => 'new',
+                'approval_status' => 'approved',
+            ]);
+        } elseif ($request->status === 'declined') {
+            $election->update([
+                'status' => 'cancelled',
+                'approval_status' => 'declined',
+            ]);
+        }
+
+        $election->update([
+            'processed_by' => Auth::user()->username,
+            'approved_at' => Carbon::now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Done!');
+    }
 }

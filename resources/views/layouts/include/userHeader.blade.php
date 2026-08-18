@@ -76,14 +76,12 @@
 
                                     if (
                                         $user->photo &&
-                                        file_exists(public_path('assets/uploads/users/members/photo/' . $user->photo))
+                                        file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo))
                                     ) {
-                                        $image = asset('assets/uploads/users/members/photo/' . $user->photo);
+                                        $image = asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo);
                                     }
                                 }
                             @endphp
-
-
 
                             <img src="{{ $image }}" alt="{{ $user->username }}" width="30px">
 

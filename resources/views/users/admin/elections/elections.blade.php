@@ -89,8 +89,15 @@
                                                     @foreach ($data['elections'] as $election)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
-                                                            <td class="text-start">
-                                                                {{ $election->title }} {{ $election->academic_session .'/'. $election->academic_session +1 }}
+                                                            <td class="text-start"> <span class="nav-link-text">
+                                                                    {{ $election->title }}
+                                                                    {{ $election->academic_session . '/' . $election->academic_session + 1 }} &nbsp;
+                                                                    @if ($election->status == 'awaiting_approval')
+                                                                        <span
+                                                                            class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                                                            style="font-size: 11px"> <i
+                                                                                class="fas fa-info p-1"></i>
+                                                                    @endif
                                                             </td>
                                                             <td class="text-start">
                                                                 {{ $election->description }}

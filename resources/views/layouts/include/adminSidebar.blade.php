@@ -157,23 +157,20 @@
             </li><!--//nav-item-->
         @endif
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/elections') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/election') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-9" aria-expanded="false"
                 aria-controls="submenu-9">
                 <span class="nav-icon">
                     <i class="fas fa-fingerprint"></i>
                 </span>
-                {{-- @php
-                    $totalElectionNotifications =
-                        (int) countElectionsAwaitingApproval() +
-                        (int) countElectionsPositionAwaitingApproval() +
-                        (int) countElectionsApplicationsAwaitingApproval();
-                @endphp --}}
+                @php
+                    $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + 0;
+                @endphp
                 <span class="nav-link-text">Elections &nbsp;
-                    {{-- @if ($totalElectionNotifications > 0)
+                    @if ($totalElectionNotifications > 0)
                         <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
                             style="font-size: 11px">{{ $totalElectionNotifications }}
-                    @endif --}}
+                    @endif
 
                 </span>
                 <span class="submenu-arrow">
@@ -185,12 +182,13 @@
                 <div id="submenu-9" class="collapse submenu submenu-9" data-bs-parent="#menu-accordion">
                     <ul class="submenu-list list-unstyled">
                         <li class="submenu-item"><a
-                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/elections') || Str::startsWith(request()->path(), 'admin/elections/view') ? 'sidebar-active' : '' }}"
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/election') || Str::startsWith(request()->path(), 'admin/elections/view') ? 'sidebar-active' : '' }}"
                                 href="{{ route('allElections') }}">Elections
-                                {{-- &nbsp; @if ($totalElectionNotifications > 0)
-                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                    style="font-size: 11px">{{ $totalElectionNotifications }} </span>
-                            @endif --}}
+                                &nbsp; @if ($totalElectionNotifications > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ $totalElectionNotifications }} </span>
+                                @endif
                             </a>
                         </li>
                     </ul>

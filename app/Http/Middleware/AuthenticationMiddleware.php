@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Config\SystemPolicies\SystemPolicy;
 use App\Models\Config\SystemPolicies\UserAgreedPolicy;
+use App\Models\Elections\Election;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,43 @@ class AuthenticationMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // update functins
+        // form sales period
+        $elections = Election::where('approval_status', 'approved')
+            ->whereIn('status', ['new', 'registration', 'screening'])
+            ->get();
+
+        foreach ($elections as $election) {
+
+            if (now()->lt($election->form_sales_starts)) {
+
+                // Form sales has not started yet
+                if ($election->status !== 'new') {
+                    $election->update([
+                        'status' => 'new',
+                    ]);
+                }
+            } elseif (now()->between(
+                $election->form_sales_starts,
+                $election->form_sales_ends
+            )) {
+
+                // Form sales is currently ongoing
+                if ($election->status !== 'registration') {
+                    $election->update([
+                        'status' => 'registration',
+                    ]);
+                }
+            } elseif (now()->gt($election->form_sales_ends)) {
+
+                // Form sales has ended
+                if ($election->status !== 'screening') {
+                    $election->update([
+                        'status' => 'screening',
+                    ]);
+                }
+            }
+        }
         ############
         $response = $next($request);
 

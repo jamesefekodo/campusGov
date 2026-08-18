@@ -229,7 +229,7 @@
                                                     </div>
 
                                                     <hr>
-                                                    <button type="submit" class="green-button mt-2">Submit/Next</button>
+                                                    <button type="submit" class="green-button mt-2">Submit</button>
                                                 </div>
 
                                             </form>

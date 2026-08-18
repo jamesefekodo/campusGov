@@ -7,6 +7,7 @@ use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Election\ElectionController;
+use App\Http\Controllers\Election\MemberElectionController;
 use App\Http\Controllers\Finance\AssociationDueController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
@@ -151,11 +152,18 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/my_profile/misconducts', [MemberSelfProfileController::class, 'myMisconducts'])->name('myMisconducts');
 
     // payment
-    Route::get('student/payment/dues', [MemberSelfProfileController::class, 'myAssociationDues'])->name('myAssociationDues');
-    Route::get('student/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
+    Route::get('member/payment/dues', [MemberSelfProfileController::class, 'myAssociationDues'])->name('myAssociationDues');
+    Route::get('member/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
 
 
     Route::post('member/association_dues/{uuid}', [PaymentTransasctionController::class, 'memberPayAssociationDue'])->name('memberPayAssociationDue');
+
+    // elections
+    Route::get('member/elections/new', [MemberElectionController::class, 'memberNewElections'])->name('memberNewElections');
+    Route::get('member/elections/new/search', [MemberElectionController::class, 'memberNewElections'])->name('memberNewElectionsSearch');
+    Route::get('member/elections/view/{uuid}', [MemberElectionController::class, 'memberViewElection'])->name('memberViewElection');
+    Route::post('member/elections/self_application/initiate/{uuid}', [MemberElectionController::class, 'memberInitiateSelfApplyForPositionSubmit'])->name('memberInitiateSelfApplyForPositionSubmit');
+
 });
 
 
@@ -402,15 +410,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/elections/positions/qualified_candidate_group/update/{uuid}', [ElectionController::class, 'updateQualifiedCandidateGroupSubmit'])->name('updateQualifiedCandidateGroupSubmit');
     Route::get('admin/elections/positions/qualified_candidate_group/remove/{uuid}', [ElectionController::class, 'removeQualifiedCandidateGroup'])->name('removeQualifiedCandidateGroup');
     Route::get('admin/elections/submit_for_approval/remove/{uuid}', [ElectionController::class, 'submitElectionForApproval'])->name('submitElectionForApproval');
-    Route::get('admin/elections/concent_and_awareness_form/remove/{uuid}', [ElectionController::class, 'printElectionConcentAwarenessForm'])->name('printElectionConcentAwarenessForm');
+    Route::get('admin/elections/concent_and_awareness_form/remove/{uuid}', [ElectionController::class, 'printElectionConsentAwarenessForm'])->name('printElectionConsentAwarenessForm');
 
 
-
-
-    // to be deleted
-
-
-    Route::get('admin/elections/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');
-
-
+    Route::get('admin/election/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');
+    Route::put('admin/election/requests/approval/submit/{uuid}', [ElectionController::class, 'approveElectionSubmit'])->name('approveElectionSubmit');
 });

@@ -109,7 +109,7 @@
             </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'student/payment') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/payment') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false"
                 aria-controls="submenu-3">
                 <span class="nav-icon">
@@ -123,11 +123,11 @@
             <div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/dues') ? 'sidebar-active' : '' }}"
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/dues') ? 'sidebar-active' : '' }}"
                             href="{{ route('myAssociationDues') }}">Dues</a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/transactions') ? 'sidebar-active' : '' }}"
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/transactions') ? 'sidebar-active' : '' }}"
                             href="{{ route('myPaymentTransactions') }}">Transactions</a>
                     </li>
                     <li class="submenu-item"><a
@@ -146,7 +146,7 @@
             </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'student/elections') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/elections') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-7" aria-expanded="false"
                 aria-controls="submenu-7">
                 <span class="nav-icon">
@@ -160,9 +160,9 @@
             <div id="submenu-7" class="collapse submenu submenu-7" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'student/elections/elections') ? 'sidebar-active' : '' }}"
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/elections/new') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('studentNewElections') }} --}}
+                            {{ route('memberNewElections') }}
                              ">Election</a>
                     </li>
                 </ul>

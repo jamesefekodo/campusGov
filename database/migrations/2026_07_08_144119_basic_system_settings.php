@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('association_logo')->nullable();
             $table->text('association_slogan')->nullable();
             $table->longText('description')->nullable();
-            $table->string('operational_level')->default('department'); // department, faculty (+school), university
+            $table->string('operational_level')->default('department'); // department, faculty (+school), institute
             $table->text('school_name')->nullable();
             $table->boolean('is_polytechnic')->default(true);
             $table->string('school_acronym')->nullable();
