@@ -223,6 +223,7 @@ class ElectionController extends Controller
             'academic_session' => 'required|integer|digits:4',
             'voting_starts' => 'required|date|after:form_sales_ends',
             'voting_ends' => 'required|date|after:voting_starts',
+            'one_candidate_multiple_positions' => 'required',
         ]);
 
         $election = Election::where('uuid', $uuid)->first();
@@ -247,6 +248,7 @@ class ElectionController extends Controller
             'cost_per_vote' => trim($request->cost_per_vote) !== ''
                 ? trim($request->cost_per_vote)
                 : null,
+            'one_candidate_multiple_positions' => $request->one_candidate_multiple_positions,
         ]);
         return redirect()->back()->with('success', 'Done!');
     }

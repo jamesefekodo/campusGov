@@ -1,0 +1,95 @@
+<?php
+
+namespace App\Models\Elections;
+
+use App\Models\AcademicConfig\Department;
+use App\Models\AcademicConfig\Faculty;
+use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramType;
+use App\Models\Elections\Election;
+use App\Models\Elections\ElectionPosition;
+use App\Models\Traits\BelongsToTenant;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+
+class ElectionCandidateApplication extends Model
+{
+    use BelongsToTenant;
+    use HasFactory;
+    protected $table = 'election_candidate_applications';
+    protected $fillable = [
+        'uuid',
+        'tenant_id',
+        'election_id',
+        'position_id',
+        'candidate',
+        'application_type',
+        'current_program',
+        'current_program_type',
+        'current_faculty',
+        'current_department',
+        'level_at_application',
+        'bio',
+        'manifesto',
+        'stakeholders_remarks',
+        'application_form',
+        'initiated_by',
+        'approval_status',
+        'approved_at',
+        'processed_by',
+    ];
+
+    // protected $casts = [
+    //     'approved_at' => 'datetime',
+    // ];
+
+    // uuid
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = 'eca-' . date('Ymd') . '-' . Str::uuid();
+            }
+        });
+    }
+
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class, 'current_program', 'slug');
+    }
+    public function faculty()
+    {
+        return $this->belongsTo(Faculty::class, 'current_faculty', 'slug');
+    }
+    public function department()
+    {
+        return $this->belongsTo(Department::class, 'current_department', 'slug');
+    }
+    public function programType()
+    {
+        return $this->belongsTo(ProgramType::class, 'current_program_type', 'slug');
+    }
+    public function election()
+    {
+        return $this->belongsTo(Election::class, 'election_id', 'election_id');
+    }
+    public function position()
+    {
+        return $this->belongsTo(ElectionPosition::class, 'position_id', 'id');
+    }
+    public function theCandidate()
+    {
+        return $this->belongsTo(User::class, 'candidate', 'username');
+    }
+    public function processedBy()
+    {
+        return $this->belongsTo(User::class, 'processed_by', 'username');
+    }
+    public function initiatedBy()
+    {
+        return $this->belongsTo(User::class, 'initiated_by', 'username');
+    }
+}

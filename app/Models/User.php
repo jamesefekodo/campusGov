@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Media\MemberSocialMediaHandle;
@@ -258,5 +259,15 @@ class User extends Authenticatable
             'username',
             'username'
         )->where('status', 'approved');
+    }
+
+
+    public function memberElectionApplications()
+    {
+        return $this->hasMany(
+            ElectionCandidateApplication::class,
+            'initiated_by',
+            'username'
+        );
     }
 }

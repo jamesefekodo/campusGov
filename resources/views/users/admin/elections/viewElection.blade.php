@@ -214,6 +214,20 @@
                                         </div>
                                     @endif
                                     <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">One candidate can apply for multiple positions?:</span>
+                                        <span class="text-black text-capitalize">
+                                            @switch($data['election']->one_candidate_multiple_positions)
+                                                @case(true)
+                                                    Yes
+                                                @break
+
+                                                @default
+                                                    No
+                                                @break
+                                            @endswitch
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Public Visibility:</span>
                                         <span class="text-black text-capitalize">
                                             @switch($data['election']->public_visibility)

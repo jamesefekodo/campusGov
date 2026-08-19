@@ -4,7 +4,7 @@
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
         <div class="container-fluid">
             <div class="navigation">
-                @include('users.admin.elections.include.view_election_inner_nav')
+                @include('users.member.elections.include.view_election_inner_nav')
             </div>
             <div class="">
                 <div class="row">
@@ -80,7 +80,7 @@
                                                     <strong id="registration-countdown" class="ms-1"></strong>
                                                 </span>
 
-                                                {{-- <script>
+                                                <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
 
                                                         const deadline = new Date(
@@ -117,7 +117,7 @@
                                                         updateCountdown();
                                                         setInterval(updateCountdown, 1000);
                                                     });
-                                                </script> --}}
+                                                </script>
                                                 <script>
                                                     document.addEventListener('DOMContentLoaded', function() {
 
@@ -256,6 +256,7 @@
                                             {{ $data['election']->voting_method }}
                                         </span>
                                     </div>
+
                                     @if ($data['election']->voting_method == 'monetary')
                                         <div class="col-md-6 p-1">
                                             <span style="font-weight: bold">Cost Per Vote:</span>
@@ -264,6 +265,21 @@
                                             </span>
                                         </div>
                                     @endif
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">One candidate can apply for multiple
+                                            positions?:</span>
+                                        <span class="text-black text-capitalize">
+                                            @switch($data['election']->one_candidate_multiple_positions)
+                                                @case(true)
+                                                    Yes
+                                                @break
+
+                                                @default
+                                                    No
+                                                @break
+                                            @endswitch
+                                        </span>
+                                    </div>
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Public Visibility:</span>
                                         <span class="text-black text-capitalize">
@@ -330,15 +346,19 @@
                                                             <button class="btn btn-primary rounded-3 m-1"
                                                                 {{ !$qualification['qualified'] ? 'disabled' : '' }}
                                                                 data-toggle="modal"
-                                                                                            data-target="#memberSelfApplyForPositionModal_{{ $position->id }}" style="cursor: pointer;">
-                                                                <i class="fas fa-solid fa-file-pen me-1"></i>Apply for this position
+                                                                data-target="#memberSelfApplyForPositionModal_{{ $position->id }}"
+                                                                style="cursor: pointer;">
+                                                                <i class="fas fa-solid fa-file-pen me-1"></i>Apply for this
+                                                                position
                                                             </button>
-                                                            <button class="btn btn-warning rounded-3 m-1"
-                                                                {{-- data-toggle="modal"
-                                                                                            data-target="#editQualifiedCandidateGoupModal_{{ $group->id }}" --}} style="cursor: pointer;">
+                                                            {{-- Nomination is disabled --}}
+                                                            {{-- <button class="btn btn-warning rounded-3 m-1"
+                                                                data-toggle="modal"
+                                                                data-target="#editQualifiedCandidateGoupModal_{{ $group->id }}"
+                                                                style="cursor: pointer;">
                                                                 <i class="fas fa-hand-holding-heart me-1"></i>Nominate
                                                                 Someone for this positino
-                                                            </button>
+                                                            </button> --}}
 
                                                             @include('users.member.elections.include.memberSelfApplyForPositionModal')
                                                             {{-- ############################################# --}}

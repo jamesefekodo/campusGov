@@ -21,6 +21,7 @@ class Election extends Model
         'election_id',
         'voting_method',
         'public_visibility',
+        'one_candidate_multiple_positions',
         'title',
         'academic_session',
         'description',
@@ -44,6 +45,7 @@ class Election extends Model
     protected $casts = [
         'approved_at' => 'datetime',
         'public_visibility' => 'boolean',
+        'one_candidate_multiple_positions',
     ];
 
     // uuid

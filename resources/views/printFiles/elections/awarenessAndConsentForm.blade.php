@@ -90,6 +90,20 @@
                                 @endswitch
                             </span>
                             <br>
+                            <span style="font-weight: bold">One candidate can apply for multiple positions?: </span>
+                            <span class="">
+
+                                @switch($data['election']->one_candidate_multiple_positions)
+                                    @case(true)
+                                        Yes
+                                    @break
+
+                                    @default
+                                        No
+                                    @break
+                                @endswitch
+                            </span>
+                            <br>
                             <span style="font-weight: bold">Form Sales Starts: </span>
                             <span class="">
                                 {{ \Carbon\Carbon::parse($data['election']->form_sales_starts)->format('D, d M, Y h:i A') }}

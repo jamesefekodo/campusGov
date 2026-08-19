@@ -76,6 +76,7 @@
                                 </p>
                             </div>
 
+                            
 
                             <div class="form-group col-md-6" id="cost_per_vote_container"
                                 style="{{ old('voting_method') == 'monetary' ? '' : 'display: none;' }}">
@@ -138,6 +139,22 @@
                                 <p style="color: red">
                                     {{ $errors->first('public_visibility') }}</p>
                             </div>
+                             <div class="form-group col-md-6">
+                                <label for="one_candidate_multiple_positions">One candidate can apply for multiple positions?:<span class="text-red">*</span></label>
+                                <select class="form-select" name="one_candidate_multiple_positions" required>
+                                    <option selected disabled>
+                                        -Select-</option>
+                                    <option value=0
+                                        {{ $data['election']->one_candidate_multiple_positions == '0' ? 'selected' : '' }}>
+                                        No</option>
+                                    <option value=1
+                                        {{ $data['election']->one_candidate_multiple_positions == '1' ? 'selected' : '' }}>
+                                        Yes</option>
+                                </select>
+                                <p style="color: red">
+                                    {{ $errors->first('one_candidate_multiple_positions') }}</p>
+                            </div>
+                            
                             <div class="d-flex align-items-center mt-2">
                                 <hr class="flex-grow-1">
                                 <span class="mx-2 text-blue">Form Sales Period</span>

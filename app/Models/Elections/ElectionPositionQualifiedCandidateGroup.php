@@ -66,6 +66,6 @@ class ElectionPositionQualifiedCandidateGroup extends Model
     }
     public function position()
     {
-        return $this->belongsTo(ElectionPosition::class, 'election_id', 'election_id');
+        return $this->belongsTo(ElectionPosition::class, 'position_id', 'position_id');
     }
 }

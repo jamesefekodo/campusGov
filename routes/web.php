@@ -163,7 +163,8 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/new/search', [MemberElectionController::class, 'memberNewElections'])->name('memberNewElectionsSearch');
     Route::get('member/elections/view/{uuid}', [MemberElectionController::class, 'memberViewElection'])->name('memberViewElection');
     Route::post('member/elections/self_application/initiate/{uuid}', [MemberElectionController::class, 'memberInitiateSelfApplyForPositionSubmit'])->name('memberInitiateSelfApplyForPositionSubmit');
-
+    Route::get('member/elections/my_applications/{uuid}', [MemberElectionController::class, 'myElectionApplications'])->name('myElectionApplications');
+    Route::get('member/elections/my_applications/view/{uuid}', [MemberElectionController::class, 'viewMyElectionApplication'])->name('viewMyElectionApplication');
 });
 
 
@@ -410,7 +411,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/elections/positions/qualified_candidate_group/update/{uuid}', [ElectionController::class, 'updateQualifiedCandidateGroupSubmit'])->name('updateQualifiedCandidateGroupSubmit');
     Route::get('admin/elections/positions/qualified_candidate_group/remove/{uuid}', [ElectionController::class, 'removeQualifiedCandidateGroup'])->name('removeQualifiedCandidateGroup');
     Route::get('admin/elections/submit_for_approval/remove/{uuid}', [ElectionController::class, 'submitElectionForApproval'])->name('submitElectionForApproval');
-    Route::get('admin/elections/concent_and_awareness_form/remove/{uuid}', [ElectionController::class, 'printElectionConsentAwarenessForm'])->name('printElectionConsentAwarenessForm');
+    Route::get('admin/elections/concent_and_awareness_form/print/{uuid}', [ElectionController::class, 'printElectionConsentAwarenessForm'])->name('printElectionConsentAwarenessForm');
 
 
     Route::get('admin/election/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');

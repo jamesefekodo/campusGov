@@ -27,7 +27,7 @@ return new class extends Migration
 
                 $table->string('current_program')->nullable(); // Foreign
                 $table->string('current_program_type')->nullable(); // Foreign
-                $table->string('current_application')->nullable(); // Foreign
+                $table->string('current_faculty')->nullable(); // Foreign
                 $table->string('current_department')->nullable(); // Foreign
                 $table->string('level_at_application');
 
@@ -37,7 +37,7 @@ return new class extends Migration
                 $table->string('application_form')->nullable(); // picture
 
                 $table->string('initiated_by')->nullable(); // Foreign
-                $table->string('approval_status')->default('pending');
+                $table->string('status')->default('draft');
                 $table->dateTime('approved_at')->nullable();
                 $table->string('processed_by')->nullable(); // Foreign
 
@@ -54,7 +54,7 @@ return new class extends Migration
                 $table->foreign('position_id')->references('id')->on('election_positions')->nullOnDelete()->cascadeOnUpdate();
                 $table->foreign('current_program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
                 $table->foreign('current_program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();
-                $table->foreign('current_application')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
+                $table->foreign('current_faculty')->references('slug')->on('faculties')->onUpdate('cascade')->nullOnDelete();
                 $table->foreign('current_department')->references('slug')->on('departments')->onUpdate('cascade')->nullOnDelete();
 
                 $table->foreign('candidate')->references('username')->on('users')->onUpdate('cascade');

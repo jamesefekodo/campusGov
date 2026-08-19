@@ -15,28 +15,27 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('memberInitiateSelfApplyForPositionSubmit', ['uuid' => $position->uuid]) }}"
+                    <form class="form my_form" method="POST"
+                        action="{{ route('memberInitiateSelfApplyForPositionSubmit', ['uuid' => $position->uuid]) }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-12">
                                 <label for="bio_{{ $position->id }}">Bio:<span class="text-red">*</span></label>
-                                <!-- Using array notation for names like bio[{{ $position->id }}] is also best practice for loops -->
-                                <textarea id="bio_{{ $position->id }}" name="bio_{{ $position->id }}" required>{{ old('bio_' . $position->id) }}</textarea>
-                                <p style="color: red">{{ $errors->first('bio_' . $position->id) }}</p>
+                                <!-- Using single names since each modal has its own isolated form -->
+                                <textarea id="bio_{{ $position->id }}" name="bio" required>{{ old('bio') }}</textarea>
+                                <p style="color: red">{{ $errors->first('bio') }}</p>
                             </div>
 
                             <div class="form-group col-md-12">
                                 <label for="manifesto_{{ $position->id }}">Manifesto:<span
                                         class="text-red">*</span></label>
-                                <textarea id="manifesto_{{ $position->id }}" name="manifesto_{{ $position->id }}" required>{{ old('manifesto_' . $position->id) }}</textarea>
-                                <p style="color: red">{{ $errors->first('manifesto_' . $position->id) }}</p>
+                                <textarea id="manifesto_{{ $position->id }}" name="manifesto" required>{{ old('manifesto') }}</textarea>
+                                <p style="color: red">{{ $errors->first('manifesto') }}</p>
                             </div>
 
                             <script>
                                 $(document).ready(function() {
-                                    // Initialize Summernote uniquely for this iteration using attribute starts-with [id^=...]
-                                    // or by injecting the ID directly:
                                     $('#bio_{{ $position->id }}').summernote({
                                         height: 200,
                                         toolbar: [
