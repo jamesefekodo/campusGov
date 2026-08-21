@@ -7,6 +7,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\Elections\Election;
+use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionGeneralQualifiedCandidateGroup;
 use App\Models\Elections\ElectionGeneralQualifiedVoterGroup;
 use App\Models\Elections\ElectionPosition;
@@ -14,7 +15,9 @@ use App\Models\Elections\ElectionPositionQualifiedCandidateGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Mpdf\Mpdf;
 
@@ -366,6 +369,33 @@ class ElectionController extends Controller
         ]);
         return redirect()->back()->with('success', 'Done!');
     }
+    public function updateElectionPositionSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.update'),
+            403
+        );
+
+        $position = ElectionPosition::where('uuid', $uuid)->first();
+        if (!$position) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+        $request->validate([
+            'position' => 'required|string',
+            'description' => 'required|string',
+            'application_fee' => 'required|numeric|min:0',
+        ]);
+
+        $position->update([
+            'position' => $request->position,
+            'description' => $request->description,
+            'application_fee' => $request->application_fee,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
     public function addNewPositionQualifiedCandidateGroupSubmit(Request $request, $uuid)
     {
         /** @var \App\Models\User $user */
@@ -565,9 +595,11 @@ class ElectionController extends Controller
         );
 
         $electionApprovalRequests = Election::where('status', 'awaiting_approval')->orderBy('title')->get();
+        $candidatesAwaitingApproval = ElectionCandidateApplication::where('status', 'pending_approval')->get();
 
         $data = [
             'electionApprovalRequests' => $electionApprovalRequests,
+            'candidatesAwaitingApproval' => $candidatesAwaitingApproval,
         ];
 
         return view('users.admin.elections.electionRequests', compact('data'));
@@ -609,5 +641,209 @@ class ElectionController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Done!');
+    }
+    public function viewElectionCandidateApplication($uuid)
+    {
+        $application = ElectionCandidateApplication::where('uuid', $uuid)->first();
+        if (!$application) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $data = [
+            'application' => $application,
+            'election' => $application->election,
+        ];
+
+        return view('users.admin.elections.viewElectionCandidateRequest', compact('data'));
+    }
+    public function processElectionCandidateRequestSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.approve'),
+            403
+        );
+
+        $application = ElectionCandidateApplication::where('uuid', $uuid)->first();
+        if (!$application) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+        $request->validate([
+            'status' => ['required', 'in:approved,declined'],
+            'application_form' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:3145728',
+            'stakeholders_remarks' => 'nullable',
+        ]);
+
+        $application->update([
+            'status' => $request->status,
+            'stakeholders_remarks' => $request->stakeholders_remarks,
+            'approved_at' => Carbon::now(),
+            'processed_by' => Auth::user()->username,
+        ]);
+
+
+        if ($request->hasFile('application_form')) {
+
+            $file = $request->file('application_form');
+            $mime = $file->getMimeType();
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $uploadPath = public_path('assets/tenant_' . tenant()->id . '/uploads/elections/applicationForm');
+            File::ensureDirectoryExists($uploadPath);
+
+            // Base filename
+            $baseName = strtolower($application->uuid);
+
+            $baseName = Str::of($baseName)
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->toString();
+            $fallbackName = $baseName . '.' . $ext;
+            $counter = 1;
+
+            // Delete existing file(s) with same base name regardless of extension
+            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+                if (file_exists($existingFile)) {
+                    unlink($existingFile);
+                }
+            }
+
+            // Avoid overwriting existing files
+            while (file_exists($uploadPath . '/' . $fallbackName)) {
+                $fallbackName = $baseName . '-' . $counter . '.' . $ext;
+                $counter++;
+            }
+
+            $fallbackPath = $uploadPath . '/' . $fallbackName;
+
+            /*
+            |--------------------------------------------------------------------------
+            | GD + WebP processing
+            |--------------------------------------------------------------------------
+            */
+            $processed = false;
+
+            if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
+
+                $tmp = $file->getPathname();
+
+                $src = match ($mime) {
+                    'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmp) : null,
+                    'image/png'  => function_exists('imagecreatefrompng')  ? @imagecreatefrompng($tmp)  : null,
+                    'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : null,
+                    default => null,
+                };
+
+                if ($src) {
+                    $width  = imagesx($src);
+                    $height = imagesy($src);
+
+                    // Resize if needed
+                    $maxSize = 800;
+                    $scale = min(1, $maxSize / max($width, $height));
+
+                    if ($scale < 1) {
+                        $newW = (int)($width * $scale);
+                        $newH = (int)($height * $scale);
+                        $dst = imagecreatetruecolor($newW, $newH);
+
+                        // Preserve transparency
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+                        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                        imagefill($dst, 0, 0, $transparent);
+
+                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $width, $height);
+                        imagedestroy($src);
+                        $src = $dst;
+                    }
+
+                    // WebP conversion with quality loop
+                    $webpName = $baseName . '.webp';
+                    $webpCounter = 1;
+                    $webpPath = $uploadPath . '/' . $webpName;
+
+                    while (file_exists($webpPath)) {
+                        $webpName = $baseName . '-' . $webpCounter . '.webp';
+                        $webpPath = $uploadPath . '/' . $webpName;
+                        $webpCounter++;
+                    }
+
+                    $quality = 90;
+                    do {
+                        imagewebp($src, $webpPath, $quality);
+                        clearstatcache();
+
+                        if (filesize($webpPath) <= 1048576) {
+                            $processed = true;
+                            $application->application_form = $webpName;
+                            imagedestroy($src);
+                            break;
+                        }
+
+                        $quality -= 5;
+                    } while ($quality >= 40);
+
+                    if (!$processed) {
+                        @unlink($webpPath);
+                    }
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fallback: move original file
+            |--------------------------------------------------------------------------
+            */
+            if (!$processed) {
+                $file->move($uploadPath, $fallbackName);
+                $application->application_form = $fallbackName;
+            }
+        }
+
+        $application->save();
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function electionCandidates($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.read'),
+            403
+        );
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $data = [
+            'election' => $election,
+        ];
+        return view('users.admin.elections.candidates.candidates', compact('data'));
+    }
+    public function viewElectionCandidatesForPosition($uuid)
+    {
+         /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.read'),
+            403
+        );
+        
+        $position = ElectionPosition::where('uuid', $uuid)->first();
+        if (!$position) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+        $data = [
+            'position' => $position,
+            'election' => $position->election,
+        ];
+
+        return view('users.admin.elections.candidates.viewCandidates', compact('data'));
     }
 }

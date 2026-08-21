@@ -8,6 +8,7 @@ use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionPosition;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,7 +37,7 @@ class ElectionCandidateApplication extends Model
         'stakeholders_remarks',
         'application_form',
         'initiated_by',
-        'approval_status',
+        'status',
         'approved_at',
         'processed_by',
     ];
@@ -92,4 +93,59 @@ class ElectionCandidateApplication extends Model
     {
         return $this->belongsTo(User::class, 'initiated_by', 'username');
     }
+
+    public function allPaymentAttempts()
+    {
+        return $this->hasMany(
+            PaymentTransaction::class,
+            'election_candidate_application',
+            'id'
+        );
+    }
+    public function successfulPaymentTransaction()
+    {
+        return $this->hasOne(
+            PaymentTransaction::class,
+            'election_candidate_application',
+            'id'
+        )
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved');
+    }
+
+    // public function allPaymentAttempts()
+    // {
+    //     return $this->hasMany(
+    //         PaymentTransaction::class,
+    //         'election_id',
+    //         'election_id'
+    //     )->where(
+    //         'election_position',
+    //         $this->position_id
+    //     );
+    // }
+
+    // public function successfulPaymentTransaction()
+    // {
+    //     return $this->hasMany(
+    //         PaymentTransaction::class,
+    //         'election_id',
+    //         'election_id'
+    //     )
+    //         ->where('election_position', $this->position_id)
+    //         ->where('payment_status', 'successful')
+    //         ->where('approval_status', 'approved');
+    // }
+
+    // public function successfulPaymentTransaction()
+    // {
+    //     return $this->hasOne(
+    //         PaymentTransaction::class,
+    //         'election_id',
+    //         'election_id'
+    //     )
+    //         ->where('election_position', $this->position_id)
+    //         ->where('payment_status', 'successful')
+    //         ->where('approval_status', 'approved');
+    // }
 }

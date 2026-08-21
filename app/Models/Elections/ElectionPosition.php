@@ -41,4 +41,12 @@ class ElectionPosition extends Model
     {
         return $this->hasMany(ElectionPositionQualifiedCandidateGroup::class, 'position_id', 'id');
     }
+    public function qualifiedCandidates()
+    {
+        return $this->hasMany(
+            ElectionCandidateApplication::class,
+            'position_id',
+            'id'
+        )->where('status', 'approved');
+    }
 }

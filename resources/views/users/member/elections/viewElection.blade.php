@@ -51,6 +51,10 @@
                                                     <span class="badge bg-warning-subtle text-warning">Campaign</span>
                                                 @break
 
+                                                @case('voting')
+                                                    <span class="badge bg-blue text-white">Voting</span>
+                                                @break
+
                                                 @case('completed')
                                                     <span class="badge bg-success-subtle text-success">Completed</span>
                                                 @break
@@ -334,6 +338,11 @@
                                                         <div class="">
                                                             <span class="fw-bold text-muted">Description:</span>
                                                             {{ $position->description }}
+                                                        </div>
+                                                        <div class="">
+                                                            <span class="fw-bold text-muted">Application
+                                                                Fee:</span>
+                                                            ₦{{ number_format($position->application_fee, 2) }}
                                                         </div>
                                                         <div class="">
                                                             @php

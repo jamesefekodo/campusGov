@@ -35,6 +35,8 @@ return new class extends Migration
                 $table->string('election_id')->nullable(); // Foreign
                 $table->unsignedBigInteger('election_position')->nullable(); // Foreign
 
+                $table->unsignedBigInteger('election_candidate_application')->nullable(); // Foreign                
+
                 $table->decimal('amount_payable', 15, 2)->nullable();
                 $table->decimal('amount_paid', 15, 2);
                 $table->decimal('amount_settled', 15, 2)->nullable();
@@ -85,15 +87,20 @@ return new class extends Migration
                 //     ->on('association_invoices')
                 //     ->onUpdate('cascade');
 
-                // $table->foreign('election_id')
-                //     ->references('election_id')
-                //     ->on('elections')
-                //     ->onUpdate('cascade');
+                $table->foreign('election_id')
+                    ->references('election_id')
+                    ->on('elections')
+                    ->onUpdate('cascade');
 
-                // $table->foreign('election_position')
-                //     ->references('id')
-                //     ->on('election_positions')
-                //     ->onUpdate('cascade');
+                $table->foreign('election_position')
+                    ->references('id')
+                    ->on('election_positions')
+                    ->onUpdate('cascade');
+
+                $table->foreign('election_candidate_application')
+                    ->references('id')
+                    ->on('election_candidate_applications')
+                    ->onUpdate('cascade');
             }
         );
     }

@@ -51,6 +51,10 @@
                                                     <span class="badge bg-warning-subtle text-warning">Campaign</span>
                                                 @break
 
+                                                @case('voting')
+                                                    <span class="badge bg-blue text-white">Voting</span>
+                                                @break
+
                                                 @case('completed')
                                                     <span class="badge bg-success-subtle text-success">Completed</span>
                                                 @break
@@ -214,7 +218,8 @@
                                         </div>
                                     @endif
                                     <div class="col-md-6 p-1">
-                                        <span style="font-weight: bold">One candidate can apply for multiple positions?:</span>
+                                        <span style="font-weight: bold">One candidate can apply for multiple
+                                            positions?:</span>
                                         <span class="text-black text-capitalize">
                                             @switch($data['election']->one_candidate_multiple_positions)
                                                 @case(true)
@@ -528,6 +533,19 @@
                                                                     <span class="fw-bold text-muted">Description:</span>
                                                                     {{ $position->description }}
                                                                 </div>
+                                                                <div class="">
+                                                                    <span class="fw-bold text-muted">Application
+                                                                        Fee:</span>
+                                                                    ₦{{ number_format($position->application_fee, 2) }}
+                                                                    <span
+                                                                        class="badge bg-blue text-white ms-3 pe-2 ps-3 py-2 m-1 rounded-3"
+                                                                        data-toggle="modal"
+                                                                        data-target="#editPositionModal_{{ $position->id }}"
+                                                                        style="cursor: pointer;">
+                                                                        <i class="fas fa-edit me-1"></i>Update Position
+                                                                    </span>
+                                                                </div>
+                                                                @include('users.admin.elections.include.editPositionModal')
                                                                 <div class="">
                                                                     <span class="fw-bold text-muted">Reserved Cand.
                                                                         Groups:</span>

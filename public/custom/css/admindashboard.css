@@ -557,8 +557,10 @@ a.sub-menu {
 .mini_card_container {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     grid-gap: 20px;
+    /* justify-content: center; */
+    place-items: center;
 }
 
 .mini_card {
@@ -566,6 +568,7 @@ a.sub-menu {
     margin: 0.5rem;
     height: 280px;
     max-width: 280px;
+    min-width: 250px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);

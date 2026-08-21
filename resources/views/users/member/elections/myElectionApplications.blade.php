@@ -58,47 +58,46 @@
                                                     @foreach ($data['applications'] as $application)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
-                                                            <td class="text-start"> <span class="nav-link-text">
-                                                                    {{ $application->election->title }}
+                                                            <td class="text-start">
+                                                                {{ $application->election->title }}
                                                             </td>
-                                                            <td class="text-start"> <span class="nav-link-text">
-                                                                    {{ $application->position->position }}
+                                                            <td class="text-start">
+                                                                {{ $application->position->position }}
                                                             </td>
-                                                            <td class="text-start text-capitalize"> <span
-                                                                    class="nav-link-text">
-                                                                    {{ $application->application_type }}
+                                                            <td class="text-start text-capitalize">
+                                                                {{ $application->application_type }}
                                                             </td>
-                                                            <td class=""> <span class="nav-link-text">
-                                                                    @switch($application->status)
-                                                                        @case('draft')
-                                                                            <span class="badge bg-primary-subtle text-primary">
-                                                                                Draft
-                                                                            </span>
-                                                                        @break
+                                                            <td class="">
+                                                                @switch($application->status)
+                                                                    @case('draft')
+                                                                        <span class="badge bg-primary-subtle text-primary">
+                                                                            Draft
+                                                                        </span>
+                                                                    @break
 
-                                                                        @case('pending_approval')
-                                                                            <span class="badge bg-warning-subtle text-warning">
-                                                                                Pending Approval
-                                                                            </span>
-                                                                        @break
+                                                                    @case('pending_approval')
+                                                                        <span class="badge bg-warning-subtle text-warning">
+                                                                            Pending Approval
+                                                                        </span>
+                                                                    @break
 
-                                                                        @case('approved')
-                                                                            <span class="badge bg-success-subtle text-success">
-                                                                                Approved
-                                                                            </span>
-                                                                        @break
+                                                                    @case('approved')
+                                                                        <span class="badge bg-success-subtle text-success">
+                                                                            Approved
+                                                                        </span>
+                                                                    @break
 
-                                                                        @case('declined')
-                                                                            <span class="badge bg-danger-subtle text-danger">
-                                                                                Declined
-                                                                            </span>
-                                                                        @break
+                                                                    @case('declined')
+                                                                        <span class="badge bg-danger-subtle text-danger">
+                                                                            Declined
+                                                                        </span>
+                                                                    @break
 
-                                                                        @default
-                                                                            <span class="badge bg-danger-subtle text-danger">
-                                                                                {{ $application->status }}
-                                                                            </span>
-                                                                    @endswitch
+                                                                    @default
+                                                                        <span class="badge bg-danger-subtle text-danger">
+                                                                            {{ $application->status }}
+                                                                        </span>
+                                                                @endswitch
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"

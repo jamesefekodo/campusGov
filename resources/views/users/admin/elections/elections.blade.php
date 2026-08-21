@@ -91,7 +91,8 @@
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start"> <span class="nav-link-text">
                                                                     {{ $election->title }}
-                                                                    {{ $election->academic_session . '/' . $election->academic_session + 1 }} &nbsp;
+                                                                    {{ $election->academic_session . '/' . $election->academic_session + 1 }}
+                                                                    &nbsp;
                                                                     @if ($election->status == 'awaiting_approval')
                                                                         <span
                                                                             class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
@@ -173,6 +174,10 @@
                                                                     @case('campaign')
                                                                         <span
                                                                             class="badge bg-warning-subtle text-warning">Campaign</span>
+                                                                    @break
+
+                                                                    @case('voting')
+                                                                        <span class="badge bg-blue text-white">Voting</span>
                                                                     @break
 
                                                                     @case('completed')

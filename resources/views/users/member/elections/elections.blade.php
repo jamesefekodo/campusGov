@@ -171,6 +171,11 @@
                                                                             class="badge bg-warning-subtle text-warning">Campaign</span>
                                                                     @break
 
+                                                                     @case('voting')
+                                                                        <span
+                                                                            class="badge bg-blue text-white">Voting</span>
+                                                                    @break
+
                                                                     @case('completed')
                                                                         <span
                                                                             class="badge bg-success-subtle text-success">Completed</span>

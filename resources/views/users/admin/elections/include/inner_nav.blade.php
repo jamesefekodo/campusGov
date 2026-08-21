@@ -11,7 +11,7 @@
         @endif
         @if (Auth::user()->hasPermission('elections.approve'))
             @php
-                $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + 0;
+                $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + totalElectionCandidatesAwaitingApproval();
             @endphp
 
             <a href="{{ route('electionOperationRequests') }}">

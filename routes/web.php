@@ -163,8 +163,18 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/new/search', [MemberElectionController::class, 'memberNewElections'])->name('memberNewElectionsSearch');
     Route::get('member/elections/view/{uuid}', [MemberElectionController::class, 'memberViewElection'])->name('memberViewElection');
     Route::post('member/elections/self_application/initiate/{uuid}', [MemberElectionController::class, 'memberInitiateSelfApplyForPositionSubmit'])->name('memberInitiateSelfApplyForPositionSubmit');
+    Route::put('member/elections/self_application/update/{uuid}', [MemberElectionController::class, 'memberUpdateSelfApplyForPositionSubmit'])->name('memberUpdateSelfApplyForPositionSubmit');
+
+
     Route::get('member/elections/my_applications/{uuid}', [MemberElectionController::class, 'myElectionApplications'])->name('myElectionApplications');
     Route::get('member/elections/my_applications/view/{uuid}', [MemberElectionController::class, 'viewMyElectionApplication'])->name('viewMyElectionApplication');
+    Route::post('member/elections/my_applications/pay_for_candidacy/{uuid}', [MemberElectionController::class, 'memberPayForElectionCandidacy'])->name('memberPayForElectionCandidacy');
+
+    Route::get('member/elections/my_applications/application/print/{uuid}', [MemberElectionController::class, 'printElectionApplicationEndorsementForm'])->name('printElectionApplicationEndorsementForm');
+
+    Route::get('member/elections/candidates/{uuid}', [MemberElectionController::class, 'memberElectionCandidates'])->name('memberElectionCandidates');
+    Route::get('member/elections/candidates/position/{uuid}', [MemberElectionController::class, 'memberViewElectionCandidatesForPosition'])->name('memberViewElectionCandidatesForPosition');
+
 });
 
 
@@ -407,6 +417,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/elections/qualified_voter_groups/update/submit/{uuid}', [ElectionController::class, 'updateQualifiedVoterGroupSubmit'])->name('updateQualifiedVoterGroupSubmit');
 
     Route::post('admin/elections/positions/add_new/{uuid}', [ElectionController::class, 'addNewElectionPositionSubmit'])->name('addNewElectionPositionSubmit');
+    Route::put('admin/elections/positions/update/submit/{uuid}', [ElectionController::class, 'updateElectionPositionSubmit'])->name('updateElectionPositionSubmit');
+
+
+
     Route::post('admin/elections/positions/qualified_candidate_group/add/{uuid}', [ElectionController::class, 'addNewPositionQualifiedCandidateGroupSubmit'])->name('addNewPositionQualifiedCandidateGroupSubmit');
     Route::put('admin/elections/positions/qualified_candidate_group/update/{uuid}', [ElectionController::class, 'updateQualifiedCandidateGroupSubmit'])->name('updateQualifiedCandidateGroupSubmit');
     Route::get('admin/elections/positions/qualified_candidate_group/remove/{uuid}', [ElectionController::class, 'removeQualifiedCandidateGroup'])->name('removeQualifiedCandidateGroup');
@@ -416,4 +430,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/election/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');
     Route::put('admin/election/requests/approval/submit/{uuid}', [ElectionController::class, 'approveElectionSubmit'])->name('approveElectionSubmit');
+
+    Route::get('admin/election/requests/prospective_candidates/{uuid}', [ElectionController::class, 'viewElectionCandidateApplication'])->name('viewElectionCandidateApplication');
+    Route::put('admin/election/requests/prospective_candidates/process/submit/{uuid}', [ElectionController::class, 'processElectionCandidateRequestSubmit'])->name('processElectionCandidateRequestSubmit');
+
+    Route::get('admin/election/requests/candidates/{uuid}', [ElectionController::class, 'electionCandidates'])->name('electionCandidates');
+    Route::get('admin/election/requests/candidates/view/{uuid}', [ElectionController::class, 'viewElectionCandidatesForPosition'])->name('viewElectionCandidatesForPosition');
 });

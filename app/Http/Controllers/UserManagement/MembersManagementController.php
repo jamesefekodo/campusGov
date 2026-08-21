@@ -202,7 +202,7 @@ class MembersManagementController extends Controller
             $members = MemberAcademicInfo::query()
                 ->where('member_academic_infos.academic_status', 'student')
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
                 ->with([
                     'userProfile',
@@ -290,7 +290,7 @@ class MembersManagementController extends Controller
                 ->where('member_academic_infos.academic_status', 'student')
 
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
 
                 ->when(!empty($selectedProgram) && $selectedProgram !== 'all', function ($query) use ($selectedProgram) {
@@ -336,7 +336,7 @@ class MembersManagementController extends Controller
         } else {
             $members = MemberAcademicInfo::where('academic_status', 'student')
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
                 ->orderBy(
                     MemberPersonalProfile::select('first_name')
@@ -401,7 +401,7 @@ class MembersManagementController extends Controller
             $members = MemberAcademicInfo::query()
                 ->where('member_academic_infos.academic_status', '!=', 'student')
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
                 ->with([
                     'userProfile',
@@ -487,7 +487,7 @@ class MembersManagementController extends Controller
                 ->where('member_academic_infos.academic_status', '!=', 'student')
 
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
 
                 ->when(!empty($selectedAcademicStatus) && $selectedAcademicStatus !== 'all', function ($query) use ($selectedAcademicStatus) {
@@ -545,7 +545,7 @@ class MembersManagementController extends Controller
         } else {
             $members = MemberAcademicInfo::where('academic_status', '!=', 'student')
                 ->whereHas('userProfile', function ($query) {
-                    $query->where('account_status', 2);
+                    $query->where('account_type', 2)->where('account_status', 2);
                 })
                 ->orderBy(
                     MemberPersonalProfile::select('first_name')
@@ -1335,7 +1335,7 @@ class MembersManagementController extends Controller
             403
         );
 
-        $member = User::where('uuid', $uuid)->first();
+        $member = User::where('uuid', $uuid)->where('account_type', 2)->first();
         if (!$member) {
             return redirect()->back()->with('error', 'Records not found!');
         }

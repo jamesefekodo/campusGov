@@ -14,9 +14,9 @@
                 </div>
             </a>
         @endif
-        <a href="{{ route('memberNewElections') }}">
+        <a href="{{ route('memberElectionCandidates', ['uuid' => $data['election']->uuid]) }}">
             <div
-                class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">
+                class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/candidates') ? 'inner_nav_active' : '' }}">
                 Candidates
             </div>
         </a>

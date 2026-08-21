@@ -38,9 +38,16 @@
                                                 </tr>
                                             </thead>
 
-                                            @if ($data['electionApprovalRequests']->isEmpty())
-                                                There is no request pending approval.
+                                            @if ($data['electionApprovalRequests']->isEmpty() && $data['candidatesAwaitingApproval']->isEmpty())
+                                                <tbody>
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            There is no request pending approval.
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
                                             @endif
+                                            {{-- election approval --}}
                                             @if ($data['electionApprovalRequests']->isNotEmpty())
                                                 <tbody>
                                                     @foreach ($data['electionApprovalRequests'] as $election)
@@ -58,6 +65,73 @@
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
                                                                     href="{{ route('viewElection', ['uuid' => $election->uuid]) }}">View</a>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            @endif
+                                            {{-- canditate approval --}}
+                                            @if ($data['candidatesAwaitingApproval']->isNotEmpty())
+                                                <tbody>
+                                                    @foreach ($data['candidatesAwaitingApproval'] as $application)
+                                                        <tr class=" align-middle text-center">
+                                                            <td>
+                                                                *
+                                                            </td>
+                                                            <td>
+                                                                {{ $application->election->title }}
+                                                                {{ $application->election->academic_session . '/' . $application->election->academic_session + 1 }}
+                                                            </td>
+                                                            <td>
+                                                                <div class="d-flex align-items-center gap-3">
+                                                                    {{-- Avatar --}}
+                                                                    <div class="flex-shrink-0">
+                                                                        @php
+                                                                            $user = $application->theCandidate;
+                                                                        @endphp
+                                                                        @include('users.admin.userManagement.members.include.profilePictureAndAvatarDisplay')
+                                                                    </div>
+
+                                                                    {{-- Name & Code --}}
+                                                                    <div class="flex-grow-1 min-width-0 text-center">
+                                                                        <p
+                                                                            class="fw-bold mb-0 text-truncate text-capitalize">
+                                                                            {{ $application->position->position }} | <span
+                                                                                class="badge bg-secondary-subtle text-black">
+                                                                                Candidate Application
+                                                                            </span>
+                                                                        </p>
+                                                                        <p class="text-muted mb-0 small text-truncate">
+                                                                            @php
+                                                                                $middleInitial = $application
+                                                                                    ->theCandidate
+                                                                                    ->memberPersonalProfile->middle_name
+                                                                                    ? strtoupper(
+                                                                                            substr(
+                                                                                                $application
+                                                                                                    ->theCandidate
+                                                                                                    ->memberPersonalProfile
+                                                                                                    ->middle_name,
+                                                                                                0,
+                                                                                                1,
+                                                                                            ),
+                                                                                        ) . '. '
+                                                                                    : '';
+                                                                            @endphp
+
+                                                                            <span class="text-capitalize">
+                                                                                {{ strtolower($application->theCandidate->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($application->theCandidate->memberPersonalProfile->last_name) }} 
+                                                                            ({{ strtoupper($application->theCandidate->memberAcademicInfo->matric_number) }})
+                                                                            </span>
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+
+                                                            </td>
+                                                            <td>
+                                                                <a class="btn btn-primary btn-sm"
+                                                                    href="{{ route('viewElectionCandidateApplication', ['uuid' => $application->uuid]) }}"
+                                                                    >View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach

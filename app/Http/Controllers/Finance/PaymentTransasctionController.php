@@ -660,6 +660,14 @@ class PaymentTransasctionController extends Controller
                             'balance_update_status' => 'cancelled',
                         ]);
                     }
+
+                    // submit election position application
+                    if ($paymentTransaction->electionCandidateApplication) {
+                        $paymentTransaction->electionCandidateApplication->update([
+                            'status' => 'pending_approval',
+                        ]);
+                    }
+                    return redirect()->back();
                 }
             } else {
                 $paymentTransaction->payment_status = $responseData['status'];
@@ -750,6 +758,14 @@ class PaymentTransasctionController extends Controller
                         'balance_update_status' => 'cancelled',
                     ]);
                 }
+
+                // submit election position application
+                if ($paymentTransaction->electionCandidateApplication) {
+                    $paymentTransaction->electionCandidateApplication->update([
+                        'status' => 'pending_approval',
+                    ]);
+                }
+
                 return redirect()->back();
             } else {
                 if ($responseData && $responseData['data'] && $responseData['data']['id']) {

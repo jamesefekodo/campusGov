@@ -6,6 +6,7 @@ use App\Models\Config\BasicSystemSetting;
 use App\Models\Config\SystemPolicies\SystemPolicy;
 use App\Models\Config\SystemPolicies\UserAgreedPolicy;
 use App\Models\Elections\Election;
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +61,40 @@ class AuthenticationMiddleware
                 }
             }
         }
+
+        $now = Carbon::now();
+
+        // Completed first
+        Election::where('approval_status', 'approved')
+            ->where('status', 'voting')
+            ->where('voting_ends', '<', $now)
+            ->update([
+                'status' => 'completed'
+            ]);
+
+        // Voting
+        Election::where('approval_status', 'approved')
+            ->where('voting_starts', '<=', $now)
+            ->where('voting_ends', '>=', $now)
+            ->update([
+                'status' => 'voting'
+            ]);
+
+        // Campaign
+        Election::where('approval_status', 'approved')
+            ->where('campaign_starts', '<=', $now)
+            ->where('campaign_ends', '>=', $now)
+            ->update([
+                'status' => 'campaign'
+            ]);
+
+        // Screening
+        Election::where('approval_status', 'approved')
+            ->where('screening_starts', '<=', $now)
+            ->where('screening_ends', '>=', $now)
+            ->update([
+                'status' => 'screening'
+            ]);
         ############
         $response = $next($request);
 

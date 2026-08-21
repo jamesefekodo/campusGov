@@ -5,6 +5,7 @@ use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Elections\Election;
+use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
@@ -561,6 +562,13 @@ if (!function_exists('totalElectionsAwaitingApproval')) {
     }
 }
 
+
+if (!function_exists('totalElectionCandidatesAwaitingApproval')) {
+    function totalElectionCandidatesAwaitingApproval()
+    {
+        return ElectionCandidateApplication::where('status', 'pending_approval')->count();
+    }
+}
 
 
 if (!function_exists('highestProgramDuration')) {

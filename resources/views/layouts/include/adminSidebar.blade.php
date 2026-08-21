@@ -164,7 +164,7 @@
                     <i class="fas fa-fingerprint"></i>
                 </span>
                 @php
-                    $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + 0;
+                    $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + totalElectionCandidatesAwaitingApproval();
                 @endphp
                 <span class="nav-link-text">Elections &nbsp;
                     @if ($totalElectionNotifications > 0)

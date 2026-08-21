@@ -2,6 +2,9 @@
 
 namespace App\Models\Finance\Transactions;
 
+use App\Models\Elections\Election;
+use App\Models\Elections\ElectionCandidateApplication;
+use App\Models\Elections\ElectionPosition;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Traits\BelongsToTenant;
@@ -31,6 +34,7 @@ class PaymentTransaction extends Model
         'donation_id',
         'election_id',
         'election_position',
+        'election_candidate_application',
         'amount_payable',
         'amount_paid',
         'amount_settled',
@@ -63,7 +67,7 @@ class PaymentTransaction extends Model
         return $this->belongsTo(User::class, 'approved_by', 'username');
     }
 
-    
+
     // public function onlinePaymentMethod()
     // {
     //     return $this->belongsTo(OnlinePaymentMethod::class, 'online_payment_method', 'slug');
@@ -76,14 +80,20 @@ class PaymentTransaction extends Model
     // {
     //     return $this->belongsTo(AssociationDonation::class, 'donation_id', 'donation_id');
     // }
-    // public function election()
-    // {
-    //     return $this->belongsTo(Election::class, 'election_id', 'election_id');
-    // }
-    // public function electionPosition()
-    // {
-    //     return $this->belongsTo(ElectionPosition::class, 'election_position', 'id');
-    // }
+    public function election()
+    {
+        return $this->belongsTo(Election::class, 'election_id', 'election_id');
+    }
+    public function electionPosition()
+    {
+        return $this->belongsTo(ElectionPosition::class, 'election_position', 'id');
+    }
+     public function electionCandidateApplication()
+    {
+        return $this->belongsTo(ElectionCandidateApplication::class, 'election_candidate_application', 'id');
+    }
+    
+    
     // public function monetaryVote()
     // {
     //     return $this->belongsTo(MonetaryElectionVote::class, 'payment_transaction_id', 'payment_transaction_id');
