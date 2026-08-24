@@ -21,6 +21,8 @@ return new class extends Migration
                 $table->string('election_id'); // Foreign
                 $table->unsignedBigInteger('position_id')->nullable(); // foreign
 
+
+                $table->string('application_id')->unique(); // Foreign
                 $table->string('candidate'); // Foreign
 
                 $table->string('application_type')->default('self');

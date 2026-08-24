@@ -52,7 +52,7 @@
                                                 @break
 
                                                 @case('voting')
-                                                    <span class="badge bg-blue text-white">Voting</span>
+                                                    <span class="badge bg-blue text-white">Ongoing</span>
                                                 @break
 
                                                 @case('completed')
@@ -139,6 +139,14 @@
                                             {{ $data['election']->description }}
                                         </span>
                                     </div>
+                                    @if (in_array($data['election']->status, ['voting', 'result_pending', 'completed']))
+                                        <div class="col-md-6 p-1">
+                                            <span style="font-weight: bold">Qualified Voters:</span>
+                                            <span class="text-black">
+                                                {{ $data['election']->qualified_voters }}
+                                            </span>
+                                        </div>
+                                    @endif
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Form sales starts:</span>
                                         <span class="text-black">

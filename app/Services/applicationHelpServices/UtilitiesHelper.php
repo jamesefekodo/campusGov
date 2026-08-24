@@ -12,6 +12,7 @@ use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
+use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -570,6 +571,13 @@ if (!function_exists('totalElectionCandidatesAwaitingApproval')) {
     }
 }
 
+if (!function_exists('totalOngoingElection')) {
+    function totalOngoingElection()
+    {
+        return Election::where('status', 'voting')->count();
+    }
+}
+
 
 if (!function_exists('highestProgramDuration')) {
     function highestProgramDuration(): int
@@ -645,4 +653,125 @@ if (!function_exists('canApplyForPosition')) {
         }
         return ['qualified' => false, 'message' => 'You do not meet the eligibility requirements for this position',];
     }
+
+    // total qualified voters
+    function totalQualifiedVoters(Election $election): int
+    {
+        $groups = $election->voterGroups;
+
+        // No restrictions = all students
+        if ($groups->isEmpty()) {
+            return MemberAcademicInfo::query()
+                ->where('academic_status', 'student')
+                ->count();
+        }
+
+        return MemberAcademicInfo::query()
+            ->where('academic_status', 'student')
+            ->where(function ($query) use ($groups) {
+
+                foreach ($groups as $group) {
+
+                    $query->orWhere(function ($q) use ($group) {
+
+                        if ($group->faculty) {
+                            $q->where('faculty', $group->faculty);
+                        }
+
+                        if ($group->department) {
+                            $q->where('department', $group->department);
+                        }
+
+                        if ($group->program) {
+                            $q->where('program', $group->program);
+                        }
+
+                        if ($group->program_type) {
+                            $q->where('program_type', $group->program_type);
+                        }
+
+                        if ($group->admission_session) {
+                            $q->where(
+                                'admission_session',
+                                $group->admission_session
+                            );
+                        }
+                    });
+                }
+            })
+            ->distinct('username')
+            ->count('username');
+    }
+}
+
+// can this user vote
+function canUserVoteInElection(Election $election, User $user): bool
+{
+    $academicInfo = $user->memberAcademicInfo;
+
+    // No academic information = cannot vote
+    if (!$academicInfo) {
+        return false;
+    }
+
+    // Only current students can vote
+    if ($academicInfo->academic_status !== 'student') {
+        return false;
+    }
+
+    // No qualification conditions = all students can vote
+    $groups = $election->voterGroups;
+
+    if ($groups->isEmpty()) {
+        return true;
+    }
+
+    // User must match at least ONE qualification group
+    foreach ($groups as $group) {
+
+        // Faculty condition
+        if (
+            !empty($group->faculty) &&
+            $academicInfo->faculty !== $group->faculty
+        ) {
+            continue;
+        }
+
+        // Department condition
+        if (
+            !empty($group->department) &&
+            $academicInfo->department !== $group->department
+        ) {
+            continue;
+        }
+
+        // Program condition
+        if (
+            !empty($group->program) &&
+            $academicInfo->program !== $group->program
+        ) {
+            continue;
+        }
+
+        // Program type condition
+        if (
+            !empty($group->program_type) &&
+            $academicInfo->program_type !== $group->program_type
+        ) {
+            continue;
+        }
+
+        // Admission session condition
+        if (
+            !empty($group->admission_session) &&
+            $academicInfo->admission_session != $group->admission_session
+        ) {
+            continue;
+        }
+
+        // All conditions in this group matched
+        return true;
+    }
+
+    return false;
 }

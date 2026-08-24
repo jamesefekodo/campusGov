@@ -40,6 +40,8 @@ return new class extends Migration
                 $table->dateTime('voting_ends');
                 $table->decimal('cost_per_vote', 10, 2)->nullable();
 
+                $table->integer('qualified_voters');
+
                 $table->boolean('one_candidate_multiple_positions')->default(false);
 
                 $table->string('initiated_by')->nullable(); // Foreign

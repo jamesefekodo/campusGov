@@ -23,6 +23,7 @@ class ElectionCandidateApplication extends Model
     protected $fillable = [
         'uuid',
         'tenant_id',
+        'application_id',
         'election_id',
         'position_id',
         'candidate',
@@ -46,12 +47,23 @@ class ElectionCandidateApplication extends Model
     //     'approved_at' => 'datetime',
     // ];
 
-    // uuid
+    // UUID & Application ID
     protected static function booted(): void
     {
         static::creating(function ($model) {
+
+            // UUID
             if (empty($model->uuid)) {
-                $model->uuid = 'eca-' . date('Ymd') . '-' . Str::uuid();
+                $model->uuid = 'eca-' . now()->format('Ymd') . '-' . Str::uuid();
+            }
+
+            // Application ID
+            if (empty($model->application_id)) {
+                $model->application_id =
+                    'elec-app-' .
+                    now()->format('Ymd-His') .
+                    '-' .
+                    Str::random(15);
             }
         });
     }

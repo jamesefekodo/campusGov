@@ -152,7 +152,11 @@
                 <span class="nav-icon">
                     <i class="fas fa-fingerprint"></i>
                 </span>
-                <span class="nav-link-text">Elections</span>
+                <span class="nav-link-text">Elections &nbsp; @if (totalOngoingElection() > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
+                                @endif</span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
                 </span><!--//submenu-arrow-->
@@ -163,7 +167,11 @@
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/elections/new') ? 'sidebar-active' : '' }}"
                             href="
                             {{ route('memberNewElections') }}
-                             ">Election</a>
+                             ">Election &nbsp; @if (totalOngoingElection() > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
+                                @endif</a>
                     </li>
                 </ul>
             </div>

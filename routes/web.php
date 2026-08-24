@@ -165,6 +165,13 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::post('member/elections/self_application/initiate/{uuid}', [MemberElectionController::class, 'memberInitiateSelfApplyForPositionSubmit'])->name('memberInitiateSelfApplyForPositionSubmit');
     Route::put('member/elections/self_application/update/{uuid}', [MemberElectionController::class, 'memberUpdateSelfApplyForPositionSubmit'])->name('memberUpdateSelfApplyForPositionSubmit');
 
+    Route::get('member/elections/ongoing', [MemberElectionController::class, 'memberOngoingElections'])->name('memberOngoingElections');
+    Route::get('member/elections/ongoing/search', [MemberElectionController::class, 'memberOngoingElections'])->name('memberOngoingElectionsSearch');
+
+    Route::get('member/elections/voting/{uuid}', [MemberElectionController::class, 'memberElectionVoting'])->name('memberElectionVoting');
+    Route::get('member/elections/voting/position/{uuid}', [MemberElectionController::class, 'memberViewElectionPositionCandidatesForVote'])->name('memberViewElectionPositionCandidatesForVote');
+    Route::post('member/elections/voting/submit_vote/{election}/{position}/{candidate}', [MemberElectionController::class, 'memberSubmitStandardVote'])->name('memberSubmitStandardVote');
+
 
     Route::get('member/elections/my_applications/{uuid}', [MemberElectionController::class, 'myElectionApplications'])->name('myElectionApplications');
     Route::get('member/elections/my_applications/view/{uuid}', [MemberElectionController::class, 'viewMyElectionApplication'])->name('viewMyElectionApplication');

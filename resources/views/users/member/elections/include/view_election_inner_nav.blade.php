@@ -20,12 +20,17 @@
                 Candidates
             </div>
         </a>
-        <a href="{{ route('memberNewElections') }}">
-            <div
-                class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">
-                Voting
-            </div>
-        </a>
+        @if ($data['election']->status == 'voting')
+            <a href="{{ route('memberElectionVoting', ['uuid' => $data['election']->uuid]) }}">
+                <div
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/voting') ? 'inner_nav_active' : '' }}">
+                    Voting &nbsp; @if (totalOngoingElection() > 0)
+                        <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                            style="font-size: 11px"><i class="fas fa-thumbs-up me-1 fs-6"></i></span>
+                    @endif
+                </div>
+            </a>
+        @endif
         <a href="{{ route('memberNewElections') }}">
             <div
                 class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">

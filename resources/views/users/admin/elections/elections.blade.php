@@ -177,7 +177,7 @@
                                                                     @break
 
                                                                     @case('voting')
-                                                                        <span class="badge bg-blue text-white">Voting</span>
+                                                                        <span class="badge bg-blue text-white">Ongoing</span>
                                                                     @break
 
                                                                     @case('completed')

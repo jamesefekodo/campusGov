@@ -172,6 +172,14 @@ class ElectionController extends Controller
         $activeProgram = Program::where('is_active', true)->orderBy('name')->get();
         $activeFaculties = Faculty::where('is_active', true)->orderBy('name')->get();
 
+        if ($election->status == 'voting') {
+            $election->update(
+                [
+                    'qualified_voters' => totalQualifiedVoters($election),
+                ]
+            );
+        }
+
         $data = [
             'election' => $election,
             'activeProgram' => $activeProgram,
@@ -827,14 +835,14 @@ class ElectionController extends Controller
     }
     public function viewElectionCandidatesForPosition($uuid)
     {
-         /** @var \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
             $user->hasPermission('elections.read'),
             403
         );
-        
+
         $position = ElectionPosition::where('uuid', $uuid)->first();
         if (!$position) {
             return redirect()->back()->with('error', 'No records found!');

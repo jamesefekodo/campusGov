@@ -37,6 +37,7 @@ class Election extends Model
         'cost_per_vote',
         'initiated_by',
         'initiated_at',
+        'qualified_voters',
         'processed_by',
         'approval_status',
         'approved_at',

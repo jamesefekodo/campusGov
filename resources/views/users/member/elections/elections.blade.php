@@ -11,6 +11,10 @@
             @php
                 $searchRoute = route('memberNewElectionsSearch');
                 $backRoute = route('memberNewElections');
+                if (in_array(Route::currentRouteName(), ['memberOngoingElections', 'memberOngoingElectionsSearch'], true)) {
+                    $searchRoute = route('memberOngoingElectionsSearch');
+                    $backRoute = route('memberOngoingElections');
+                }
             @endphp
 
             <div class="individual-review-card-container">
@@ -171,9 +175,8 @@
                                                                             class="badge bg-warning-subtle text-warning">Campaign</span>
                                                                     @break
 
-                                                                     @case('voting')
-                                                                        <span
-                                                                            class="badge bg-blue text-white">Voting</span>
+                                                                    @case('voting')
+                                                                        <span class="badge bg-blue text-white">Ongoing</span>
                                                                     @break
 
                                                                     @case('completed')

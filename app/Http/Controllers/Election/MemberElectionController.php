@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionPosition;
+use App\Models\Elections\ElectionStandardVote;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\Tax;
 use App\Models\Finance\Transactions\PaymentTransaction;
@@ -87,11 +88,69 @@ class MemberElectionController extends Controller
 
         return view('users.member.elections.elections', compact('data'));
     }
+    public function memberOngoingElections(Request $request)
+    {
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $elections = '';
+        $totalElections = 0;
+
+
+        if (Route::currentRouteName() == 'memberNewElectionsSearch') {
+            $searchKey = $request->input('searchKey');
+            $elections = Election::where('approval_status', 'approved')
+                ->where('status', 'voting')
+
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    // Group the search conditions to ensure they apply cleanly alongside other constraints
+                    $query->where(function ($q) use ($searchKey) {
+                        $q->where('election_id', 'like', "%{$searchKey}%")
+                            ->orWhere('voting_method', 'like', "%{$searchKey}%")
+                            ->orWhere('title', 'like', "%{$searchKey}%")
+                            ->orWhere('description', 'like', "%{$searchKey}%")
+                            ->orWhere('status', 'like', "%{$searchKey}%");
+                    });
+                })
+                ->orderByDesc('created_at')
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalElections = $elections->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $elections = Election::where('approval_status', 'approved')
+                ->where('status', 'voting')
+                ->orderByDesc('created_at')
+                ->paginate(20);
+
+            $totalElections = $elections->total();
+            $requestType = 'all';
+            $pageTitle = 'Ongoing Elections';
+        }
+        $data = [
+            'elections' => $elections,
+            'totalElections' => $totalElections,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.member.elections.elections', compact('data'));
+    }
     public function memberViewElection($uuid)
     {
         $election = Election::where('uuid', $uuid)->first();
         if (!$election) {
             return redirect()->back()->with('error', 'Records not found!');
+        }
+        if ($election->status == 'voting') {
+            $election->update(
+                [
+                    'qualified_voters' => totalQualifiedVoters($election),
+                ]
+            );
         }
 
         $data = [
@@ -462,7 +521,7 @@ class MemberElectionController extends Controller
         $mpdf->showImageErrors = true;
 
         $basicSystemInfo = basicSystemInfo();
-       
+
 
         $data = [
             'election' => $election,
@@ -482,7 +541,8 @@ class MemberElectionController extends Controller
         $mpdf->Output($fileName, 'I'); // 'I' for inline, 'D' for download
         exit;
     }
-    public function memberElectionCandidates($uuid){
+    public function memberElectionCandidates($uuid)
+    {
         $election = Election::where('uuid', $uuid)->first();
         if (!$election) {
             return redirect()->back()->with('error', 'No records found!');
@@ -493,7 +553,8 @@ class MemberElectionController extends Controller
         ];
         return view('users.member.elections.electionCandidates', compact('data'));
     }
-    public function memberViewElectionCandidatesForPosition($uuid){
+    public function memberViewElectionCandidatesForPosition($uuid)
+    {
         $position = ElectionPosition::where('uuid', $uuid)->first();
         if (!$position) {
             return redirect()->back()->with('error', 'No records found!');
@@ -505,5 +566,97 @@ class MemberElectionController extends Controller
         ];
 
         return view('users.member.elections.viewElectionPositionCandidates', compact('data'));
+    }
+    public function memberElectionVoting($uuid)
+    {
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+        if ($election->status == 'voting') {
+            $election->update(
+                [
+                    'qualified_voters' => totalQualifiedVoters($election),
+                ]
+            );
+        } else {
+            return redirect()->route('memberViewElection', ['uuid' => $election->uuid])->with('error', 'Voting is currently inactive!');
+        }
+
+        $data = [
+            'election' => $election,
+        ];
+
+        return view('users.member.elections.voting.votingPageIndex', compact('data'));
+    }
+    public function memberViewElectionPositionCandidatesForVote($uuid)
+    {
+        $position = ElectionPosition::where('uuid', $uuid)->first();
+        if (!$position) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+        $hasAlreadyVoted = ElectionStandardVote::where('election_id', $position->election_id)->where('position', $position->id)->where('voter', Auth::user()->username)->first();
+
+        $data = [
+            'position' => $position,
+            'election' => $position->election,
+            'hasAlreadyVoted' => $hasAlreadyVoted,
+        ];
+        return view('users.member.elections.voting.votingPageIndex', compact('data'));
+    }
+    public function memberSubmitStandardVote($election, $position, $candidate)
+    {
+        $theElection = Election::where('uuid', $election)->first();
+        if (!$theElection) {
+            return redirect()->back()->with('error', 'Election records not found!');
+        }
+
+        $thePosition = ElectionPosition::where('uuid', $position)->first();
+        if (!$thePosition) {
+            return redirect()->back()->with('error', 'Position records not found!');
+        }
+
+        $theCandidate = ElectionCandidateApplication::where('uuid', $candidate)->first();
+        if (!$theCandidate) {
+            return redirect()->back()->with('error', 'Candidate records not found!');
+        }
+        // check if he can vote
+        if (!canUserVoteInElection($theElection, Auth::user())) {
+            return redirect()->back()->with('error', 'You are not qualified to vote in this election!');
+        }
+
+        // check if he has voted for this position
+        $hasAlreadyVoted = ElectionStandardVote::where('election_id', $theElection->election_id)->where('position', $thePosition->id)->where('voter', Auth::user()->username)->first();
+        if ($hasAlreadyVoted) {
+            return redirect()->back()->with('error', 'You can only vote once!');
+        }
+
+
+        // academic info start
+        $academicInfo = MemberAcademicInfo::where('username', Auth::user()->username)->where('academic_status', 'student')->first();
+        if (!$academicInfo) {
+            return redirect()->route('myElectionApplications', ['uuid' => $position->election->uuid])->with('error', 'Academic info not found!');
+        }
+        $currentLevel = null;
+        if ($academicInfo?->academic_status == 'student') {
+            $currentLevel = currentLevel($academicInfo?->theProgram, studentCurrentLevel($academicInfo));
+        }
+        // academic info end
+
+
+
+        ElectionStandardVote::create([
+            'election_id' => $theElection->election_id,
+            'position' => $thePosition->id,
+            'candidate' => $theCandidate->application_id,
+            'voter' => Auth::user()->username,
+
+            'current_program' => $academicInfo->program,
+            'current_program_type' => $academicInfo->program_type,
+            'current_faculty' => $academicInfo->faculty,
+            'current_department' => $academicInfo->department,
+            'level_at_application' => $currentLevel,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
     }
 }
