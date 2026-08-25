@@ -16,7 +16,7 @@
 
             <a href="{{ route('electionOperationRequests') }}">
                 <div
-                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/election/requests') ? 'inner_nav_active' : '' }}">
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/election/request') ? 'inner_nav_active' : '' }}">
                     Requests
                     @if ($totalElectionNotifications > 0)
                         &nbsp;

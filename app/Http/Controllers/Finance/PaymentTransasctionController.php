@@ -667,6 +667,13 @@ class PaymentTransasctionController extends Controller
                             'status' => 'pending_approval',
                         ]);
                     }
+
+                    // count election votes
+                    if ($paymentTransaction->monetaryVote) {
+                        $paymentTransaction->monetaryVote->update([
+                            'votes_counted' => true,
+                        ]);
+                    }
                     return redirect()->back();
                 }
             } else {
@@ -763,6 +770,13 @@ class PaymentTransasctionController extends Controller
                 if ($paymentTransaction->electionCandidateApplication) {
                     $paymentTransaction->electionCandidateApplication->update([
                         'status' => 'pending_approval',
+                    ]);
+                }
+
+                // count election votes
+                if ($paymentTransaction->monetaryVote) {
+                    $paymentTransaction->monetaryVote->update([
+                        'votes_counted' => true,
                     ]);
                 }
 

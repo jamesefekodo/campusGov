@@ -6,12 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
+use App\Models\AcademicConfig\ProgramType;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionGeneralQualifiedCandidateGroup;
 use App\Models\Elections\ElectionGeneralQualifiedVoterGroup;
+use App\Models\Elections\ElectionMonetaryVote;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Elections\ElectionPositionQualifiedCandidateGroup;
+use App\Models\Elections\ElectionStandardVote;
+use App\Models\Members\MemberPersonalProfile;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -507,7 +511,7 @@ class ElectionController extends Controller
             return redirect()->back()->with('error', 'Record not found!');
         }
 
-        if (!$election->positions) {
+        if (!$election->positions()->exists()) {
             return redirect()->back()->with('error', 'Create at least one position!');
         }
 
@@ -605,12 +609,30 @@ class ElectionController extends Controller
         $electionApprovalRequests = Election::where('status', 'awaiting_approval')->orderBy('title')->get();
         $candidatesAwaitingApproval = ElectionCandidateApplication::where('status', 'pending_approval')->get();
 
+
+
         $data = [
             'electionApprovalRequests' => $electionApprovalRequests,
             'candidatesAwaitingApproval' => $candidatesAwaitingApproval,
         ];
 
         return view('users.admin.elections.electionRequests', compact('data'));
+    }
+    public function processedElectionOperationRequests()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.approve'),
+            403
+        );
+        $alreadyProcessedCandidateRequests = ElectionCandidateApplication::where('status', '!=', 'pending_approval')->orderBy('created_at', 'desc')->paginate(20);
+
+        $data = [
+            'alreadyProcessedCandidateRequests' => $alreadyProcessedCandidateRequests,
+        ];
+        return view('users.admin.elections.processedElectionRequests', compact('data'));
     }
     public function approveElectionSubmit($uuid, Request $request)
     {
@@ -853,5 +875,537 @@ class ElectionController extends Controller
         ];
 
         return view('users.admin.elections.candidates.viewCandidates', compact('data'));
+    }
+
+    public function electionResults($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.results'),
+            403
+        );
+
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $standardVoteResults = ElectionStandardVote::where('election_id', $election->election_id)->get();
+
+
+
+        // =====================================================
+        // OVERALL VOTER PARTICIPATION
+        // =====================================================
+
+        $qualifiedVoters = $election->qualified_voters;
+
+        $totalVoters = $standardVoteResults
+            ->pluck('voter')
+            ->unique()
+            ->count();
+
+        $totalNotVoted = max(0, $qualifiedVoters - $totalVoters);
+
+        $participationRate = $qualifiedVoters > 0
+            ? round(($totalVoters / $qualifiedVoters) * 100, 2)
+            : 0;
+
+
+        // =====================================================
+        // VOTERS BY FACULTY
+        // =====================================================
+
+        $facultyNames = Faculty::pluck('name', 'slug');
+
+        $votersByFaculty = $standardVoteResults
+            ->groupBy('current_faculty')
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $slug) use ($facultyNames) {
+                return [$facultyNames->get($slug, $slug) => $count];
+            });
+
+
+        // =====================================================
+        // VOTERS BY DEPARTMENT
+        // =====================================================
+
+        $departmentNames = Department::pluck('name', 'slug');
+
+        $votersByDepartment = $standardVoteResults
+            ->groupBy('current_department')
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $slug) use ($departmentNames) {
+                return [$departmentNames->get($slug, $slug) => $count];
+            });
+
+        // =====================================================
+        // VOTERS BY PROGRAM
+        // =====================================================
+
+        $programNames = Program::pluck('name', 'slug');
+
+        $votersByProgram = $standardVoteResults
+            ->groupBy('current_program')
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $slug) use ($programNames) {
+                return [$programNames->get($slug, $slug) => $count];
+            });
+
+        // =====================================================
+        // VOTERS BY PROGRAM TYPE
+        // =====================================================
+
+        $programTypeNames = ProgramType::pluck('type_name', 'slug');
+
+        $votersByProgramType = $standardVoteResults
+            ->groupBy('current_program_type')
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $slug) use ($programTypeNames) {
+                return [$programTypeNames->get($slug, $slug) => $count];
+            });
+
+
+        // =====================================================
+        // VOTERS BY LEVEL
+        // =====================================================
+
+        $votersByLevel = $standardVoteResults
+            ->groupBy('level_at_application')
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            })
+            ->sortKeys();
+
+
+        // =====================================================
+        // VOTES BY POSITION
+        // =====================================================
+
+        $positionNames = ElectionPosition::pluck('position', 'id');
+
+        $votesByPosition = $standardVoteResults
+            ->groupBy('position')
+            ->map(function ($votes) {
+                return $votes->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $positionId) use ($positionNames) {
+                return [$positionNames->get($positionId, $positionId) => $count];
+            });
+
+        // voting ttrends
+        $votingTrend = $standardVoteResults
+            ->groupBy(function ($vote) {
+                return $vote->created_at->format('Y-m-d');
+            })
+            ->map(function ($votes) {
+                return $votes->pluck('voter')->unique()->count();
+            });
+
+
+        // =====================================================
+        // VOTES BY CANDIDATE
+        // =====================================================
+
+
+
+        $candidateAppIds = $standardVoteResults->pluck('candidate')->unique();
+
+        $candidateNames = ElectionCandidateApplication::with('theCandidate.memberPersonalProfile')
+            ->whereIn('application_id', $candidateAppIds)
+            ->get()
+            ->mapWithKeys(function ($application) {
+                $profile = optional($application->theCandidate)->memberPersonalProfile;
+                $name = optional($profile)->first_name;
+                return [$application->application_id => $name ?? $application->application_id];
+            });
+
+        $votesByCandidate = $standardVoteResults
+            ->groupBy('candidate')
+            ->map(function ($votes) {
+                return $votes->count();
+            })
+            ->sortDesc()
+            ->mapWithKeys(function ($count, $applicationId) use ($candidateNames) {
+                return [$candidateNames->get($applicationId, $applicationId) => $count];
+            });
+
+        // per gender
+        $uniqueVoterUsernames = $standardVoteResults->pluck('voter')->unique();
+
+        $votersByGender = MemberPersonalProfile::whereIn('username', $uniqueVoterUsernames)
+            ->get()
+            ->groupBy(function ($profile) {
+                return $profile->gender ?: 'Unspecified';
+            })
+            ->map(function ($profiles) {
+                return $profiles->count();
+            })
+            ->sortDesc();
+
+
+        $data = [
+            'election' => $election,
+            'standardVoteResults' => $standardVoteResults,
+
+
+            'qualifiedVoters' => $qualifiedVoters,
+            'totalVoters' => $totalVoters,
+            'totalNotVoted' => $totalNotVoted,
+            'participationRate' => $participationRate,
+
+            'votersByFaculty' => $votersByFaculty,
+            'votersByDepartment' => $votersByDepartment,
+            'votersByProgram' => $votersByProgram,
+            'votersByProgramType' => $votersByProgramType,
+            'votersByLevel' => $votersByLevel,
+
+            'votesByPosition' => $votesByPosition,
+            'votesByCandidate' => $votesByCandidate,
+
+            'votingTrend' => $votingTrend,
+            'votersByGender' => $votersByGender,
+        ];
+        return view('users.admin.elections.results.results', compact('data'));
+    }
+    public function viewElectionResultForPosition($election, $position)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.results'),
+            403
+        );
+
+        $theElection = Election::where('uuid', $election)->first();
+        if (!$theElection) {
+            if (!$theElection) {
+                return redirect()->back()->with('error', 'Election records not found!');
+            }
+        }
+
+        $thePosition = ElectionPosition::where('uuid', $position)->first();
+        if (!$thePosition) {
+            if (!$thePosition) {
+                return redirect()->back()->with('error', 'Position records not found!');
+            }
+        }
+
+
+        // #########################################
+        if ($theElection->voting_method == 'monetary') {
+            $candidates = ElectionCandidateApplication::with([
+                'theCandidate.memberPersonalProfile',
+                'election',
+            ])
+                ->where('election_id', $theElection->election_id)
+                ->where('position_id', $thePosition->id)
+                ->get();
+
+            $candidateResults = $candidates->map(function ($candidate) {
+
+                $candidate->voteCount = $candidate->totalMonetaryVote();
+
+                return $candidate;
+            })->sortByDesc('voteCount')->values();
+        } else {
+            $candidates = ElectionCandidateApplication::with('theCandidate.memberPersonalProfile')
+                ->where('election_id', $theElection->election_id)
+                ->where('position_id', $thePosition->id)
+                ->get();
+
+            $voteCounts = ElectionStandardVote::where('election_id', $theElection->election_id)
+                ->where('position', $thePosition->id)
+                ->selectRaw('candidate, count(*) as votes')
+                ->groupBy('candidate')
+                ->pluck('votes', 'candidate');
+
+            $candidateResults = $candidates->map(function ($candidate) use ($voteCounts) {
+                $candidate->voteCount = $voteCounts->get($candidate->application_id, 0);
+                return $candidate;
+            })->sortByDesc('voteCount')->values();
+        }
+
+        $highestVotes = $candidateResults->max('voteCount');
+        $totalVotes = $candidateResults->sum('voteCount');
+
+        $data = [
+            'election' => $theElection,
+            'position' => $thePosition,
+
+            'candidateResults'  => $candidateResults,
+            'highestVotes'      => $highestVotes,
+            'totalVotes'        => $totalVotes,
+        ];
+        return view('users.admin.elections.results.resultForPosition', compact('data'));
+    }
+    public function printElectionResults($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('elections.results'),
+            403
+        );
+
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+        if ($election->status !== 'completed') {
+            return redirect()->back()->with('error', 'Election result is not available!');
+        }
+
+        $positions = $election->positions()
+            ->with([
+                'qualifiedCandidates.theCandidate.memberPersonalProfile',
+            ])
+            ->get();
+        $standardVoteCounts = ElectionStandardVote::where(
+            'election_id',
+            $election->election_id
+        )
+            ->selectRaw('position, candidate, COUNT(*) as votes')
+            ->groupBy('position', 'candidate')
+            ->get()
+            ->keyBy(function ($row) {
+                return $row->position . '|' . $row->candidate;
+            });
+
+        $totalUniqueVoters = ElectionStandardVote::where(
+            'election_id',
+            $election->election_id
+        )->distinct('voter')->count('voter');
+
+        $totalQualifiedVoters = $election->qualified_voters;
+
+        $participationPercentage = $totalQualifiedVoters > 0
+            ? round(($totalUniqueVoters / $totalQualifiedVoters) * 100, 2)
+            : 0;
+
+
+        $electionSession = $election->academic_session . '/' . $election->academic_session + 1;
+
+
+        ini_set('pcre.backtrack_limit', 10000000);
+        ini_set('max_execution_time', 600);
+        ini_set('memory_limit', '1024M');
+
+
+        $mpdf = new Mpdf([
+            'default_font_size'  => 10,
+            'default_font'       => 'Arial',
+            'margin_left'        => 5,
+            'margin_right'       => 5,
+            'margin_top'         => 10,
+            'margin_bottom'      => 15,
+            'format'             => 'A4',
+            'autoLangToFont'     => true,
+            'autoScriptToLang'   => true,
+            'tempDir'            => storage_path('app/mpdf-temp'),
+        ]);
+
+        $mpdf->setFooter('Page {PAGENO} of {nb} >> Election Results : ' . $election->title . ' ' . $electionSession);
+        $mpdf->showImageErrors = true;
+
+        $basicSystemInfo = basicSystemInfo();
+        $faculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
+
+        $onlyFaculty = null;
+        if ($basicSystemInfo->operational_level == 'faculty') {
+            $onlyFaculty = Faculty::where('is_active', true)->first();
+        }
+
+        $onlyDepartment = null;
+        if ($basicSystemInfo->operational_level == 'department') {
+            $onlyDepartment = Department::where('is_active', true)->first();
+        }
+
+
+        // result analysis start
+        $standardVoteCounts = ElectionStandardVote::where(
+            'election_id',
+            $election->election_id
+        )
+            ->selectRaw('position, candidate, COUNT(*) as votes')
+            ->groupBy('position', 'candidate')
+            ->get()
+            ->keyBy(function ($row) {
+                return $row->position . '|' . $row->candidate;
+            });
+        $monetaryVoteAmounts = ElectionMonetaryVote::where(
+            'election_id',
+            $election->election_id
+        )
+            ->where('votes_counted', true)
+            ->selectRaw('position, candidate, SUM(amount_paid) as total_amount')
+            ->groupBy('position', 'candidate')
+            ->get()
+            ->keyBy(function ($row) {
+                return $row->position . '|' . $row->candidate;
+            });
+        ######################################################
+        $costPerVote = (float) $election->cost_per_vote;
+
+        $positionResults = collect();
+
+        foreach ($positions as $position) {
+
+            $candidateResults = $position->qualifiedCandidates;
+
+            /*
+    |--------------------------------------------------------------------------
+    | Calculate vote count WITHOUT querying the database
+    |--------------------------------------------------------------------------
+    */
+
+            $candidateResults = $candidateResults->map(function ($candidate) use (
+                $election,
+                $position,
+                $standardVoteCounts,
+                $monetaryVoteAmounts,
+                $costPerVote
+            ) {
+
+                $key = $position->id . '|' . $candidate->application_id;
+
+                if ($election->voting_method === 'monetary') {
+
+                    $totalAmount =
+                        (float) ($monetaryVoteAmounts->get($key)->total_amount ?? 0);
+
+                    $candidate->voteCount = $costPerVote > 0
+                        ? (int) floor($totalAmount / $costPerVote)
+                        : 0;
+                } else {
+
+                    $candidate->voteCount =
+                        (int) ($standardVoteCounts->get($key)->votes ?? 0);
+                }
+
+                return $candidate;
+            });
+
+            /*
+    |--------------------------------------------------------------------------
+    | Sort candidates
+    |--------------------------------------------------------------------------
+    */
+
+            $candidateResults = $candidateResults
+                ->sortByDesc('voteCount')
+                ->values();
+
+            /*
+    |--------------------------------------------------------------------------
+    | Total votes
+    |--------------------------------------------------------------------------
+    */
+
+            $totalVotes = $candidateResults->sum('voteCount');
+
+            /*
+    |--------------------------------------------------------------------------
+    | Highest vote
+    |--------------------------------------------------------------------------
+    */
+
+            $highestVotes = $candidateResults->max('voteCount') ?? 0;
+
+            /*
+    |--------------------------------------------------------------------------
+    | Find candidates sharing highest vote
+    |--------------------------------------------------------------------------
+    */
+
+            $leadingCandidates = $candidateResults
+                ->where('voteCount', $highestVotes)
+                ->values();
+
+            /*
+    |--------------------------------------------------------------------------
+    | Tie
+    |--------------------------------------------------------------------------
+    */
+
+            $isTie =
+                $highestVotes > 0 &&
+                $leadingCandidates->count() > 1;
+
+            /*
+    |--------------------------------------------------------------------------
+    | Winner
+    |--------------------------------------------------------------------------
+    */
+
+            $winner =
+                (!$isTie && $highestVotes > 0)
+                ? $leadingCandidates->first()
+                : null;
+
+            /*
+    |--------------------------------------------------------------------------
+    | Store result for this position
+    |--------------------------------------------------------------------------
+    */
+
+            $positionResults->push([
+                'position' => $position,
+                'candidateResults' => $candidateResults,
+                'totalVotes' => $totalVotes,
+                'highestVotes' => $highestVotes,
+                'isTie' => $isTie,
+                'winner' => $winner,
+                'tiedCandidates' => $isTie
+                    ? $leadingCandidates
+                    : collect(),
+            ]);
+        }
+        // result analysis end
+
+        $data = [
+            'election' => $election,
+            'faculties' => $faculties,
+            'departments' => $departments,
+            'basicSystemInfo' => $basicSystemInfo,
+            'onlyFaculty' => $onlyFaculty,
+            'onlyDepartment' => $onlyDepartment,
+
+            'totalUniqueVoters' => $totalUniqueVoters,
+            'totalQualifiedVoters' => $totalQualifiedVoters,
+            'participationPercentage' => $participationPercentage,
+
+
+            'positionResults' => $positionResults,
+        ];
+
+        $html = view('printFiles.elections.electionResults', compact('data'))->render();
+
+        $mpdf->WriteHTML($html); // AddPage() not needed — WriteHTML handles it
+
+        $fileName = 'Election Results :' . $election->title . '_' . $electionSession . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+        while (ob_get_level()) ob_end_clean();
+
+        $mpdf->Output($fileName, 'I'); // 'I' for inline, 'D' for download
+        exit;
     }
 }

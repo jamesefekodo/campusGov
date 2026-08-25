@@ -240,6 +240,24 @@
                                 href="{{ route('associationDues') }}">Dues</a>
                         </li>
                     @endif
+                    <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/financial_claims') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{ route('financialClaims') }}
+                            ">Financial Claims</a>
+                        </li>
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{-- {{ route('manualPaymentMethods') }} --}}
+                            ">Other Payments</a>
+                        </li>
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{-- {{ route('manualPaymentMethods') }} --}}
+                            ">Reports</a>
+                        </li>
                     @if (Auth::user()->hasPermission('manage_payment_settings'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/settings') ? 'sidebar-active' : '' }}"

@@ -193,17 +193,17 @@
 
                             <div class="d-flex align-items-center mt-2">
                                 <hr class="flex-grow-1">
-                                <span class="mx-2 text-blue">Screening Period</span>
+                                <span class="mx-2 text-blue">Campaign Period</span>
                                 <hr class="flex-grow-1">
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="campaign_starts">Screening Starts</label>
+                                <label for="campaign_starts">Campaign Starts</label>
                                 <input type="datetime-local" class="form-control" name="campaign_starts"
                                     value="{{ $data['election']->campaign_starts }}">
                                 <p style="color: red">{{ $errors->first('campaign_starts') }}</p>
                             </div>
                             <div class="form-group col-md-6">
-                                <label for="campaign_ends">Screening Ends</label>
+                                <label for="campaign_ends">Campaign Ends</label>
                                 <input type="datetime-local" class="form-control" name="campaign_ends"
                                     value="{{ $data['election']->campaign_ends }}">
                                 <p style="color: red">{{ $errors->first('campaign_ends') }}</p>

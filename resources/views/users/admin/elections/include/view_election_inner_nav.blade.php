@@ -31,18 +31,11 @@
             </div>
         </a>
 
-        @if (Auth::user()->hasPermission('elections.put'))
-            <a
-            {{-- href="{{ route('electionOperationRequests', ['uuid' => $data['election']->uuid]) }}" --}}
-                >
+        @if (Auth::user()->hasPermission('elections.results') && in_array($data['election']->status, ['voting', 'completed']))
+            <a href="{{ route('electionResults', ['uuid' => $data['election']->uuid]) }}">
                 <div
-                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/finance/transaction/regularizations') ? 'inner_nav_active' : '' }}">
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/election/results') ? 'inner_nav_active' : '' }}">
                     Results
-                    {{-- @if (totalPendingPaymentRegularizations() > 0)
-                        &nbsp;
-                        <span class="position-relative translate-middle badge rounded-pill bg-red ml-3 ms-2"
-                            style="font-size: 11px">{{ totalPendingPaymentRegularizations() }}</span>
-                    @endif --}}
                 </div>
             </a>
         @endif

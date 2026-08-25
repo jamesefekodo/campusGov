@@ -545,13 +545,15 @@
                                                                     <span class="fw-bold text-muted">Application
                                                                         Fee:</span>
                                                                     ₦{{ number_format($position->application_fee, 2) }}
-                                                                    <span
-                                                                        class="badge bg-blue text-white ms-3 pe-2 ps-3 py-2 m-1 rounded-3"
-                                                                        data-toggle="modal"
-                                                                        data-target="#editPositionModal_{{ $position->id }}"
-                                                                        style="cursor: pointer;">
-                                                                        <i class="fas fa-edit me-1"></i>Update Position
-                                                                    </span>
+                                                                    @unless (in_array($data['election']->status, ['voting', 'completed', 'cancelled', 'suspended', 'declined']))
+                                                                        <span
+                                                                            class="badge bg-blue text-white ms-3 pe-2 ps-3 py-2 m-1 rounded-3"
+                                                                            data-toggle="modal"
+                                                                            data-target="#editPositionModal_{{ $position->id }}"
+                                                                            style="cursor: pointer;">
+                                                                            <i class="fas fa-edit me-1"></i>Update Position
+                                                                        </span>
+                                                                    @endunless
                                                                 </div>
                                                                 @include('users.admin.elections.include.editPositionModal')
                                                                 <div class="">
@@ -646,17 +648,19 @@
                                                                             @include('users.admin.elections.include.editPositionQualifiedCandidateGoupModal')
                                                                         @endforeach
                                                                     @endif
-                                                                    <div class="d-flex justify-content-end">
-                                                                        <span
-                                                                            class="badge bg-green text-white p-1 fs-6 mx-2 px-2"
-                                                                            data-toggle="modal"
-                                                                            data-target="#addPositionQualifiedCandidateModal_{{ $position->id }}"
-                                                                            style="cursor: pointer;">
-                                                                            <i class="fas fa-plus me-2"></i>Add New
-                                                                            Requirement
-                                                                            (qualified candidate group)
-                                                                        </span>
-                                                                    </div>
+                                                                    @if (in_array($data['election']->status, ['draft', 'awaiting_approval', 'new', 'registration', 'screening', 'campaign']))
+                                                                        <div class="d-flex justify-content-end">
+                                                                            <span
+                                                                                class="badge bg-green text-white p-1 fs-6 mx-2 px-2"
+                                                                                data-toggle="modal"
+                                                                                data-target="#addPositionQualifiedCandidateModal_{{ $position->id }}"
+                                                                                style="cursor: pointer;">
+                                                                                <i class="fas fa-plus me-2"></i>Add New
+                                                                                Requirement
+                                                                                (qualified candidate group)
+                                                                            </span>
+                                                                        </div>
+                                                                    @endif
                                                                 </div>
                                                             </div>
                                                         @endforeach
@@ -689,9 +693,13 @@
                                             Submit For Approval</a>
                                     @endif
                                     @if ($data['election']->status == 'awaiting_approval')
-                                        <a href="{{ route('printElectionConsentAwarenessForm', ['uuid' => $data['election']->uuid]) }}"
-                                            class="btn btn-block btn-danger mt-5"> <i class="fas fa-print me-2"></i>
-                                            Print Consent/Awareness Form</a>
+                                        <div class="px-5">
+                                            <a href="{{ route('printElectionConsentAwarenessForm', ['uuid' => $data['election']->uuid]) }}"
+                                                target="_blank" class="btn w-100 btn-danger mt-5"> <i
+                                                    class="fas fa-print me-2"></i>
+                                                Print Consent/Awareness Form</a>
+                                        </div>
+
                                     @endif
 
                                 </div>

@@ -57,6 +57,8 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js"></script>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <title>
         @yield('title') | {{ basicSystemInfo()->association_acronym ?? config('app.name') }}
     </title>
@@ -135,6 +137,8 @@
     <!-- Charts JS -->
     <script src="{{ asset('portal-dashboard/assets/plugins/chart.js/chart.min.js') }}"></script>
     <script src="{{ asset('portal-dashboard/assets/js/index-charts.js') }}"></script>
+
+
     <!-- Page Specific JS -->
     <script src="{{ asset('portal-dashboard/assets/js/app.js') }}"></script>
 

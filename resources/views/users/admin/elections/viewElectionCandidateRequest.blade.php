@@ -232,7 +232,10 @@
                                     @if (
                                         $data['application']->application_form &&
                                             file_exists(public_path(
-                                                    'assets/tenant_' . tenant()->id . '/uploads/elections/applicationForm/' . $data['application']->application_form)))
+                                                    'assets/tenant_' .
+                                                        tenant()->id .
+                                                        '/uploads/elections/applicationForm/' .
+                                                        $data['application']->application_form)))
                                         @php
                                             $applicationId = 'formImageModal_' . $data['application']->id;
                                         @endphp
@@ -329,7 +332,13 @@
                     </div>
                     {{-- Back Home --}}
                     <div class="w-100 justify-content-center text-center my-4 pt-5">
-                        <a class="btn btn-primary" href="{{ route('electionOperationRequests') }}">
+                        @php
+                            $backRoute = route('electionOperationRequests');
+                            if ($data['application']->status !== 'pending_approval') {
+                                $backRoute = route('processedElectionOperationRequests');
+                            }
+                        @endphp
+                        <a class="btn btn-primary" href="{{ $backRoute }}">
                             <i class="fas fa-chevron-left"></i>
                             Back
                         </a>

@@ -125,6 +125,43 @@ class ElectionCandidateApplication extends Model
             ->where('approval_status', 'approved');
     }
 
+    public function standardVotes()
+    {
+        return $this->hasMany(
+            ElectionStandardVote::class,
+            'election_id',
+            'election_id'
+        )->where(
+            'position',
+            $this->position_id
+        )->where('candidate', $this->application_id);
+    }
+
+ public function totalMonetaryVote()
+{
+    // Sum the amount_paid for valid votes
+    $totalAmount = $this->hasMany(
+        ElectionMonetaryVote::class,
+        'election_id',
+        'election_id'
+    )
+        ->where('position', $this->position_id)
+        ->where('candidate', $this->application_id)
+        ->where('votes_counted', true)
+        ->sum('amount_paid');
+
+    // Get the cost per vote from the election
+    $costPerVote = $this->election->cost_per_vote;
+
+    if ($costPerVote <= 0) {
+        return 0;
+    }
+
+    // Convert the monetary amount into number of votes
+    return (int) floor($totalAmount / $costPerVote);
+}
+
+
     // public function allPaymentAttempts()
     // {
     //     return $this->hasMany(

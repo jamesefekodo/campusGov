@@ -31,12 +31,14 @@
                 </div>
             </a>
         @endif
-        <a href="{{ route('memberNewElections') }}">
-            <div
-                class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">
-                Results
-            </div>
-        </a>
+        @if (in_array($data['election']->status, ['voting', 'completed']))
+            <a href="{{ route('memberElectionResults', ['uuid' => $data['election']->uuid]) }}">
+                <div
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/results') ? 'inner_nav_active' : '' }}">
+                    Results
+                </div>
+            </a>
+        @endif
 
 
     </div>

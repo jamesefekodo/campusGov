@@ -31,9 +31,10 @@ class ElectionStandardVote extends Model
 
     ];
 
-    // protected $casts = [
-    //     'approved_at' => 'datetime',
-    // ];
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
 
 
 
@@ -42,7 +43,7 @@ class ElectionStandardVote extends Model
     {
         return $this->belongsTo(Election::class, 'election_id', 'election_id');
     }
-    public function position()
+    public function thePosition()
     {
         return $this->belongsTo(ElectionPosition::class, 'position_id', 'id');
     }

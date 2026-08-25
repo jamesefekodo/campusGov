@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Election;
 use App\Http\Controllers\Controller;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
+use App\Models\Elections\ElectionMonetaryVote;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Elections\ElectionStandardVote;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
@@ -583,8 +584,13 @@ class MemberElectionController extends Controller
             return redirect()->route('memberViewElection', ['uuid' => $election->uuid])->with('error', 'Voting is currently inactive!');
         }
 
+        $userStandardVotesForPosition = ElectionStandardVote::where('election_id', $election->election_id)
+            ->where('voter', Auth::user()->username)
+            ->get();
+
         $data = [
             'election' => $election,
+            'userStandardVotesForPosition' => $userStandardVotesForPosition,
         ];
 
         return view('users.member.elections.voting.votingPageIndex', compact('data'));
@@ -606,7 +612,7 @@ class MemberElectionController extends Controller
     }
     public function memberSubmitStandardVote($election, $position, $candidate)
     {
-        $theElection = Election::where('uuid', $election)->first();
+        $theElection = Election::where('uuid', $election)->where('voting_method', 'standard')->first();
         if (!$theElection) {
             return redirect()->back()->with('error', 'Election records not found!');
         }
@@ -658,5 +664,321 @@ class MemberElectionController extends Controller
             'level_at_application' => $currentLevel,
         ]);
         return redirect()->back()->with('success', 'Done!');
+    }
+    public function memberSubmitMonetaryVote($election, $position, $candidate, Request $request)
+    {
+        $request->validate([
+            'no_of_votes' => 'required|integer|min:1',
+            'voters_name' => 'nullable',
+            'phone' => 'nullable',
+            'email' => 'nullable|email',
+            'electronic_payment_method' => 'required|exists:electronic_payment_methods,slug',
+        ]);
+
+        // get election info
+        $theElection = Election::where('uuid', $election)->where('voting_method', 'monetary')->first();
+        if (!$theElection) {
+            return redirect()->back()->with('error', 'Election records not found!');
+        }
+
+        $thePosition = ElectionPosition::where('uuid', $position)->first();
+        if (!$thePosition) {
+            return redirect()->back()->with('error', 'Position records not found!');
+        }
+
+        $theCandidate = ElectionCandidateApplication::where('uuid', $candidate)->first();
+        if (!$theCandidate) {
+            return redirect()->back()->with('error', 'Candidate records not found!');
+        }
+
+
+        do {
+            $transactionId = 'pymt-' . now()->format('Ymds') . '-' . tenant()->id . random_int(100000000, 999999999);
+        } while (PaymentTransaction::where('payment_transaction_id', $transactionId)->exists());
+
+        $basicAmount = $theElection->cost_per_vote * $request->no_of_votes;
+
+        // Taxes
+        $taxes = Tax::where('is_active', true)->orderBy('tax_name')->get();
+        $totalTax = 0;
+        $taxesPaid = '';
+        if ($taxes) {
+            $taxesPaid = '';
+            foreach ($taxes as $tax) {
+                $taxAmount = 0; // Initialize tax amount for each tax.
+
+                // Concatenate tax details.
+                $taxesPaid .= '**' . $tax->tax_name . ' (' . $tax->tax_method . '-' . $tax->tax_rate . ')';
+
+                // Calculate tax amount based on the method.
+                if ($tax->tax_method === 'percentage') {
+                    $taxAmount = ($tax->tax_rate / 100) * $basicAmount;
+                } elseif ($tax->tax_method === 'fixed_amount') {
+                    $taxAmount = $tax->tax_rate;
+                }
+
+                $totalTax += $taxAmount; // Add to total tax.
+                $taxesPaid .= ': ₦' . number_format($taxAmount, 2) . "\n"; // Add tax amount to the concatenated string.
+            }
+        }
+
+        $totalDueAndTax = $basicAmount + $totalTax;
+        // get personal profile
+        $payer = Auth::user();
+
+        if ($payer && $payer->memberPersonalProfile) {
+
+            $payerName = $payer->memberPersonalProfile->first_name . ' ' .
+                $payer->memberPersonalProfile->last_name;
+
+            $payerEmail = $payer->email;
+            $payerPhone = $payer->phone;
+        } else {
+
+            $payerName  = trim($request->voters_name);
+            $payerEmail = trim($request->voter_email);
+            $payerPhone = trim($request->voter_phone);
+        }
+
+        // log voting records
+        $votingData = [
+            'election_id' => $theElection->election_id,
+            'position' => $thePosition->id,
+            'candidate' => $theCandidate->application_id,
+            'no_of_votes' => $request->no_of_votes,
+            'payment_transaction_id' => $transactionId,
+            'amount_paid' => $basicAmount,
+            'cost_per_vote' => $theElection->cost_per_vote,
+        ];
+
+        if (Auth::check()) {
+            $votingData['registered_voter'] = Auth::user()->username;
+        } else {
+            $votingData['unregistered_voter'] = $payerName;
+            $votingData['voter_email'] = $payerEmail;
+            $votingData['voter_phone'] = $payerPhone;
+        }
+
+
+        // proceed with payment       
+        // paystact
+        if ($request->electronic_payment_method == 'paystack') {
+            $pastackSettings = ElectronicPaymentMethod::where('slug', $request->electronic_payment_method)->where('is_active', true)->first();
+            if (!$pastackSettings) {
+                return redirect()->back()->with('error', 'Paystack method not found!');
+            }
+            $paystackApi = $pastackSettings->apiConfig;
+            if (!$paystackApi) {
+                return redirect()->back()->with('error', 'Paystack method not found!');
+            }
+
+            $secretKey = $paystackApi->secret_key;
+            $amount = $totalDueAndTax * 100; // Convert to kobo
+            $email = $payerEmail;
+
+            $data = [
+                'transaction_id' => $transactionId,
+                'reciept_number' => $transactionId,
+                'email' => $payerEmail,
+                'amount' => $payerPhone,
+                'callback_url' => route('paystackPaymentCallback', ['transaction_id' => $transactionId]),
+            ];
+
+            $response = Http::withToken($secretKey)
+                ->post('https://api.paystack.co/transaction/initialize', $data);
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+                $transaction = new PaymentTransaction();
+                $transaction->payment_transaction_id = $transactionId; // Local reference
+                $transaction->payment_mode = 'electronic';
+                $transaction->payment_purpose = 'voting';
+
+                $transaction->election_id = $theElection->election_id;
+                $transaction->election_position = $thePosition->id;
+                $transaction->election_candidate_voted = $theCandidate->application_id;
+
+                $transaction->amount_payable = $basicAmount;
+                if (Auth::user()) {
+                    $transaction->registered_payer = Auth::user()->username;
+                } else {
+                    $transaction->non_registered_payer = $payerName;
+                    $transaction->phone = $payerEmail;
+                    $transaction->email = $payerPhone;
+                }
+                $transaction->amount_paid = $totalDueAndTax;
+                $transaction->total_tax = $totalTax;
+                $transaction->taxes_paid = $taxesPaid;
+                $transaction->electronic_payment_method = $pastackSettings->slug;
+                $transaction->payment_status = 'pending';
+                $transaction->approval_status = 'pending';
+                $transaction->paid_at = Carbon::now();
+                $transaction->save();
+
+                ElectionMonetaryVote::create($votingData);
+
+                return redirect()->away($responseData['data']['authorization_url']);
+            }
+
+            return redirect()->back()->with('error', 'Failed!');
+        }
+        // // flutterwave
+        elseif ($request->electronic_payment_method == 'flutterwave') {
+            $flutterwaveSettings = ElectronicPaymentMethod::where('slug', $request->electronic_payment_method)->where('is_active', true)->first();
+            if (!$flutterwaveSettings) {
+                return redirect()->back()->with('error', 'Flutterwave method not found!');
+            }
+            $flutterwaveApi = $flutterwaveSettings->apiConfig;
+            if (!$flutterwaveApi) {
+                return redirect()->back()->with('error', 'Flutterwave config not found!');
+            }
+
+            $secretKey = $flutterwaveApi->secret_key;
+
+            $data = [
+                'tx_ref' => $transactionId,
+                'amount' => $totalDueAndTax,
+                'currency' => 'NGN',
+                'redirect_url' => route('flutterwavePaymentCallback'),
+                'customer' => [
+                    'email' => $payerEmail,
+                    'phone_number' => $payerPhone,
+                    'name' => $payerName,
+                ],
+                'customizations' => [
+                    'title' => config('app.name'),
+                    'description' => 'Election Votes ' . $theElection->title,
+                    'logo' => associationLogo(),
+                ],
+            ];
+
+            // Make API request for payment
+            $response = Http::withToken($secretKey)
+                ->post('https://api.flutterwave.com/v3/payments', $data);
+
+            if ($response->successful()) {
+                $responseData = $response->json()['data'];
+                if (isset($responseData['link'])) {
+                    $transaction = new PaymentTransaction();
+                    $transaction->payment_transaction_id = $transactionId; // Local reference
+                    $transaction->payment_mode = 'electronic';
+                    $transaction->payment_purpose = 'voting';
+
+                    $transaction->election_id = $theElection->election_id;
+                    $transaction->election_position = $thePosition->id;
+                    $transaction->election_candidate_voted = $theCandidate->application_id;
+
+                    $transaction->amount_payable = $basicAmount;
+                    if (Auth::user()) {
+                        $transaction->registered_payer = Auth::user()->username;
+                    } else {
+                        $transaction->non_registered_payer = $payerName;
+                        $transaction->phone = $payerEmail;
+                        $transaction->email = $payerPhone;
+                    }
+
+                    $transaction->amount_paid = $totalDueAndTax;
+                    $transaction->total_tax = $totalTax;
+                    $transaction->taxes_paid = $taxesPaid;
+                    $transaction->electronic_payment_method = $flutterwaveSettings->slug;
+                    $transaction->payment_status = 'pending';
+                    $transaction->approval_status = 'pending';
+                    $transaction->paid_at = Carbon::now();
+                    $transaction->save();
+
+                    ElectionMonetaryVote::create($votingData);
+
+
+                    return redirect()->away($responseData['link']);
+                } else {
+                    logger()->error('Invalid Flutterwave response', $response->json());
+                    return redirect()->back()->with('error', 'Unable to initiate payment. Please try again.');
+                }
+            } else {
+                logger()->error('Flutterwave API Error', $response->json());
+                return redirect()->back()->with('error', 'Failed to initiate payment. Please try again.');
+            }
+        }
+    }
+    public function memberElectionResults($uuid)
+    {
+        $election = Election::where('uuid', $uuid)->first();
+        if (!$election) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $position = null;
+        $candidateResults = null;
+        $highestVotes = null;
+        $totalVotes = null;
+
+        $data = [
+            'election' => $election,
+            'positions' => $election->positions,
+
+            'position' => $position,
+            'candidateResults' => $candidateResults,
+            'highestVotes' => $highestVotes,
+            'totalVotes' => $totalVotes,
+        ];
+        return view('users.member.elections.results.results', compact('data'));
+    }
+    public function memberViewElectionResultsForPosition($election, $position)
+    {
+        $theElection = Election::where('uuid', $election)->first();
+        if (!$theElection) {
+            return redirect()->back()->with('error', 'Election records not found!');
+        }
+
+        $thePosition = ElectionPosition::where('uuid', $position)->first();
+        if (!$thePosition) {
+            return redirect()->back()->with('error', 'Position records not found!');
+        }
+
+        if ($theElection->voting_method == 'monetary') {
+            $candidates = ElectionCandidateApplication::with([
+                'theCandidate.memberPersonalProfile',
+                'election',
+            ])
+                ->where('election_id', $theElection->election_id)
+                ->where('position_id', $thePosition->id)
+                ->get();
+
+            $candidateResults = $candidates->map(function ($candidate) {
+
+                $candidate->voteCount = $candidate->totalMonetaryVote();
+
+                return $candidate;
+            })->sortByDesc('voteCount')->values();
+        } else {
+            $candidates = ElectionCandidateApplication::with('theCandidate.memberPersonalProfile')
+                ->where('election_id', $theElection->election_id)
+                ->where('position_id', $thePosition->id)
+                ->get();
+
+            $voteCounts = ElectionStandardVote::where('election_id', $theElection->election_id)
+                ->where('position', $thePosition->id)
+                ->selectRaw('candidate, count(*) as votes')
+                ->groupBy('candidate')
+                ->pluck('votes', 'candidate');
+
+            $candidateResults = $candidates->map(function ($candidate) use ($voteCounts) {
+                $candidate->voteCount = $voteCounts->get($candidate->application_id, 0);
+                return $candidate;
+            })->sortByDesc('voteCount')->values();
+        }
+
+        $highestVotes = $candidateResults->max('voteCount');
+        $totalVotes = $candidateResults->sum('voteCount');
+
+        $data = [
+            'election' => $theElection,
+            'position' => $thePosition,
+
+            'candidateResults'  => $candidateResults,
+            'highestVotes'      => $highestVotes,
+            'totalVotes'        => $totalVotes,
+        ];
+        return view('users.member.elections.results.results', compact('data'));
     }
 }

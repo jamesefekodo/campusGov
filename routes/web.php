@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Election\ElectionController;
 use App\Http\Controllers\Election\MemberElectionController;
 use App\Http\Controllers\Finance\AssociationDueController;
+use App\Http\Controllers\Finance\FinancialClaimController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
 use App\Http\Controllers\Frontend\FrontendController;
@@ -171,6 +172,14 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/voting/{uuid}', [MemberElectionController::class, 'memberElectionVoting'])->name('memberElectionVoting');
     Route::get('member/elections/voting/position/{uuid}', [MemberElectionController::class, 'memberViewElectionPositionCandidatesForVote'])->name('memberViewElectionPositionCandidatesForVote');
     Route::post('member/elections/voting/submit_vote/{election}/{position}/{candidate}', [MemberElectionController::class, 'memberSubmitStandardVote'])->name('memberSubmitStandardVote');
+
+    Route::post('member/elections/voting/monetary/submit_vote/{election}/{position}/{candidate}', [MemberElectionController::class, 'memberSubmitMonetaryVote'])->name('memberSubmitMonetaryVote');
+
+    Route::get('member/elections/results/{uuid}', [MemberElectionController::class, 'memberElectionResults'])->name('memberElectionResults');
+    Route::get('member/elections/results/view/{election}/{position}', [MemberElectionController::class, 'memberViewElectionResultsForPosition'])->name('memberViewElectionResultsForPosition');
+
+    
+
 
 
     Route::get('member/elections/my_applications/{uuid}', [MemberElectionController::class, 'myElectionApplications'])->name('myElectionApplications');
@@ -409,6 +418,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/transaction/waivers/view/{uuid}', [PaymentTransasctionController::class, 'viewPaymentWaiver'])->name('viewPaymentWaiver');
     Route::put('admin/finance/transaction/waivers/proccess/{uuid}', [PaymentTransasctionController::class, 'processPaymentWaiverSubmit'])->name('processPaymentWaiverSubmit');
 
+
+    // financial claims
+    Route::get('admin/finance/financial_claims', [FinancialClaimController::class, 'financialClaims'])->name('financialClaims');
+    Route::get('admin/finance/financial_claims/search', [FinancialClaimController::class, 'financialClaims'])->name('financialClaimsSearch');
+
+    
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
@@ -438,9 +453,17 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/election/requests', [ElectionController::class, 'electionOperationRequests'])->name('electionOperationRequests');
     Route::put('admin/election/requests/approval/submit/{uuid}', [ElectionController::class, 'approveElectionSubmit'])->name('approveElectionSubmit');
 
+    Route::get('admin/election/request/processed', [ElectionController::class, 'processedElectionOperationRequests'])->name('processedElectionOperationRequests');
+
+
     Route::get('admin/election/requests/prospective_candidates/{uuid}', [ElectionController::class, 'viewElectionCandidateApplication'])->name('viewElectionCandidateApplication');
     Route::put('admin/election/requests/prospective_candidates/process/submit/{uuid}', [ElectionController::class, 'processElectionCandidateRequestSubmit'])->name('processElectionCandidateRequestSubmit');
 
     Route::get('admin/election/requests/candidates/{uuid}', [ElectionController::class, 'electionCandidates'])->name('electionCandidates');
     Route::get('admin/election/requests/candidates/view/{uuid}', [ElectionController::class, 'viewElectionCandidatesForPosition'])->name('viewElectionCandidatesForPosition');
+    
+    Route::get('admin/election/results/{uuid}', [ElectionController::class, 'electionResults'])->name('electionResults');
+    Route::get('admin/election/results/{election}/{position}', [ElectionController::class, 'viewElectionResultForPosition'])->name('viewElectionResultForPosition');    
+
+    Route::get('admin/election/print_results/{uuid}', [ElectionController::class, 'printElectionResults'])->name('printElectionResults');
 });

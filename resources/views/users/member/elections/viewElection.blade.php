@@ -352,14 +352,17 @@
                                                                 );
                                                             @endphp
 
-                                                            <button class="btn btn-primary rounded-3 m-1"
-                                                                {{ !$qualification['qualified'] ? 'disabled' : '' }}
-                                                                data-toggle="modal"
-                                                                data-target="#memberSelfApplyForPositionModal_{{ $position->id }}"
-                                                                style="cursor: pointer;">
-                                                                <i class="fas fa-solid fa-file-pen me-1"></i>Apply for this
-                                                                position
-                                                            </button>
+                                                            @if ($data['election']->status == 'registration')
+                                                                <button class="btn btn-primary rounded-3 m-1"
+                                                                    {{ !$qualification['qualified'] ? 'disabled' : '' }}
+                                                                    data-toggle="modal"
+                                                                    data-target="#memberSelfApplyForPositionModal_{{ $position->id }}"
+                                                                    style="cursor: pointer;">
+                                                                    <i class="fas fa-solid fa-file-pen me-1"></i>Apply for
+                                                                    this
+                                                                    position
+                                                                </button>
+                                                            @endif
                                                             {{-- Nomination is disabled --}}
                                                             {{-- <button class="btn btn-warning rounded-3 m-1"
                                                                 data-toggle="modal"

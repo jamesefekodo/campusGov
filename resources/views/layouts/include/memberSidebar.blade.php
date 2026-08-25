@@ -164,7 +164,7 @@
             <div id="submenu-7" class="collapse submenu submenu-7" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/elections/new') ? 'sidebar-active' : '' }}"
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/elections') ? 'sidebar-active' : '' }}"
                             href="
                             {{ route('memberNewElections') }}
                              ">Election &nbsp; @if (totalOngoingElection() > 0)

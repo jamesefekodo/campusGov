@@ -330,7 +330,7 @@
                                     </div>
                                     <div class="d-flex justify-content-end flex-wrap mt-3">
                                         @if ($data['application']->status == 'pending_approval')
-                                            <a href="{{ route('printElectionApplicationEndorsementForm', ['uuid' => $data['application']->uuid]) }}"
+                                            <a href="{{ route('printElectionApplicationEndorsementForm', ['uuid' => $data['application']->uuid]) }}" target="_blank"
                                                 class="btn btn-primary m-1 d-flex align-items-center">
                                                 <i class="fas fa-print me-2"></i>
                                                 <span>Print Endorsement Form</span>

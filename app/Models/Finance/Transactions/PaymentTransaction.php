@@ -4,6 +4,7 @@ namespace App\Models\Finance\Transactions;
 
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
+use App\Models\Elections\ElectionMonetaryVote;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
@@ -94,8 +95,8 @@ class PaymentTransaction extends Model
     }
     
     
-    // public function monetaryVote()
-    // {
-    //     return $this->belongsTo(MonetaryElectionVote::class, 'payment_transaction_id', 'payment_transaction_id');
-    // }
+    public function monetaryVote()
+    {
+        return $this->belongsTo(ElectionMonetaryVote::class, 'payment_transaction_id', 'payment_transaction_id');
+    }
 }

@@ -240,6 +240,67 @@
                                                     </div>
                                                 </div>
                                             @endif
+
+                                            {{-- ############################## --}}
+                                            <span
+                                                class="badge rounded-pill bg-danger-subtle text-danger border border-danger px-3 py-2 w-100">
+                                                <i class="fas fa-hourglass-half me-1"></i>
+                                                Voting closes in
+                                                <strong id="voting-countdown" class="ms-1"></strong>
+                                            </span>
+
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+
+                                                    const deadline = new Date(
+                                                        "{{ \Carbon\Carbon::parse($data['election']->voting_ends)->toIso8601String() }}"
+                                                    ).getTime();
+
+                                                    const countdown = document.getElementById('voting-countdown');
+
+                                                    if (!countdown) {
+                                                        return;
+                                                    }
+
+                                                    function updateCountdown() {
+
+                                                        const now = new Date().getTime();
+                                                        const distance = deadline - now;
+
+                                                        if (distance <= 0) {
+                                                            countdown.innerHTML = 'Voting has ended.';
+                                                            return;
+                                                        }
+
+                                                        const days = Math.floor(
+                                                            distance / (1000 * 60 * 60 * 24)
+                                                        );
+
+                                                        const hours = Math.floor(
+                                                            (distance % (1000 * 60 * 60 * 24)) /
+                                                            (1000 * 60 * 60)
+                                                        );
+
+                                                        const minutes = Math.floor(
+                                                            (distance % (1000 * 60 * 60)) /
+                                                            (1000 * 60)
+                                                        );
+
+                                                        const seconds = Math.floor(
+                                                            (distance % (1000 * 60)) / 1000
+                                                        );
+
+                                                        countdown.innerHTML =
+                                                            `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                                                    }
+
+                                                    updateCountdown();
+
+                                                    setInterval(updateCountdown, 1000);
+
+                                                });
+                                            </script>
+                                            {{-- ################################## --}}
                                         @endif
                                     </div>
                                 </div>
@@ -260,6 +321,11 @@
                                     id="summaryContent">
                                     @if ($data['election']->positions->count() > 0)
                                         @foreach ($data['election']->positions as $position)
+                                            @php
+                                                $alreadyVoted = $data['userStandardVotesForPosition']
+                                                    ->where('position', $position->id)
+                                                    ->isNotEmpty();
+                                            @endphp
                                             <a
                                                 href="{{ route('memberViewElectionPositionCandidatesForVote', ['uuid' => $position->uuid]) }}">
                                                 <div class="col">
@@ -267,13 +333,13 @@
                                                         <div class="card-body">
                                                             <i class="fas fa-user-tie fa-2x"></i>
                                                             <h4 class="card-title">{{ $position->position }}</h4>
-                                                            @if ($position->qualifiedCandidates->isNotEmpty())
-                                                                <span class="badge bg-primary text-white fs-5">
-                                                                    {{ $position->qualifiedCandidates->count() }}
-                                                                    Candidate(s)
-                                                                </span>
+
+                                                            @if ($alreadyVoted)
+                                                                <span class="btn btn-secondary text-white"><i
+                                                                        class="fas fa-check-circle me-1"></i> Voted</span>
                                                             @else
-                                                                <span class="badge bg-danger text-white">N/A</span>
+                                                                <span class="btn btn-danger text-white"><i
+                                                                        class="fas fa-thumbs-up me-1"></i> Vote Now</span>
                                                             @endif
                                                         </div>
                                                     </div>
@@ -339,9 +405,17 @@
 
                                 <section class="mini_card_container">
                                     @foreach ($data['position']->qualifiedCandidates as $candidate)
+                                        {{-- ########################### --}}
+                                        @php
+                                            $votingModalSelector =
+                                                $data['election']->voting_method == 'monetary'
+                                                    ? '#monetaryVoteNowModal_' . $candidate->id
+                                                    : '#standardVoteNowModal_' . $candidate->id;
+                                        @endphp
+                                        {{-- ########################### --}}
                                         @if (canUserVoteInElection($data['election'], auth()->user()) && !$data['hasAlreadyVoted'])
                                             <a href="#" data-toggle="modal"
-                                                data-target="#standardVoteNowModal_{{ $candidate->id }}">
+                                                data-target="{{ $votingModalSelector }}">
                                             @else
                                                 <a href="#">
                                         @endif
@@ -378,7 +452,7 @@
                                                         @if (canUserVoteInElection($data['election'], auth()->user()) && !$data['hasAlreadyVoted'])
                                                             <span class="badge bg-red text-white fs-6 mt-2"
                                                                 data-toggle="modal"
-                                                                data-target="#standardVoteNowModal_{{ $candidate->id }}"
+                                                                data-target="{{ $votingModalSelector }}"
                                                                 style="cursor: pointer;">
                                                                 <i class="fas fa-thumbs-up me-1"></i> Vote
                                                             </span>
@@ -397,8 +471,57 @@
                                     @endforeach
 
                                     @foreach ($data['position']->qualifiedCandidates as $candidate)
-                                        @include('users.member.elections.include.standardVoteNowModal')
+                                        @if ($data['election']->voting_method == 'monetary')
+                                            @include('users.member.elections.include.monetaryVoteNowModal')
+                                        @else
+                                            @include('users.member.elections.include.standardVoteNowModal')
+                                        @endif
                                     @endforeach
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+
+                                            function formatNaira(amount) {
+                                                return '₦' + amount.toLocaleString('en-NG', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                });
+                                            }
+
+                                            document.querySelectorAll('.vote-input').forEach(function(input) {
+                                                const id = input.dataset.candidate;
+                                                const cost = parseFloat(input.dataset.cost);
+                                                const summary = document.getElementById('vote-summary-' + id);
+                                                const count = document.getElementById('vote-count-' + id);
+                                                const total = document.getElementById('vote-total-' + id);
+                                                const banner = document.getElementById('vote-pay-banner-' + id);
+                                                const payTotal = document.getElementById('vote-pay-total-' + id);
+
+                                                input.addEventListener('input', function() {
+                                                    const votes = parseInt(this.value) || 0;
+
+                                                    if (votes > 0) {
+                                                        const amount = votes * cost;
+                                                        const formatted = formatNaira(amount);
+
+                                                        count.textContent = votes;
+                                                        total.textContent = formatted;
+                                                        payTotal.textContent = formatted;
+
+                                                        summary.style.removeProperty('display');
+                                                        banner.style.removeProperty('display');
+                                                    } else {
+                                                        summary.style.setProperty('display', 'none', 'important');
+                                                        banner.style.setProperty('display', 'none', 'important');
+                                                    }
+                                                });
+
+                                                if (input.value && parseInt(input.value) > 0) {
+                                                    input.dispatchEvent(new Event('input'));
+                                                }
+                                            });
+
+                                        });
+                                    </script>
                                 </section>
                                 {{-- voting - position end --}}
                             @endif

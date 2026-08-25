@@ -12,7 +12,7 @@
                         <div class="col-md-12 individual-review-card">
                             <div class="my_form_container pb-5">
                                 <h4 class="block text-white text-center py-2 type-b-page-header text-capitalize">
-                                    Election - <span class="text-uppercase">{{ strtolower($data['election']->title) }}
+                                    Candidate - <span class="text-uppercase">{{ strtolower($data['election']->title) }}
                                         {{ $data['election']->academic_session . '/' . $data['election']->academic_session + 1 }}</span>
                                 </h4>
                                 <div class="card-body p-4 row col-md-12">

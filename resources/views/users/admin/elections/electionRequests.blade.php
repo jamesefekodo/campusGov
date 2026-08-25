@@ -7,8 +7,12 @@
             <div class="navigation">
                 @include('users.admin.elections.include.inner_nav')
             </div>
-            <div class="individual-review-card-container">
-                <div class="col-md-12 individual-review-card">
+            <div class="individual-review-card-container row">
+                <div class="col-md-1 individual-review-card text-black">
+                    {{-- sidde menu --}}
+                    @include('users.admin.elections.include.electionApplicationSideMenu')
+                </div>
+                <div class="col-md-11 individual-review-card">
                     <div class="table_head">
                         <div class="table_head_item col-md-12">
                             <div class="table_title">
@@ -120,8 +124,8 @@
                                                                             @endphp
 
                                                                             <span class="text-capitalize">
-                                                                                {{ strtolower($application->theCandidate->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($application->theCandidate->memberPersonalProfile->last_name) }} 
-                                                                            ({{ strtoupper($application->theCandidate->memberAcademicInfo->matric_number) }})
+                                                                                {{ strtolower($application->theCandidate->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($application->theCandidate->memberPersonalProfile->last_name) }}
+                                                                                ({{ strtoupper($application->theCandidate->memberAcademicInfo->matric_number) }})
                                                                             </span>
                                                                         </p>
                                                                     </div>
@@ -130,8 +134,7 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewElectionCandidateApplication', ['uuid' => $application->uuid]) }}"
-                                                                    >View</a>
+                                                                    href="{{ route('viewElectionCandidateApplication', ['uuid' => $application->uuid]) }}">View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach

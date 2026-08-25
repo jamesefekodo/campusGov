@@ -199,6 +199,9 @@
                                                                         <span
                                                                             class="badge bg-danger-subtle text-danger">{{ $election->status }}</span>
                                                                 @endswitch
+                                                                @if ($election->status == 'voting')
+                                                                    <span class="badge bg-danger text-white"><i class="fas fa-exclamation-circle"></i></span>
+                                                                @endif
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
