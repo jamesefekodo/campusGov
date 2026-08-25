@@ -255,7 +255,7 @@
 
                             <section class="mini_card_container">
                                 @foreach ($data['position']->qualifiedCandidates as $candidate)
-                                    <a href="#" data-toggle="modal" data-target="#">
+                                    <button data-toggle="modal" data-target="#" class="border-none">
                                         <div class="mini_card">
                                             <div class="mini_card_body">
                                                 <div class="mini-card-content">
@@ -295,11 +295,17 @@
                                                             @endif
                                                             <i class="fas fa-thumbs-up me-1"></i>
                                                         </span>
+
+                                                        @if(Auth::user()->hasPermission('voters.read'))
+                                                        <span class="badge bg-blue text-white fs-6 mt-1">
+                                                            <i class="fas fa-eye me-1"></i>
+                                                        </span>
+                                                        @endif
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </a>
+                                    </button>
                                 @endforeach
 
                             </section>

@@ -7,5 +7,7 @@ use Illuminate\Http\Request;
 
 class FinancialClaimController extends Controller
 {
-    //
+    public function financialClaims(){
+        
+    }
 }
