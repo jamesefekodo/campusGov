@@ -255,7 +255,7 @@
 
                             <section class="mini_card_container">
                                 @foreach ($data['position']->qualifiedCandidates as $candidate)
-                                    <button data-toggle="modal" data-target="#" class="border-none">
+                                    <a href="#" data-toggle="modal" data-target="#">
                                         <div class="mini_card">
                                             <div class="mini_card_body">
                                                 <div class="mini-card-content">
@@ -296,16 +296,18 @@
                                                             <i class="fas fa-thumbs-up me-1"></i>
                                                         </span>
 
-                                                        @if(Auth::user()->hasPermission('voters.read'))
-                                                        <span class="badge bg-blue text-white fs-6 mt-1">
-                                                            <i class="fas fa-eye me-1"></i>
-                                                        </span>
+                                                        @if (Auth::user()->hasPermission('voters.read'))
+                                                            <span class="badge bg-blue text-white fs-6 mt-1" role="button"
+                                                                style="cursor: pointer;"
+                                                                onclick="window.location.href='{{ route('viewElectionVoters', ['uuid' => $candidate->uuid]) }}'">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </span>
                                                         @endif
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </button>
+                                    </a>
                                 @endforeach
 
                             </section>
@@ -362,7 +364,7 @@
                                                 @if ($isLeading)
                                                     @if ($isCompleted)
                                                         <span
-                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success text-dark"
+                                                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success text-white"
                                                             title="{{ $isTie ? 'Tied winner' : 'Winner' }}">
                                                             <i class="fas fa-crown"></i>
                                                         </span>

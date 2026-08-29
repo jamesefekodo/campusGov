@@ -7,6 +7,7 @@ use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Traits\BelongsToTenant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -50,6 +51,10 @@ class ElectionMonetaryVote extends Model
     public function theCandidate()
     {
         return $this->belongsTo(ElectionCandidateApplication::class, 'candidate', 'application_id');
+    }
+    public function voter()
+    {
+        return $this->belongsTo(User::class, 'registered_voter', 'username');
     }
     public function paymentTransaction()
     {

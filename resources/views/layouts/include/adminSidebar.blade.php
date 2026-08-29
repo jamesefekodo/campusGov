@@ -164,7 +164,10 @@
                     <i class="fas fa-fingerprint"></i>
                 </span>
                 @php
-                    $totalElectionNotifications = (int) totalElectionsAwaitingApproval() + totalElectionCandidatesAwaitingApproval() + totalOngoingElection();
+                    $totalElectionNotifications =
+                        (int) totalElectionsAwaitingApproval() +
+                        totalElectionCandidatesAwaitingApproval() +
+                        totalOngoingElection();
                 @endphp
                 <span class="nav-link-text">Elections &nbsp;
                     @if ($totalElectionNotifications > 0)
@@ -240,24 +243,34 @@
                                 href="{{ route('associationDues') }}">Dues</a>
                         </li>
                     @endif
-                    <li class="submenu-item"><a
+                    @if (Auth::user()->hasPermission('dues.read'))
+                        <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/financial_claims') ? 'sidebar-active' : '' }}"
                                 href="
                             {{ route('financialClaims') }}
-                            ">Financial Claims</a>
+                            ">Financial
+                                Claims
+                                @if (financialClaimPendingApproval() > 0)
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ financialClaimPendingApproval() }}</span>
+                                @endif
+                            </a>
                         </li>
-                        <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
-                                href="
+                    @endif
+                    <li class="submenu-item"><a
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
+                            href="
                             {{-- {{ route('manualPaymentMethods') }} --}}
-                            ">Other Payments</a>
-                        </li>
-                        <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"
-                                href="
+                            ">Other
+                            Payments</a>
+                    </li>
+                    <li class="submenu-item"><a
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"
+                            href="
                             {{-- {{ route('manualPaymentMethods') }} --}}
                             ">Reports</a>
-                        </li>
+                    </li>
                     @if (Auth::user()->hasPermission('manage_payment_settings'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/settings') ? 'sidebar-active' : '' }}"

@@ -422,6 +422,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // financial claims
     Route::get('admin/finance/financial_claims', [FinancialClaimController::class, 'financialClaims'])->name('financialClaims');
     Route::get('admin/finance/financial_claims/search', [FinancialClaimController::class, 'financialClaims'])->name('financialClaimsSearch');
+    Route::post('admin/finance/financial_claims/add_new/submit', [FinancialClaimController::class, 'addNewFinancialClaimSubmit'])->name('addNewFinancialClaimSubmit');
+    Route::get('admin/finance/financial_claim/approval/approval', [FinancialClaimController::class, 'financialClaimsPendingApproval'])->name('financialClaimsPendingApproval');
+    Route::get('admin/finance/financial_claim/approval/approval/search', [FinancialClaimController::class, 'financialClaimsPendingApproval'])->name('financialClaimsPendingApprovalSearch');
+
+    Route::get('admin/finance/financial_claim/view', [FinancialClaimController::class, 'viewFinancialClaim'])->name('viewFinancialClaim');
+    
 
     
     // elections
@@ -463,7 +469,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/election/requests/candidates/view/{uuid}', [ElectionController::class, 'viewElectionCandidatesForPosition'])->name('viewElectionCandidatesForPosition');
     
     Route::get('admin/election/results/{uuid}', [ElectionController::class, 'electionResults'])->name('electionResults');
-    Route::get('admin/election/results/{election}/{position}', [ElectionController::class, 'viewElectionResultForPosition'])->name('viewElectionResultForPosition');    
+    Route::get('admin/election/results/per_position/{election}/{position}', [ElectionController::class, 'viewElectionResultForPosition'])->name('viewElectionResultForPosition');    
 
     Route::get('admin/election/print_results/{uuid}', [ElectionController::class, 'printElectionResults'])->name('printElectionResults');
+
+    Route::get('admin/election/results/votes/view/{uuid}', [ElectionController::class, 'viewElectionVoters'])->name('viewElectionVoters');
+
+
+    
 });

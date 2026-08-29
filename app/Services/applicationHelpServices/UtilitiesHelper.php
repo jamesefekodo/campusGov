@@ -6,6 +6,7 @@ use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
+use App\Models\Finance\Claims\FinancialClaim;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
@@ -774,4 +775,13 @@ function canUserVoteInElection(Election $election, User $user): bool
     }
 
     return false;
+}
+
+
+if (!function_exists('financialClaimPendingApproval')) {
+    function financialClaimPendingApproval()
+    {
+        return FinancialClaim::where('approval_status', 'pending')
+            ->count();
+    }
 }

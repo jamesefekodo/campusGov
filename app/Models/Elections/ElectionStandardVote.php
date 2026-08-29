@@ -9,6 +9,7 @@ use App\Models\AcademicConfig\ProgramType;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Traits\BelongsToTenant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -67,5 +68,10 @@ class ElectionStandardVote extends Model
     public function programType()
     {
         return $this->belongsTo(ProgramType::class, 'current_program_type', 'slug');
+    }
+
+    public function theVoter()
+    {
+        return $this->belongsTo(User::class, 'voter', 'username');
     }
 }

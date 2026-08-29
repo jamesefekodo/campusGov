@@ -6,6 +6,7 @@ use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class FinancialClaim extends Model
 {
@@ -18,8 +19,9 @@ class FinancialClaim extends Model
         'claim_id',
         'amount',
         'date',
+        'claim_type',
         'description',
-        'update_balance',
+        'balance_update',
         'remarks',
         'initiated_by',
         'initiated_at',
@@ -29,7 +31,15 @@ class FinancialClaim extends Model
 
     ];
 
-
+    // uuid
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = 'fincl-' . date('Ymd') . '-' . Str::uuid();
+            }
+        });
+    }
 
     public function registeredPayer()
     {
@@ -39,5 +49,4 @@ class FinancialClaim extends Model
     {
         return $this->belongsTo(User::class, 'processed_by', 'username');
     }
-
 }

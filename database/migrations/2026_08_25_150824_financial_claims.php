@@ -24,8 +24,10 @@ return new class extends Migration
 
                 $table->text('description')->nullable();
 
-                $table->boolean('update_balance')->default(true);
+                $table->boolean('balance_update')->default(false);
                 $table->text('remarks')->nullable();
+
+                $table->string('claim_type'); // credit / debit
 
 
                 $table->string('initiated_by')->nullable(); // Foreign

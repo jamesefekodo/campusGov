@@ -463,7 +463,7 @@
                                                     @if ($isLeading)
                                                         @if ($isCompleted)
                                                             <span
-                                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success text-dark"
+                                                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success text-white"
                                                                 title="{{ $isTie ? 'Tied winner' : 'Winner' }}">
                                                                 <i class="fas fa-crown"></i>
                                                             </span>

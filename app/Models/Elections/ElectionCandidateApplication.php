@@ -136,6 +136,17 @@ class ElectionCandidateApplication extends Model
             $this->position_id
         )->where('candidate', $this->application_id);
     }
+    public function monetaryVotes()
+    {
+        return $this->hasMany(
+            ElectionMonetaryVote::class,
+            'election_id',
+            'election_id'
+        )->where(
+            'position',
+            $this->position_id
+        )->where('candidate', $this->application_id)->where('votes_counted', true);
+    }
 
  public function totalMonetaryVote()
 {

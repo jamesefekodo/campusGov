@@ -1408,4 +1408,39 @@ class ElectionController extends Controller
         $mpdf->Output($fileName, 'I'); // 'I' for inline, 'D' for download
         exit;
     }
+    public function viewElectionVoters($uuid)
+    {
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('voters.read'),
+            403
+        );
+
+        $candidate = ElectionCandidateApplication::where('uuid', $uuid)->where('status', 'approved')->first();
+        if (!$candidate) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+        if ($candidate->election->status !== 'completed') {
+            return redirect()->back()->with('error', 'Election result is not available!');
+        }
+        $standardVotes = $candidate->standardVotes()
+            ->paginate(50)
+            ->withQueryString();
+
+        $monetaryVotes = $candidate->monetaryVotes()
+            ->paginate(50)
+            ->withQueryString();
+
+        $data = [
+            'candidate' => $candidate,
+            'election' => $candidate->election,
+            'standardVotes' => $standardVotes,
+            'monetaryVotes' => $monetaryVotes,
+        ];
+
+        return view('users.admin.elections.results.viewElectionVoters', compact('data'));
+    }
 }
