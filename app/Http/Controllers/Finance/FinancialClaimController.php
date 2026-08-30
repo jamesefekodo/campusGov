@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
+use App\Models\Config\BasicSystemSetting;
 use App\Models\Finance\Claims\FinancialClaim;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -64,7 +65,7 @@ class FinancialClaimController extends Controller
     }
     public function addNewFinancialClaimSubmit(Request $request)
     {
-         /** @var \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -94,8 +95,9 @@ class FinancialClaimController extends Controller
         ]);
         return redirect()->back()->with('success', 'Done!');
     }
-    public function financialClaimsPendingApproval(Request $request){
- /** @var \App\Models\User $user */
+    public function financialClaimsPendingApproval(Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -103,7 +105,7 @@ class FinancialClaimController extends Controller
             403
         );
 
-   $requestType = '';
+        $requestType = '';
         $searchKey = '';
         $pageTitle = '';
         $financialClaims = '';
@@ -143,7 +145,78 @@ class FinancialClaimController extends Controller
         ];
         return view('users.admin.finance.financialClaims.financialClaims', compact('data'));
     }
-    public function viewFinancialClaim($uuid){
-        
+    public function viewFinancialClaim($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('financial_claim.read'),
+            403
+        );
+
+        $claim = FinancialClaim::where('uuid', $uuid)->first();
+        if (!$claim) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $data = [
+            'claim' => $claim,
+        ];
+        return view('users.admin.finance.financialClaims.viewFinancialClaim', compact('data'));
+    }
+    public function processFinancialClaimSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('financial_claim.put'),
+            403
+        );
+
+        $claim = FinancialClaim::where('uuid', $uuid)->first();
+        if (!$claim) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $settings = BasicSystemSetting::where('tenant_id', $claim->tenant_id)->first();
+        if (!$settings) {
+            return redirect()->back()->with('error', 'Payment config not found!');
+        }
+
+
+        $request->validate([
+            'description' => 'required',
+            'remarks' => 'nullable',
+            'approval_status' => 'required|in:approved,declined',
+        ]);
+
+        $claim->update([
+            'description' => trim($request->description),
+            'remarks' => trim($request->remarks),
+            'approval_status' => trim($request->approval_status),
+            'processed_by' => Auth::user()->username,
+            'approved_at' => Carbon::now(),
+        ]);
+
+        if (
+            $claim->approval_status === 'approved' &&
+            $claim->balance_update_status !== 'updated'
+        ) {
+
+            if ($claim->claim_type === 'credit') {
+
+                $settings->increment('account_balance', $claim->amount);
+            } elseif ($claim->claim_type === 'debit') {
+
+                $settings->decrement('account_balance', $claim->amount);
+            }
+
+            $claim->update([
+                'balance_update_status' => 'updated',
+            ]);
+        }
+        return redirect()->back()->with('success', 'Done!');
     }
 }

@@ -41,7 +41,7 @@ class FinancialClaim extends Model
         });
     }
 
-    public function registeredPayer()
+    public function submittedBy()
     {
         return $this->belongsTo(User::class, 'initiated_by', 'username');
     }

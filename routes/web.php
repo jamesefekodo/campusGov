@@ -10,6 +10,7 @@ use App\Http\Controllers\Election\ElectionController;
 use App\Http\Controllers\Election\MemberElectionController;
 use App\Http\Controllers\Finance\AssociationDueController;
 use App\Http\Controllers\Finance\FinancialClaimController;
+use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
 use App\Http\Controllers\Frontend\FrontendController;
@@ -155,6 +156,11 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     // payment
     Route::get('member/payment/dues', [MemberSelfProfileController::class, 'myAssociationDues'])->name('myAssociationDues');
     Route::get('member/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
+
+    // invoice
+    Route::get('member/payment/invoices', [InvoiceController::class, 'myInvoices'])->name('myInvoices');
+    Route::get('member/payment/invoices/view/{uuid}', [InvoiceController::class, 'viewMyInvoice'])->name('viewMyInvoice');
+
 
 
     Route::post('member/association_dues/{uuid}', [PaymentTransasctionController::class, 'memberPayAssociationDue'])->name('memberPayAssociationDue');
@@ -426,8 +432,16 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/financial_claim/approval/approval', [FinancialClaimController::class, 'financialClaimsPendingApproval'])->name('financialClaimsPendingApproval');
     Route::get('admin/finance/financial_claim/approval/approval/search', [FinancialClaimController::class, 'financialClaimsPendingApproval'])->name('financialClaimsPendingApprovalSearch');
 
-    Route::get('admin/finance/financial_claim/view', [FinancialClaimController::class, 'viewFinancialClaim'])->name('viewFinancialClaim');
+    Route::get('admin/finance/financial_claim/view/{uuid}', [FinancialClaimController::class, 'viewFinancialClaim'])->name('viewFinancialClaim');
+
+    Route::put('admin/finance/financial_claim/view/process/{uuid}', [FinancialClaimController::class, 'processFinancialClaimSubmit'])->name('processFinancialClaimSubmit');
     
+    // invoices
+    
+    Route::get('admin/finance/other_payments/invoices', [InvoiceController::class, 'invoices'])->name('invoices');
+    Route::get('admin/finance/other_payments/invoices/search', [InvoiceController::class, 'invoices'])->name('invoicesSearch');
+    Route::post('admin/finance/other_payments/invoices/add_new/submit', [InvoiceController::class, 'addNewInvoiceSubmit'])->name('addNewInvoiceSubmit');
+    Route::get('admin/finance/other_payments/invoices/view/{uuid}', [InvoiceController::class, 'viewInvoice'])->name('viewInvoice');
 
     
     // elections

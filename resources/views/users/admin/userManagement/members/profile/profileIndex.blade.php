@@ -151,6 +151,18 @@
                                 <a href="#">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
+                                            <i class="fas fa-file-invoice"></i>
+                                        </div>
+                                        <div class="review-info-content">
+                                            <p class="review-card-info-title">
+                                                Invoices
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                                <a href="#">
+                                    <div class="review-info-card">
+                                        <div class="review-info-icon">
                                             <i class="fas fa-receipt"></i>
                                         </div>
                                         <div class="review-info-content">
@@ -160,6 +172,7 @@
                                         </div>
                                     </div>
                                 </a>
+
                                 <a href="{{ route('viewMemberMisconducts', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
@@ -182,7 +195,7 @@
                     @php
                         if ($data['member']?->memberAcademicInfo?->academic_status == 'student') {
                             $backBtn = route('studentMembers');
-                        } elseif($data['member']?->memberAcademicInfo?->academic_status !== 'student'){
+                        } elseif ($data['member']?->memberAcademicInfo?->academic_status !== 'student') {
                             $backBtn = route('nonStudentMembers');
                         } else {
                             $backBtn = route('loginPage');

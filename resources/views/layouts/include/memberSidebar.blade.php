@@ -131,13 +131,11 @@
                             href="{{ route('myPaymentTransactions') }}">Transactions</a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/invoices') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('studentSelfInvoices') }} --}}
-                             ">Invoices</a>
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/invoice') ? 'sidebar-active' : '' }}"
+                            href="{{ route('myInvoices') }}">Invoices</a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/payment/donation') ? 'sidebar-active' : '' }}"
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/donation') ? 'sidebar-active' : '' }}"
                             href="
                             {{-- {{ route('studentSelfDonations') }} --}}
                              ">Donations</a>

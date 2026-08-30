@@ -16,8 +16,10 @@
 @section('content')
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
-            <div class="navigation">
+            @if (financialClaimPendingApproval() > 0)
                 @include('users.admin.finance.financialClaims.include.inner_nav')
+            @endif
+            <div class="navigation">
             </div>
             @if (Auth::user()->hasPermission('financial_claim.create') && $showAddNew == true)
                 <div class="d-flex justify-content-end">
@@ -125,7 +127,7 @@
                                                                 {{ $claim->description }}
                                                             </td>
                                                             <td>
-                                                                {{ \Carbon\Carbon::parse($claim->date)->format('l, d F, Y h:i A') }}
+                                                                {{ \Carbon\Carbon::parse($claim->date)->format('l, d F, Y') }}
                                                             </td>
                                                             <td>
                                                                 {{ \Carbon\Carbon::parse($claim->created_at)->format('l, d F, Y h:i A') }}

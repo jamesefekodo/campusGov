@@ -245,7 +245,7 @@
                     @endif
                     @if (Auth::user()->hasPermission('dues.read'))
                         <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/financial_claims') ? 'sidebar-active' : '' }}"
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/financial_claim') ? 'sidebar-active' : '' }}"
                                 href="
                             {{ route('financialClaims') }}
                             ">Financial
@@ -258,13 +258,13 @@
                             </a>
                         </li>
                     @endif
+                    @if(Auth::user()->hasPermission('invoice.read'))
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('manualPaymentMethods') }} --}}
-                            ">Other
+                            href="{{ route('invoices') }}">Other
                             Payments</a>
                     </li>
+                    @endif
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"
                             href="
