@@ -65,13 +65,78 @@
                                             @endswitch </span>
                                     </div>
                                     @if ($data['invoice']->status == 'pending')
+                                        {{-- expiry countdown start --}}
+                                        <div id="invoice-countdown-alert" class="alert alert-warning text-center shadow-sm my-3"
+                                            role="alert">
+
+                                            <div class="mb-2">
+                                                <i class="fas fa-clock me-2"></i>
+                                                <strong>Invoice Payment Deadline</strong>
+                                            </div>
+
+                                            <div>
+                                                Please complete your payment before this invoice expires.
+                                            </div>
+
+                                            <div id="invoice-countdown" class="fw-bold fs-3 mt-2">
+                                                Loading...
+                                            </div>
+
+                                            <small class="d-block mt-1">
+                                                Due:
+                                                {{ \Carbon\Carbon::parse($data['invoice']->due_date)->format('d M Y, h:i A') }}
+                                            </small>
+                                        </div>
+                                        <script>
+                                            const dueDate = new Date(
+                                                "{{ \Carbon\Carbon::parse($data['invoice']->due_date)->format('Y-m-d H:i:s') }}"
+                                                .replace(' ', 'T')
+                                            ).getTime();
+
+                                            const countdown = document.getElementById('invoice-countdown');
+                                            const alertBox = document.getElementById('invoice-countdown-alert');
+
+                                            function updateCountdown() {
+
+                                                const now = new Date().getTime();
+                                                const distance = dueDate - now;
+
+                                                if (distance <= 0) {
+
+                                                    countdown.innerHTML = 'Invoice Expired';
+                                                    alertBox.classList.remove('alert-warning');
+                                                    alertBox.classList.add('alert-danger');
+
+                                                    return;
+                                                }
+
+                                                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                const hours = Math.floor(
+                                                    (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
+                                                );
+                                                const minutes = Math.floor(
+                                                    (distance % (1000 * 60 * 60)) / (1000 * 60)
+                                                );
+                                                const seconds = Math.floor(
+                                                    (distance % (1000 * 60)) / 1000
+                                                );
+
+                                                countdown.innerHTML =
+                                                    `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                                            }
+
+                                            updateCountdown();
+
+                                            setInterval(updateCountdown, 1000);
+                                        </script>
+                                        {{-- expiry countdown ends --}}
                                         {{-- Pay Now start --}}
 
                                         <div class="m-4">
 
                                             <hr>
-                                            <form class="form my_form" method="POST" 
-                                            action="{{ route('memberPayInvoice', ['uuid' => $data['invoice']->uuid]) }}"
+                                            <form class="form my_form" method="POST"
+                                                action="{{ route('memberPayInvoice', ['uuid' => $data['invoice']->uuid]) }}"
                                                 enctype="multipart/form-data">
                                                 @csrf
 

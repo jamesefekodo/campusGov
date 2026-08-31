@@ -250,6 +250,7 @@
                             {{ route('financialClaims') }}
                             ">Financial
                                 Claims
+                                &nbsp;
                                 @if (financialClaimPendingApproval() > 0)
                                     <span
                                         class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
@@ -258,12 +259,12 @@
                             </a>
                         </li>
                     @endif
-                    @if(Auth::user()->hasPermission('invoice.read'))
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
-                            href="{{ route('invoices') }}">Other
-                            Payments</a>
-                    </li>
+                    @if (Auth::user()->hasPermission('invoice.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
+                                href="{{ route('invoices') }}">Other
+                                Payments</a>
+                        </li>
                     @endif
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"

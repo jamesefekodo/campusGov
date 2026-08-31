@@ -65,7 +65,11 @@
                                         <span class="text-black">
                                             @switch($data['invoice']->status)
                                                 @case('paid')
-                                                    <span class="badge bg-green text-white">Paid</span> show payment transaction
+                                                    <span class="badge bg-green text-white">Paid</span> <a href="{{ route('viewPaymentTransaction', ['payment_transaction_id' => $data['invoice']->successfulPayment->payment_transaction_id]) }}"
+                                                    target="_blank" class="badge bg-secondary text-white"
+                                                    title="View Approver">
+                                                    <i class="fas fa-link"></i>
+                                                </a>
                                                 @break
 
                                                 @case('expired')

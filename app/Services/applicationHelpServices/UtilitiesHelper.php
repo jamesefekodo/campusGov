@@ -7,6 +7,7 @@ use App\Models\Config\BasicSystemSetting;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Claims\FinancialClaim;
+use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Settings\BankAccount;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
@@ -604,52 +605,52 @@ if (!function_exists('highestProgramDuration')) {
 if (!function_exists('canApplyForPosition')) {
     function canApplyForPosition($student, $position): array
     {
-        // Academic record required 
+        // Academic record required
         $academic = $student->memberAcademicInfo;
         if (!$academic) {
             return ['qualified' => false, 'message' => 'Academic record not found',];
         }
-        // General requirement 
+        // General requirement
         if ($academic->academic_status !== 'student') {
             return ['qualified' => false, 'message' => 'Only active students can apply',];
         }
         $requirements = $position->candidateGroups;
-        // No requirements = any student qualifies 
+        // No requirements = any student qualifies
         if ($requirements->isEmpty()) {
             return ['qualified' => true, 'message' => 'Qualified',];
         }
         foreach ($requirements as $requirement) {
-            // Program 
+            // Program
             if ($requirement->program && $requirement->program !== $academic->program) {
                 continue;
             }
-            // Program Type 
+            // Program Type
             if ($requirement->program_type && $requirement->program_type !== $academic->program_type) {
                 continue;
             }
-            // Faculty 
+            // Faculty
             if ($requirement->faculty && $requirement->faculty !== $academic->faculty) {
                 continue;
             }
-            // Department 
+            // Department
             if ($requirement->department && $requirement->department !== $academic->department) {
                 continue;
             }
-            // Current level 
+            // Current level
             $level = studentCurrentLevel($academic);
-            // Single level requirement 
+            // Single level requirement
             if ($requirement->start_level && !$requirement->end_level) {
                 if ($level != $requirement->start_level) {
                     continue;
                 }
             }
-            // Level range requirement 
+            // Level range requirement
             if ($requirement->start_level && $requirement->end_level) {
                 if ($level < $requirement->start_level || $level > $requirement->end_level) {
                     continue;
                 }
             }
-            // Student passed this requirement 
+            // Student passed this requirement
             return ['qualified' => true, 'message' => 'Qualified',];
         }
         return ['qualified' => false, 'message' => 'You do not meet the eligibility requirements for this position',];
@@ -782,6 +783,14 @@ if (!function_exists('financialClaimPendingApproval')) {
     function financialClaimPendingApproval()
     {
         return FinancialClaim::where('approval_status', 'pending')
+            ->count();
+    }
+}
+
+if (!function_exists('countPendingInvoicesForMember')) {
+    function countPendingInvoicesForMember()
+    {
+        return Invoice::where('registered_payer', Auth::user()->username)->where('status', 'pending')
             ->count();
     }
 }

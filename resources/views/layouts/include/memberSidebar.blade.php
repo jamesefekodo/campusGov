@@ -115,7 +115,12 @@
                 <span class="nav-icon">
                     <i class="fas fa-dollar-sign"></i>
                 </span>
-                <span class="nav-link-text">Payments</span>
+                <span class="nav-link-text">Payments &nbsp;
+                    @if (countPendingInvoicesForMember() > 0)
+                        <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                            style="font-size: 11px">{{ countPendingInvoicesForMember() }}</span>
+                    @endif
+                </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down bi"></i>
                 </span><!--//submenu-arrow-->
@@ -132,7 +137,12 @@
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/invoice') ? 'sidebar-active' : '' }}"
-                            href="{{ route('myInvoices') }}">Invoices</a>
+                            href="{{ route('myInvoices') }}">Invoices &nbsp;
+                            @if (countPendingInvoicesForMember() > 0)
+                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                    style="font-size: 11px">{{ countPendingInvoicesForMember() }}</span>
+                            @endif
+                        </a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/donation') ? 'sidebar-active' : '' }}"
@@ -151,10 +161,10 @@
                     <i class="fas fa-fingerprint"></i>
                 </span>
                 <span class="nav-link-text">Elections &nbsp; @if (totalOngoingElection() > 0)
-                                    <span
-                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                        style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
-                                @endif</span>
+                        <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                            style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
+                    @endif
+                </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
                 </span><!--//submenu-arrow-->
@@ -165,11 +175,12 @@
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/elections') ? 'sidebar-active' : '' }}"
                             href="
                             {{ route('memberNewElections') }}
-                             ">Election &nbsp; @if (totalOngoingElection() > 0)
-                                    <span
-                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                        style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
-                                @endif</a>
+                             ">Election
+                            &nbsp; @if (totalOngoingElection() > 0)
+                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                    style="font-size: 11px"><i class="fas fa-thumbs-up me-1"></i> </span>
+                            @endif
+                        </a>
                     </li>
                 </ul>
             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Models\Finance\Claims;
 
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -41,8 +42,16 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'created_by', 'username');
     }
-     public function invoiceFor()
+    public function invoiceFor()
     {
         return $this->belongsTo(User::class, 'registered_payer', 'username');
+    }
+    public function successfulPayment()
+    {
+        return $this->belongsTo(
+            PaymentTransaction::class,
+            'invoice_number',
+            'invoice_number'
+        )->where('approval_status', 'approved');
     }
 }

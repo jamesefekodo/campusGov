@@ -160,6 +160,9 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     // invoice
     Route::get('member/payment/invoices', [InvoiceController::class, 'myInvoices'])->name('myInvoices');
     Route::get('member/payment/invoices/view/{uuid}', [InvoiceController::class, 'viewMyInvoice'])->name('viewMyInvoice');
+    Route::post('member/payment/invoices/pay_now/{uuid}', [InvoiceController::class, 'memberPayInvoice'])->name('memberPayInvoice');
+
+    
 
 
 

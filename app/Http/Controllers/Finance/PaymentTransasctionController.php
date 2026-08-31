@@ -674,6 +674,13 @@ class PaymentTransasctionController extends Controller
                             'votes_counted' => true,
                         ]);
                     }
+
+                    // update invoice records
+                    if ($paymentTransaction->invoice) {
+                        $paymentTransaction->invoice->update([
+                            'status' => 'paid',
+                        ]);
+                    }
                     return redirect()->back();
                 }
             } else {
@@ -780,6 +787,12 @@ class PaymentTransasctionController extends Controller
                     ]);
                 }
 
+                // update invoice records
+                if ($paymentTransaction->invoice) {
+                    $paymentTransaction->invoice->update([
+                        'status' => 'paid',
+                    ]);
+                }
                 return redirect()->back();
             } else {
                 if ($responseData && $responseData['data'] && $responseData['data']['id']) {

@@ -30,7 +30,7 @@ return new class extends Migration
 
                 $table->string('payment_purpose');
                 $table->string('due_id')->nullable(); // Foreign
-                $table->string('invoice_id')->nullable(); // Foreign
+                $table->string('invoice_number')->nullable(); // Foreign
                 $table->string('donation_id')->nullable(); // Foreign
                 $table->string('election_id')->nullable(); // Foreign
                 $table->unsignedBigInteger('election_position')->nullable(); // Foreign
@@ -84,10 +84,10 @@ return new class extends Migration
 
 
 
-                // $table->foreign('invoice_id')
-                //     ->references('invoice_number')
-                //     ->on('association_invoices')
-                //     ->onUpdate('cascade');
+                $table->foreign('invoice_number')
+                    ->references('invoice_number')
+                    ->on('invoices')
+                    ->onUpdate('cascade');
 
                 $table->foreign('election_id')
                     ->references('election_id')

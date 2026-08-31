@@ -6,6 +6,7 @@ use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionMonetaryVote;
 use App\Models\Elections\ElectionPosition;
+use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Traits\BelongsToTenant;
@@ -31,7 +32,7 @@ class PaymentTransaction extends Model
         'email',
         'payment_purpose',
         'due_id',
-        'invoice_id',
+        'invoice_number',
         'donation_id',
         'election_id',
         'election_position',
@@ -73,10 +74,10 @@ class PaymentTransaction extends Model
     // {
     //     return $this->belongsTo(OnlinePaymentMethod::class, 'online_payment_method', 'slug');
     // }
-    // public function invoice()
-    // {
-    //     return $this->belongsTo(AssociationInvoice::class, 'invoice_id', 'invoice_number');
-    // }
+    public function invoice()
+    {
+        return $this->belongsTo(Invoice::class, 'invoice_number', 'invoice_number');
+    }
     // public function donation()
     // {
     //     return $this->belongsTo(AssociationDonation::class, 'donation_id', 'donation_id');
@@ -93,8 +94,8 @@ class PaymentTransaction extends Model
     {
         return $this->belongsTo(ElectionCandidateApplication::class, 'election_candidate_application', 'id');
     }
-    
-    
+
+
     public function monetaryVote()
     {
         return $this->belongsTo(ElectionMonetaryVote::class, 'payment_transaction_id', 'payment_transaction_id');
