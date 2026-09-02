@@ -81,7 +81,7 @@ class MemberReAdmissionApplication extends Model
     }
     public function previousFaculty()
     {
-        return $this->belongsTo(Faculty::class, 'new_faculty', 'slug');
+        return $this->belongsTo(Faculty::class, 'previous_faculty', 'slug');
     }
     public function previousDepartment()
     {

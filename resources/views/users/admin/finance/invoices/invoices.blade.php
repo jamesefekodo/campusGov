@@ -107,7 +107,7 @@
                                                                     <a href="{{ route('viewMember', ['uuid' => $invoice->invoiceFor->uuid]) }}"
                                                                         target="_blank"
                                                                         class="badge bg-secondary text-white"
-                                                                        title="View Approver">
+                                                                        title="View Owner">
                                                                         <i class="fas fa-link"></i>
                                                                     </a>
                                                                 @else

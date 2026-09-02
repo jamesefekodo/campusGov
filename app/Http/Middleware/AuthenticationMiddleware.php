@@ -6,6 +6,9 @@ use App\Models\Config\BasicSystemSetting;
 use App\Models\Config\SystemPolicies\SystemPolicy;
 use App\Models\Config\SystemPolicies\UserAgreedPolicy;
 use App\Models\Elections\Election;
+use App\Models\Finance\Claims\Invoice;
+use App\Models\Finance\Donations\Donation;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -24,6 +27,50 @@ class AuthenticationMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // #################################################################
+        Invoice::where('status', 'pending')
+            ->where('due_date', '<=', now())
+            ->update([
+                'status' => 'expired',
+            ]);
+        // ######################################################################
+        // donations   // Decline pending donations whose deadline has passed
+        // Ensure non-approved donations are never active
+        Donation::where('is_active', true)
+            ->whereNotIn('approval_status', ['approved'])
+            ->update(['is_active' => false]);
+
+        // Decline pending donations whose deadline has passed
+        Donation::where('approval_status', 'pending')
+            ->whereNotNull('deadline')
+            ->where('deadline', '<=', now())
+            ->update([
+                'is_active'       => false,
+                'approval_status' => 'declined',
+            ]);
+
+        // Deactivate donations whose target amount has been reached
+        // Uses a subquery because amount_raised is computed from PaymentTransactions
+        Donation::where('is_active', true)
+            ->whereNotNull('target_amount')
+            ->get()
+            ->each(function ($donation) {
+                $raised = PaymentTransaction::where('donation_id', $donation->donation_id)
+                    ->where('payment_status', 'successful')
+                    ->where('approval_status', 'approved')
+                    ->sum('amount_settled');
+
+                if ($raised >= $donation->target_amount) {
+                    $donation->update(['is_active' => false]);
+                }
+            });
+
+        // Deactivate active donations whose deadline has passed
+        Donation::where('is_active', true)
+            ->whereNotNull('deadline')
+            ->where('deadline', '<=', now())
+            ->update(['is_active' => false]);
+        // ######################################################################
         // update functins
         // form sales period
         $elections = Election::where('approval_status', 'approved')

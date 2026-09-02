@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Election\ElectionController;
 use App\Http\Controllers\Election\MemberElectionController;
 use App\Http\Controllers\Finance\AssociationDueController;
+use App\Http\Controllers\Finance\DonationController;
 use App\Http\Controllers\Finance\FinancialClaimController;
 use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
@@ -162,7 +163,9 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/payment/invoices/view/{uuid}', [InvoiceController::class, 'viewMyInvoice'])->name('viewMyInvoice');
     Route::post('member/payment/invoices/pay_now/{uuid}', [InvoiceController::class, 'memberPayInvoice'])->name('memberPayInvoice');
 
-    
+    // memberDonations
+    Route::get('member/payment/donations', [DonationController::class, 'memberDonations'])->name('memberDonations');
+    Route::get('member/payment/donations/search', [DonationController::class, 'memberDonations'])->name('memberDonationsSearch');
 
 
 
@@ -187,7 +190,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/results/{uuid}', [MemberElectionController::class, 'memberElectionResults'])->name('memberElectionResults');
     Route::get('member/elections/results/view/{election}/{position}', [MemberElectionController::class, 'memberViewElectionResultsForPosition'])->name('memberViewElectionResultsForPosition');
 
-    
+
 
 
 
@@ -282,8 +285,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/user_management/members/view/association_dues/initiate_regularization/{uuid}', [MembersManagementController::class, 'initiatePaymentRegularization'])->name('initiatePaymentRegularization');
     Route::post('admin/user_management/members/view/association_dues/initiate_payment_waiver/{uuid}', [MembersManagementController::class, 'initiatePaymentWaiver'])->name('initiatePaymentWaiver');
 
-
-
+    Route::get('admin/user_management/members/view/invoices/{uuid}', [MembersManagementController::class, 'viewMemberInvoices'])->name('viewMemberInvoices');
 
 
 
@@ -408,7 +410,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::post('admin/finance/dues/variation/create/submit/{uuid}', [AssociationDueController::class, 'createAssociationDueVariation'])->name('createAssociationDueVariation');
     Route::put('admin/finance/dues/variation/edit/submit/{id}', [AssociationDueController::class, 'editAssociationDueVariation'])->name('editAssociationDueVariation');
-    Route::get('admin/finance/dues/variation/delet/{id}', [AssociationDueController::class, 'removeAssociationVariation'])->name('removeAssociationVariation');
+    Route::get('admin/finance/dues/variation/delete/{id}', [AssociationDueController::class, 'removeAssociationVariation'])->name('removeAssociationVariation');
+
+    Route::get('admin/finance/dues/view/waiver_and_payment/print/{uuid}', [AssociationDueController::class, 'printAssociationDueWaiverAndPayment'])->name('due.paidOrWaived.download');
+    Route::get('admin/finance/dues/view/debtors/print/{uuid}', [AssociationDueController::class, 'printAssociationDueDebtors'])->name('due.outstanding.download');
+
+    
 
     // transactions
     Route::get('admin/finance/transactions', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactions');
@@ -436,15 +443,32 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/financial_claim/approval/approval/search', [FinancialClaimController::class, 'financialClaimsPendingApproval'])->name('financialClaimsPendingApprovalSearch');
 
     Route::get('admin/finance/financial_claim/view/{uuid}', [FinancialClaimController::class, 'viewFinancialClaim'])->name('viewFinancialClaim');
-
     Route::put('admin/finance/financial_claim/view/process/{uuid}', [FinancialClaimController::class, 'processFinancialClaimSubmit'])->name('processFinancialClaimSubmit');
-    
+
     // invoices
-    
     Route::get('admin/finance/other_payments/invoices', [InvoiceController::class, 'invoices'])->name('invoices');
     Route::get('admin/finance/other_payments/invoices/search', [InvoiceController::class, 'invoices'])->name('invoicesSearch');
     Route::post('admin/finance/other_payments/invoices/add_new/submit', [InvoiceController::class, 'addNewInvoiceSubmit'])->name('addNewInvoiceSubmit');
     Route::get('admin/finance/other_payments/invoices/view/{uuid}', [InvoiceController::class, 'viewInvoice'])->name('viewInvoice');
+    Route::put('admin/finance/other_payments/invoices/update/submit/{uuid}', [InvoiceController::class, 'updateInvoiceSubmit'])->name('updateInvoiceSubmit');
+    Route::put('admin/finance/other_payments/invoices/update/link_to_user/{uuid}', [InvoiceController::class, 'linkInvoiceToRegisteredUser'])->name('linkInvoiceToRegisteredUser');
+
+    
+
+    // donation
+    Route::get('admin/finance/other_payments/donations', [DonationController::class, 'donations'])->name('donations');
+    Route::get('admin/finance/other_payments/donations/search', [DonationController::class, 'donations'])->name('donationsSearch');
+    Route::post('admin/finance/other_payments/donations/add_new/submit', [DonationController::class, 'addNewDonationSubmit'])->name('addNewDonationSubmit');
+    Route::get('admin/finance/other_payments/donations/view/{uuid}', [DonationController::class, 'viewDonation'])->name('viewDonation');
+    Route::put('admin/finance/other_payments/donations/update/{uuid}', [DonationController::class, 'updateDonationSubmit'])->name('updateDonationSubmit');
+    Route::put('admin/finance/other_payments/donations/process_approval/{uuid}', [DonationController::class, 'processApproveDonationSubmit'])->name('processApproveDonationSubmit');
+
+    
+
+
+    // 
+
+    
 
     
     // elections
@@ -484,14 +508,14 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/election/requests/candidates/{uuid}', [ElectionController::class, 'electionCandidates'])->name('electionCandidates');
     Route::get('admin/election/requests/candidates/view/{uuid}', [ElectionController::class, 'viewElectionCandidatesForPosition'])->name('viewElectionCandidatesForPosition');
-    
+
     Route::get('admin/election/results/{uuid}', [ElectionController::class, 'electionResults'])->name('electionResults');
-    Route::get('admin/election/results/per_position/{election}/{position}', [ElectionController::class, 'viewElectionResultForPosition'])->name('viewElectionResultForPosition');    
+    Route::get('admin/election/results/per_position/{election}/{position}', [ElectionController::class, 'viewElectionResultForPosition'])->name('viewElectionResultForPosition');
 
     Route::get('admin/election/print_results/{uuid}', [ElectionController::class, 'printElectionResults'])->name('printElectionResults');
 
     Route::get('admin/election/results/votes/view/{uuid}', [ElectionController::class, 'viewElectionVoters'])->name('viewElectionVoters');
 
 
-    
+
 });

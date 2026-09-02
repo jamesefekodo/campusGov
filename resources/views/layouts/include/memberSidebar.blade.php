@@ -146,9 +146,7 @@
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'member/payment/donation') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('studentSelfDonations') }} --}}
-                             ">Donations</a>
+                            href="{{ route('memberDonations') }}">Donations</a>
                     </li>
                 </ul>
             </div>

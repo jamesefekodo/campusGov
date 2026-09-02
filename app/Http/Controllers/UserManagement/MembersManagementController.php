@@ -7,6 +7,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
@@ -2009,7 +2010,7 @@ class MembersManagementController extends Controller
             );
         }
 
-         do {
+        do {
             $waiverId = 'pymt-waiver-' . now()->format('Ymds') . '-' . tenant()->id . random_int(100000000, 999999999);
         } while (PaymentWaiver::where('waiver_id', $waiverId)->exists());
 
@@ -2023,4 +2024,36 @@ class MembersManagementController extends Controller
         $waiverRequest->save();
         return redirect()->back()->with('success', 'Done!');
     }
+    public function viewMemberInvoices($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('invoice.read'),
+            403
+        );
+
+
+        Invoice::where('status', 'pending')
+            ->where('due_date', '<=', now())
+            ->update([
+                'status' => 'expired',
+            ]);
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $invoices = Invoice::where('registered_payer', $member->username)->orderBy('updated_at', 'desc')->paginate(20);
+
+        $data = [
+            'member' => $member,
+            'invoices' => $invoices,
+        ];
+
+        return view('users.admin.userManagement.members.profile.invoices', compact('data'));
+    }
+    
 }

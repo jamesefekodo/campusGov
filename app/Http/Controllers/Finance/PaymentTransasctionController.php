@@ -417,9 +417,10 @@ class PaymentTransasctionController extends Controller
             $transactions = PaymentTransaction::with([
                 'due' => function ($query) use ($searchKey) {
                     $query->where('title', 'like', "%$searchKey%")
+                        ->orWhere('fee_id', 'like', "%$searchKey%")
                         ->orWhere('description', 'like', "%$searchKey%");
                 },
-                'registeredPayer' => function ($query) use ($searchKey) {
+                'payerPersonalProfile' => function ($query) use ($searchKey) {
                     $query->where('phone1', 'like', "%$searchKey%")
                         ->orWhere('email1', 'like', "%$searchKey%")
                         ->orWhere('phone2', 'like', "%$searchKey%")
@@ -444,13 +445,18 @@ class PaymentTransasctionController extends Controller
                         ->orWhere('electronic_payment_method', 'like', "%$searchKey%")
                         ->orWhere('manual_payment_method', 'like', "%$searchKey%")
                         ->orWhere('payment_status', 'like', "%$searchKey%")
-                        ->orWhere('approval_status', 'like', "%$searchKey%");
+                        ->orWhere('approval_status', 'like', "%$searchKey%")
+                        ->orWhere('due_id', 'like', "%$searchKey%")
+                        ->orWhere('invoice_number', 'like', "%$searchKey%")
+                        ->orWhere('donation_id', 'like', "%$searchKey%")
+                        ->orWhere('election_id', 'like', "%$searchKey%");
                 })
                 ->orWhereHas('due', function ($query) use ($searchKey) {
                     $query->where('title', 'like', "%$searchKey%")
+                        ->orWhere('fee_id', 'like', "%$searchKey%")
                         ->orWhere('description', 'like', "%$searchKey%");
                 })
-                ->orWhereHas('registeredPayer', function ($query) use ($searchKey) {
+                ->orWhereHas('payerPersonalProfile', function ($query) use ($searchKey) {
                     $query->where('phone1', 'like', "%$searchKey%")
                         ->orWhere('email1', 'like', "%$searchKey%")
                         ->orWhere('phone2', 'like', "%$searchKey%")
@@ -1062,10 +1068,13 @@ class PaymentTransasctionController extends Controller
 
                         // PaymentRegularization fields
                         $q->where('reason', 'like', $keyword)
+                            ->orWhere('due_id', 'like', $keyword)
+                            ->orWhere('approval_status', 'like', $keyword)
 
                             // Due
                             ->orWhereHas('due', function ($dueQuery) use ($keyword) {
                                 $dueQuery->where('title', 'like', $keyword)
+                                    ->orWhere('fee_id', 'like', $keyword)
                                     ->orWhere('description', 'like', $keyword);
                             })
 

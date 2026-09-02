@@ -7,7 +7,9 @@ use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Elections\ElectionMonetaryVote;
 use App\Models\Elections\ElectionPosition;
 use App\Models\Finance\Claims\Invoice;
+use App\Models\Finance\Donations\Donation;
 use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
@@ -64,6 +66,15 @@ class PaymentTransaction extends Model
     {
         return $this->belongsTo(User::class, 'registered_payer', 'username');
     }
+    public function payerPersonalProfile()
+    {
+        return $this->belongsTo(MemberPersonalProfile::class, 'registered_payer', 'username');
+    }
+    public function payerAcademicInfo()
+    {
+        return $this->belongsTo(MemberAcademicInfo::class, 'registered_payer', 'username');
+    }
+
     public function approvedBy()
     {
         return $this->belongsTo(User::class, 'approved_by', 'username');
@@ -78,10 +89,10 @@ class PaymentTransaction extends Model
     {
         return $this->belongsTo(Invoice::class, 'invoice_number', 'invoice_number');
     }
-    // public function donation()
-    // {
-    //     return $this->belongsTo(AssociationDonation::class, 'donation_id', 'donation_id');
-    // }
+    public function donation()
+    {
+        return $this->belongsTo(Donation::class, 'donation_id', 'donation_id');
+    }
     public function election()
     {
         return $this->belongsTo(Election::class, 'election_id', 'election_id');
@@ -90,7 +101,7 @@ class PaymentTransaction extends Model
     {
         return $this->belongsTo(ElectionPosition::class, 'election_position', 'id');
     }
-     public function electionCandidateApplication()
+    public function electionCandidateApplication()
     {
         return $this->belongsTo(ElectionCandidateApplication::class, 'election_candidate_application', 'id');
     }

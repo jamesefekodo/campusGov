@@ -3,6 +3,7 @@
 namespace App\Models\Finance\Transactions;
 
 use App\Models\Finance\Dues\AssociationDue;
+use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
@@ -55,6 +56,10 @@ class PaymentWaiver extends Model
     public function personalProfile()
     {
         return $this->belongsTo(MemberPersonalProfile::class, 'username', 'username');
+    }
+      public function memberAcademicInfo()
+    {
+        return $this->belongsTo(MemberAcademicInfo::class, 'username', 'username');
     }
     public function processedBy()
     {

@@ -108,6 +108,11 @@ return new class extends Migration
                     ->references('application_id')
                     ->on('election_candidate_applications')
                     ->onUpdate('cascade');
+
+                $table->foreign('donation_id')
+                    ->references('donation_id')
+                    ->on('donations')
+                    ->onUpdate('cascade');
             }
         );
     }

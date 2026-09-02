@@ -243,7 +243,7 @@
                                 href="{{ route('associationDues') }}">Dues</a>
                         </li>
                     @endif
-                    @if (Auth::user()->hasPermission('dues.read'))
+                    @if (Auth::user()->hasPermission('dues.read') || Auth::user()->hasPermission('donation.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/financial_claim') ? 'sidebar-active' : '' }}"
                                 href="

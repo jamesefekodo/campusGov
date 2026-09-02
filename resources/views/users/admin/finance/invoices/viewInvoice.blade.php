@@ -65,11 +65,11 @@
                                         <span class="text-black">
                                             @switch($data['invoice']->status)
                                                 @case('paid')
-                                                    <span class="badge bg-green text-white">Paid</span> <a href="{{ route('viewPaymentTransaction', ['payment_transaction_id' => $data['invoice']->successfulPayment->payment_transaction_id]) }}"
-                                                    target="_blank" class="badge bg-secondary text-white"
-                                                    title="View Approver">
-                                                    <i class="fas fa-link"></i>
-                                                </a>
+                                                    <span class="badge bg-green text-white">Paid</span> <a
+                                                        href="{{ route('viewPaymentTransaction', ['payment_transaction_id' => $data['invoice']->successfulPayment->payment_transaction_id]) }}"
+                                                        target="_blank" class="badge bg-secondary text-white" title="View Approver">
+                                                        <i class="fas fa-link"></i>
+                                                    </a>
                                                 @break
 
                                                 @case('expired')
@@ -100,6 +100,29 @@
                                             @endif |
                                             {{ \Carbon\Carbon::parse($data['invoice']->created_at)->format('l, d F, Y h:i A') }}
                                         </span>
+                                    </div>
+
+                                    <hr class="mt-5">
+                                    <div class="d-flex justify-content-end flex-wrap mt-3">
+                                        @if (Auth::user()->hasPermission('invoice.update'))
+                                            @if (!$data['invoice']->invoiceFor)
+                                                <button class="btn btn-primary m-1 d-flex align-items-center"
+                                                    data-toggle="modal" data-target="#linkInvoiceToMemberModal">
+                                                    <i class="fas fa-user me-2"></i>
+                                                    <span>Link to to a member</span>
+                                                </button>
+                                                
+                                                @include('users.admin.finance.invoices.include.linkInvoiceToMemberModal')
+                                            @endif
+                                            @if ($data['invoice']->status == 'pending')
+                                                <button class="btn btn-warning m-1 d-flex align-items-center"
+                                                    data-toggle="modal" data-target="#editInvoiceModal">
+                                                    <i class="fas fa-edit me-2"></i>
+                                                    <span>Update</span>
+                                                </button>
+                                                @include('users.admin.finance.invoices.include.editInvoiceModal')
+                                            @endif
+                                        @endif
                                     </div>
                                 </div>
                             </div>

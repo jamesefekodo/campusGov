@@ -480,55 +480,107 @@ if (!function_exists('electronicsPaymentMethods')) {
 // }
 
 if (!function_exists('studentLevelAtDue')) {
-    function studentLevelAtDue($academic, $due): int
+    function studentLevelAtDue($academic, $due): array
     {
+        $default = [
+            'program' => $academic?->theProgram,
+            'level' => 1,
+            'is_previous_program' => false,
+            'readmission' => null,
+        ];
+
         if (!$academic || !$due) {
-            return 1;
+            return $default;
         }
 
-        /*
-         * Check whether this due belongs to a previous programme.
-         */
-        $pastProgram = $academic->approvedReAdmissions()
-            ->get()
-            ->first(function ($reAdmission) use ($due) {
+        $dueYear = (int) substr((string) $due->academic_year, 0, 4);
 
-                return $due->academic_year >=
-                    (int) $reAdmission->previous_admission_session
+        if ($dueYear < 1) {
+            return $default;
+        }
 
-                    &&
+        $readmissions = $academic->approvedReAdmissions
+            ?? collect();
 
-                    $due->academic_year <=
-                    (int) $reAdmission->previous_graduation_session;
+        $previousReadmission = $readmissions
+            ->sortByDesc(function ($readmission) {
+                return (int) substr(
+                    (string) $readmission->previous_graduation_session,
+                    0,
+                    4
+                );
+            })
+            ->first(function ($readmission) use ($dueYear) {
+                $previousAdmissionYear = (int) substr(
+                    (string) $readmission->previous_admission_session,
+                    0,
+                    4
+                );
+
+                $previousGraduationYear = (int) substr(
+                    (string) $readmission->previous_graduation_session,
+                    0,
+                    4
+                );
+
+                return $previousAdmissionYear > 0
+                    && $previousGraduationYear > 0
+                    && $dueYear >= $previousAdmissionYear
+                    && $dueYear <= $previousGraduationYear;
             });
 
         /*
-         * If the due belongs to a previous programme,
-         * calculate the level using that programme's
-         * admission session.
+         * Previous-programme due:
+         * Use the programme stored on the readmission record.
          */
-        if ($pastProgram) {
-            return max(
-                1,
-                (int) $due->academic_year -
-                    (int) $pastProgram->previous_admission_session +
-                    1
+        if ($previousReadmission) {
+            $previousProgram = $previousReadmission->previousProgram;
+
+            /*
+             * Do not silently use the current programme here.
+             * If this is null, your old programme ID/relationship
+             * is missing or has not been eager-loaded.
+             */
+            if (!$previousProgram) {
+                return [
+                    'program' => null,
+                    'level' => 1,
+                    'is_previous_program' => true,
+                    'readmission' => $previousReadmission,
+                ];
+            }
+
+            $previousAdmissionYear = (int) substr(
+                (string) $previousReadmission->previous_admission_session,
+                0,
+                4
             );
+
+            return [
+                'program' => $previousProgram,
+                'level' => max(1, $dueYear - $previousAdmissionYear + 1),
+                'is_previous_program' => true,
+                'readmission' => $previousReadmission,
+            ];
         }
 
         /*
-         * Otherwise, it is a current-programme due.
+         * Current-programme due.
          */
-        if (!$academic->admission_session) {
-            return 1;
-        }
-
-        return max(
-            1,
-            (int) $due->academic_year -
-                (int) $academic->admission_session +
-                1
+        $currentAdmissionYear = (int) substr(
+            (string) $academic->admission_session,
+            0,
+            4
         );
+
+        return [
+            'program' => $academic->theProgram,
+            'level' => $currentAdmissionYear > 0
+                ? max(1, $dueYear - $currentAdmissionYear + 1)
+                : 1,
+            'is_previous_program' => false,
+            'readmission' => null,
+        ];
     }
 }
 
@@ -792,5 +844,85 @@ if (!function_exists('countPendingInvoicesForMember')) {
     {
         return Invoice::where('registered_payer', Auth::user()->username)->where('status', 'pending')
             ->count();
+    }
+}
+
+
+##################################################
+if (!function_exists('resolveAcademicContextForDue')) {
+    function resolveAcademicContextForDue(
+        \App\Models\Members\MemberAcademicInfo $academicInfo,
+        \App\Models\Finance\Dues\AssociationDue $due
+    ): array {
+
+        $dueYear = (int) $due->academic_year;
+
+        // ── Check current program ──────────────────────────────────────
+        // A due belongs to the current program if its academic_year falls
+        // within the member's current admission → graduation range
+        $currentStart = (int) $academicInfo->admission_session;
+        $currentEnd   = (int) ($academicInfo->graduation_session
+            ?? ($currentStart + ($academicInfo->theProgram?->duration ?? 0) - 1));
+
+        if ($dueYear >= $currentStart && $dueYear <= $currentEnd) {
+            return [
+                'source'             => 'current',
+                'matric_number'      => $academicInfo->matric_number,
+                'program'            => $academicInfo->theProgram?->name,
+                'program_type'       => $academicInfo->programType?->type_name,
+                'faculty'            => $academicInfo->theFaculty?->name,
+                'department'         => $academicInfo->theDepartment?->name,
+                'admission_session'  => $academicInfo->admission_session,
+                'graduation_session' => $academicInfo->graduation_session,
+                'reAdmission'        => null,
+            ];
+        }
+
+        // ── Check past programs ────────────────────────────────────────
+        // approvedReAdmissions is already eager loaded in the controller
+        // so no extra query here — just iterate the loaded collection
+        $reAdmissions = $academicInfo->approvedReAdmissions
+            ->sortByDesc('previous_admission_session'); // most recent first
+
+        foreach ($reAdmissions as $reAdmission) {
+
+            if (
+                empty($reAdmission->previous_admission_session) ||
+                empty($reAdmission->previous_graduation_session)
+            ) {
+                continue;
+            }
+
+            $start = (int) $reAdmission->previous_admission_session;
+            $end   = (int) $reAdmission->previous_graduation_session;
+
+            if ($dueYear >= $start && $dueYear <= $end) {
+                return [
+                    'source'             => 'readmission',
+                    'matric_number'      => $reAdmission->previous_matric_number
+                                           ?? $academicInfo->matric_number,
+                    'program'            => $reAdmission->previousProgram?->name,
+                    'program_type'       => $reAdmission->previousProgramType?->type_name,
+                    'faculty'            => $reAdmission->previousFaculty?->name,
+                    'department'         => $reAdmission->previousDepartment?->name,
+                    'admission_session'  => $reAdmission->previous_admission_session,
+                    'graduation_session' => $reAdmission->previous_graduation_session,
+                    'reAdmission'        => $reAdmission,
+                ];
+            }
+        }
+
+        // ── Fallback — should never reach here ─────────────────────────
+        return [
+            'source'             => 'current',
+            'matric_number'      => $academicInfo->matric_number,
+            'program'            => $academicInfo->theProgram?->name,
+            'program_type'       => $academicInfo->programType?->type_name,
+            'faculty'            => $academicInfo->theFaculty?->name,
+            'department'         => $academicInfo->theDepartment?->name,
+            'admission_session'  => $academicInfo->admission_session,
+            'graduation_session' => $academicInfo->graduation_session,
+            'reAdmission'        => null,
+        ];
     }
 }

@@ -83,7 +83,7 @@
                                             @switch($data['transaction']->payment_purpose)
                                                 @case('association_due')
                                                     @if ($data['transaction']->due)
-                                                        @php
+                                                        {{-- @php
                                                             $academic =
                                                                 $data['transaction']->registeredPayer
                                                                     ->memberAcademicInfo;
@@ -91,13 +91,27 @@
                                                                 $academic,
                                                                 $data['transaction']->due,
                                                             );
+                                                        @endphp --}}
+                                                        @php
+                                                            $academic = $data['transaction']->registeredPayer?->memberAcademicInfo;
+
+                                                            $programLevel = studentLevelAtDue($academic, $data['transaction']->due);
+
+                                                            $program = $programLevel['program'];
+                                                            $level = $programLevel['level'];
                                                         @endphp
 
                                                         {{ $data['transaction']->due->title }}
                                                         ({{ $data['transaction']->due->academic_year }}/{{ $data['transaction']->due->academic_year + 1 }}
                                                         Academic Session)
                                                         -
-                                                        {{ currentLevel($academic->theProgram, $level) }}
+                                                        {{-- {{ currentLevel($academic->theProgram, $level) }} --}} @if ($program)
+                                                            {{ currentLevel($program, $level) }}
+                                                        @else
+                                                            <span class="text-danger">
+                                                                Previous programme is missing
+                                                            </span>
+                                                        @endif
                                                     @endif
                                                 @break
 
@@ -247,8 +261,8 @@
                                                 @if ($data['transaction']->payment_status !== 'successful')
                                                     @switch($data['transaction']->electronic_payment_method)
                                                         @case('flutterwave')
-                                                            <form action="{{ route('flutterwavePaymentCallback') }}"
-                                                                method="GET" class="d-inline">
+                                                            <form action="{{ route('flutterwavePaymentCallback') }}" method="GET"
+                                                                class="d-inline">
                                                                 @csrf
                                                                 <input type="hidden" name="transaction_id"
                                                                     value="{{ $data['transaction']->service_provider_id }}">
@@ -384,7 +398,8 @@
                                     </div>
                                     @if (
                                         $data['transaction']->photo &&
-                                            file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof/' . $data['transaction']->photo)))
+                                            file_exists(public_path(
+                                                    'assets/tenant_' . tenant()->id . '/uploads/paymentTransactions/proof/' . $data['transaction']->photo)))
                                         @php
                                             $proofModalId = 'proofImageModal_' . $data['transaction']->id;
                                         @endphp

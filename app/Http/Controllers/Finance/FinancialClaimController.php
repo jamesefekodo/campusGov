@@ -185,6 +185,10 @@ class FinancialClaimController extends Controller
             return redirect()->back()->with('error', 'Payment config not found!');
         }
 
+        if ($claim->initiated_by == Auth::user()->username) {
+            return redirect()->back()->with('error', 'You cannot approve or decline a financial claim you initiated.');
+        }
+
 
         $request->validate([
             'description' => 'required',

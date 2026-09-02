@@ -89,7 +89,7 @@
                                                                 @switch($transaction->payment_purpose)
                                                                     @case('association_due')
                                                                         @if ($transaction->due)
-                                                                            @php
+                                                                            {{-- @php
                                                                                 $academic =
                                                                                     $transaction->registeredPayer
                                                                                         ->memberAcademicInfo;
@@ -97,13 +97,33 @@
                                                                                     $academic,
                                                                                     $transaction->due,
                                                                                 );
+                                                                            @endphp --}}
+                                                                            @php
+                                                                                $academic =
+                                                                                    $transaction->registeredPayer
+                                                                                        ?->memberAcademicInfo;
+
+                                                                                $programLevel = studentLevelAtDue(
+                                                                                    $academic,
+                                                                                    $transaction->due,
+                                                                                );
+
+                                                                                $program = $programLevel['program'];
+                                                                                $level = $programLevel['level'];
                                                                             @endphp
 
                                                                             {{ $transaction->due->title }}
                                                                             ({{ $transaction->due->academic_year }}/{{ $transaction->due->academic_year + 1 }}
                                                                             Academic Session)
                                                                             -
-                                                                            {{ currentLevel($academic->theProgram, $level) }}
+                                                                            {{-- {{ currentLevel($academic->theProgram, $level) }} --}}
+                                                                            @if ($program)
+                                                                                {{ currentLevel($program, $level) }}
+                                                                            @else
+                                                                                <span class="text-danger">
+                                                                                    Previous programme is missing
+                                                                                </span>
+                                                                            @endif
                                                                         @endif
                                                                     @break
 

@@ -148,7 +148,7 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a href="#">
+                                <a href="{{ route('viewMemberInvoices', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-file-invoice"></i>

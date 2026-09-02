@@ -8,14 +8,13 @@
                 </div>
             </a>
         @endif
-        <a {{-- href="{{ route('memberNewElections') }}" --}}>
-            <div
-                class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">
-                Donations
-            </div>
-        </a>
-
-
+        @if (Auth::user()->hasPermission('donation.read'))
+            <a href="{{ route('donations') }}">
+                <div
+                    class="inner_nav_menu {{ Str::startsWith(request()->path(), 'admin/finance/other_payments/donations') ? 'inner_nav_active' : '' }}">
+                    Donations
+                </div>
+            </a>
+        @endif
     </div>
-
 </div>

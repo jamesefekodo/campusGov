@@ -25,12 +25,6 @@ class InvoiceController extends Controller
             $user->hasPermission('invoice.read'),
             403
         );
-        Invoice::where('status', 'pending')
-            ->where('due_date', '<=', now())
-            ->update([
-                'status' => 'expired',
-            ]);
-
 
         $requestType = '';
         $searchKey = '';
@@ -148,13 +142,7 @@ class InvoiceController extends Controller
     }
     public function myInvoices()
     {
-        Invoice::where('status', 'pending')
-            ->where('due_date', '<=', now())
-            ->update([
-                'status' => 'expired',
-            ]);
-
-        $myInvoices = Invoice::where('registered_payer', Auth::user()->username)->orderBy('created_at', 'desc')->paginate(20);
+        $myInvoices = Invoice::where('registered_payer', Auth::user()->username)->orderBy('updated_at', 'desc')->paginate(20);
 
         $data = [
             'myInvoices' => $myInvoices,
@@ -368,5 +356,74 @@ class InvoiceController extends Controller
             }
         }
         // flutterwave processing end
+    }
+    public function updateInvoiceSubmit($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('invoice.update'),
+            403
+        );
+
+        $invoice = Invoice::where('uuid', $uuid)->where('status', 'pending')->first();
+        if (!$invoice) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $request->validate([
+            'description' => ['required'],
+            'amount' => ['required', 'numeric', 'min:1000'],
+            'registered_payer' => [
+                Rule::requiredIf(fn() => $invoice->invoiceFor),
+                'nullable',
+                'exists:users,username'
+            ],
+            'non_registered_payer' => [
+                Rule::requiredIf(fn() => !$invoice->invoiceFor),
+                'nullable',
+                'string'
+            ],
+            'due_date' => [
+                'required',
+                'date',
+                'after_or_equal:' . today(),
+            ],
+        ]);
+
+        $invoice->update([
+            'description' => $request->description,
+            'amount' => $request->amount,
+            'is_registered_member' => $request->is_registered_member,
+            'registered_payer' => $request->registered_payer,
+            'non_registered_payer' => $request->non_registered_payer,
+            'due_date' => $request->due_date,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function linkInvoiceToRegisteredUser($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('invoice.update'),
+            403
+        );
+
+        $invoice = Invoice::where('uuid', $uuid)->first();
+        if (!$invoice) {
+            return redirect()->back()->with('error', 'Records not found.');
+        }
+
+        $request->validate([
+            'registered_payer' => 'required|exists:users,username',
+        ]);
+
+        $invoice->update([
+            'registered_payer' => $request->registered_payer,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
     }
 }

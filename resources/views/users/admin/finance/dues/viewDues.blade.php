@@ -15,63 +15,51 @@
                                     </h4>
                                     <div class="card-body pt-2 pb-5 px-4">
                                         <div class="col-md-12 row">
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Title:</span>
-                                                    <span class="text-black">
-                                                        {{ $data['due']->title }}
-                                                    </span>
-                                                </div>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Title:</span>
+                                                <span class="text-black">
+                                                    {{ $data['due']->title }}
+                                                </span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Description:</span>
-                                                    <span class="text-black">
-                                                        {{ $data['due']->description }}
-                                                    </span>
-                                                </div>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Description:</span>
+                                                <span class="text-black">
+                                                    {{ $data['due']->description }}
+                                                </span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Academic Year:</span>
-                                                    <span class="text-black">
-                                                        {{ $data['due']->academic_year }}/{{ $data['due']->academic_year + 1 }}
-                                                    </span>
-                                                </div>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Academic Year:</span>
+                                                <span class="text-black">
+                                                    {{ $data['due']->academic_year }}/{{ $data['due']->academic_year + 1 }}
+                                                </span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Amount:</span>
-                                                    <span class="text-black">
-                                                        ₦{{ number_format($data['due']->amount, 2) }}
-                                                    </span>
-                                                </div>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Amount:</span>
+                                                <span class="text-black">
+                                                    ₦{{ number_format($data['due']->amount, 2) }}
+                                                </span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Status:</span>
-                                                    <span class="text-black">
-                                                        @switch($data['due']->is_active)
-                                                            @case(true)
-                                                                <span class="badge bg-success-subtle text-success">
-                                                                    Active
-                                                                </span>
-                                                            @break
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Status:</span>
+                                                <span class="text-black">
+                                                    @switch($data['due']->is_active)
+                                                        @case(true)
+                                                            <span class="badge bg-success-subtle text-success">
+                                                                Active
+                                                            </span>
+                                                        @break
 
-                                                            @default
-                                                                <span class="badge bg-danger-subtle text-danger">
-                                                                    Inactive
-                                                                </span>
-                                                        @endswitch </span>
-                                                </div>
+                                                        @default
+                                                            <span class="badge bg-danger-subtle text-danger">
+                                                                Inactive
+                                                            </span>
+                                                    @endswitch </span>
                                             </div>
-                                            <div class="col-md-6">
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Variations:</span>
-                                                    <span class="text-black">
-                                                        {{ $data['due']->variations->count() }}
-                                                    </span>
-                                                </div>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Variations:</span>
+                                                <span class="text-black">
+                                                    {{ $data['due']->variations->count() }}
+                                                </span>
                                             </div>
 
                                         </div>
@@ -181,9 +169,182 @@
                                             @endif
 
                                         </div>
-                                        show button to lead, see, downlioad all successful payment transactions, approved waivers.....
 
+                                        <div class="d-flex align-items-center mt-4">
+                                            <hr class="flex-grow-1">
+                                            <span class="mx-2 text-black">Payments
+                                            </span>
+                                            <hr class="flex-grow-1">
+                                        </div>
 
+                                        <div class="row g-3 mt-2 mb-4">
+                                            <div class="col-md-4">
+                                                <div
+                                                    class="card shadow-sm border-0 bg-primary-subtle bg-opacity-10 h-100 m-2">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3">
+                                                                <i class="fas fa-users fa-2x text-blue"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small">Total Expected Payers</div>
+                                                                <div class="fs-1 fw-bold text-blue">
+                                                                    {{ $data['due']->expectedPayerCount() }}</div>
+                                                            </div>
+                                                        </div>
+                                                        {{-- <div class="d-flex gap-2 mt-auto">
+                                                            <a 
+                                                            href="{{ route('due.expectedPayers', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-primary flex-fill">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                            <a 
+                                                            href="{{ route('due.expectedPayers.download', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-outline-primary flex-fill">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a>
+                                                        </div> --}}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="card shadow-sm border-0 bg-info-subtle bg-opacity-10 h-100 m-2">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3">
+                                                                <i class="fas fa-check-circle fa-2x text-info"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small">Successful Payments</div>
+                                                                <div class="fs-4 fw-bold text-info">
+                                                                    {{ $data['due']->successfulPaymentCount() }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-2 mt-auto">
+                                                            <form type="GET"
+                                                                action="{{ route('paymentTransactionsSearch') }}"
+                                                                target="_blank" class="w-100">
+                                                                @csrf
+                                                                <div class="input-group-append">
+                                                                    <input type="hidden" class="table_search my-2 my-sm-0"
+                                                                        name="searchKey"
+                                                                        value="{{ $data['due']->fee_id }}">
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-info flex-fill w-100">
+                                                                        <i class="fas fa-eye me-1"></i> View
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                            {{-- <a href="{{ route('due.successfulPayments.download', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-outline-info flex-fill">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a> --}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div
+                                                    class="card shadow-sm border-0 bg-warning-subtle bg-opacity-10 h-100 m-2">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3">
+                                                                <i
+                                                                    class="fas fa-hand-holding-heart fa-2x text-warning"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small">Waived</div>
+                                                                <div class="fs-4 fw-bold text-warning">
+                                                                    {{ $data['due']->approvedWaiverCount() }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-2 mt-auto">
+                                                            <form type="GET"
+                                                                action="{{ route('paymentWaiverRequestsSearch') }}"
+                                                                target="_blank" class="w-100">
+                                                                @csrf
+                                                                <div class="input-group-append">
+                                                                    <input type="hidden"
+                                                                        class="table_search my-2 my-sm-0" name="searchKey"
+                                                                        value="{{ $data['due']->fee_id }}">
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-warning flex-fill w-100">
+                                                                        <i class="fas fa-eye me-1"></i> View
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                            {{-- <a href="{{ route('due.paidOrWaived.download', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-outline-warning flex-fill">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a> --}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div
+                                                    class="card shadow-sm border-0 bg-success-subtle bg-opacity-10 h-100 m-2">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3">
+                                                                <i
+                                                                    class="fas fa-hand-holding-heart fa-2x text-success"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small">Paid or Waived</div>
+                                                                <div class="fs-4 fw-bold text-success">
+                                                                    {{ $data['due']->membersPaidOrWaived()->count() }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-2 mt-auto">
+                                                            {{-- <a href="{{ route('due.outstanding', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-success flex-fill">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a> --}}
+                                                            <a href="{{ route('due.paidOrWaived.download', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-success flex-fill">
+                                                                <i class="fas fa-print me-1"></i> Print
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="card shadow-sm border-0 bg-danger bg-opacity-10 h-100 m-2">
+                                                    <div class="card-body d-flex flex-column">
+                                                        <div class="d-flex align-items-center mb-3">
+                                                            <div class="me-3">
+                                                                <i
+                                                                    class="fas fa-exclamation-triangle fa-2x text-danger"></i>
+                                                            </div>
+                                                            <div>
+                                                                <div class="text-muted small">Outstanding</div>
+                                                                <div class="fs-4 fw-bold text-danger">
+                                                                    {{-- {{ $data['due']->membersUnpaidAndUnwaived()->count() }} --}}
+                                                                    {{ $data['due']->expectedPayerCount() - $data['due']->membersPaidOrWaived()->count() }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-2 mt-auto">
+                                                            {{-- <a href="{{ route('due.outstanding', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-danger flex-fill">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a> --}}
+                                                            <a href="{{ route('due.outstanding.download', ['uuid' => $data['due']->uuid]) }}"
+                                                                class="btn btn-sm btn-danger flex-fill w-100">
+                                                                <i class="fas fa-print me-1"></i> Print
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

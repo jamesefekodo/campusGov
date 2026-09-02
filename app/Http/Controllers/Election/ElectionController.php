@@ -649,6 +649,10 @@ class ElectionController extends Controller
             return redirect()->back()->with('error', 'No records found!');
         }
 
+        if ($election->initiated_by == Auth::user()->username) {
+            return redirect()->back()->with('error', 'You cannot approve or decline an election you initiated.');
+        }
+
         $request->validate([
             'status' => ['required', 'in:approved,declined'],
         ]);
