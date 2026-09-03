@@ -81,12 +81,25 @@
                                                             </td>
                                                             <td class="text-start">
                                                                 @if ($waiver->due)
-                                                                    @php
+                                                                    {{-- @php
                                                                         $academic = $waiver->payer->memberAcademicInfo;
                                                                         $level = studentLevelAtDue(
                                                                             $academic,
                                                                             $waiver->due,
                                                                         );
+                                                                    @endphp --}}
+                                                                    @php
+                                                                        $academic =
+                                                                            $waiver->payer
+                                                                                ?->memberAcademicInfo;
+
+                                                                        $programLevel = studentLevelAtDue(
+                                                                            $academic,
+                                                                            $waiver->due,
+                                                                        );
+
+                                                                        $program = $programLevel['program'];
+                                                                        $level = $programLevel['level'];
                                                                     @endphp
 
                                                                     {{ $waiver->due->title }}
@@ -166,8 +179,7 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewPaymentWaiver', ['uuid' => $waiver->uuid]) }}"
-                                                                    >
+                                                                    href="{{ route('viewPaymentWaiver', ['uuid' => $waiver->uuid]) }}">
                                                                     View
                                                                 </a>
                                                             </td>

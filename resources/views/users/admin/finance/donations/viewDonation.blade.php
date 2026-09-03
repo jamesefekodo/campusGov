@@ -9,7 +9,7 @@
                     <div class="individual-review-card-container">
                         <div class="col-md-12 individual-review-card">
                             <div class="col-md-12 m-auto">
-                                <div class="my_form_container p-3">
+                                <div class="my_form_container">
                                     <h4 class="block text-center py-2 text-uppercase type-b-page-header">
                                         {{ $data['donation']->title }}
                                     </h4>
@@ -51,6 +51,8 @@
                                                 <span style="font-weight: bold">Amount Raised:</span>
                                                 <span class="text-black">
                                                     ₦{{ number_format($data['donation']->getAmountRaisedAttribute(), 2) }}
+                                                    (Gross:
+                                                    ₦{{ number_format($data['donation']->getGrossAmountRaisedAttribute(), 2) }})
                                                 </span>
                                             </div>
 
@@ -135,6 +137,67 @@
                                                     @endif
                                                 </span>
                                             </div>
+                                            {{-- Target amount + amount left --}}
+                                            @php
+                                                $hasTarget =
+                                                    filled($data['donation']->target_amount) &&
+                                                    $data['donation']->target_amount > 0;
+                                                $amountRaised = $data['donation']->getAmountRaisedAttribute();
+                                                $amountLeft = $hasTarget
+                                                    ? max(0, $data['donation']->target_amount - $amountRaised)
+                                                    : null;
+                                                $targetReached =
+                                                    $hasTarget && $amountRaised >= $data['donation']->target_amount;
+                                            @endphp
+
+                                            @if ($hasTarget)
+                                                <div class="col-md-6 p-1">
+                                                    <span style="font-weight: bold">Target Amount:</span>
+                                                    <span class="text-black">
+                                                        ₦{{ number_format($data['donation']->target_amount, 2) }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="col-md-6 p-1">
+                                                    <span style="font-weight: bold">Amount Raised:</span>
+                                                    <span class="text-black">
+                                                        ₦{{ number_format($amountRaised, 2) }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="col-md-6 p-1">
+                                                    <span style="font-weight: bold">Amount Left:</span>
+                                                    <span class="text-black">
+                                                        @if ($targetReached)
+                                                            <span class="badge bg-success text-white">Target reached!</span>
+                                                        @else
+                                                            ₦{{ number_format($amountLeft, 2) }}
+                                                        @endif
+                                                    </span>
+                                                </div>
+
+                                                {{-- Progress bar --}}
+                                                <div class="col-md-12 p-1">
+                                                    @php
+                                                        $percent = min(
+                                                            100,
+                                                            round(
+                                                                ($amountRaised / $data['donation']->target_amount) *
+                                                                    100,
+                                                                1,
+                                                            ),
+                                                        );
+                                                    @endphp
+                                                    <div class="progress mt-1" style="height:10px;">
+                                                        <div class="progress-bar {{ $targetReached ? 'bg-success' : 'bg-primary' }}"
+                                                            role="progressbar" style="width: {{ $percent }}%;"
+                                                            aria-valuenow="{{ $percent }}" aria-valuemin="0"
+                                                            aria-valuemax="100">
+                                                        </div>
+                                                    </div>
+                                                    <small class="text-muted">{{ $percent }}% of target raised</small>
+                                                </div>
+                                            @endif
                                         </div>
 
                                         <hr class="mt-4">
@@ -175,7 +238,7 @@
                                             <hr class="flex-grow-1">
                                         </div>
                                         <div class="row g-3 mt-2 mb-4">
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <div
                                                     class="card shadow-sm border-0 bg-primary-subtle bg-opacity-10 h-100 m-2">
                                                     <div class="card-body d-flex flex-column">
@@ -185,29 +248,32 @@
                                                             </div>
                                                             <div>
                                                                 <div class="text-muted small">Amount Raised</div>
-                                                                <div class="fs-1 fw-bold text-blue">
+                                                                <div class="fw-bold text-blue"
+                                                                    style="font-size: clamp(14px, 4vw, 2rem); word-break: break-word; line-height: 1.2;">
                                                                     ₦{{ number_format($data['donation']->getAmountRaisedAttribute(), 2) }}
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        {{-- <div class="d-flex gap-2 mt-auto">
-                                                            <a 
-                                                            href="{{ route('due.expectedPayers', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-primary flex-fill">
+                                                        <div class="d-flex gap-2 mt-auto w-100">
+                                                            <!-- View Form Button -->
+                                                            <a href="{{ route('viewDonationReport', ['uuid' => $data['donation']->uuid]) }}"
+                                                                class="btn btn-sm btn-primary flex-fill text-nowrap d-flex align-items-center justify-content-center">
                                                                 <i class="fas fa-eye me-1"></i> View
                                                             </a>
-                                                            <a 
-                                                            href="{{ route('due.expectedPayers.download', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-outline-primary flex-fill">
+
+                                                            <!-- Download Anchor Button -->
+                                                            <a href="{{ route('downloadDonationReport', ['uuid' => $data['donation']->uuid]) }}"
+                                                                class="btn btn-sm btn-outline-primary flex-fill text-nowrap d-flex align-items-center justify-content-center">
                                                                 <i class="fas fa-download me-1"></i> Download
                                                             </a>
-                                                        </div> --}}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3">
-                                                <div class="card shadow-sm border-0 bg-success-subtle bg-opacity-10 h-100 m-2">
+                                            <div class="col-md-6">
+                                                <div
+                                                    class="card shadow-sm border-0 bg-success-subtle bg-opacity-10 h-100 m-2">
                                                     <div class="card-body d-flex flex-column">
                                                         <div class="d-flex align-items-center mb-3">
                                                             <div class="me-3">
@@ -227,7 +293,8 @@
                                                                 target="_blank" class="flex-fill">
                                                                 @csrf
                                                                 <div class="input-group w-100">
-                                                                    {{-- <input type="hidden" name="searchKey" value="{{ $data['due']->fee_id }}"> --}}
+                                                                    <input type="hidden" name="searchKey"
+                                                                        value="{{ $data['donation']->donation_id }}">
                                                                     <button type="submit"
                                                                         class="btn btn-sm btn-success w-100 text-nowrap">
                                                                         <i class="fas fa-eye me-1"></i> View
@@ -236,16 +303,16 @@
                                                             </form>
 
                                                             <!-- Download Anchor Button -->
-                                                            <a href="#"
+                                                            {{-- <a href="#"
                                                                 class="btn btn-sm btn-outline-success flex-fill text-nowrap d-flex align-items-center justify-content-center">
                                                                 <i class="fas fa-download me-1"></i> Download
-                                                            </a>
+                                                            </a> --}}
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <div
                                                     class="card shadow-sm border-0 bg-warning-subtle bg-opacity-10 h-100 m-2">
                                                     <div class="card-body d-flex flex-column">
@@ -263,12 +330,13 @@
                                                         </div>
                                                         <div class="d-flex gap-2 mt-auto">
                                                             <form type="GET"
-                                                                action="{{ route('paymentWaiverRequestsSearch') }}"
+                                                                action="{{ route('paymentTransactionsSearch') }}"
                                                                 target="_blank" class="w-100">
                                                                 @csrf
                                                                 <div class="input-group-append">
-                                                                    {{-- <input type="hidden" class="table_search my-2 my-sm-0"
-                                                                    name="searchKey" value="{{ $data['due']->fee_id }}"> --}}
+                                                                    <input type="hidden" name="searchKey"
+                                                                        value="{{ $data['donation']->donation_id }}">
+
                                                                     <button type="submit"
                                                                         class="btn btn-sm btn-warning flex-fill w-100">
                                                                         <i class="fas fa-eye me-1"></i> View
@@ -284,7 +352,7 @@
                                                 </div>
                                             </div>
 
-                                            <div class="col-md-3">
+                                            <div class="col-md-6">
                                                 <div class="card shadow-sm border-0 bg-danger bg-opacity-10 h-100 m-2">
                                                     <div class="card-body d-flex flex-column">
                                                         <div class="d-flex align-items-center mb-3">
@@ -300,14 +368,24 @@
                                                             </div>
                                                         </div>
                                                         <div class="d-flex gap-2 mt-auto">
-                                                            {{-- <a href="{{ route('due.outstanding', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-danger flex-fill">
-                                                                <i class="fas fa-eye me-1"></i> View
-                                                            </a> --}}
-                                                            <a {{-- href="{{ route('due.outstanding.download', ['uuid' => $data['due']->uuid]) }}" --}}
+                                                            <form type="GET"
+                                                                action="{{ route('paymentTransactionsSearch') }}"
+                                                                target="_blank" class="w-100">
+                                                                @csrf
+                                                                <div class="input-group-append">
+                                                                    <input type="hidden" name="searchKey"
+                                                                        value="{{ $data['donation']->donation_id }}">
+
+                                                                    <button type="submit"
+                                                                        class="btn btn-sm btn-danger flex-fill w-100">
+                                                                        <i class="fas fa-eye me-1"></i> View
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                            {{-- <a href="{{ route('due.outstanding.download', ['uuid' => $data['due']->uuid]) }}"
                                                                 class="btn btn-sm btn-danger flex-fill w-100">
                                                                 <i class="fas fa-print me-1"></i> Print
-                                                            </a>
+                                                            </a> --}}
                                                         </div>
                                                     </div>
                                                 </div>

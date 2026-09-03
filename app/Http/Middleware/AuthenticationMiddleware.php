@@ -50,9 +50,10 @@ class AuthenticationMiddleware
             ]);
 
         // Deactivate donations whose target amount has been reached
-        // Uses a subquery because amount_raised is computed from PaymentTransactions
+        // ── Deactivate if target amount reached ───────────────────────────
         Donation::where('is_active', true)
             ->whereNotNull('target_amount')
+            ->where('target_amount', '>', 0)
             ->get()
             ->each(function ($donation) {
                 $raised = PaymentTransaction::where('donation_id', $donation->donation_id)
@@ -65,10 +66,58 @@ class AuthenticationMiddleware
                 }
             });
 
-        // Deactivate active donations whose deadline has passed
+        // ──Deactivate if deadline has passed (and target not set or not reached) ──
         Donation::where('is_active', true)
             ->whereNotNull('deadline')
             ->where('deadline', '<=', now())
+            ->get()
+            ->each(function ($donation) {
+                // If target is set, only deactivate if target is NOT yet reached
+                // (target reached is already handled in step 1)
+                // This allows admin to extend deadline — re-activating the donation
+                // will bring it back into the active pool
+                $raised = PaymentTransaction::where('donation_id', $donation->donation_id)
+                    ->where('payment_status', 'successful')
+                    ->where('approval_status', 'approved')
+                    ->sum('amount_settled');
+
+                $targetReached = filled($donation->target_amount)
+                    && $donation->target_amount > 0
+                    && $raised >= $donation->target_amount;
+
+                // Only deactivate due to deadline if target hasn't been reached
+                if (!$targetReached) {
+                    $donation->update(['is_active' => false]);
+                }
+            });
+
+        // ── Re-activate donations whose deadline was extended by admin ─────
+        // If admin updated the deadline to a future date, restore is_active
+        // as long as target is not reached and approval is still approved
+        Donation::where('is_active', false)
+            ->where('approval_status', 'approved')
+            ->whereNotNull('deadline')
+            ->where('deadline', '>', now()) // deadline is now in the future (admin extended)
+            ->get()
+            ->each(function ($donation) {
+                $raised = PaymentTransaction::where('donation_id', $donation->donation_id)
+                    ->where('payment_status', 'successful')
+                    ->where('approval_status', 'approved')
+                    ->sum('amount_settled');
+
+                $targetReached = filled($donation->target_amount)
+                    && $donation->target_amount > 0
+                    && $raised >= $donation->target_amount;
+
+                // Only re-activate if target has NOT been reached
+                if (!$targetReached) {
+                    $donation->update(['is_active' => true]);
+                }
+            });
+
+        // ── Ensure non-approved donations are never active ────────────────
+        Donation::where('is_active', true)
+            ->whereNotIn('approval_status', ['approved'])
             ->update(['is_active' => false]);
         // ######################################################################
         // update functins

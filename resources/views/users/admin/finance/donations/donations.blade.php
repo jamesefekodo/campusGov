@@ -107,7 +107,7 @@
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                ₦{{ number_format($donation->getAmountRaisedAttribute(), 2) }}
+                                                                ₦{{ number_format($donation->getAmountRaisedAttribute(), 2) }} (Gross: ₦{{ number_format($donation->getGrossAmountRaisedAttribute(), 2) }})
                                                             </td>
                                                             <td>
                                                                 @switch($donation->is_active)

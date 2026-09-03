@@ -63,6 +63,14 @@ class Donation extends Model
             ->sum('amount_settled');
     }
 
+    public function getGrossAmountRaisedAttribute(): float
+    {
+        return $this->hasMany(PaymentTransaction::class, 'donation_id', 'donation_id')
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved')
+            ->sum('amount_paid');
+    }
+
     public function failedPayments()
     {
         return $this->hasMany(PaymentTransaction::class, 'donation_id', 'donation_id')

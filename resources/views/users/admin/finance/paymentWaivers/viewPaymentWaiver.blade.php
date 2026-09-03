@@ -56,9 +56,17 @@
                                     <div class="col-md-6 p-2">
                                         <span style="font-weight: bold">Due:</span>
                                         <span class="text-black">
-                                            @php
+                                            {{-- @php
                                                 $academic = $data['waiver']->payer->memberAcademicInfo;
                                                 $level = studentLevelAtDue($academic, $data['waiver']->due);
+                                            @endphp --}}
+                                            @php
+                                                $academic = $data['waiver']->payer?->memberAcademicInfo;
+
+                                                $programLevel = studentLevelAtDue($academic, $data['waiver']->due);
+
+                                                $program = $programLevel['program'];
+                                                $level = $programLevel['level'];
                                             @endphp
 
                                             {{ $data['waiver']->due->title }}

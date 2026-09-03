@@ -166,7 +166,8 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     // memberDonations
     Route::get('member/payment/donations', [DonationController::class, 'memberDonations'])->name('memberDonations');
     Route::get('member/payment/donations/search', [DonationController::class, 'memberDonations'])->name('memberDonationsSearch');
-
+    Route::get('member/payment/donations/view/{uuid}', [DonationController::class, 'memberViewDonation'])->name('memberViewDonation');
+    Route::post('member/payment/donations/view/contribute_now/{uuid}', [DonationController::class, 'memberPayForDonation'])->name('donation.contribute');
 
 
     Route::post('member/association_dues/{uuid}', [PaymentTransasctionController::class, 'memberPayAssociationDue'])->name('memberPayAssociationDue');
@@ -415,7 +416,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/dues/view/waiver_and_payment/print/{uuid}', [AssociationDueController::class, 'printAssociationDueWaiverAndPayment'])->name('due.paidOrWaived.download');
     Route::get('admin/finance/dues/view/debtors/print/{uuid}', [AssociationDueController::class, 'printAssociationDueDebtors'])->name('due.outstanding.download');
 
-    
+
 
     // transactions
     Route::get('admin/finance/transactions', [PaymentTransasctionController::class, 'paymentTransactions'])->name('paymentTransactions');
@@ -453,7 +454,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/finance/other_payments/invoices/update/submit/{uuid}', [InvoiceController::class, 'updateInvoiceSubmit'])->name('updateInvoiceSubmit');
     Route::put('admin/finance/other_payments/invoices/update/link_to_user/{uuid}', [InvoiceController::class, 'linkInvoiceToRegisteredUser'])->name('linkInvoiceToRegisteredUser');
 
-    
+
 
     // donation
     Route::get('admin/finance/other_payments/donations', [DonationController::class, 'donations'])->name('donations');
@@ -462,15 +463,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/other_payments/donations/view/{uuid}', [DonationController::class, 'viewDonation'])->name('viewDonation');
     Route::put('admin/finance/other_payments/donations/update/{uuid}', [DonationController::class, 'updateDonationSubmit'])->name('updateDonationSubmit');
     Route::put('admin/finance/other_payments/donations/process_approval/{uuid}', [DonationController::class, 'processApproveDonationSubmit'])->name('processApproveDonationSubmit');
+    Route::get('admin/finance/other_payments/donations/view/reports/{uuid}', [DonationController::class, 'viewDonationReport'])->name('viewDonationReport');
+    Route::get('admin/finance/other_payments/donations/print/reports/{uuid}', [DonationController::class, 'downloadDonationReport'])->name('downloadDonationReport');
 
-    
 
-
-    // 
-
-    
-
-    
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');
