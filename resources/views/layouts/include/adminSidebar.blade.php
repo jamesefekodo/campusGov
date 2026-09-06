@@ -268,9 +268,7 @@
                     @endif
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/reports') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('manualPaymentMethods') }} --}}
-                            ">Reports</a>
+                            href="{{ route('financialReports') }}">Reports</a>
                     </li>
                     @if (Auth::user()->hasPermission('manage_payment_settings'))
                         <li class="submenu-item"><a

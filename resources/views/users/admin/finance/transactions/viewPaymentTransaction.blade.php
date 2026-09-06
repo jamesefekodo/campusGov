@@ -93,9 +93,14 @@
                                                             );
                                                         @endphp --}}
                                                         @php
-                                                            $academic = $data['transaction']->registeredPayer?->memberAcademicInfo;
+                                                            $academic =
+                                                                $data['transaction']->registeredPayer
+                                                                    ?->memberAcademicInfo;
 
-                                                            $programLevel = studentLevelAtDue($academic, $data['transaction']->due);
+                                                            $programLevel = studentLevelAtDue(
+                                                                $academic,
+                                                                $data['transaction']->due,
+                                                            );
 
                                                             $program = $programLevel['program'];
                                                             $level = $programLevel['level'];
@@ -440,6 +445,14 @@
                                         </div>
                                     @endif
 
+                                    <hr>
+                                    <div class="d-flex justify-content-end flex-wrap mt-3">
+                                        <a href="{{ route('downloadPaymentReceipt', ['payment_transaction_id' => $data['transaction']->payment_transaction_id]) }}"
+                                            class="btn btn-warning m-1 d-flex align-items-center">
+                                            <i class="fas fa-download me-2"></i>
+                                            <span>Download Receipt</span>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>

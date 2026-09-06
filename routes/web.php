@@ -40,6 +40,8 @@ Route::get('/fetch-departments', [AcademicConfigController::class, 'fetchDepartm
 
 Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('unknownTenant');
 
+
+
 // payment rollback
 Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionController::class, 'paystackPaymentCallback'])->name('paystackPaymentCallback');
 Route::get('/callback/with_flutterwave', [PaymentTransasctionController::class, 'flutterwavePaymentCallback'])->name('flutterwavePaymentCallback');
@@ -85,6 +87,15 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::get('manage_sessions', [AuthController::class, 'manageSession'])->name('manageSession');
     Route::get('end_other_sessions', [AuthController::class, 'endOtherSessions'])->name('endOtherSessions');
     Route::get('disabled_account', [AuthController::class, 'disabledUserAccount'])->name('disabledUserAccount');
+
+
+
+    // oppen routes
+    Route::get('/verify/payments/waiver/{uuid}', [PaymentTransasctionController::class, 'verifyAssociationDuePaymentWaiver'])->name('verifyAssociationDuePaymentWaiver');
+    Route::get('/verify/payments/receipt/{payment_transaction_id}', [PaymentTransasctionController::class, 'verifyPaymentReceipt'])->name('verifyPaymentReceipt');
+
+    
+
 });
 
 // member routes
@@ -283,6 +294,17 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/misconducts/{uuid}', [MembersManagementController::class, 'viewMemberMisconducts'])->name('viewMemberMisconducts');
 
     Route::get('admin/user_management/members/view/association_dues/{uuid}', [MembersManagementController::class, 'viewMemberAssociationDues'])->name('viewMemberAssociationDues');
+
+    Route::get('admin/user_management/members/view/association_dues/waiver_notice/download/{uuid}', [MembersManagementController::class, 'downloadDuePaymentWaiverNotice'])->name('downloadDuePaymentWaiverNotice');
+    Route::get('admin/user_management/members/view/association_dues/payment_transaction/download/{payment_transaction_id}', [PaymentTransasctionController::class, 'downloadPaymentReceipt'])->name('downloadPaymentReceipt');
+
+    
+
+
+
+
+
+
     Route::post('admin/user_management/members/view/association_dues/initiate_regularization/{uuid}', [MembersManagementController::class, 'initiatePaymentRegularization'])->name('initiatePaymentRegularization');
     Route::post('admin/user_management/members/view/association_dues/initiate_payment_waiver/{uuid}', [MembersManagementController::class, 'initiatePaymentWaiver'])->name('initiatePaymentWaiver');
 
@@ -466,7 +488,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/finance/other_payments/donations/view/reports/{uuid}', [DonationController::class, 'viewDonationReport'])->name('viewDonationReport');
     Route::get('admin/finance/other_payments/donations/print/reports/{uuid}', [DonationController::class, 'downloadDonationReport'])->name('downloadDonationReport');
 
+    // financialReports
+    Route::get('admin/finance/report', [PaymentTransasctionController::class, 'financialReports'])->name('financialReports');
 
+
+    
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');

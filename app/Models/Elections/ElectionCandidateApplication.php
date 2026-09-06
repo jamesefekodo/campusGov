@@ -28,6 +28,7 @@ class ElectionCandidateApplication extends Model
         'position_id',
         'candidate',
         'application_type',
+        'current_matric_no',
         'current_program',
         'current_program_type',
         'current_faculty',

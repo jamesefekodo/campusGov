@@ -790,7 +790,7 @@ class AssociationDueController extends Controller
             ob_end_clean();
         }
 
-        $mpdf->Output($fileName, 'I');
+        $mpdf->Output($fileName, 'D');
 
         exit;
     }
@@ -1067,7 +1067,7 @@ class AssociationDueController extends Controller
         ob_end_clean();
     }
 
-    $mpdf->Output($fileName, 'I');
+    $mpdf->Output($fileName, 'D');
 
     exit;
 }

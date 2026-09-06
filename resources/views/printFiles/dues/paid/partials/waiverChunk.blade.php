@@ -56,7 +56,7 @@
                 <td>
                     <strong>Name:</strong> {{ $fullName ?: 'N/A' }}<br>
 
-                    <strong>Level:</strong> 
+                    <strong>Level:</strong>
                     @php
                         $academic = $waiver->registeredPayer?->memberAcademicInfo;
 
@@ -82,6 +82,9 @@
 
                     <strong>Matric Number:</strong>
                     {{ $ctx['matric_number'] ?? 'N/A' }}<br>
+
+                    <strong>Faculty:</strong>
+                    {{ $ctx['faculty'] ?? 'N/A' }}<br>
 
                     <strong>Department:</strong>
                     {{ $ctx['department'] ?? 'N/A' }}<br>

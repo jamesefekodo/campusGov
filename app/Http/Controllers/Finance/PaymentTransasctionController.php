@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Finance\Claims\FinancialClaim;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\Tax;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Mpdf\Mpdf;
 
 class PaymentTransasctionController extends Controller
 {
@@ -1173,5 +1175,209 @@ class PaymentTransasctionController extends Controller
 
         ]);
         return redirect()->back()->with('success', 'done!');
+    }
+    public function verifyAssociationDuePaymentWaiver($uuid)
+    {
+        $waiver = PaymentWaiver::with([
+            'memberAcademicInfo.theProgram',
+            'memberAcademicInfo.programType',
+            'memberAcademicInfo.theFaculty',
+            'memberAcademicInfo.theDepartment',
+            'memberAcademicInfo.approvedReAdmissions.previousProgram',
+            'memberAcademicInfo.approvedReAdmissions.previousProgramType',
+            'memberAcademicInfo.approvedReAdmissions.previousFaculty',
+            'memberAcademicInfo.approvedReAdmissions.previousDepartment',
+        ])->where('uuid', $uuid)->first();
+        if (!$waiver) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+        $memberDue = $waiver->memberAcademicInfo
+            ->associationDues()
+            ->firstWhere('uuid', $waiver->due->uuid);
+
+        if (!$memberDue) {
+            $memberDue = $waiver->memberAcademicInfo
+                ->pastProgramsAssociationDues()
+                ->flatten(1)
+                ->firstWhere('uuid', $waiver->due->uuid);
+        }
+
+        if (!$memberDue) {
+            return redirect()->back()->with(
+                'error',
+                'This due does not apply to this member.'
+            );
+        }
+
+        $due = $memberDue;
+        $due->payable_amount;
+        $data = [
+            'waiver' => $waiver,
+            'due' => $due,
+        ];
+
+        return view('miscellaneous.paymentVerifications.verifyWaiver', compact('data'));
+    }
+    public function downloadPaymentReceipt($payment_transaction_id)
+    {
+        $payment = PaymentTransaction::query()
+            ->with([
+                'payerPersonalProfile',
+
+                'payerAcademicInfo.theProgram',
+                'payerAcademicInfo.programType',
+                'payerAcademicInfo.theFaculty',
+                'payerAcademicInfo.theDepartment',
+
+                'payerAcademicInfo.approvedReAdmissions.previousProgram',
+                'payerAcademicInfo.approvedReAdmissions.previousProgramType',
+                'payerAcademicInfo.approvedReAdmissions.previousFaculty',
+                'payerAcademicInfo.approvedReAdmissions.previousDepartment',
+
+                /*
+             * Used for the photo in your old Blade:
+             * $payment->registeredPayer->photo
+             */
+                'registeredPayer.memberAcademicInfo.theProgram',
+                'registeredPayer.memberAcademicInfo.programType',
+                'registeredPayer.memberAcademicInfo.theFaculty',
+                'registeredPayer.memberAcademicInfo.theDepartment',
+
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousProgram',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousProgramType',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousFaculty',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousDepartment',
+
+                'due',
+            ])
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved')->where('payment_transaction_id', $payment_transaction_id)->first();
+
+
+        if (!$payment) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+        // if it has a due
+        $due = null;
+        if ($payment->due) {
+            $memberDue = $payment->payerAcademicInfo
+                ->associationDues()
+                ->firstWhere('uuid', $payment->due->uuid);
+
+            if (!$memberDue) {
+                $memberDue = $payment->payerAcademicInfo
+                    ->pastProgramsAssociationDues()
+                    ->flatten(1)
+                    ->firstWhere('uuid', $payment->due->uuid);
+            }
+
+            if (!$memberDue) {
+                return redirect()->back()->with(
+                    'error',
+                    'This due does not apply to this member.'
+                );
+            }
+            $due = $memberDue;
+
+            $due->payable_amount;
+        }
+
+        // if it is a donation 
+        $amountHeContributed = null;
+        $numberOfContributions = 0;
+        if ($payment->donation) {
+            if ($payment->donation->registeredPayer) {
+                $amountHeContributed = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('registered_payer', $payment->registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->sum('amount_payable');
+                $numberOfContributions = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('registered_payer', $payment->registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->count();
+            } else {
+                $amountHeContributed = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('non_registered_payer', $payment->non_registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->sum('amount_payable');
+                $numberOfContributions = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('non_registered_payer', $payment->non_registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->count();
+            }
+        }
+
+
+
+        ini_set('pcre.backtrack_limit', 10000000);
+        ini_set('max_execution_time', 600);
+        ini_set('memory_limit', '1024M');
+
+
+        $mpdf = new Mpdf([
+            'default_font_size'  => 10,
+            'default_font'       => 'Arial',
+            'margin_left'        => 5,
+            'margin_right'       => 5,
+            'margin_top'         => 10,
+            'margin_bottom'      => 15,
+            'format'             => 'A4',
+            'autoLangToFont'     => true,
+            'autoScriptToLang'   => true,
+            'tempDir'            => storage_path('app/mpdf-temp'),
+        ]);
+
+        $mpdf->setFooter('Page {PAGENO} of {nb} >> Payment Transaction :: ' . $payment->payment_transaction_id);
+        $mpdf->showImageErrors = true;
+
+        $basicSystemInfo = basicSystemInfo();
+
+        $data = [
+            'due' => $due,
+            'basicSystemInfo' => $basicSystemInfo,
+            'tenant' => tenant(),
+            'payment' => $payment,
+            'amountHeContributed' => $amountHeContributed,
+            'numberOfContributions' => $numberOfContributions,
+        ];
+
+
+        $html = view('printFiles.paymentTransactions.paymentReceipt', compact('data'))->render();
+
+        $mpdf->WriteHTML($html); // AddPage() not needed — WriteHTML handles it
+
+        $fileName = 'Payment Transaction :: ' . $payment->payment_transaction_id . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+        while (ob_get_level()) ob_end_clean();
+
+        $mpdf->Output($fileName, 'D'); // 'I' for inline, 'D' for download
+        exit;
+    }
+    public function financialReports(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        $startDate = $request->start_date ?? now()->startOfMonth();
+        $endDate = $request->end_date ?? now();
+
+        $paymentTransactions = PaymentTransaction::where('tenant_id', tenant()->id)
+            ->whereBetween('paid_at', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay(),
+            ])
+            ->get();
+
+        $financialClaim = FinancialClaim::where('tenant_id', tenant()->id)
+            ->whereBetween('initiated_at', [
+                $startDate->startOfDay(),
+                $endDate->endOfDay(),
+            ])
+            ->get();
+        if ($request->page_type == 'failed_page') {
+        }
     }
 }

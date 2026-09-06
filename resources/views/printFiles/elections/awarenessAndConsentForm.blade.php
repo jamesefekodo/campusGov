@@ -184,8 +184,9 @@
                                     @break
 
                                     @default
-                                        {{ $data['election']->status }}</span>
-                            @endswitch
+                                        {{ $data['election']->status }}
+                                @endswitch
+                            </span>
                             </span>
                             <br>
                             <span style="font-weight: bold">Form Sales Ends: </span>

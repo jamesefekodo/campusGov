@@ -1409,7 +1409,7 @@ class ElectionController extends Controller
 
         while (ob_get_level()) ob_end_clean();
 
-        $mpdf->Output($fileName, 'I'); // 'I' for inline, 'D' for download
+        $mpdf->Output($fileName, 'D'); // 'I' for inline, 'D' for download
         exit;
     }
     public function viewElectionVoters($uuid)

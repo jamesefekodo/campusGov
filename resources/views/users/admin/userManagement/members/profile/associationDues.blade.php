@@ -124,9 +124,45 @@
                                                     <div class="row">
                                                         <div class="col-12">
                                                             @if ($data['member']->successfulPaymentForDue($due->fee_id))
-                                                                butttn to print reciept
+                                                                <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                                    @php
+                                                                        $successfulPayment = $data[
+                                                                            'member'
+                                                                        ]->successfulPaymentForDue($due->fee_id);
+                                                                    @endphp
+                                                                    <a
+                                                                    href="{{ route('downloadPaymentReceipt', ['payment_transaction_id' => $successfulPayment->payment_transaction_id]) }}"
+                                                                        class="btn btn-warning m-1 d-flex align-items-center">
+                                                                        <i class="fas fa-download me-2"></i>
+                                                                        <span>Download Receipt</span>
+                                                                    </a>
+                                                                </div>
                                                             @elseif($data['member']->pendingPaymentForDue($due->fee_id))
-                                                                show button to view payment transaction and process
+                                                                <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                                    @php
+                                                                        $pendingPaymentTransaction = $data[
+                                                                            'member'
+                                                                        ]->pendingPaymentForDue($due->fee_id);
+                                                                    @endphp
+                                                                    <a href="{{ route('viewPaymentTransaction', ['payment_transaction_id' => $pendingPaymentTransaction->payment_transaction_id]) }}"
+                                                                        class="btn btn-warning m-1 d-flex align-items-center">
+                                                                        <i class="fas fa-eye me-2"></i>
+                                                                        <span>View Pending Payment Transaction</span>
+                                                                    </a>
+                                                                </div>
+                                                            @elseif ($data['member']->approvedDueWaiver($due->fee_id))
+                                                                <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                                    @php
+                                                                        $approvedWaiver = $data[
+                                                                            'member'
+                                                                        ]->approvedDueWaiver($due->fee_id);
+                                                                    @endphp
+                                                                    <a href="{{ route('downloadDuePaymentWaiverNotice', ['uuid' => $approvedWaiver->uuid]) }}"
+                                                                        class="btn btn-warning m-1 d-flex align-items-center">
+                                                                        <i class="fas fa-download me-2"></i>
+                                                                        <span>Waiver Notice</span>
+                                                                    </a>
+                                                                </div>
                                                             @else
                                                                 <div
                                                                     class="d-flex flex-wrap align-items-center justify-content-end gap-2">

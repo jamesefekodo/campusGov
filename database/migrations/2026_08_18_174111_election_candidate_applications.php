@@ -27,6 +27,9 @@ return new class extends Migration
 
                 $table->string('application_type')->default('self');
 
+
+                $table->string('current_matric_no')->nullable();
+
                 $table->string('current_program')->nullable(); // Foreign
                 $table->string('current_program_type')->nullable(); // Foreign
                 $table->string('current_faculty')->nullable(); // Foreign

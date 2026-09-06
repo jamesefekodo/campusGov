@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Mpdf\Mpdf;
 
 class MembersManagementController extends Controller
 {
@@ -2055,5 +2056,87 @@ class MembersManagementController extends Controller
 
         return view('users.admin.userManagement.members.profile.invoices', compact('data'));
     }
-    
+
+    public function downloadDuePaymentWaiverNotice($uuid)
+    {
+
+        $waiver = PaymentWaiver::with([
+            'memberAcademicInfo.theProgram',
+            'memberAcademicInfo.programType',
+            'memberAcademicInfo.theFaculty',
+            'memberAcademicInfo.theDepartment',
+            'memberAcademicInfo.approvedReAdmissions.previousProgram',
+            'memberAcademicInfo.approvedReAdmissions.previousProgramType',
+            'memberAcademicInfo.approvedReAdmissions.previousFaculty',
+            'memberAcademicInfo.approvedReAdmissions.previousDepartment',
+        ])->where('uuid', $uuid)->first();
+        if (!$waiver) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+        $memberDue = $waiver->memberAcademicInfo
+            ->associationDues()
+            ->firstWhere('uuid', $waiver->due->uuid);
+
+        if (!$memberDue) {
+            $memberDue = $waiver->memberAcademicInfo
+                ->pastProgramsAssociationDues()
+                ->flatten(1)
+                ->firstWhere('uuid', $waiver->due->uuid);
+        }
+
+        if (!$memberDue) {
+            return redirect()->back()->with(
+                'error',
+                'This due does not apply to this member.'
+            );
+        }
+
+        $due = $memberDue;
+
+        $due->payable_amount;
+
+
+        ini_set('pcre.backtrack_limit', 10000000);
+        ini_set('max_execution_time', 600);
+        ini_set('memory_limit', '1024M');
+
+
+        $mpdf = new Mpdf([
+            'default_font_size'  => 10,
+            'default_font'       => 'Arial',
+            'margin_left'        => 5,
+            'margin_right'       => 5,
+            'margin_top'         => 10,
+            'margin_bottom'      => 15,
+            'format'             => 'A4',
+            'autoLangToFont'     => true,
+            'autoScriptToLang'   => true,
+            'tempDir'            => storage_path('app/mpdf-temp'),
+        ]);
+
+        $mpdf->setFooter('Page {PAGENO} of {nb} >> Payment Waiver Notice :: ' . $waiver->uuid);
+        $mpdf->showImageErrors = true;
+
+        $basicSystemInfo = basicSystemInfo();
+
+        $data = [
+            'waiver' => $waiver,
+            'basicSystemInfo' => $basicSystemInfo,
+            'tenant' => tenant(),
+            'due' => $due,
+        ];
+
+
+        $html = view('printFiles.dues.waiver.waiverNotice', compact('data'))->render();
+
+        $mpdf->WriteHTML($html); // AddPage() not needed — WriteHTML handles it
+
+        $fileName = 'Payment Waiver Notice :: ' . $waiver->uuid . '_' . date('Y-m-d_H-i-s') . '.pdf';
+
+        while (ob_get_level()) ob_end_clean();
+
+        $mpdf->Output($fileName, 'D'); // 'I' for inline, 'D' for download
+        exit;
+    }
 }

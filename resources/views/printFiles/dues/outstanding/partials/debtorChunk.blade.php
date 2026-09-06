@@ -108,6 +108,10 @@
                     {{-- ######################## --}}
                     <br>
 
+                    <strong>Faculty:</strong>
+                    {{ $ctx['faculty'] ?? 'N/A' }}
+                    <br>
+
                     <strong>Department:</strong>
                     {{ $ctx['department'] ?? 'N/A' }}
                     <br>

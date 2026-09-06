@@ -216,6 +216,7 @@ class MemberElectionController extends Controller
             [
                 'bio'         => $request->input('bio'),
                 'manifesto'   => $request->input('manifesto'),
+                'current_matric_no' => $academicInfo->matric_number,
                 'current_program' => $academicInfo->program,
                 'current_program_type' => $academicInfo->program_type,
                 'current_faculty' => $academicInfo->faculty,

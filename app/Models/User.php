@@ -7,6 +7,7 @@ use App\Models\Config\AccessControl\Role;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Finance\Transactions\PaymentWaiver;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
@@ -235,6 +236,15 @@ class User extends Authenticatable
             ->where('due_id', $dueId)
             ->first();
     }
+
+    public function approvedDueWaiver($dueId)
+    {
+        return PaymentWaiver::where('username', $this->username)
+            ->where('due_id', $dueId)
+            ->where('approval_status', 'approved')
+            ->first();
+    }
+
 
     public function pendingPaymentForDue($dueId)
     {

@@ -830,7 +830,7 @@ class DonationController extends Controller
             ob_end_clean();
         }
 
-        $mpdf->Output($fileName, 'I');
+        $mpdf->Output($fileName, 'D');
 
         exit;
     }
