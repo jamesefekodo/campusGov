@@ -119,16 +119,19 @@ class PermissionAccessController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
+            'user_cap' => ['nullable', 'numeric', 'min:1'],
+            'assignment_scope' => 'required',
         ]);
 
         $role = Role::where('uuid', $uuid)->first();
         if (!$role) {
             return redirect()->back()->with('error', 'Role not found.');
         }
-
         $role->update([
             'name' => trim($request->name),
             'description' => trim($request->description),
+            'user_cap' => filled($request->user_cap) ? $request->user_cap : null,
+            'assignment_scope' => $request->assignment_scope,
         ]);
 
         return redirect()->back()->with('success', 'Role updated successfully.');

@@ -70,6 +70,16 @@
         </span>
     </p>
 
+
+    @if ($data['member']->roles->isNotEmpty())
+        <p class="text-capitalize m-0"><span style="font-weight: bold">Role(s):
+            </span>
+           @foreach ($data['member']->roles as $role)
+           <span class="badge bg-secondary ms-1">{{ $role->name }}</span>
+           @endforeach
+        </p>
+    @endif
+
     <p class="text-capitalize"><span style="font-weight: bold">Account Status:
         </span>
         @switch($data['member']->account_status)

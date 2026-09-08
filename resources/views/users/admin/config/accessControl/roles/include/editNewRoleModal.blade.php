@@ -32,9 +32,23 @@
                                     value="{{ $data['role']->description }}" required>
                                 <p style="color: red">{{ $errors->first('description') }}</p>
                             </div>
-
-
-
+                             <div class="form-group col-md-6">
+                                <label for="user_cap">User Cap <span class="text-red ms-1">Leave blank for unlimited</span>:</label>
+                                <input type="number" class="form-control" name="user_cap" value="{{ $data['role']->user_cap }}">
+                                <p style="color: red">{{ $errors->first('user_cap') }}</p>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="assignment_scope">Status: <span class="text-danger">*</span></label>
+                                <select class="form-select" name="assignment_scope" required>
+                                    <option selected disabled>
+                                        -Select-</option>
+                                    <option value="permanent" {{ $data['role']->assignment_scope == 'permanent' ? 'selected' : '' }}>
+                                        Permanent</option>
+                                    <option value="per_session" {{ $data['role']->assignment_scope == 'per_session' ? 'selected' : '' }}>
+                                        Per Session</option>
+                                </select>
+                                <p style="color: red">{{ $errors->first('assignment_scope') }}</p>
+                            </div>
                         </div>
                         <hr>
 

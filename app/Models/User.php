@@ -103,11 +103,22 @@ class User extends Authenticatable
     }
 
     // relationships
+    // public function roles()
+    // {
+    //     return $this->belongsToMany(
+    //         Role::class,
+    //         'role_users'
+    //     );
+    // }
     public function roles()
     {
         return $this->belongsToMany(
             Role::class,
-            'role_users'
+            'role_users',
+            'username',   // foreign key on pivot table referencing User
+            'role_id',    // foreign key on pivot table referencing Role
+            'username',   // local key on User
+            'id'          // local key on Role
         );
     }
 

@@ -186,6 +186,18 @@
                                     </div>
                                 </a>
 
+                                <a href="{{ route('viewMemberRoles', ['uuid' => $data['member']->uuid]) }}">
+                                    <div class="review-info-card">
+                                        <div class="review-info-icon">
+                                            <i class="fa-solid fa-user-shield"></i>
+                                        </div>
+                                        <div class="review-info-content">
+                                            <p class="review-card-info-title">
+                                                Roles & Permissions
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
 
 
                             </div>

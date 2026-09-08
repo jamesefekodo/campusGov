@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,8 +21,18 @@ class PermissionMiddleware
             abort(401);
         }
 
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
+        // update admin access permission
+        $expectedPrivilege = $user->roles()->exists();
+
+        if ($user->admin_privilege !== $expectedPrivilege) {
+            User::where('username', $user->username)->update([
+                'admin_privilege' => $expectedPrivilege
+            ]);
+        }
+
 
         // Root user bypasses all permission checks
         if ($user->account_type === 0) {

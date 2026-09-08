@@ -32,8 +32,7 @@
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
-                                            value="{{ $data['searchKey'] }}"><button
-                                            type="submit"
+                                            value="{{ $data['searchKey'] }}"><button type="submit"
                                             class="table_search_button btn btn-primary
                                                 "><i
                                                 class="fas fa-search"></i></button>
@@ -59,6 +58,12 @@
                                                         Description
                                                     </th>
                                                     <th scope="col" class="table_header">
+                                                        User Cap
+                                                    </th>
+                                                    <th scope="col" class="table_header">
+                                                        Assignment Scope
+                                                    </th>
+                                                    <th scope="col" class="table_header">
                                                         Users
                                                     </th>
                                                 </tr>
@@ -66,7 +71,7 @@
 
                                             @if ($data['roles']->isEmpty())
                                                 <tr>
-                                                    <td colspan="4" class="text-center">
+                                                    <td colspan="6" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -83,6 +88,28 @@
                                                             <td class="text-start">
                                                                 {{ $role->description }}
                                                             </td>
+                                                            <td class="text-start">
+                                                                @if ($role->user_cap == null)
+                                                                    Unlimited
+                                                                @else
+                                                                    {{ $role->user_cap }}
+                                                                @endif
+                                                            </td>
+                                                            <td class="text-start">
+                                                                @switch($role->assignment_scope)
+                                                                    @case('permanent')
+                                                                        Permanent
+                                                                    @break
+
+                                                                    @case('per_session')
+                                                                        Per Session
+                                                                    @break
+
+                                                                    @default
+                                                                @endswitch
+                                                            </td>
+
+
 
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"

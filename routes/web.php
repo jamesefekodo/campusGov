@@ -94,7 +94,7 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::get('/verify/payments/waiver/{uuid}', [PaymentTransasctionController::class, 'verifyAssociationDuePaymentWaiver'])->name('verifyAssociationDuePaymentWaiver');
     Route::get('/verify/payments/receipt/{payment_transaction_id}', [PaymentTransasctionController::class, 'verifyPaymentReceipt'])->name('verifyPaymentReceipt');
 
-    
+
 
 });
 
@@ -295,10 +295,17 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/user_management/members/view/association_dues/{uuid}', [MembersManagementController::class, 'viewMemberAssociationDues'])->name('viewMemberAssociationDues');
 
+    Route::get('admin/user_management/members/view/roles/{uuid}', [MembersManagementController::class, 'viewMemberRoles'])->name('viewMemberRoles');
+    Route::post('admin/user_management/members/view/roles/assign_new/{uuid}', [MembersManagementController::class, 'assignUserNewRoleSubmit'])->name('assignUserNewRoleSubmit');
+    Route::get('admin/user_management/members/view/roles/un_assign_role/{uuid}/{id}', [MembersManagementController::class, 'unAssignRole'])->name('unAssignRole');
+
+
+
+
     Route::get('admin/user_management/members/view/association_dues/waiver_notice/download/{uuid}', [MembersManagementController::class, 'downloadDuePaymentWaiverNotice'])->name('downloadDuePaymentWaiverNotice');
     Route::get('admin/user_management/members/view/association_dues/payment_transaction/download/{payment_transaction_id}', [PaymentTransasctionController::class, 'downloadPaymentReceipt'])->name('downloadPaymentReceipt');
 
-    
+
 
 
 
@@ -494,7 +501,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
 
-    
+
     // elections
     Route::get('admin/elections', [ElectionController::class, 'allElections'])->name('allElections');
     Route::get('admin/elections/search', [ElectionController::class, 'allElections'])->name('allElectionsSearch');

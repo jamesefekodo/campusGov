@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('uuid')->unique();
             $table->string('name');
             $table->text('description');
+
+            $table->unsignedInteger('user_cap')->nullable()->default(1); // null = unlimited
+            $table->string('assignment_scope')->default('per_session'); // permanent, per_session
+
+
             $table->timestamps();
 
 

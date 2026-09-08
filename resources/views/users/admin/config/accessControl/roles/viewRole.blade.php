@@ -32,6 +32,37 @@
                                                     {{ $data['role']->description }}
                                                 </span>
                                             </p>
+
+                                            <p class="m-1 p-0">
+                                                <span class="text-mute">
+                                                    User Cap:
+                                                </span>
+                                                <span class="text-black">
+                                                    @if ($data['role']->user_cap == null)
+                                                        Unlimited
+                                                    @else
+                                                        {{ $data['role']->user_cap }}
+                                                    @endif (Currently 0)
+                                                </span>
+                                            </p>
+                                            <p class="m-1 p-0">
+                                                <span class="text-mute">
+                                                    Assignment Scope:
+                                                </span>
+                                                <span class="text-black">
+                                                    @switch($data['role']->assignment_scope)
+                                                        @case('permanent')
+                                                            Permanent
+                                                        @break
+
+                                                        @case('per_session')
+                                                            Per Session
+                                                        @break
+
+                                                        @default
+                                                    @endswitch
+                                                </span>
+                                            </p>
                                         </div>
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
                                             @if (Auth::user()->hasPermission('roles.update'))

@@ -2,6 +2,8 @@
 
 namespace App\Models\Config\AccessControl;
 
+use App\Models\Traits\BelongsToTenant;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RoleUser extends Model
@@ -10,9 +12,12 @@ class RoleUser extends Model
 
     public $timestamps = false;
 
+    // use BelongsToTenant;
+    use HasFactory;
+
     protected $fillable = [
         'tenant_id',
-        'user_id',
+        'username',
         'role_id',
     ];
 
@@ -27,4 +32,3 @@ class RoleUser extends Model
             ->unique('id');
     }
 }
-

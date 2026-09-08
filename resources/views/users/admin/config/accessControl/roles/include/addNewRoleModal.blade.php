@@ -32,8 +32,6 @@
                                 <p style="color: red">{{ $errors->first('description') }}</p>
                             </div>
 
-
-
                         </div>
                         <hr>
 

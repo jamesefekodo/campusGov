@@ -19,6 +19,8 @@ class Role extends Model
         'uuid',
         'name',
         'description',
+        'user_cap',
+        'assignment_scope',
     ];
 
     // cast attributes
@@ -46,11 +48,23 @@ class Role extends Model
         );
     }
 
+    // public function users()
+    // {
+    //     return $this->belongsToMany(
+    //         User::class,
+    //         'role_users'
+    //     );
+    // }
+
     public function users()
     {
         return $this->belongsToMany(
             User::class,
-            'role_users'
+            'role_users',
+            'role_id',    // foreign key on pivot table referencing Role
+            'username',   // foreign key on pivot table referencing User
+            'id',         // local key on Role
+            'username'    // local key on User
         );
     }
 }

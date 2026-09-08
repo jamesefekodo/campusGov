@@ -39,28 +39,28 @@
 
                 <td>
                     @switch($payment->payment_purpose)
-                    @case('association_due')
-                        Association Due
-                    @break
+                        @case('association_due')
+                            Association Due
+                        @break
 
-                    @case('donation')
-                        Donation
-                    @break
+                        @case('donation')
+                            Donation
+                        @break
 
-                    @case('invoice')
-                        Invoice
-                    @break
+                        @case('invoice')
+                            Invoice
+                        @break
 
-                    @case('election_form')
-                        Election Form
-                    @break
+                        @case('election_form')
+                            Election Form
+                        @break
 
-                    @case('voting')
-                        Voting
-                    @break
+                        @case('voting')
+                            Voting
+                        @break
 
-                    @default
-                @endswitch
+                        @default
+                    @endswitch
                 </td>
                 <td>
                     {{ strtoupper($payment->payment_status ?? 'N/A') }}

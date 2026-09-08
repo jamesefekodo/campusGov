@@ -7,6 +7,8 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Config\AccessControl\Role;
+use App\Models\Config\AccessControl\RoleUser;
 use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentRegularization;
@@ -2138,5 +2140,92 @@ class MembersManagementController extends Controller
 
         $mpdf->Output($fileName, 'D'); // 'I' for inline, 'D' for download
         exit;
+    }
+    public function viewMemberRoles($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('member_profile.read'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $roles = Role::where('tenant_id', tenant()->id)->orderBy('name')->get();
+
+        $data = [
+            'member' => $member,
+            'availableRoles' => $roles,
+        ];
+        return view('users.admin.userManagement.members.profile.roles', compact('data'));
+    }
+    public function assignUserNewRoleSubmit($uuid, Request $request)
+    {
+        $request->validate([
+            'role' => 'required|exists:roles,id'
+        ]);
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('roles.assign'),
+            403
+        );
+        $theRole = Role::where('id', $request->role)->first();
+        if (!$theRole) {
+            return redirect()->back()->with('error', 'Role records not found!');
+        }
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'User records not found!');
+        }
+
+        // check if role is already assigned
+        $alreadyAssigned = RoleUser::where('username', $member->username)->where('role_id', $theRole->id)->first();
+        if ($alreadyAssigned) {
+            return redirect()->back()->with('error', 'Already assigned!');
+        }
+
+        // check if assignment limit is reached
+        if (!is_null($theRole->user_cap) && $theRole->users()->count() >= $theRole->user_cap) {
+            return redirect()->back()->with('error', 'User cap reached, please remove at least one assignment to proceed!');
+        }
+
+        RoleUser::create([
+            'tenant_id' => tenant()->id,
+            'username' => $member->username,
+            'role_id' => $theRole->id,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function unAssignRole($uuid, $id)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('roles.assign'),
+            403
+        );
+
+        $member = User::where('uuid', $uuid)->first();
+        if (!$member) {
+            return redirect()->back()->with('error', 'User records not found!');
+        }
+
+
+        RoleUser::where('username', $member->username)
+            ->where('role_id', $id)
+            ->where('tenant_id', tenant()->id)
+            ->delete();
+
+        return redirect()->back()->with('success', 'Done!');
     }
 }

@@ -259,7 +259,7 @@
                             </a>
                         </li>
                     @endif
-                    @if (Auth::user()->hasPermission('invoice.read'))
+                    @if (Auth::user()->hasPermission('invoice.read') || Auth::user()->hasPermission('donation.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/finance/other_payments') ? 'sidebar-active' : '' }}"
                                 href="{{ route('invoices') }}">Other
