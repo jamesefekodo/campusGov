@@ -418,12 +418,12 @@
 
                                                 @include('layouts.include.pagination')
 
-                                                     <div class="px-5">
-                                            <a href="{{ route('downloadDonationReport', ['uuid' => $data['donation']->uuid]) }}"
-                                                target="_blank" class="btn w-100 btn-danger mt-5"> <i
-                                                    class="fas fa-print me-2"></i>
-                                                Print Report</a>
-                                        </div>
+                                                <div class="px-5">
+                                                    <a href="{{ route('downloadDonationReport', ['uuid' => $data['donation']->uuid]) }}"
+                                                        class="btn w-100 btn-danger mt-5"> <i
+                                                            class="fas fa-download me-2"></i>
+                                                        Download Report</a>
+                                                </div>
                                             </div>
 
 

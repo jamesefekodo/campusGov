@@ -90,14 +90,14 @@
                                                                     @case('association_due')
                                                                         @if ($transaction->due)
                                                                             {{-- @php
-                                                                                $academic =
-                                                                                    $transaction->registeredPayer
-                                                                                        ->memberAcademicInfo;
-                                                                                $level = studentLevelAtDue(
-                                                                                    $academic,
-                                                                                    $transaction->due,
-                                                                                );
-                                                                            @endphp --}}
+                                                            $academic =
+                                                                $transaction->registeredPayer
+                                                                    ->memberAcademicInfo;
+                                                            $level = studentLevelAtDue(
+                                                                $academic,
+                                                                $transaction->due,
+                                                            );
+                                                        @endphp --}}
                                                                             @php
                                                                                 $academic =
                                                                                     $transaction->registeredPayer
@@ -116,8 +116,7 @@
                                                                             ({{ $transaction->due->academic_year }}/{{ $transaction->due->academic_year + 1 }}
                                                                             Academic Session)
                                                                             -
-                                                                            {{-- {{ currentLevel($academic->theProgram, $level) }} --}}
-                                                                            @if ($program)
+                                                                            {{-- {{ currentLevel($academic->theProgram, $level) }} --}} @if ($program)
                                                                                 {{ currentLevel($program, $level) }}
                                                                             @else
                                                                                 <span class="text-danger">
@@ -125,22 +124,62 @@
                                                                                 </span>
                                                                             @endif
                                                                         @endif
+
+                                                                        <a href="{{ route('viewDue', ['uuid' => $transaction->due->uuid]) }}"
+                                                                            target="_blank" class="badge bg-secondary text-white"
+                                                                            title="View Due">
+                                                                            <i class="fas fa-link"></i>
+                                                                        </a>
                                                                     @break
 
                                                                     @case('donation')
-                                                                        Donation
+                                                                        Donation @if ($transaction->donation)
+                                                                            ({{ $transaction->donation->title }})
+                                                                            <a href="{{ route('viewDonation', ['uuid' => $transaction->donation->uuid]) }}"
+                                                                                target="_blank"
+                                                                                class="badge bg-secondary text-white"
+                                                                                title="View Donation">
+                                                                                <i class="fas fa-link"></i>
+                                                                            </a>
+                                                                        @endif
                                                                     @break
 
                                                                     @case('invoice')
                                                                         Invoice
+                                                                        @if ($transaction->invoice)
+                                                                            ({{ \Illuminate\Support\Str::words($transaction->invoice->description, 5, '...') }})
+                                                                            <a href="{{ route('viewInvoice', ['uuid' => $transaction->invoice->uuid]) }}"
+                                                                                target="_blank"
+                                                                                class="badge bg-secondary text-white"
+                                                                                title="View Invoice">
+                                                                                <i class="fas fa-link"></i>
+                                                                            </a>
+                                                                        @endif
                                                                     @break
 
                                                                     @case('election_form')
-                                                                        Election Form
+                                                                        Election Form @if ($transaction->election)
+                                                                            (Candidacy Fee:
+                                                                            {{ $transaction?->electionCandidateApplication?->position?->position ?? 'Position' }}
+                                                                            — {{ $transaction->election->title }}
+                                                                            ({{ $transaction->election->academic_session }}/{{ $transaction->election->academic_session + 1 }}))
+                                                                            <a href="{{ route('viewElectionCandidateApplication', ['uuid' => $transaction->electionCandidateApplication->uuid]) }}"
+                                                                                target="_blank"
+                                                                                class="badge bg-secondary text-white"
+                                                                                title="View Donation">
+                                                                                <i class="fas fa-link"></i>
+                                                                            </a>
+                                                                        @endif
                                                                     @break
 
                                                                     @case('voting')
-                                                                        Voting
+                                                                        Voting 
+                                                                        @if ($transaction->monetaryVote) -
+                                                                            {{ $transaction->monetaryVote->no_of_votes }} votes for
+                                                                            {{ $transaction->monetaryVote->thePosition }} —
+                                                                            {{ $transaction->election->title }}
+                                                                            ({{ $transaction->election->academic_session }}/{{ $transaction->election->academic_session + 1 }})
+                                                                        @endif
                                                                     @break
 
                                                                     @default

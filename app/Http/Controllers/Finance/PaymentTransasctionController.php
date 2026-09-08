@@ -1361,23 +1361,367 @@ class PaymentTransasctionController extends Controller
             403
         );
 
-        $startDate = $request->start_date ?? now()->startOfMonth();
-        $endDate = $request->end_date ?? now();
+        $request->validate([
+            'start_date' => [
+                'nullable',
+                'date',
+                'before:end_date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->filled('end_date')) {
+                        $start = Carbon::parse($value);
+                        $end   = Carbon::parse($request->end_date);
+                        if ($start->copy()->addYear()->lt($end)) {
+                            $fail('The date gap must not be more than one year.');
+                        }
+                    }
+                },
+            ],
+            'end_date' => [
+                'nullable',
+                'date',
+                'after:start_date',
+            ],
+        ]);
 
-        $paymentTransactions = PaymentTransaction::where('tenant_id', tenant()->id)
+
+
+        $startDate = $request->filled('start_date')
+            ? Carbon::parse($request->start_date)
+            : now()->startOfMonth();
+
+        $endDate = $request->filled('end_date')
+            ? Carbon::parse($request->end_date)
+            : now();
+
+        // ── Base queries ──────────────────────────────────────────────────────
+
+        $paymentQuery = PaymentTransaction::where('tenant_id', tenant()->id)
             ->whereBetween('paid_at', [
-                $startDate->startOfDay(),
-                $endDate->endOfDay(),
-            ])
-            ->get();
+                $startDate->copy()->startOfDay(),
+                $endDate->copy()->endOfDay(),
+            ]);
 
-        $financialClaim = FinancialClaim::where('tenant_id', tenant()->id)
-            ->whereBetween('initiated_at', [
-                $startDate->startOfDay(),
-                $endDate->endOfDay(),
-            ])
-            ->get();
-        if ($request->page_type == 'failed_page') {
+        // Successful + approved payments only — used for financial totals
+        $successfulPaymentQuery = (clone $paymentQuery)
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved');
+
+        // Pending/failed payments — for display only, NOT included in totals
+        $pendingFailedPaymentQuery = (clone $paymentQuery)
+            ->where(function ($q) {
+                $q->where('payment_status', '!=', 'successful')
+                    ->orWhere('approval_status', '!=', 'approved');
+            });
+
+        $financialClaimQuery = FinancialClaim::where('tenant_id', tenant()->id)
+            ->whereBetween('date', [
+                $startDate->copy()->startOfDay(),
+                $endDate->copy()->endOfDay(),
+            ]);
+
+        // Approved claims only — used for financial totals
+        $approvedClaimQuery = (clone $financialClaimQuery)
+            ->where('approval_status', 'approved');
+
+        // Unapproved claims — for display only, NOT included in totals
+        $unapprovedClaimQuery = (clone $financialClaimQuery)
+            ->where('approval_status', '!=', 'approved');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Payment Transaction Totals (successful + approved only)
+    |--------------------------------------------------------------------------
+    */
+        $totalAmountPaid          = (clone $successfulPaymentQuery)->sum('amount_paid');
+        $totalPaymentTransactions = (clone $successfulPaymentQuery)->count();
+        $totalTax                 = (clone $successfulPaymentQuery)->sum('total_tax');
+        $totalTaxTransactions     = (clone $successfulPaymentQuery)->where('total_tax', '>', 0)->count();
+        $totalServiceCharge       = (clone $successfulPaymentQuery)->sum('service_charge');
+        $totalAmountSettled       = (clone $successfulPaymentQuery)->sum('amount_settled');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Direct Payments (successful + approved only)
+    |--------------------------------------------------------------------------
+    */
+        $totalDirectPaymentCount  = (clone $successfulPaymentQuery)->where('payment_type', 'direct')->count();
+        $totalDirectPaymentAmount = (clone $successfulPaymentQuery)->where('payment_type', 'direct')->sum('amount_settled');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Regularized Payments (successful + approved only)
+    |--------------------------------------------------------------------------
+    */
+        $totalRegularizedPaymentCount  = (clone $successfulPaymentQuery)->where('payment_type', 'regularization')->count();
+        $totalRegularizedPaymentAmount = (clone $successfulPaymentQuery)->where('payment_type', 'regularization')->sum('amount_settled');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Pending / Failed Payments (display only — NOT in totals)
+    |--------------------------------------------------------------------------
+    */
+        $totalPendingFailedCount  = (clone $pendingFailedPaymentQuery)->count();
+        $totalPendingFailedAmount = (clone $pendingFailedPaymentQuery)->sum('amount_paid');
+
+        $totalPendingCount = (clone $paymentQuery)
+            ->where('payment_status', 'pending')
+            ->count();
+
+        $totalFailedCount = (clone $paymentQuery)
+            ->whereNotIn('payment_status', ['successful', 'pending'])
+            ->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Financial Claims (approved only — used in totals)
+    |--------------------------------------------------------------------------
+    */
+        $totalCreditFinClaim      = (clone $approvedClaimQuery)->where('claim_type', 'credit')->sum('amount');
+        $totalCreditFinClaimCount = (clone $approvedClaimQuery)->where('claim_type', 'credit')->count();
+        $totalDebitFinClaim       = (clone $approvedClaimQuery)->where('claim_type', 'debit')->sum('amount');
+        $totalDebitFinClaimCount  = (clone $approvedClaimQuery)->where('claim_type', 'debit')->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Unapproved Claims (display only — NOT in totals)
+    |--------------------------------------------------------------------------
+    */
+        $totalUnapprovedClaimCount  = (clone $unapprovedClaimQuery)->count();
+        $totalUnapprovedClaimAmount = (clone $unapprovedClaimQuery)->sum('amount');
+
+        $totalPendingClaimCount = (clone $financialClaimQuery)
+            ->where('approval_status', 'pending')
+            ->count();
+
+        $totalRejectedClaimCount = (clone $financialClaimQuery)
+            ->where('approval_status', 'declined')
+            ->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Paginated Records
+    |--------------------------------------------------------------------------
+    */
+        // $paymentTransactions = (clone $successfulPaymentQuery)
+        //     ->orderByDesc('paid_at')
+        //     ->paginate(20)
+        //     ->withQueryString();
+
+        $paymentTransactions = PaymentTransaction::whereBetween('paid_at', [
+            Carbon::parse($startDate)->startOfDay(),
+            Carbon::parse($endDate)->endOfDay(),
+        ])
+            ->orderByDesc('paid_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $pendingFailedTransactions = (clone $pendingFailedPaymentQuery)
+            ->orderByDesc('paid_at')
+            ->paginate(20, ['*'], 'pf_page')
+            ->withQueryString();
+
+        $pendingFailedTransactions = (clone $pendingFailedPaymentQuery)
+            ->orderByDesc('paid_at')
+            ->paginate(20, ['*'], 'pf_page')
+            ->withQueryString();
+
+        // $financialClaim = (clone $approvedClaimQuery)
+        //     ->orderByDesc('initiated_at')
+        //     ->paginate(20)
+        //     ->withQueryString();
+
+        $financialClaims = FinancialClaim::whereBetween('date', [
+            Carbon::parse($startDate)->startOfDay(),
+            Carbon::parse($endDate)->endOfDay(),
+        ])
+            ->orderByDesc('initiated_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $unapprovedClaims = (clone $unapprovedClaimQuery)
+            ->orderByDesc('initiated_at')
+            ->paginate(20, ['*'], 'uc_page')
+            ->withQueryString();
+
+        /*
+    |--------------------------------------------------------------------------
+    | Chart Grouping
+    |--------------------------------------------------------------------------
+    */
+        $days = $startDate->diffInDays($endDate);
+
+        if ($days <= 31) {
+            $chartGrouping = 'daily';
+        } elseif ($days <= 90) {
+            $chartGrouping = 'weekly';
+        } else {
+            $chartGrouping = 'monthly';
         }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Chart Data Queries (successful + approved only for accuracy)
+    |--------------------------------------------------------------------------
+    */
+        $paymentIncome = (clone $successfulPaymentQuery)
+            ->selectRaw("DATE(paid_at) as period, SUM(amount_settled) as amount")
+            ->groupBy('period')
+            ->pluck('amount', 'period');
+
+        $paymentExpenses = (clone $successfulPaymentQuery)
+            ->selectRaw("DATE(paid_at) as period, SUM(service_charge) as amount")
+            ->groupBy('period')
+            ->pluck('amount', 'period');
+
+        $creditClaims = (clone $approvedClaimQuery)
+            ->where('claim_type', 'credit')
+            ->selectRaw("DATE(initiated_at) as period, SUM(amount) as amount")
+            ->groupBy('period')
+            ->pluck('amount', 'period');
+
+        $debitClaims = (clone $approvedClaimQuery)
+            ->where('claim_type', 'debit')
+            ->selectRaw("DATE(initiated_at) as period, SUM(amount) as amount")
+            ->groupBy('period')
+            ->pluck('amount', 'period');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Build Chart Data
+    |--------------------------------------------------------------------------
+    */
+        $chartData = collect();
+
+        if ($chartGrouping === 'daily') {
+            $period = $startDate->copy()->startOfDay();
+            while ($period->lte($endDate)) {
+                $key = $period->format('Y-m-d');
+                $chartData->push([
+                    'label'    => $period->format('d M'),
+                    'income'   => (float) ($paymentIncome->get($key, 0) + $creditClaims->get($key, 0)),
+                    'expenses' => (float) ($paymentExpenses->get($key, 0) + $debitClaims->get($key, 0)),
+                ]);
+                $period->addDay();
+            }
+        } elseif ($chartGrouping === 'weekly') {
+            $period = $startDate->copy()->startOfWeek();
+            while ($period->lte($endDate)) {
+                $weekStart = $period->copy()->startOfWeek();
+                $weekEnd   = $period->copy()->endOfWeek();
+                $income = $expenses = 0;
+
+                foreach ($paymentIncome  as $date => $amount) {
+                    if (Carbon::parse($date)->between($weekStart, $weekEnd)) $income   += (float) $amount;
+                }
+                foreach ($creditClaims   as $date => $amount) {
+                    if (Carbon::parse($date)->between($weekStart, $weekEnd)) $income   += (float) $amount;
+                }
+                foreach ($paymentExpenses as $date => $amount) {
+                    if (Carbon::parse($date)->between($weekStart, $weekEnd)) $expenses += (float) $amount;
+                }
+                foreach ($debitClaims    as $date => $amount) {
+                    if (Carbon::parse($date)->between($weekStart, $weekEnd)) $expenses += (float) $amount;
+                }
+
+                $chartData->push([
+                    'label'    => $weekStart->format('d M') . ' - ' . $weekEnd->format('d M'),
+                    'income'   => $income,
+                    'expenses' => $expenses,
+                ]);
+                $period->addWeek();
+            }
+        } else {
+            $period = $startDate->copy()->startOfMonth();
+            $end    = $endDate->copy()->startOfMonth();
+
+            while ($period->lte($end)) {
+                $monthStart = $period->copy()->startOfMonth();
+                $monthEnd   = $period->copy()->endOfMonth();
+                $income = $expenses = 0;
+
+                foreach ($paymentIncome   as $date => $amount) {
+                    if (Carbon::parse($date)->between($monthStart, $monthEnd)) $income   += (float) $amount;
+                }
+                foreach ($creditClaims    as $date => $amount) {
+                    if (Carbon::parse($date)->between($monthStart, $monthEnd)) $income   += (float) $amount;
+                }
+                foreach ($paymentExpenses as $date => $amount) {
+                    if (Carbon::parse($date)->between($monthStart, $monthEnd)) $expenses += (float) $amount;
+                }
+                foreach ($debitClaims     as $date => $amount) {
+                    if (Carbon::parse($date)->between($monthStart, $monthEnd)) $expenses += (float) $amount;
+                }
+
+                $chartData->push([
+                    'label'    => $period->format('M Y'),
+                    'income'   => $income,
+                    'expenses' => $expenses,
+                ]);
+                $period->addMonth();
+            }
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Data
+    |--------------------------------------------------------------------------
+    */
+        // 
+        // 
+
+        if ($request->page_type == 'claims_page') {
+            $pageType = 'claims_page';
+        } else {
+            $pageType = 'transactions_page';
+        }
+
+        $data = [
+            // ── Successful payment totals ──────────────────────────────────
+            'totalAmountPaid'              => $totalAmountPaid,
+            'totalPaymentTransactions'     => $totalPaymentTransactions,
+            'totalTax'                     => $totalTax,
+            'totalTaxTransactions'         => $totalTaxTransactions,
+            'totalServiceCharge'           => $totalServiceCharge,
+            'totalAmountSettled'           => $totalAmountSettled,
+            'totalDirectPaymentCount'      => $totalDirectPaymentCount,
+            'totalDirectPaymentAmount'     => $totalDirectPaymentAmount,
+            'totalRegularizedPaymentCount' => $totalRegularizedPaymentCount,
+            'totalRegularizedPaymentAmount' => $totalRegularizedPaymentAmount,
+            'pageType' => $pageType,
+
+            // ── Pending / failed payments (display only) ───────────────────
+            'totalPendingFailedCount'      => $totalPendingFailedCount,
+            'totalPendingFailedAmount'     => $totalPendingFailedAmount,
+            'totalPendingCount'            => $totalPendingCount,
+            'totalFailedCount'             => $totalFailedCount,
+
+            // ── Approved financial claim totals ────────────────────────────
+            'totalCreditFinClaim'          => $totalCreditFinClaim,
+            'totalCreditFinClaimCount'     => $totalCreditFinClaimCount,
+            'totalDebitFinClaim'           => $totalDebitFinClaim,
+            'totalDebitFinClaimCount'      => $totalDebitFinClaimCount,
+
+            // ── Unapproved claims (display only) ──────────────────────────
+            'totalUnapprovedClaimCount'    => $totalUnapprovedClaimCount,
+            'totalUnapprovedClaimAmount'   => $totalUnapprovedClaimAmount,
+            'totalPendingClaimCount'       => $totalPendingClaimCount,
+            'totalRejectedClaimCount'      => $totalRejectedClaimCount,
+
+            // ── Paginated records ──────────────────────────────────────────
+            'paymentTransactions'          => $paymentTransactions,
+            'pendingFailedTransactions'    => $pendingFailedTransactions,
+            'financialClaims'               => $financialClaims,
+            'unapprovedClaims'             => $unapprovedClaims,
+
+            // ── Date range ────────────────────────────────────────────────
+            'startDate'                    => $startDate,
+            'endDate'                      => $endDate,
+
+            // ── Chart ─────────────────────────────────────────────────────
+            'chartData'                    => $chartData,
+            'chartGrouping'                => $chartGrouping,
+        ];
+
+        return view('users.admin.finance.reports.financialReports', compact('data'));
     }
 }

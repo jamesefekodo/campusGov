@@ -118,22 +118,58 @@
                                                             </span>
                                                         @endif
                                                     @endif
+
+                                                    <a href="{{ route('viewDue', ['uuid' => $data['transaction']->due->uuid]) }}"
+                                                        target="_blank" class="badge bg-secondary text-white" title="View Due">
+                                                        <i class="fas fa-link"></i>
+                                                    </a>
                                                 @break
 
                                                 @case('donation')
-                                                    Donation
+                                                    Donation @if ($data['transaction']->donation)
+                                                        ({{ $data['transaction']->donation->title }})
+                                                        <a href="{{ route('viewDonation', ['uuid' => $data['transaction']->donation->uuid]) }}"
+                                                            target="_blank" class="badge bg-secondary text-white"
+                                                            title="View Donation">
+                                                            <i class="fas fa-link"></i>
+                                                        </a>
+                                                    @endif
                                                 @break
 
                                                 @case('invoice')
                                                     Invoice
+                                                    @if ($data['transaction']->invoice)
+                                                        ({{ \Illuminate\Support\Str::words($data['transaction']->invoice->description, 5, '...') }})
+                                                        <a href="{{ route('viewInvoice', ['uuid' => $data['transaction']->invoice->uuid]) }}"
+                                                            target="_blank" class="badge bg-secondary text-white"
+                                                            title="View Invoice">
+                                                            <i class="fas fa-link"></i>
+                                                        </a>
+                                                    @endif
                                                 @break
 
                                                 @case('election_form')
-                                                    Election Form
+                                                    Election Form @if ($data['transaction']->election)
+                                                        (Candidacy Fee:
+                                                        {{ $data['transaction']?->electionCandidateApplication?->position?->position ?? 'Position' }}
+                                                        — {{ $data['transaction']->election->title }}
+                                                        ({{ $data['transaction']->election->academic_session }}/{{ $data['transaction']->election->academic_session + 1 }}))
+                                                        <a href="{{ route('viewElectionCandidateApplication', ['uuid' => $data['transaction']->electionCandidateApplication->uuid]) }}"
+                                                            target="_blank" class="badge bg-secondary text-white"
+                                                            title="View Donation">
+                                                            <i class="fas fa-link"></i>
+                                                        </a>
+                                                    @endif
                                                 @break
 
                                                 @case('voting')
                                                     Voting
+                                                    @if ($data['transaction']->monetaryVote) -
+                                                        {{ $data['transaction']->monetaryVote->no_of_votes }} votes for
+                                                        {{ $data['transaction']->monetaryVote->thePosition }} —
+                                                        {{ $data['transaction']->election->title }}
+                                                        ({{ $data['transaction']->election->academic_session }}/{{ $data['transaction']->election->academic_session + 1 }})
+                                                    @endif
                                                 @break
 
                                                 @default

@@ -485,6 +485,26 @@
                     @endif
                     {{-- election candidate application end --}}
 
+                    {{-- election voting start --}}
+                    @if ($purposeOfPayment == 'electionVoting')
+                        <tr style="border: 0px; border-bottom:none; padding:10px">
+                            <td>
+                                <span style="font-weight: bold">Voting: </span>
+                                <span class="">
+                                    @if ($data['payment']->monetaryVote)
+                                        {{ $data['payment']->monetaryVote->no_of_votes }} votes for
+                                        {{ $data['payment']->monetaryVote->thePosition }} —
+                                        {{ $data['payment']->election->title }}
+                                        ({{ $data['payment']->election->academic_session }}/{{ $data['payment']->election->academic_session + 1 }})
+                                    @endif
+                                </span>
+                                <br>
+                            </td>
+                        </tr>
+
+                    @endif
+                    {{-- election voting ends --}}
+
                     {{-- transaction start --}}
                     <tr>
                         <td colspan="2" style="width:100%">

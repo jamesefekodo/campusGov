@@ -490,6 +490,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // financialReports
     Route::get('admin/finance/report', [PaymentTransasctionController::class, 'financialReports'])->name('financialReports');
+        Route::get('admin/finance/report/download', [PaymentTransasctionController::class, 'downloadFinancialReports'])->name('downloadFinancialReports');
+
 
 
     
