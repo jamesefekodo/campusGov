@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
+use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
 
 class PaymentTransasctionController extends Controller
@@ -1723,5 +1724,611 @@ class PaymentTransasctionController extends Controller
         ];
 
         return view('users.admin.finance.reports.financialReports', compact('data'));
+    }
+    public function downloadFinancialReports(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('transactions.read'),
+            403
+        );
+
+        /*
+    |--------------------------------------------------------------------------
+    | Date validation
+    |--------------------------------------------------------------------------
+    */
+        $request->validate([
+            'start_date' => [
+                'nullable',
+                'date',
+                'before_or_equal:end_date',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($request->filled('end_date')) {
+                        $startDate = Carbon::parse($value);
+                        $endDate = Carbon::parse($request->end_date);
+
+                        if ($startDate->copy()->addYear()->lt($endDate)) {
+                            $fail('The date gap must not be more than one year.');
+                        }
+                    }
+                },
+            ],
+
+            'end_date' => [
+                'nullable',
+                'date',
+                'after_or_equal:start_date',
+            ],
+        ]);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Date range
+    |--------------------------------------------------------------------------
+    */
+        $startDate = $request->filled('start_date')
+            ? Carbon::parse($request->start_date)->startOfDay()
+            : now()->startOfMonth();
+
+        $endDate = $request->filled('end_date')
+            ? Carbon::parse($request->end_date)->endOfDay()
+            : now()->endOfDay();
+
+        $tenantId = tenant()->id;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Runtime configuration
+    |--------------------------------------------------------------------------
+    */
+        ini_set('pcre.backtrack_limit', 10000000);
+        ini_set('max_execution_time', 0);
+        ini_set('memory_limit', '2048M');
+
+        /*
+    |--------------------------------------------------------------------------
+    | mPDF temporary directory
+    |--------------------------------------------------------------------------
+    */
+        $tempDirectory = storage_path('app/mpdf-temp');
+
+        if (!is_dir($tempDirectory)) {
+            mkdir($tempDirectory, 0755, true);
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Base payment query
+    |--------------------------------------------------------------------------
+    */
+        $paymentQuery = PaymentTransaction::query()
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('paid_at', [
+                $startDate,
+                $endDate,
+            ]);
+
+        $successfulPaymentQuery = (clone $paymentQuery)
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved');
+
+        $pendingFailedPaymentQuery = (clone $paymentQuery)
+            ->where(function ($query) {
+                $query->where('payment_status', '!=', 'successful')
+                    ->orWhere('approval_status', '!=', 'approved');
+            });
+
+        /*
+    |--------------------------------------------------------------------------
+    | Base financial claims query
+    |--------------------------------------------------------------------------
+    */
+        $financialClaimQuery = FinancialClaim::query()
+            ->where('tenant_id', $tenantId)
+            ->whereBetween('date', [
+                $startDate,
+                $endDate,
+            ]);
+
+        $approvedClaimQuery = (clone $financialClaimQuery)
+            ->where('approval_status', 'approved');
+
+        $unapprovedClaimQuery = (clone $financialClaimQuery)
+            ->where('approval_status', '!=', 'approved');
+
+        /*
+    |--------------------------------------------------------------------------
+    | Totals
+    |--------------------------------------------------------------------------
+    |
+    | All values below come from SQL aggregate queries.
+    | No transaction records are loaded into PHP memory here.
+    |
+    */
+        $totalAmountPaid = (float) (
+            (clone $successfulPaymentQuery)->sum('amount_paid')
+        );
+
+        $totalPaymentTransactions = (clone $successfulPaymentQuery)->count();
+
+        $totalTax = (float) (
+            (clone $successfulPaymentQuery)->sum('total_tax')
+        );
+
+        $totalTaxTransactions = (clone $successfulPaymentQuery)
+            ->where('total_tax', '>', 0)
+            ->count();
+
+        $totalServiceCharge = (float) (
+            (clone $successfulPaymentQuery)->sum('service_charge')
+        );
+
+        $totalAmountSettled = (float) (
+            (clone $successfulPaymentQuery)->sum('amount_settled')
+        );
+
+        $totalDirectPaymentCount = (clone $successfulPaymentQuery)
+            ->where('payment_type', 'direct')
+            ->count();
+
+        $totalDirectPaymentAmount = (float) (
+            (clone $successfulPaymentQuery)
+            ->where('payment_type', 'direct')
+            ->sum('amount_settled')
+        );
+
+        $totalRegularizedPaymentCount = (clone $successfulPaymentQuery)
+            ->where('payment_type', 'regularization')
+            ->count();
+
+        $totalRegularizedPaymentAmount = (float) (
+            (clone $successfulPaymentQuery)
+            ->where('payment_type', 'regularization')
+            ->sum('amount_settled')
+        );
+
+        $totalPendingFailedCount = (clone $pendingFailedPaymentQuery)->count();
+
+        $totalPendingFailedAmount = (float) (
+            (clone $pendingFailedPaymentQuery)->sum('amount_paid')
+        );
+
+        $totalPendingCount = (clone $paymentQuery)
+            ->where('payment_status', 'pending')
+            ->count();
+
+        $totalFailedCount = (clone $paymentQuery)
+            ->whereNotIn('payment_status', ['successful', 'pending'])
+            ->count();
+
+        $totalCreditFinClaim = (float) (
+            (clone $approvedClaimQuery)
+            ->where('claim_type', 'credit')
+            ->sum('amount')
+        );
+
+        $totalCreditFinClaimCount = (clone $approvedClaimQuery)
+            ->where('claim_type', 'credit')
+            ->count();
+
+        $totalDebitFinClaim = (float) (
+            (clone $approvedClaimQuery)
+            ->where('claim_type', 'debit')
+            ->sum('amount')
+        );
+
+        $totalDebitFinClaimCount = (clone $approvedClaimQuery)
+            ->where('claim_type', 'debit')
+            ->count();
+
+        $totalUnapprovedClaimCount = (clone $unapprovedClaimQuery)->count();
+
+        $totalUnapprovedClaimAmount = (float) (
+            (clone $unapprovedClaimQuery)->sum('amount')
+        );
+
+        $totalPendingClaimCount = (clone $financialClaimQuery)
+            ->where('approval_status', 'pending')
+            ->count();
+
+        $totalRejectedClaimCount = (clone $financialClaimQuery)
+            ->where('approval_status', 'declined')
+            ->count();
+
+        /*
+    |--------------------------------------------------------------------------
+    | mPDF setup
+    |--------------------------------------------------------------------------
+    */
+        $mpdf = new Mpdf([
+            'default_font_size' => 8,
+            'default_font' => 'Arial',
+            'margin_left' => 5,
+            'margin_right' => 5,
+            'margin_top' => 10,
+            'margin_bottom' => 15,
+            'format' => 'A4-L',
+            'autoLangToFont' => true,
+            'autoScriptToLang' => true,
+            'tempDir' => $tempDirectory,
+        ]);
+
+        $mpdf->setFooter(
+            'Page {PAGENO} of {nb} >> Financial Report: '
+                . $startDate->format('d M Y')
+                . ' - '
+                . $endDate->format('d M Y')
+        );
+
+        $mpdf->showImageErrors = true;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Shared data only
+    |--------------------------------------------------------------------------
+    |
+    | No payment or claim Collections should be stored here.
+    |
+    */
+    $currentAccountBalance = basicSystemInfo()->account_balance;
+        $data = [
+            'tenant' => tenant(),
+            'basicSystemInfo' => basicSystemInfo(),
+
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'generatedAt' => now('Africa/Lagos'),
+
+            'totalAmountPaid' => $totalAmountPaid,
+            'totalPaymentTransactions' => $totalPaymentTransactions,
+            'totalTax' => $totalTax,
+            'totalTaxTransactions' => $totalTaxTransactions,
+            'totalServiceCharge' => $totalServiceCharge,
+            'totalAmountSettled' => $totalAmountSettled,
+
+            'totalDirectPaymentCount' => $totalDirectPaymentCount,
+            'totalDirectPaymentAmount' => $totalDirectPaymentAmount,
+
+            'totalRegularizedPaymentCount' => $totalRegularizedPaymentCount,
+            'totalRegularizedPaymentAmount' => $totalRegularizedPaymentAmount,
+
+            'totalPendingFailedCount' => $totalPendingFailedCount,
+            'totalPendingFailedAmount' => $totalPendingFailedAmount,
+            'totalPendingCount' => $totalPendingCount,
+            'totalFailedCount' => $totalFailedCount,
+
+            'totalCreditFinClaim' => $totalCreditFinClaim,
+            'totalCreditFinClaimCount' => $totalCreditFinClaimCount,
+            'totalDebitFinClaim' => $totalDebitFinClaim,
+            'totalDebitFinClaimCount' => $totalDebitFinClaimCount,
+
+            'totalUnapprovedClaimCount' => $totalUnapprovedClaimCount,
+            'totalUnapprovedClaimAmount' => $totalUnapprovedClaimAmount,
+            'totalPendingClaimCount' => $totalPendingClaimCount,
+            'totalRejectedClaimCount' => $totalRejectedClaimCount,
+
+            'currentAccountBalance' => $currentAccountBalance,
+        ];
+
+        /*
+    |--------------------------------------------------------------------------
+    | Write CSS once
+    |--------------------------------------------------------------------------
+    */
+        $css = view(
+            'printFiles.paymentTransactions.financialReportPartials.financialReportStyles',
+            compact('data')
+        )->render();
+
+        $mpdf->WriteHTML(
+            $css,
+            HTMLParserMode::HEADER_CSS
+        );
+
+        unset($css);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Write report header / totals once
+    |--------------------------------------------------------------------------
+    */
+        $headerHtml = view(
+            'printFiles.paymentTransactions.financialReportPartials.financialReportHeader',
+            compact('data')
+        )->render();
+
+        $mpdf->WriteHTML(
+            $headerHtml,
+            HTMLParserMode::HTML_BODY
+        );
+
+        unset($headerHtml);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Section 1: Successful approved transactions
+    |--------------------------------------------------------------------------
+    */
+        $mpdf->WriteHTML(
+            view(
+                'printFiles.paymentTransactions.financialReportPartials.financialSectionHeading',
+                [
+                    'title' => 'SUCCESSFUL AND APPROVED PAYMENT TRANSACTIONS',
+                    'colour' => '#198754',
+                ]
+            )->render(),
+            HTMLParserMode::HTML_BODY
+        );
+
+        $successfulSerialNumber = 0;
+        $successfulCount = $totalPaymentTransactions;
+
+        if ($successfulCount === 0) {
+            $mpdf->WriteHTML(
+                '<div class="no-records">No successful and approved payment transactions were found.</div>',
+                HTMLParserMode::HTML_BODY
+            );
+        } else {
+            /*
+         * Use the actual numeric primary key of payment_transactions.
+         * Change 'id' to 'payment_id' if your table uses payment_id.
+         */
+            $successfulPaymentQuery
+                ->with([
+                    'payerPersonalProfile',
+                ])
+                ->orderBy('id')
+                ->chunkById(
+                    250,
+                    function ($payments) use (
+                        $data,
+                        $mpdf,
+                        &$successfulSerialNumber
+                    ) {
+                        $html = view(
+                            'printFiles.paymentTransactions.financialReportPartials.successfulPaymentChunk',
+                            [
+                                'data' => $data,
+                                'payments' => $payments,
+                                'serialStart' => $successfulSerialNumber,
+                            ]
+                        )->render();
+
+                        $mpdf->WriteHTML(
+                            $html,
+                            HTMLParserMode::HTML_BODY
+                        );
+
+                        $successfulSerialNumber += $payments->count();
+
+                        unset($html, $payments);
+
+                        gc_collect_cycles();
+                    },
+                    'id'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Section 2: Pending / failed transactions
+    |--------------------------------------------------------------------------
+    */
+        $mpdf->WriteHTML(
+            '<pagebreak />',
+            HTMLParserMode::HTML_BODY
+        );
+
+        $mpdf->WriteHTML(
+            view(
+                'printFiles.paymentTransactions.financialReportPartials.financialSectionHeading',
+                [
+                    'title' => 'PENDING OR FAILED PAYMENT TRANSACTIONS',
+                    'colour' => '#dc2626',
+                ]
+            )->render(),
+            HTMLParserMode::HTML_BODY
+        );
+
+        $pendingFailedSerialNumber = 0;
+
+        if ($totalPendingFailedCount === 0) {
+            $mpdf->WriteHTML(
+                '<div class="no-records">No pending or failed payment transactions were found.</div>',
+                HTMLParserMode::HTML_BODY
+            );
+        } else {
+            $pendingFailedPaymentQuery
+                ->with([
+                    'payerPersonalProfile',
+                ])
+                ->orderBy('id')
+                ->chunkById(
+                    250,
+                    function ($payments) use (
+                        $data,
+                        $mpdf,
+                        &$pendingFailedSerialNumber
+                    ) {
+                        $html = view(
+                            'printFiles.paymentTransactions.financialReportPartials.pendingFailedPaymentChunk',
+                            [
+                                'data' => $data,
+                                'payments' => $payments,
+                                'serialStart' => $pendingFailedSerialNumber,
+                            ]
+                        )->render();
+
+                        $mpdf->WriteHTML(
+                            $html,
+                            HTMLParserMode::HTML_BODY
+                        );
+
+                        $pendingFailedSerialNumber += $payments->count();
+
+                        unset($html, $payments);
+
+                        gc_collect_cycles();
+                    },
+                    'id'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Section 3: Approved financial claims
+    |--------------------------------------------------------------------------
+    */
+        $mpdf->WriteHTML(
+            '<pagebreak />',
+            HTMLParserMode::HTML_BODY
+        );
+
+        $mpdf->WriteHTML(
+            view(
+                'printFiles.paymentTransactions.financialReportPartials.financialSectionHeading',
+                [
+                    'title' => 'APPROVED FINANCIAL CLAIMS',
+                    'colour' => '#2563eb',
+                ]
+            )->render(),
+            HTMLParserMode::HTML_BODY
+        );
+
+        $approvedClaimSerialNumber = 0;
+        $approvedClaimCount = (clone $approvedClaimQuery)->count();
+
+        if ($approvedClaimCount === 0) {
+            $mpdf->WriteHTML(
+                '<div class="no-records">No approved financial claims were found.</div>',
+                HTMLParserMode::HTML_BODY
+            );
+        } else {
+            /*
+         * Change 'id' if FinancialClaim uses another numeric primary key.
+         */
+            $approvedClaimQuery
+                ->orderBy('id')
+                ->chunkById(
+                    250,
+                    function ($claims) use (
+                        $data,
+                        $mpdf,
+                        &$approvedClaimSerialNumber
+                    ) {
+                        $html = view(
+                            'printFiles.paymentTransactions.financialReportPartials.approvedClaimChunk',
+                            [
+                                'data' => $data,
+                                'claims' => $claims,
+                                'serialStart' => $approvedClaimSerialNumber,
+                            ]
+                        )->render();
+
+                        $mpdf->WriteHTML(
+                            $html,
+                            HTMLParserMode::HTML_BODY
+                        );
+
+                        $approvedClaimSerialNumber += $claims->count();
+
+                        unset($html, $claims);
+
+                        gc_collect_cycles();
+                    },
+                    'id'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Section 4: Unapproved financial claims
+    |--------------------------------------------------------------------------
+    */
+        $mpdf->WriteHTML(
+            '<pagebreak />',
+            HTMLParserMode::HTML_BODY
+        );
+
+        $mpdf->WriteHTML(
+            view(
+                'printFiles.paymentTransactions.financialReportPartials.financialSectionHeading',
+                [
+                    'title' => 'PENDING OR DECLINED FINANCIAL CLAIMS',
+                    'colour' => '#d97706',
+                ]
+            )->render(),
+            HTMLParserMode::HTML_BODY
+        );
+
+        $unapprovedClaimSerialNumber = 0;
+
+        if ($totalUnapprovedClaimCount === 0) {
+            $mpdf->WriteHTML(
+                '<div class="no-records">No unapproved financial claims were found.</div>',
+                HTMLParserMode::HTML_BODY
+            );
+        } else {
+            $unapprovedClaimQuery
+                ->orderBy('id')
+                ->chunkById(
+                    250,
+                    function ($claims) use (
+                        $data,
+                        $mpdf,
+                        &$unapprovedClaimSerialNumber
+                    ) {
+                        $html = view(
+                            'printFiles.paymentTransactions.financialReportPartials.unapprovedClaimChunk',
+                            [
+                                'data' => $data,
+                                'claims' => $claims,
+                                'serialStart' => $unapprovedClaimSerialNumber,
+                            ]
+                        )->render();
+
+                        $mpdf->WriteHTML(
+                            $html,
+                            HTMLParserMode::HTML_BODY
+                        );
+
+                        $unapprovedClaimSerialNumber += $claims->count();
+
+                        unset($html, $claims);
+
+                        gc_collect_cycles();
+                    },
+                    'id'
+                );
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | PDF filename
+    |--------------------------------------------------------------------------
+    */
+        $fileName = 'financial-report-'
+            . $startDate->format('Y-m-d')
+            . '-to-'
+            . $endDate->format('Y-m-d')
+            . '-'
+            . now('Africa/Lagos')->format('H-i-s')
+            . '.pdf';
+
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+
+        /*
+    |--------------------------------------------------------------------------
+    | Inline PDF view
+    |--------------------------------------------------------------------------
+    */
+        $mpdf->Output($fileName, 'D');
+
+        exit;
     }
 }
