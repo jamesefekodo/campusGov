@@ -29,10 +29,10 @@
                                                                 {{ $role->name }}
                                                             </h5>
 
-                                                            <small class="text-muted">
+                                                            {{-- <small class="text-muted">
                                                                 since
                                                                 {{ \Carbon\Carbon::parse($role->created_at)->format('l, d F, Y h:i A') }}
-                                                            </small>
+                                                            </small> --}}
                                                         </div>
 
                                                         <i class="fas fa-user-shield fs-3 text-secondary"></i>

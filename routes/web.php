@@ -19,6 +19,7 @@ use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\Misconduct\MisconductController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
+use App\Models\Config\AccessControl\Role;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -298,6 +299,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/roles/{uuid}', [MembersManagementController::class, 'viewMemberRoles'])->name('viewMemberRoles');
     Route::post('admin/user_management/members/view/roles/assign_new/{uuid}', [MembersManagementController::class, 'assignUserNewRoleSubmit'])->name('assignUserNewRoleSubmit');
     Route::get('admin/user_management/members/view/roles/un_assign_role/{uuid}/{id}', [MembersManagementController::class, 'unAssignRole'])->name('unAssignRole');
+    
 
 
 
@@ -393,6 +395,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/config/user_roles/view/{uuid}', [PermissionAccessController::class, 'viewRole'])->name('viewRole');
     Route::put('admin/config/user_roles/update/{uuid}', [PermissionAccessController::class, 'updateRoleSubmit'])->name('updateRoleSubmit');
     Route::get('admin/config/user_roles/delete/{uuid}', [PermissionAccessController::class, 'deleteRole'])->name('deleteRole');
+
+    // permissions
+    Route::get('/roles/{role:uuid}/permissions', function (Role $role) {
+return view('admin.roles.permissions-edit', compact('role'));})->name('role.permissions.edit');
 
 
     // recognizedSocialMediaPlatforms

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Config;
 
 use App\Http\Controllers\Controller;
+use App\Models\Config\AccessControl\Permission;
 use App\Models\Config\AccessControl\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -69,12 +70,22 @@ class PermissionAccessController extends Controller
         );
 
         $role = Role::where('uuid', $uuid)->first();
+
+        $assignedPermissionIds = $role->permissions()->pluck('permissions.id')->toArray();
+
+        $permissionsByModule = Permission::orderBy('module')
+            ->orderBy('name')
+            ->get()
+            ->groupBy('module');
+
         if (!$role) {
             return redirect()->back()->with('error', 'Role not found.');
         }
 
         $data = [
             'role' => $role,
+            'assignedPermissionIds' => $assignedPermissionIds,
+            'permissionsByModule' => $permissionsByModule,
         ];
 
         return view('users.admin.config.accessControl.roles.viewRole', compact('data'));

@@ -89,6 +89,9 @@
                                                                 {{ $role->description }}
                                                             </td>
                                                             <td class="text-start">
+                                                                @if ($role->users->count() > 0)
+                                                                    {{ $role->users->count() }} /
+                                                                @endif
                                                                 @if ($role->user_cap == null)
                                                                     Unlimited
                                                                 @else

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('module')->nullable();
+            $table->boolean('advanced_management')->default(false);
             $table->timestamps();
-
         });
     }
 

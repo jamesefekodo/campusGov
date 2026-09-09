@@ -17,7 +17,15 @@ class Permission extends Model
         'slug',
         'name',
         'module',
+        'advanced_management',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'advanced_management' => 'boolean',
+        ];
+    }
 
     public function roles()
     {
