@@ -17,7 +17,7 @@
                                 @endif
             </div> 
         </a>
-        <a href="{{ route('memberNewElections') }}">
+        <a href="{{ route('memberCompletedElections') }}">
             <div
                 class="inner_nav_menu {{ Str::startsWith(request()->path(), 'member/elections/completed') ? 'inner_nav_active' : '' }}">
                 Completed

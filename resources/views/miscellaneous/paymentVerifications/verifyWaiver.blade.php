@@ -1,5 +1,5 @@
 @extends('layouts.miscellaneousLayout')
-@section('title', 'Account Setup')
+@section('title', 'Verify Payment Waiver')
 @section('content')
     <div class="container">
         <div class="col-md-12 m-auto">
@@ -13,10 +13,10 @@
                                     file_exists(public_path(
                                             'assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['waiver']->payer->photo)))
                                 <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['waiver']->payer->photo) }}"
-                                    style="max-width: 200px" alt="{{ $data['waiver']->payer->username }}">
+                                    style="max-width: 300px" alt="{{ $data['waiver']->payer->username }}">
                             @else
                                 <img src="{{ asset('system/images/default_profile_pic.webp') }}" alt="Default Picture"
-                                    style="max-width: 200px">
+                                    style="max-width: 300px">
                             @endif
                         </div>
                         <div class="col-md-7">

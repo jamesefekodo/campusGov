@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
+            $table->string('slug')->unique();
             $table->string('name');
             $table->text('description');
 

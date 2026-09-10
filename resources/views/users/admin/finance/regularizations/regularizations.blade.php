@@ -87,20 +87,34 @@
                                                             </td>
                                                             <td class="text-start">
                                                                 @if ($regularization->due)
-                                                                    @php
+                                                                    {{-- @php
                                                                         $academic =
                                                                             $regularization->payer->memberAcademicInfo;
                                                                         $level = studentLevelAtDue(
                                                                             $academic,
                                                                             $regularization->due,
                                                                         );
+                                                                    @endphp --}}
+                                                                    @php
+                                                                        $academic =
+                                                                            $regularization->payer
+                                                                                ?->memberAcademicInfo;
+
+                                                                        $programLevel = studentLevelAtDue(
+                                                                            $academic,
+                                                                            $regularization->due,
+                                                                        );
+
+                                                                        $program = $programLevel['program'];
+                                                                        $level = $programLevel['level'];
                                                                     @endphp
 
                                                                     {{ $regularization->due->title }}
                                                                     ({{ $regularization->due->academic_year }}/{{ $regularization->due->academic_year + 1 }}
                                                                     Academic Session)
                                                                     -
-                                                                    {{ currentLevel($academic->theProgram, $level) }}
+                                                                    {{-- {{ currentLevel($academic->theProgram, $level) }} --}}
+                                                                    {{ currentLevel($program, $level) }}
                                                                 @endif
                                                             </td>
                                                             <td class="text-start">

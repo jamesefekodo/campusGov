@@ -9,6 +9,7 @@ use App\Models\Elections\Election;
 use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Donations\Donation;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\User;
 use Carbon\Carbon;
 use Closure;
 use Illuminate\Http\Request;
@@ -191,7 +192,7 @@ class AuthenticationMiddleware
             ->update([
                 'status' => 'screening'
             ]);
-        ############
+        #############################
         $response = $next($request);
 
         // Disable caching for HTML
@@ -203,6 +204,20 @@ class AuthenticationMiddleware
         // verify Mfa
         if (Auth::check()) {
             $user = Auth::user();
+            // check permision start
+            // update admin access permission
+            $userRec = User::where('username', $user->username)->first();
+            if ($userRec) {
+                $expectedPrivilege = $userRec->roles()->exists();
+
+                if ($user->admin_privilege !== $expectedPrivilege) {
+                    User::where('username', $user->username)->update([
+                        'admin_privilege' => $expectedPrivilege
+                    ]);
+                }
+            }
+
+            // check permnission end
             $currentSessionId = Session::getId();
             $currentSession = DB::table('sessions')->where('id', $currentSessionId)->first();
             $userActiveSessions = DB::table('sessions')->where('user_id', $user->id)->count();
@@ -221,7 +236,7 @@ class AuthenticationMiddleware
 
             $accountType = (int) $user->account_type;
             $accountStatus = (int) $user->account_status;
-            $maintenanceModeLock = $basicDefaultSettings->maintenance_mode === true && $accountType !== 0;
+            $maintenanceModeLock = $basicDefaultSettings->maintenance_mode === true && ! in_array((int) $accountType, [0, 90], true);
 
 
             // session control

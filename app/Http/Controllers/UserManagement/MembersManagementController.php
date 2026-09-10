@@ -355,7 +355,7 @@ class MembersManagementController extends Controller
 
         $data = [
             'members' => $members,
-            'totalMembers' => $totalMembers,
+            // 'totalMembers' => $totalMembers,
             'requestType' => $requestType,
             'searchKey' => $searchKey,
             'pageTitle' => $pageTitle,
@@ -564,7 +564,7 @@ class MembersManagementController extends Controller
 
         $data = [
             'members' => $members,
-            'totalMembers' => $totalMembers,
+            // 'totalMembers' => $totalMembers,
             'requestType' => $requestType,
             'searchKey' => $searchKey,
             'pageTitle' => $pageTitle,
@@ -932,7 +932,7 @@ class MembersManagementController extends Controller
 
         $data = [
             'members' => $members,
-            'totalMembers' => $totalMembers,
+            // 'totalMembers' => $totalMembers,
             'requestType' => $requestType,
             'searchKey' => $searchKey,
             'pageTitle' => $pageTitle,

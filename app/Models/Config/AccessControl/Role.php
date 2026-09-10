@@ -17,6 +17,7 @@ class Role extends Model
     protected $fillable = [
         'tenant_id',
         'uuid',
+        'slug',
         'name',
         'description',
         'user_cap',

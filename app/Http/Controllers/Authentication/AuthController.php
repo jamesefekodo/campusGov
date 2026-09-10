@@ -33,6 +33,7 @@ class AuthController extends Controller
             // 0 - root, 1-admin , 2- student
             case 0:
             case 1:
+            case 1:
                 return redirect()->route('adminDashboard');
             case 2:
                 return redirect()->route('memberDashboard');
@@ -231,13 +232,29 @@ class AuthController extends Controller
 
         // Validate input
         $validator = Validator::make($request->all(), [
+            // 'username' => [
+            //     'required',
+            //     'unique:users,username',
+            //     'regex:/^\S*$/u',           // No spaces allowed
+            //     'max:20',                    // Maximum 20 characters
+            //     'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',  // No email format allowed
+            //     'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',  // No emoji or symbols
+            // ],
             'username' => [
                 'required',
-                'unique:users,username',
-                'regex:/^\S*$/u',           // No spaces allowed
-                'max:8',                    // Maximum 8 characters
-                'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',  // No email format allowed
-                'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',  // No emoji or symbols
+                function ($attribute, $value, $fail) {
+                    $exists = DB::table('users')
+                        ->where('username', $value)
+                        ->exists(); // no tenant_id filter
+
+                    if ($exists) {
+                        $fail('The username has already been taken.');
+                    }
+                },
+                'regex:/^\S*$/u',
+                'max:20',
+                'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',
+                'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',
             ],
             'email' => 'required|email|unique:users,email|unique:member_personal_profiles,email2',
 
@@ -250,7 +267,7 @@ class AuthController extends Controller
             'username.unique' => 'This username is already taken.',
             'username.regex' => 'The username cannot contain spaces.',
             'password.required' => 'The password is required.',
-            'password.min' => 'The password must be at least 8 characters long.',
+            'password.min' => 'The password must be at least 20 characters long.',
             'password.regex' => 'The password must include an uppercase letter, lowercase letter, number, and special character.',
             'confirm_password.same' => 'The confirmation password does not match.',
         ]);
@@ -288,7 +305,9 @@ class AuthController extends Controller
             return $this->accessDeniedLogout();
         }
         $basicDefaultSettings = BasicSystemSetting::first();
-        if ($maintenanceModeLock = $basicDefaultSettings->maintenance_mode === true && (int) $user->account_type !== 0) {
+        if (
+            $basicDefaultSettings->maintenance_mode === true && ! in_array((int) $user->account_type, [0, 90], true)
+        ) {
             return view('utilities.pages.auth.maintenanceMode');
         }
         if (!empty(Auth::check())) {
@@ -589,7 +608,7 @@ class AuthController extends Controller
         if (!$user) {
             return redirect()->back()->with('error', 'Records not found!');
         }
-        if ((int) $user->account_type !== 0) {
+        if (! in_array((int) $user->account_type, [0, 90], true)) {
             return view('utilities.pages.auth.disabledAccount');
         } else {
             return redirect()->route('homepage');

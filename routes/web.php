@@ -18,6 +18,7 @@ use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\Misconduct\MisconductController;
+use App\Http\Controllers\UserManagement\AdminsManagementController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
 use App\Models\Config\AccessControl\Role;
 use Illuminate\Support\Facades\Artisan;
@@ -91,11 +92,21 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 
 
 
-    // oppen routes
+
+
+
+
+    // oppen routes - but requirs auth protection
     Route::get('/verify/payments/waiver/{uuid}', [PaymentTransasctionController::class, 'verifyAssociationDuePaymentWaiver'])->name('verifyAssociationDuePaymentWaiver');
     Route::get('/verify/payments/receipt/{payment_transaction_id}', [PaymentTransasctionController::class, 'verifyPaymentReceipt'])->name('verifyPaymentReceipt');
 
-
+Route::middleware('auth')
+    ->post(
+        '/user-context/{context}',
+        [PermissionAccessController::class, 'switchUserContext']
+    )
+    ->whereIn('context', ['personal', 'admin'])
+    ->name('user.context.switch');
 
 });
 
@@ -166,9 +177,22 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
     Route::get('member/my_profile/misconducts', [MemberSelfProfileController::class, 'myMisconducts'])->name('myMisconducts');
 
+    Route::post('member/my_profile/change_password/submit', [MemberSelfProfileController::class, 'changeSelfPasswordSubmit'])->name('changeSelfPasswordSubmit');
+
+
+
+
+
     // payment
     Route::get('member/payment/dues', [MemberSelfProfileController::class, 'myAssociationDues'])->name('myAssociationDues');
     Route::get('member/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
+    Route::get('member/payment/transactions/view/{payment_transaction_id}', [MemberSelfProfileController::class, 'viewMyPaymentTransaction'])->name('viewMyPaymentTransaction');
+    Route::get('member/payment/transactions/download/{payment_transaction_id}', [PaymentTransasctionController::class, 'downloadPaymentReceipt'])->name('memberDownloadPaymentReceipt');
+
+
+
+
+
 
     // invoice
     Route::get('member/payment/invoices', [InvoiceController::class, 'myInvoices'])->name('myInvoices');
@@ -190,6 +214,11 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/view/{uuid}', [MemberElectionController::class, 'memberViewElection'])->name('memberViewElection');
     Route::post('member/elections/self_application/initiate/{uuid}', [MemberElectionController::class, 'memberInitiateSelfApplyForPositionSubmit'])->name('memberInitiateSelfApplyForPositionSubmit');
     Route::put('member/elections/self_application/update/{uuid}', [MemberElectionController::class, 'memberUpdateSelfApplyForPositionSubmit'])->name('memberUpdateSelfApplyForPositionSubmit');
+
+    Route::get('member/elections/completed', [MemberElectionController::class, 'memberCompletedElections'])->name('memberCompletedElections');
+    Route::get('member/elections/completed/search', [MemberElectionController::class, 'memberCompletedElections'])->name('searchMemberCompletedElections');
+
+
 
     Route::get('member/elections/ongoing', [MemberElectionController::class, 'memberOngoingElections'])->name('memberOngoingElections');
     Route::get('member/elections/ongoing/search', [MemberElectionController::class, 'memberOngoingElections'])->name('memberOngoingElectionsSearch');
@@ -299,7 +328,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/user_management/members/view/roles/{uuid}', [MembersManagementController::class, 'viewMemberRoles'])->name('viewMemberRoles');
     Route::post('admin/user_management/members/view/roles/assign_new/{uuid}', [MembersManagementController::class, 'assignUserNewRoleSubmit'])->name('assignUserNewRoleSubmit');
     Route::get('admin/user_management/members/view/roles/un_assign_role/{uuid}/{id}', [MembersManagementController::class, 'unAssignRole'])->name('unAssignRole');
-    
+
 
 
 
@@ -318,6 +347,17 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/user_management/members/view/association_dues/initiate_payment_waiver/{uuid}', [MembersManagementController::class, 'initiatePaymentWaiver'])->name('initiatePaymentWaiver');
 
     Route::get('admin/user_management/members/view/invoices/{uuid}', [MembersManagementController::class, 'viewMemberInvoices'])->name('viewMemberInvoices');
+
+
+
+    // administrators
+    Route::get('admin/user_management/admin', [AdminsManagementController::class, 'administrators'])->name('administrators');
+    Route::get('admin/user_management/admin/search', [AdminsManagementController::class, 'administrators'])->name('administratorsSearch');
+    Route::get('admin/user_management/admin/add_new', [AdminsManagementController::class, 'createNewAdmin'])->name('createNewAdmin');
+    Route::post('admin/user_management/admin/add_new/submit', [AdminsManagementController::class, 'createAdminProfileSubmit'])->name('createAdminProfileSubmit');
+    Route::get('admin/user_management/admin/view/{uuid}', [AdminsManagementController::class, 'viewAdmin'])->name('viewAdmin');
+
+    
 
 
 
@@ -502,8 +542,8 @@ return view('admin.roles.permissions-edit', compact('role'));})->name('role.perm
     Route::get('admin/finance/other_payments/donations/print/reports/{uuid}', [DonationController::class, 'downloadDonationReport'])->name('downloadDonationReport');
 
     // financialReports
-    Route::get('admin/finance/report', [PaymentTransasctionController::class, 'financialReports'])->name('financialReports');
-    Route::get('admin/finance/report/download', [PaymentTransasctionController::class, 'downloadFinancialReports'])->name('downloadFinancialReports');
+    Route::get('admin/finance/reports', [PaymentTransasctionController::class, 'financialReports'])->name('financialReports');
+    Route::get('admin/finance/reports/download', [PaymentTransasctionController::class, 'downloadFinancialReports'])->name('downloadFinancialReports');
 
 
 

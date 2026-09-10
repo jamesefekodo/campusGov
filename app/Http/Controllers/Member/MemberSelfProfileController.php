@@ -7,6 +7,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Media\RecognizedSocialMediaPlatform;
 use App\Models\Members\MemberAcademicHistory;
@@ -22,6 +23,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class MemberSelfProfileController extends Controller
 {
@@ -978,5 +981,76 @@ class MemberSelfProfileController extends Controller
         ];
 
         return view('users.member.dues.dues', compact('data'));
+    }
+    public function myPaymentTransactions()
+    {
+        $member = Auth::user();
+        $paymentTransactions = PaymentTransaction::where('registered_payer', $member->username)->orderBy('created_at', 'desc')->paginate(20);
+
+        $data = [
+            'member' => $member,
+            'paymentTransactions' => $paymentTransactions,
+        ];
+        return view('users.member.payment.myPaymentTransactions', compact('data'));
+    }
+    public function viewMyPaymentTransaction($payment_transaction_id)
+    {
+        $member = Auth::user();
+        $transaction = PaymentTransaction::where('payment_transaction_id', $payment_transaction_id)->where('registered_payer', $member->username)->first();
+        $data = [
+            'member' => $member,
+            'transaction' => $transaction,
+        ];
+        return view('users.member.payment.viewMyPaymentTransaction', compact('data'));
+    }
+    public function changeSelfPasswordSubmit(Request $request)
+    {
+        $passwordRules = [
+            'required',
+            'string',
+            'min:8',
+            'regex:/[A-Z]/',
+            'regex:/[a-z]/',
+            'regex:/[0-9]/',
+            'regex:/[!@#$%^&*(),.?":{}|<>]/',
+        ];
+
+        // Validate input
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required|string',
+            'password' => $passwordRules,
+            'confirm_password' => 'required|string|same:password',
+        ]);
+
+        // Check validation results
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        // Get authenticated user
+        $user = Auth::user();
+
+        if (!$user) {
+            return redirect()->back()
+                ->with('error', 'User record not found!');
+        }
+
+        // Verify current password
+        if (!Hash::check($request->current_password, $user->password)) {
+            return redirect()->back()
+                ->with('error', 'Current password is incorrect!')
+                ->withInput();
+        }
+
+        // Change password
+        User::where('username', $user->username)->first()->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+
+        return redirect()->back()
+            ->with('success', 'Password changed successfully!');
     }
 }

@@ -1,5 +1,11 @@
 <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
     <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+
+        @if (Auth::user()->account_type == 2)
+            <li class="nav-item mt-4 mb-2">
+                @include('layouts.include.contextSwitcher')
+            </li>
+        @endif
         <li class="nav-item">
             <a class="nav-link {{ Route::is('adminDashboard') ? 'sidebar-active' : '' }}"
                 href="{{ route('adminDashboard') }}">
@@ -46,13 +52,13 @@
                             </a>
                         </li>
                     @endif
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/product_management/categories') ? 'sidebar-active' : '' }}
+                    @if (Auth::user()->hasPermission('admin.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/user_management/admin') ? 'sidebar-active' : '' }}
                              "
-                            href="
-                            {{-- {{ route('categoriesHome') }} --}}
-                             ">Admins</a>
-                    </li>
+                                href="{{ route('administrators') }}">Admins</a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->

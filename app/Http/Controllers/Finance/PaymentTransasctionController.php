@@ -1973,7 +1973,7 @@ class PaymentTransasctionController extends Controller
     | No payment or claim Collections should be stored here.
     |
     */
-    $currentAccountBalance = basicSystemInfo()->account_balance;
+        $currentAccountBalance = basicSystemInfo()->account_balance;
         $data = [
             'tenant' => tenant(),
             'basicSystemInfo' => basicSystemInfo(),
@@ -2330,5 +2330,76 @@ class PaymentTransasctionController extends Controller
         $mpdf->Output($fileName, 'D');
 
         exit;
+    }
+    public function verifyPaymentReceipt($payment_transaction_id)
+    {
+        $payment = PaymentTransaction::query()
+            ->with([
+                'payerPersonalProfile',
+
+                'payerAcademicInfo.theProgram',
+                'payerAcademicInfo.programType',
+                'payerAcademicInfo.theFaculty',
+                'payerAcademicInfo.theDepartment',
+
+                'payerAcademicInfo.approvedReAdmissions.previousProgram',
+                'payerAcademicInfo.approvedReAdmissions.previousProgramType',
+                'payerAcademicInfo.approvedReAdmissions.previousFaculty',
+                'payerAcademicInfo.approvedReAdmissions.previousDepartment',
+
+                /*
+             * Used for the photo in your old Blade:
+             * $payment->registeredPayer->photo
+             */
+                'registeredPayer.memberAcademicInfo.theProgram',
+                'registeredPayer.memberAcademicInfo.programType',
+                'registeredPayer.memberAcademicInfo.theFaculty',
+                'registeredPayer.memberAcademicInfo.theDepartment',
+
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousProgram',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousProgramType',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousFaculty',
+                'registeredPayer.memberAcademicInfo.approvedReAdmissions.previousDepartment',
+
+                'due',
+            ])
+            ->where('payment_status', 'successful')
+            ->where('approval_status', 'approved')->where('payment_transaction_id', $payment_transaction_id)->first();
+
+
+        if (!$payment) {
+            return redirect()->back()->with('error', 'Record not found!');
+        }
+
+
+        // if it is a donation 
+        $amountHeContributed = null;
+        $numberOfContributions = 0;
+        if ($payment->donation) {
+            if ($payment->donation->registeredPayer) {
+                $amountHeContributed = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('registered_payer', $payment->registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->sum('amount_payable');
+                $numberOfContributions = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('registered_payer', $payment->registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->count();
+            } else {
+                $amountHeContributed = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('non_registered_payer', $payment->non_registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->sum('amount_payable');
+                $numberOfContributions = PaymentTransaction::where('donation_id', $payment->donation->donation_id)
+                    ->where('non_registered_payer', $payment->non_registered_payer)->where('payment_status', 'successful')->where('approval_status', 'approved')
+                    ->count();
+            }
+        }
+
+
+        $data = [
+            'payment' => $payment,
+            'amountHeContributed' => $amountHeContributed,
+            'numberOfContributions' => $numberOfContributions,
+        ];
+
+        return view('miscellaneous.paymentVerifications.verifyReceipt', compact('data'));
     }
 }

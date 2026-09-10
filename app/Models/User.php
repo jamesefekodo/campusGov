@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Models\Admin\AdminProfile;
 use App\Models\Config\AccessControl\Role;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
@@ -167,7 +169,7 @@ class User extends Authenticatable
     public function hasPermission(string $permission): bool
     {
         // // Root account bypasses all permission checks
-        if ($this->account_type === 0) {
+        if (in_array((int) $this->account_type, [0, 90], true)) {
             return true;
         }
 
@@ -290,5 +292,17 @@ class User extends Authenticatable
             'initiated_by',
             'username'
         );
+    }
+
+
+
+    // admin profild
+    public function adminProfile()
+    {
+        return $this->belongsTo(AdminProfile::class, 'username', 'username');
+    }
+    public function tenantAdministrators()
+    {
+        return $this->hasMany(AdminProfile::class, 'username', 'username');
     }
 }

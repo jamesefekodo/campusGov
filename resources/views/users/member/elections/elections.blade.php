@@ -15,6 +15,11 @@
                     $searchRoute = route('memberOngoingElectionsSearch');
                     $backRoute = route('memberOngoingElections');
                 }
+                if (in_array(Route::currentRouteName(), ['memberCompletedElections', 'searchMemberCompletedElections'], true)) {
+                    $searchRoute = route('searchMemberCompletedElections');
+                    $backRoute = route('memberCompletedElections');
+                }
+                
             @endphp
 
             <div class="individual-review-card-container">

@@ -98,7 +98,7 @@ class MemberElectionController extends Controller
         $totalElections = 0;
 
 
-        if (Route::currentRouteName() == 'memberNewElectionsSearch') {
+        if (Route::currentRouteName() == 'memberOngoingElectionsSearch') {
             $searchKey = $request->input('searchKey');
             $elections = Election::where('approval_status', 'approved')
                 ->where('status', 'voting')
@@ -140,6 +140,58 @@ class MemberElectionController extends Controller
 
         return view('users.member.elections.elections', compact('data'));
     }
+
+    public function memberCompletedElections(Request $request){
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $elections = '';
+        $totalElections = 0;
+
+
+        if (Route::currentRouteName() == 'searchMemberCompletedElections') {
+            $searchKey = $request->input('searchKey');
+            $elections = Election::where('approval_status', 'approved')
+                ->where('status', 'completed')
+
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    // Group the search conditions to ensure they apply cleanly alongside other constraints
+                    $query->where(function ($q) use ($searchKey) {
+                        $q->where('election_id', 'like', "%{$searchKey}%")
+                            ->orWhere('voting_method', 'like', "%{$searchKey}%")
+                            ->orWhere('title', 'like', "%{$searchKey}%")
+                            ->orWhere('description', 'like', "%{$searchKey}%")
+                            ->orWhere('status', 'like', "%{$searchKey}%");
+                    });
+                })
+                ->orderByDesc('created_at')
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalElections = $elections->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $elections = Election::where('approval_status', 'approved')
+                ->where('status', 'completed')
+                ->orderByDesc('created_at')
+                ->paginate(20);
+
+            $totalElections = $elections->total();
+            $requestType = 'all';
+            $pageTitle = 'Ongoing Elections';
+        }
+        $data = [
+            'elections' => $elections,
+            'totalElections' => $totalElections,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.member.elections.elections', compact('data'));
+    }
+
     public function memberViewElection($uuid)
     {
         $election = Election::where('uuid', $uuid)->first();

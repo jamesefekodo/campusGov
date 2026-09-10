@@ -16,14 +16,16 @@ class DashboardController extends Controller
         if ($user) {
             // 2 student Account
 
-            if ($user->account_type == 2) {
+            if ($user->account_type == 2 && getUserType() === 'member') {
                 $data = [
                     'member' => $user,
                 ];
                 return view('users.member.dashboard', compact('data'));
             }
-            // 1 - Admin, 0 - root
-            if ($user->account_type == 0 || $user->account_type == 1) {
+            // 1 - Admin, 0 - root - 90 odu admin
+            if (
+                in_array((int) $user->account_type, [0, 1, 90], true) || $user->admin_privilege === true
+            ) {
                 $data = [
                     'user' => $user,
                 ];

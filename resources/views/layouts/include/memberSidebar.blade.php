@@ -1,5 +1,8 @@
 <nav id="app-nav-main" class="app-nav app-nav-main flex-grow-1">
     <ul class="app-menu list-unstyled accordion" id="menu-accordion">
+        <li class="nav-item mt-4 mb-2">
+            @include('layouts.include.contextSwitcher')
+        </li>
         <li class="nav-item">
             <a class="nav-link {{ Route::is('memberDashboard') ? 'sidebar-active' : '' }}"
                 href="{{ route('memberDashboard') }}">
@@ -62,7 +65,7 @@
             </div>
         </li><!--//nav-item-->
         {{-- ################# --}}
-        <li class="nav-item has-submenu">
+        {{-- <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'student/members_directory') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-5" aria-expanded="false"
                 aria-controls="submenu-5">
@@ -73,7 +76,7 @@
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
                 </span><!--//submenu-arrow-->
-            </a><!--//nav-link-->
+            </a><!--//nav-link--> --}}
             <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
@@ -215,7 +218,7 @@
                 <span class="nav-link-text">My Profile</span>
             </a><!--//nav-link-->
         </li><!--//nav-item-->
-        <li class="nav-item has-submenu">
+        {{-- <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-6" aria-expanded="false"
                 aria-controls="submenu-6">
@@ -232,12 +235,12 @@
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('couponsHome') }} --}}
+                            {{ route('couponsHome') }}
                              ">Clearance</a>
                     </li>
                 </ul>
             </div>
-        </li><!--//nav-item-->
+        </li><!--//nav-item--> --}}
 
 
 

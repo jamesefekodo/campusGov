@@ -40,7 +40,7 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->foreign('username')->references('username')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('username')->references('username')->on('users')->onUpdate('cascade')->nullOnDelete();
 
             $table->foreign('previous_program')->references('slug')->on('programs')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('previous_program_type')->references('slug')->on('program_types')->onUpdate('cascade')->nullOnDelete();

@@ -102,16 +102,25 @@
 
                     </div><!--//app-branding-->
 
-                    @if (getUserType() === 'companyStaff')
-                        @include('layouts.include.contextSwitcher')
-                    @endif
+                   
+                    
 
-                    @if (in_array(getUserType(), ['root', 'admin']))
+                    {{-- @if (in_array(getUserType(), ['root', 'admin']))
                         @include('layouts.include.adminSidebar')
                     @endif
                     @if (getUserType() === 'member')
                         @include('layouts.include.memberSidebar')
-                    @endif
+                    @endif --}}
+
+                    @php
+    $userType = getUserType();
+@endphp
+
+@if (in_array($userType, ['root', 'admin'], true))
+    @include('layouts.include.adminSidebar')
+@elseif ($userType === 'member')
+    @include('layouts.include.memberSidebar')
+@endif
 
 
 

@@ -23,19 +23,129 @@ use Illuminate\Support\Facades\DB;
 
 
 
+// if (!function_exists('getUserType')) {
+//     function getUserType()
+//     {
+//         if (!Auth::check()) {
+//             return 'guest';
+//         }
+
+//         return match ((int) Auth::user()->account_type) {
+//             0 => 'root',
+//             1 => 'admin',
+//             2 => 'member',
+//             default => 'guest',
+//         };
+//     }
+// }
+
 if (!function_exists('getUserType')) {
-    function getUserType()
+    function getUserType(): string
     {
         if (!Auth::check()) {
             return 'guest';
         }
 
-        return match ((int) Auth::user()->account_type) {
-            0 => 'root',
-            1 => 'admin',
-            2 => 'member',
-            default => 'guest',
-        };
+        $user = Auth::user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Root account
+        |--------------------------------------------------------------------------
+        */
+        if (in_array((int) $user->account_type, [0, 90], true)) {
+            return 'root';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Permanent admin account
+        |--------------------------------------------------------------------------
+        |
+        | account_type = 1 means the account itself is an administrator.
+        | It does not need to switch context.
+        |
+        */
+        if ((int) $user->account_type === 1) {
+            return 'admin';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Non-member/unknown account types
+        |--------------------------------------------------------------------------
+        */
+        if ((int) $user->account_type !== 2) {
+            return 'guest';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Member account
+        |--------------------------------------------------------------------------
+        |
+        | A member can only switch to admin context if:
+        | 1. admin_privilege is true, and
+        | 2. the user still has at least one role.
+        |
+        */
+        $canUseAdminContext = (bool) $user->admin_privilege
+            && $user->roles()->exists();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Normal member: force personal context
+        |--------------------------------------------------------------------------
+        */
+        if (!$canUseAdminContext) {
+            if (session('user_context') !== 'personal') {
+                session([
+                    'user_context' => 'personal',
+                ]);
+            }
+
+            return 'member';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Member with administrative role:
+        | return selected context from session
+        |--------------------------------------------------------------------------
+        */
+        $selectedContext = session(
+            'user_context',
+            'personal'
+        );
+
+        /*
+        |--------------------------------------------------------------------------
+        | Prevent invalid context values
+        |--------------------------------------------------------------------------
+        */
+        if (!in_array($selectedContext, ['personal', 'admin'], true)) {
+            $selectedContext = 'personal';
+
+            session([
+                'user_context' => 'personal',
+            ]);
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Admin context selected
+        |--------------------------------------------------------------------------
+        */
+        if ($selectedContext === 'admin') {
+            return 'admin';
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Personal context selected
+        |--------------------------------------------------------------------------
+        */
+        return 'member';
     }
 }
 
@@ -900,7 +1010,7 @@ if (!function_exists('resolveAcademicContextForDue')) {
                 return [
                     'source'             => 'readmission',
                     'matric_number'      => $reAdmission->previous_matric_number
-                                           ?? $academicInfo->matric_number,
+                        ?? $academicInfo->matric_number,
                     'program'            => $reAdmission->previousProgram?->name,
                     'program_type'       => $reAdmission->previousProgramType?->type_name,
                     'faculty'            => $reAdmission->previousFaculty?->name,

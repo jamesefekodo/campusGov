@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('uuid')->unique();
             $table->string('username')->unique();
-            $table->integer('account_type')->default(2); // 0 - root, 1-admin , 2- student
+            $table->integer('account_type')->default(2); // 0 - root for association, 1-admin , 2- student ---------- 90 - odu root
             $table->integer('account_status')->default(0); // 0 - new , 1- awaiting approval , 2- active, 3 - disabled
             $table->string('phone')->unique();
             $table->string('photo')->nullable();

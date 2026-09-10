@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenancy;
 
+use App\Models\Admin\AdminProfile;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -14,7 +15,7 @@ class Tenant extends Model
     protected $fillable = [
 
         'uuid',
-        'tenant_id',
+        'id',
 
         'name',
         'slug',
@@ -74,5 +75,10 @@ class Tenant extends Model
     public function settings()
     {
         return $this->hasOne(BasicSystemSetting::class);
+    }
+
+    public function tenantAdministrators()
+    {
+        return $this->hasMany(AdminProfile::class, 'tenant_id', 'id');
     }
 }

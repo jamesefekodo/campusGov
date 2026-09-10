@@ -63,16 +63,25 @@
                                     <div class="col-md-6 p-2">
                                         <span style="font-weight: bold">Payment Purpose:</span>
                                         <span class="text-black">
-                                            @php
+                                            {{-- @php
                                                 $academic = $data['regularization']->payer->memberAcademicInfo;
                                                 $level = studentLevelAtDue($academic, $data['regularization']->due);
+                                            @endphp --}}
+                                            @php
+                                                $academic = $data['regularization']->payer?->memberAcademicInfo;
+
+                                                $programLevel = studentLevelAtDue($academic, $data['regularization']->due);
+
+                                                $program = $programLevel['program'];
+                                                $level = $programLevel['level'];
                                             @endphp
 
                                             {{ $data['regularization']->due->title }}
                                             ({{ $data['regularization']->due->academic_year }}/{{ $data['regularization']->due->academic_year + 1 }}
                                             Academic Session)
                                             -
-                                            {{ currentLevel($academic->theProgram, $level) }}
+                                            {{-- {{ currentLevel($academic->theProgram, $level) }} --}}
+                                            {{ currentLevel($program, $level) }}
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">

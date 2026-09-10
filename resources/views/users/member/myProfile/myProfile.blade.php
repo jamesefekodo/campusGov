@@ -7,6 +7,7 @@
             <div class="mb-4">
                 <h1 class="app-page-title mb-0">My Profile</h1>
                 <div class="review-info-card-container">
+
                     <a href="{{ route('myPersonalProfile') }}">
                         <div class="review-info-card">
                             <div class="review-info-icon">
@@ -107,8 +108,7 @@
                             </div>
                         </div>
                     </a>
-                    <a
-                        href="{{ route('myMisconducts') }}">
+                    <a href="{{ route('myMisconducts') }}">
                         <div class="review-info-card">
                             <div class="review-info-icon">
                                 <i class="fa-solid fa-gavel "></i>
@@ -121,14 +121,25 @@
                         </div>
                     </a>
 
-
+                    <a data-toggle="modal" data-target="#changePasswordModal">
+                        <div class="review-info-card">
+                            <div class="review-info-icon">
+                                <i class="fas fa-key"></i>
+                            </div>
+                            <div class="review-info-content">
+                                <p class="review-card-info-title">
+                                    Change Passsword
+                                </p>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-
-
+                
             </div>
-
-
+            
+            
             {{-- modals starts here --}}
+            @include ('users.member.myProfile.include.changePasswordModal')             
             {{-- modals ends here --}}
 
         </div><!--//container-fluid-->

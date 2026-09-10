@@ -30,29 +30,19 @@
                         </a>
                     </div> --}}
                     <!--//app-utility-item-->
-                    <div class="app-utility-item">
 
-                        @if (in_array(getUserType(), ['root', 'admin']) || optional(Auth::user())->admin_privilege)
-                            ₦{{ number_format(basicSystemInfo()->account_balance, 2) }}
+                    {{-- <div class="app-utility-item">
+                        @include('layouts.include.contextSwitcher')
+                    </div><!--//app-utility-item--> --}}
+
+
+
+                    <div class="app-utility-item">
+                        @if (Auth::user()->hasPermission('see_account_balance'))
+                            @if (in_array(getUserType(), ['root', 'admin']) || optional(Auth::user())->admin_privilege)
+                                ₦{{ number_format(basicSystemInfo()->account_balance, 2) }}
+                            @endif
                         @endif
-                    </div><!--//app-utility-item-->
-                    <div class="app-utility-item">
-                        @switch(getUserType())
-                            @case('association')
-                            @case('association_admin')
-                                Reg->
-                                <a href="#" title="Balance">
-                                    ₦{{ number_format(getCurrentAssociation()->associationProfile->regular_account_balance, 2) }}
-                                </a>
-                                ::Alu
-                                <a href="#" title="Balance">
-                                    ₦{{ number_format(getCurrentAssociation()->associationProfile->alumni_account_balance, 2) }}
-                                </a>
-                            @break
-
-                            @default
-                        @endswitch
-
                     </div><!--//app-utility-item-->
 
 
@@ -76,9 +66,21 @@
 
                                     if (
                                         $user->photo &&
-                                        file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo))
+                                        file_exists(
+                                            public_path(
+                                                'assets/tenant_' .
+                                                    tenant()->id .
+                                                    '/uploads/users/members/photo/' .
+                                                    $user->photo,
+                                            ),
+                                        )
                                     ) {
-                                        $image = asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $user->photo);
+                                        $image = asset(
+                                            'assets/tenant_' .
+                                                tenant()->id .
+                                                '/uploads/users/members/photo/' .
+                                                $user->photo,
+                                        );
                                     }
                                 }
                             @endphp
