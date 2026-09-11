@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamp('email_verification_code_expires_at')->nullable();
             $table->boolean('admin_privilege')->default(false);
             $table->string('password');
+            $table->string('last_seen_at');
             $table->rememberToken();
             $table->timestamps();
 

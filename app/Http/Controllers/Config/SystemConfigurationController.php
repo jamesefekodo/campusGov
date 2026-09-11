@@ -3,8 +3,13 @@
 namespace App\Http\Controllers\Config;
 
 use App\Http\Controllers\Controller;
+use App\Models\Config\AccessControl\Role;
+use App\Models\Config\AccessControl\RoleUser;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Config\HomepageSlider;
+use App\Models\Config\SeoDetail;
 use App\Models\Members\MemberAcademicInfo;
+use App\Models\User;
 use DateTime;
 use DateTimeZone;
 use Illuminate\Http\Request;
@@ -105,6 +110,17 @@ class SystemConfigurationController extends Controller
         $basicSystemSetting->save();
 
         MemberAcademicInfo::syncStudentStatuses();
+
+
+        // Revoke per-session roles/permissions
+        $perSessionRoleIds = Role::where('assignment_scope', 'per_session')->pluck('id');
+
+        RoleUser::whereIn('role_id', $perSessionRoleIds)->delete();
+
+        // Disable admin accounts
+        User::where('account_type', 1)
+            ->where('account_status', 2)
+            ->update(['account_status' => 3]);
 
         return back()->with(
             'success',
@@ -343,7 +359,7 @@ class SystemConfigurationController extends Controller
             $mime2 = $file2->getMimeType();
             $ext2  = strtolower($file2->getClientOriginalExtension());
 
-            $uploadPath2 = public_path('assets/tenant_'.tenant()->id . '/uploads/tenantProfile');
+            $uploadPath2 = public_path('assets/tenant_' . tenant()->id . '/uploads/tenantProfile');
             File::ensureDirectoryExists($uploadPath2);
 
             // Base filename
@@ -524,5 +540,454 @@ class SystemConfigurationController extends Controller
         } else {
             return back()->with('error', 'Failed to update mail configuration.');
         }
+    }
+    public function homepageSliders()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.read'),
+            403
+        );
+
+        $sliders = HomepageSlider::orderBy('order')->get();
+        $data = [
+            'sliders' => $sliders,
+        ];
+
+        return view('users.admin.config.sliders.sliders', compact('data'));
+    }
+    public function addNewSliderSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.read'),
+            403
+        );
+
+        $request->validate([
+            'background_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2097152',
+            'header' => 'required|string',
+            'order' => 'required',
+            'description' => 'nullable|string',
+
+        ]);
+
+        $orderExists = HomepageSlider::where('tenant_id', tenant()->id)->where('order', $request->order)->first();
+        if ($orderExists) {
+            return back()->with('error', 'Order already exists!');
+        }
+        $totalExistingSliders = HomepageSlider::count();
+        if ($totalExistingSliders >= 7) {
+            return back()->with('error', 'You can only add up to 7 slider images!');
+        }
+        $slider = new HomepageSlider();
+        $slider->header = trim($request->header);
+        $slider->order = trim($request->order);
+        $slider->description = trim($request->description);
+
+
+        if ($request->hasFile('background_image')) {
+
+            $file = $request->file('background_image');
+            $mime = $file->getMimeType();
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $uploadPath = public_path('assets/tenant_' . tenant()->id . '/uploads/sliders');
+            File::ensureDirectoryExists($uploadPath);
+
+            // Base filename
+            $baseName = Str::slug($request->header, '_');
+
+            $baseName = Str::of($baseName)
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->toString();
+            $fallbackName = $baseName . '.' . $ext;
+            $counter = 1;
+
+            // Delete existing file(s) with same base name regardless of extension
+            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+                if (file_exists($existingFile)) {
+                    unlink($existingFile);
+                }
+            }
+
+            // Avoid overwriting existing files
+            while (file_exists($uploadPath . '/' . $fallbackName)) {
+                $fallbackName = $baseName . '-' . $counter . '.' . $ext;
+                $counter++;
+            }
+
+            $fallbackPath = $uploadPath . '/' . $fallbackName;
+
+            /*
+            |--------------------------------------------------------------------------
+            | GD + WebP processing
+            |--------------------------------------------------------------------------
+            */
+            $processed = false;
+
+            if (function_exists('imagewebp') && function_exists('imagecreatetruecolor')) {
+
+                $tmp = $file->getPathname();
+
+                $src = match ($mime) {
+                    'image/jpeg' => function_exists('imagecreatefromjpeg') ? @imagecreatefromjpeg($tmp) : null,
+                    'image/png'  => function_exists('imagecreatefrompng')  ? @imagecreatefrompng($tmp)  : null,
+                    'image/webp' => function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($tmp) : null,
+                    default => null,
+                };
+
+                if ($src) {
+                    $width  = imagesx($src);
+                    $height = imagesy($src);
+
+                    // Resize if needed
+                    $maxSize = 800;
+                    $scale = min(1, $maxSize / max($width, $height));
+
+                    if ($scale < 1) {
+                        $newW = (int)($width * $scale);
+                        $newH = (int)($height * $scale);
+                        $dst = imagecreatetruecolor($newW, $newH);
+
+                        // Preserve transparency
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+                        $transparent = imagecolorallocatealpha($dst, 0, 0, 0, 127);
+                        imagefill($dst, 0, 0, $transparent);
+
+                        imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $width, $height);
+                        imagedestroy($src);
+                        $src = $dst;
+                    }
+
+                    // WebP conversion with quality loop
+                    $webpName = $baseName . '.webp';
+                    $webpCounter = 1;
+                    $webpPath = $uploadPath . '/' . $webpName;
+
+                    while (file_exists($webpPath)) {
+                        $webpName = $baseName . '-' . $webpCounter . '.webp';
+                        $webpPath = $uploadPath . '/' . $webpName;
+                        $webpCounter++;
+                    }
+
+                    $quality = 90;
+                    do {
+                        imagewebp($src, $webpPath, $quality);
+                        clearstatcache();
+
+                        if (filesize($webpPath) <= 1048576) {
+                            $processed = true;
+                            $slider->background_image = $webpName;
+                            imagedestroy($src);
+                            break;
+                        }
+
+                        $quality -= 5;
+                    } while ($quality >= 40);
+
+                    if (!$processed) {
+                        @unlink($webpPath);
+                    }
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Fallback: move original file
+            |--------------------------------------------------------------------------
+            */
+            if (!$processed) {
+                $file->move($uploadPath, $fallbackName);
+                $slider->background_image = $fallbackName;
+            }
+            $slider->save();
+        }
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function editSliderSubmit($id, Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.update'),
+            403
+        );
+
+        $request->validate([
+            'background_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2097152',
+            'header' => 'required|string',
+            'order' => 'required',
+            'description' => 'nullable|string',
+        ]);
+
+        $slider = HomepageSlider::where('id', $id)->first();
+        if (!$slider) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+
+        if ($request->hasFile('background_image')) {
+
+            $file = $request->file('background_image');
+
+            $mime = $file->getMimeType();
+            $ext  = strtolower($file->getClientOriginalExtension());
+
+            $uploadPath = public_path(
+                'assets/tenant_' . tenant()->id . '/uploads/sliders'
+            );
+
+            File::ensureDirectoryExists($uploadPath);
+
+            /*
+    |--------------------------------------------------------------------------
+    | Generate base filename
+    |--------------------------------------------------------------------------
+    */
+            $baseName = Str::slug($slider->header, '_');
+
+            $baseName = Str::of($baseName)
+                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+                ->trim('_')
+                ->toString();
+
+            /*
+    |--------------------------------------------------------------------------
+    | Delete previous slider image(s)
+    |--------------------------------------------------------------------------
+    */
+            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+                if (is_file($existingFile)) {
+                    @unlink($existingFile);
+                }
+            }
+
+            /*
+    |--------------------------------------------------------------------------
+    | Original uploaded temporary file
+    |--------------------------------------------------------------------------
+    */
+            $tmp = $file->getPathname();
+
+            /*
+    |--------------------------------------------------------------------------
+    | GD + WebP processing
+    |--------------------------------------------------------------------------
+    */
+            $processed = false;
+
+            if (
+                function_exists('imagewebp') &&
+                function_exists('imagecreatetruecolor')
+            ) {
+
+                $src = match ($mime) {
+
+                    'image/jpeg' =>
+                    function_exists('imagecreatefromjpeg')
+                        ? @imagecreatefromjpeg($tmp)
+                        : null,
+
+                    'image/png' =>
+                    function_exists('imagecreatefrompng')
+                        ? @imagecreatefrompng($tmp)
+                        : null,
+
+                    'image/webp' =>
+                    function_exists('imagecreatefromwebp')
+                        ? @imagecreatefromwebp($tmp)
+                        : null,
+
+                    default => null,
+                };
+
+                if ($src) {
+
+                    $width  = imagesx($src);
+                    $height = imagesy($src);
+
+                    /*
+            |--------------------------------------------------------------------------
+            | Resize if larger than 800px
+            |--------------------------------------------------------------------------
+            */
+                    $maxSize = 800;
+
+                    $scale = min(
+                        1,
+                        $maxSize / max($width, $height)
+                    );
+
+                    if ($scale < 1) {
+
+                        $newW = (int) round($width * $scale);
+                        $newH = (int) round($height * $scale);
+
+                        $dst = imagecreatetruecolor($newW, $newH);
+
+                        /*
+                |--------------------------------------------------------------------------
+                | Preserve transparency
+                |--------------------------------------------------------------------------
+                */
+                        imagealphablending($dst, false);
+                        imagesavealpha($dst, true);
+
+                        $transparent = imagecolorallocatealpha(
+                            $dst,
+                            0,
+                            0,
+                            0,
+                            127
+                        );
+
+                        imagefill(
+                            $dst,
+                            0,
+                            0,
+                            $transparent
+                        );
+
+                        imagecopyresampled(
+                            $dst,
+                            $src,
+                            0,
+                            0,
+                            0,
+                            0,
+                            $newW,
+                            $newH,
+                            $width,
+                            $height
+                        );
+
+                        imagedestroy($src);
+
+                        $src = $dst;
+                    }
+
+                    /*
+            |--------------------------------------------------------------------------
+            | WebP output
+            |--------------------------------------------------------------------------
+            */
+                    $webpName = $baseName . '.webp';
+                    $webpPath = $uploadPath . '/' . $webpName;
+
+                    $quality = 90;
+
+                    do {
+
+                        // Remove previous attempt
+                        if (file_exists($webpPath)) {
+                            @unlink($webpPath);
+                        }
+
+                        $success = imagewebp(
+                            $src,
+                            $webpPath,
+                            $quality
+                        );
+
+                        clearstatcache(true, $webpPath);
+
+                        if (
+                            $success &&
+                            file_exists($webpPath) &&
+                            filesize($webpPath) <= 1048576
+                        ) {
+
+                            $processed = true;
+
+                            $slider->background_image = $webpName;
+
+                            break;
+                        }
+
+                        $quality -= 5;
+                    } while ($quality >= 40);
+
+                    /*
+            |--------------------------------------------------------------------------
+            | Cleanup GD resource
+            |--------------------------------------------------------------------------
+            */
+                    imagedestroy($src);
+
+                    /*
+            |--------------------------------------------------------------------------
+            | Remove failed WebP
+            |--------------------------------------------------------------------------
+            */
+                    if (!$processed && file_exists($webpPath)) {
+                        @unlink($webpPath);
+                    }
+                }
+            }
+
+            /*
+    |--------------------------------------------------------------------------
+    | Fallback: save original uploaded file
+    |--------------------------------------------------------------------------
+    */
+            if (!$processed) {
+
+                $fileName = $baseName . '.' . $ext;
+
+                $file->move(
+                    $uploadPath,
+                    $fileName
+                );
+
+                $slider->background_image = $fileName;
+            }
+
+            /*
+    |--------------------------------------------------------------------------
+    | Save database record
+    |--------------------------------------------------------------------------
+    */
+            $slider->save();
+        }
+
+
+        $slider->update([
+            'header' => trim($request->header),
+            'order' => trim($request->order),
+            'description' => trim($request->description),
+        ]);
+
+        return redirect()->back()->with('success', 'Done!');
+    }
+
+    public function seoConfig()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('manage_seo'),
+            403
+        );
+
+        $seoDetails = SeoDetail::firstOrCreate([
+            'tenant_id' => tenant()->id,
+        ]);
+        $data = [
+            'seoDetails' => $seoDetails,
+        ];
+
+        return view('users.admin.config.seo.seoConfig', compact('data'));
+    }
+    public function updateSeoConfigSubmit(Request $request){
+        
     }
 }

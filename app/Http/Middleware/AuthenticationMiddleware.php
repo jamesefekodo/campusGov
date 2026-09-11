@@ -218,6 +218,14 @@ class AuthenticationMiddleware
             }
 
             // check permnission end
+            // auto update last seen start
+            if (
+                ! $userRec->last_seen_at
+                || $userRec->last_seen_at->diffInSeconds(now()) > 300 // 5 minutes
+            ) {
+                $userRec->forceFill(['last_seen_at' => now()])->save();
+            }
+            // auto update last seen end
             $currentSessionId = Session::getId();
             $currentSession = DB::table('sessions')->where('id', $currentSessionId)->first();
             $userActiveSessions = DB::table('sessions')->where('user_id', $user->id)->count();
@@ -513,6 +521,34 @@ class AuthenticationMiddleware
                         && !Route::is('memberUpdateAcademicStatusSubmit')
                     ) {
                         return redirect()->route('memberUpdateAcademicStatus');
+                    }
+                } else {
+                    $requireAcademicStatusUpdate = 'cleared';
+                }
+            }
+
+            // for admin - check if he has at least one role and the role has at least one permission
+            // reverify the first functions
+            if (
+                $maintenanceStatus === 'cleared' &&
+                $emailVerificationStatus === 'cleared' &&
+                $mfaVerificationStatus === 'cleared' &&
+                $policyGuard === 'cleared' &&
+                $sessionLimitStatus === 'cleared' &&
+                $profileSetupStatus === 'cleared' &&
+                $awaitingVerificationStatus === 'cleared' &&
+                $disabledAccountStatus === 'cleared' &&
+                $requireAcademicStatusUpdate === 'cleared'
+            ) {
+                $userRec = User::where('username', $user->username)->first();
+                $hasRole = $userRec->roles()->exists();
+
+                $hasAnyPermission = $userRec->roles()
+                    ->whereHas('permissions')
+                    ->exists();
+                if ($user->account_type == 1) {
+                    if (!$hasRole || !$hasAnyPermission) {
+                        abort(403);
                     }
                 }
             }

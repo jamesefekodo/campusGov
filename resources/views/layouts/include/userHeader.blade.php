@@ -53,11 +53,14 @@
 
                             @php
                                 $user = Auth::user();
-                                $profileRoute = 'adminDashboard';
+                                $profileRoute = 'homepage';
                                 $image = asset('system/images/default_profile_pic.webp');
 
                                 if (getUserType() == 'root' || getUserType() == 'admin') {
-                                    $profileRoute = 'adminDashboard';
+                                    $profileRoute = 'adminSelfProfile';
+                                    if ($user->account_type == 2) {
+                                        $profileRoute = 'homepage';
+                                    }
                                     $image = associationLogo();
                                 }
 

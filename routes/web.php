@@ -24,11 +24,19 @@ use App\Models\Config\AccessControl\Role;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/clear-all', function () {
-    Artisan::call('config:clear');
+// clear cache
+Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
-    return 'All cleared!';
+    Artisan::call('config:clear');
+    Artisan::call('view:clear');
+    Artisan::call('optimize:clear');
+
+    if (function_exists('opcache_reset')) {
+        opcache_reset();
+    }
+    // Redirect back with a success message
+    return redirect()->back()->with('success', 'Application cache cleared successfully');
 });
 
 
@@ -357,7 +365,19 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/user_management/admin/add_new/submit', [AdminsManagementController::class, 'createAdminProfileSubmit'])->name('createAdminProfileSubmit');
     Route::get('admin/user_management/admin/view/{uuid}', [AdminsManagementController::class, 'viewAdmin'])->name('viewAdmin');
 
+    Route::put('admin/user_management/admin/view/update/submit/{uuid}', [AdminsManagementController::class, 'updateAdminProfileSubmit'])->name('updateAdminProfileSubmit');
+    Route::post('admin/user_management/admin/view/change_password/submit/{uuid}', [AdminsManagementController::class, 'changeAdminPasswordSubmit'])->name('changeAdminPasswordSubmit');
+
+    Route::post('admin/user_management/admin/view/account_status/toggle/{uuid}', [AdminsManagementController::class, 'toggleAdminAccountStatus'])->name('toggleAdminAccountStatus');
+
+
     
+    
+
+    
+
+        Route::get('admin/profile/view', [AdminsManagementController::class, 'adminSelfProfile'])->name('adminSelfProfile');
+        Route::post('admin/profile/view', [MemberSelfProfileController::class, 'changeSelfPasswordSubmit'])->name('adminChangeSelfPasswordSubmit');
 
 
 
@@ -411,11 +431,25 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     // basic system configuration
-    Route::get('admin/config/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
-    Route::put('admin/config/basics/acedemic_year/update', [SystemConfigurationController::class, 'updateAcademicYear'])->name('updateAcademicYear');
-    Route::put('admin/config/basics/maintenance_mode/update', [SystemConfigurationController::class, 'updateMaintenanceMode'])->name('updateMaintenanceMode');
-    Route::put('admin/config/basics/system_info/update', [SystemConfigurationController::class, 'updateBasicSystemInfoUpdate'])->name('updateBasicSystemInfoUpdate');
-    Route::put('admin/config/basics/email_config/update', [SystemConfigurationController::class, 'updateEmailConfigSubmit'])->name('updateEmailConfigSubmit');
+    Route::get('admin/config/basics/basics', [SystemConfigurationController::class, 'viewSystemSettings'])->name('configBasicSettings');
+    Route::put('admin/config/basics/basics/acedemic_year/update', [SystemConfigurationController::class, 'updateAcademicYear'])->name('updateAcademicYear');
+    Route::put('admin/config/basics/basics/maintenance_mode/update', [SystemConfigurationController::class, 'updateMaintenanceMode'])->name('updateMaintenanceMode');
+    Route::put('admin/config/basics/basics/system_info/update', [SystemConfigurationController::class, 'updateBasicSystemInfoUpdate'])->name('updateBasicSystemInfoUpdate');
+    Route::put('admin/config/basics/basics/email_config/update', [SystemConfigurationController::class, 'updateEmailConfigSubmit'])->name('updateEmailConfigSubmit');
+
+    // homepage sliders
+    Route::get('admin/config/basics/sliders', [SystemConfigurationController::class, 'homepageSliders'])->name('homepageSliders');
+    Route::post('admin/config/basics/sliders/add_new/submit', [SystemConfigurationController::class, 'addNewSliderSubmit'])->name('addNewSliderSubmit');
+    Route::put('admin/config/basics/sliders/update/{id}/submit', [SystemConfigurationController::class, 'editSliderSubmit'])->name('editSliderSubmit');
+
+    
+    // seo settings 
+    Route::get('admin/config/seo', [SystemConfigurationController::class, 'seoConfig'])->name('seoConfig');
+    Route::put('admin/config/seo/update/submit', [SystemConfigurationController::class, 'updateSeoConfigSubmit'])->name('updateSeoConfigSubmit');
+
+    
+
+
 
     // policy setup
     Route::get('admin/config/policies', [SystemPolicyController::class, 'systemPolicies'])->name('systemPolicies');

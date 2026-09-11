@@ -72,13 +72,21 @@
 
 
     @if ($data['member']->roles->isNotEmpty())
-        <p class="text-capitalize m-0"><span style="font-weight: bold">Role(s):
+        <p class="m-0"><span style="font-weight: bold">Role(s):
             </span>
-           @foreach ($data['member']->roles as $role)
-           <span class="badge bg-secondary ms-1">{{ $role->name }}</span>
-           @endforeach
+            @foreach ($data['member']->roles as $role)
+                <span class="badge bg-secondary ms-1 text-capitalize">{{ $role->name }}</span>
+            @endforeach
         </p>
     @endif
+    <p class="m-0"><span style="font-weight: bold">Last Seen:
+        </span>
+        {{ $data['member']->last_seen_at
+            ? (\Carbon\Carbon::parse($data['member']->last_seen_at)->isToday()
+                ? \Carbon\Carbon::parse($data['member']->last_seen_at)->format('h:i:s A')
+                : \Carbon\Carbon::parse($data['member']->last_seen_at)->format('d M Y h:i:s A'))
+            : '-' }}
+    </p>
 
     <p class="text-capitalize"><span style="font-weight: bold">Account Status:
         </span>

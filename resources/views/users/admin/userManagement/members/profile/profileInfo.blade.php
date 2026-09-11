@@ -120,13 +120,38 @@
                                                     ) }}
                                                 </a>
                                             @endif |
-                                            {{ \Carbon\Carbon::parse($data['member']?->memberPersonalProfile?->verified_at)->format('l, d F Y \a\t h:i A') }}
+                                            @if ($data['member']?->memberPersonalProfile?->verified_at)
+                                                {{ \Carbon\Carbon::parse($data['member']?->memberPersonalProfile?->verified_at)->format('l, d F Y \a\t h:i:s A') }}
+                                            @endif
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
                                         <span style="font-weight: bold">Login Mfa:</span>
-                                        @livewire('user-mfa-toggle', ['userId' => $data['member']->id])
+                                        {{-- @livewire('user-mfa-toggle', ['userId' => $data['member']->id]) --}}
+                                        @if (Auth::user()->hasPermission('verify_users'))
+                                            @livewire('user-mfa-toggle', ['userId' => $data['member']->id])
+                                        @else
+                                            @switch($data['member']->require_login_mfa)
+                                                @case(true)
+                                                    <span class="badge bg-blue text-white">Active</span>
+                                                @break
+
+                                                @default
+                                                    <span class="badge bg-secondary text-white">In-active</span>
+                                            @endswitch
+                                        @endif
                                     </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Last Seen:</span>
+                                        <span class="text-black">
+                                            {{ $data['member']->last_seen_at
+                                                ? (\Carbon\Carbon::parse($data['member']->last_seen_at)->isToday()
+                                                    ? \Carbon\Carbon::parse($data['member']->last_seen_at)->format('h:i:s A')
+                                                    : \Carbon\Carbon::parse($data['member']->last_seen_at)->format('l, d F Y \a\t h:i:s A'))
+                                                : '-' }}
+                                        </span>
+                                    </div>
+
 
                                 </div>
                             </div>

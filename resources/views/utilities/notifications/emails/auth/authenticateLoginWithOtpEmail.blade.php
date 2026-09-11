@@ -4,6 +4,9 @@
         @if ($user->memberPersonalProfile)
             Hello
             {{ $user->memberPersonalProfile->first_name }}
+            @elseif ($user->adminProfile)
+             Hello 
+            {{ $user->adminProfile->name }}
         @else
             Hello
         @endif,

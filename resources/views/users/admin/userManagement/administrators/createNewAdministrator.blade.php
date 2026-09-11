@@ -174,8 +174,7 @@
                             </div>
                             {{-- Back Home --}}
                             <div class="w-100 justify-content-center text-center my-4 pt-5">
-                                <a class="btn btn-primary" href="{{ route('administrators') }}"
-                                    >
+                                <a class="btn btn-primary" href="{{ route('administrators') }}">
                                     <i class="fas fa-chevron-left"></i>
                                     Back
                                 </a>

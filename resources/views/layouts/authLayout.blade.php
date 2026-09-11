@@ -32,7 +32,8 @@
 
 
     <title>
-        @yield('title') | {{ config('app.name') }}
+        @yield('title') |  {{ basicSystemInfo()?->association_acronym ?? config('app.name') }}
+        {{-- {{ config('app.name') }} --}}
     </title>
 
     @yield('style')

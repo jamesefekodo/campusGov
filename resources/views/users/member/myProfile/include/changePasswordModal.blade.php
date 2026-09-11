@@ -15,16 +15,36 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('changeSelfPasswordSubmit') }}"
+                    <form class="form my_form" method="POST"
+                        @php
+if(request()->routeIs('viewAdmin')){
+                        $isForAdminManagement = true;
+                        $isForAdminSelf = false;
+                    }elseif(request()->routeIs('adminSelfProfile')){
+                        $isForAdminManagement = false;
+                        $isForAdminSelf = true;
+                    }
+                    else{
+                        $isForAdminManagement = false;
+                        $isForAdminSelf = false;
+                    } @endphp
+                        @if ($isForAdminManagement == true) action="{{ route('changeAdminPasswordSubmit', ['uuid' => $data['admin']->uuid]) }}"
+                        @elseif ($isForAdminSelf == true)
+                        action="{{ route('adminChangeSelfPasswordSubmit') }}"
+                    @else
+                         action="{{ route('changeSelfPasswordSubmit') }}" @endif
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="form-group col-md-12">
-                                <label for="current_password">Current Password <span class="text-red">*</span></label>
-                                <input type="text" value="{{ old('current_password') }}" class="form-control"
-                                    autocomplete="off" name="current_password" required>
-                                <p style="color: red">{{ $errors->first('current_password') }}</p>
-                            </div>
+                            @if ($isForAdminManagement == false)
+                                <div class="form-group col-md-12">
+                                    <label for="current_password">Current Password <span
+                                            class="text-red">*</span></label>
+                                    <input type="text" value="{{ old('current_password') }}" class="form-control"
+                                        autocomplete="off" name="current_password" required>
+                                    <p style="color: red">{{ $errors->first('current_password') }}</p>
+                                </div>
+                            @endif
                             {{-- Password --}}
                             <div class="form-group col-md-12">
                                 <label for="password" class="form-label">

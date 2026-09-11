@@ -4,7 +4,9 @@
     <div class="app-content pt-3 p-md-3 p-lg-4 mb-4">
         <div class="container-fluid">
             <div class="">
-
+                <div class="navigation">
+                    @include('users.admin.config.basic.include.inner_nav')
+                </div>
                 <div class="row">
                     <div class="individual-review-card-container">
                         <div class="col-md-12 individual-review-card">

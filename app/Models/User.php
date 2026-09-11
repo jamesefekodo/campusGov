@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Admin\AdminProfile;
 use App\Models\Config\AccessControl\Role;
+use App\Models\Config\SystemPolicies\UserAgreedPolicy;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
@@ -58,6 +59,7 @@ class User extends Authenticatable
         'email_verification_code_expires_at',
         'password',
         'admin_privilege',
+        'last_seen_at',
     ];
 
 
@@ -71,6 +73,7 @@ class User extends Authenticatable
             'email_verification' => 'boolean',
             'require_login_mfa' => 'boolean',
             'admin_privilege' => 'boolean',
+            'last_seen_at' => 'datetime',
         ];
     }
 
@@ -294,6 +297,11 @@ class User extends Authenticatable
         );
     }
 
+
+    public function agreedPolicies()
+    {
+        return $this->hasMany(UserAgreedPolicy::class, 'username', 'username');
+    }
 
 
     // admin profild

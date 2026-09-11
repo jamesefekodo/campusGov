@@ -366,7 +366,7 @@
                 <ul class="submenu-list list-unstyled">
                     @if (Auth::user()->hasPermission('basic_system_config.read'))
                         <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basics') ? 'sidebar-active' : '' }}"
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/basic') ? 'sidebar-active' : '' }}"
                                 href="{{ route('configBasicSettings') }}">Basics</a>
                         </li>
                     @endif
@@ -390,19 +390,17 @@
                             ">Other
                             Pages</a>
                     </li>
+                    @if(Auth::user()->hasPermission('manage_seo'))
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/seo') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('systemSeoSettings') }} --}}
-                             ">SEO</a>
+                            href="{{ route('seoConfig') }}">SEO</a>
                     </li>
-                    <li class="submenu-item"><a
+                    @endif
+                    {{-- <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/google_analytics') ? 'sidebar-active' : '' }}"
-                            href="
-                        {{-- {{ route('googleAnalyticsSettings') }} --}}
-                         ">Google
+                            href="{{ route('googleAnalyticsSettings') }}">Google
                             Analytics</a>
-                    </li>
+                    </li> --}}
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/server') ? 'sidebar-active' : '' }}"
                             href="
