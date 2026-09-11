@@ -450,6 +450,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     
 
 
+    // support/ help
+    Route::get('admin/help/chat', [SystemConfigurationController::class, 'whatsAppSupportLines'])->name('whatsAppSupportLines');
+
 
     // policy setup
     Route::get('admin/config/policies', [SystemPolicyController::class, 'systemPolicies'])->name('systemPolicies');

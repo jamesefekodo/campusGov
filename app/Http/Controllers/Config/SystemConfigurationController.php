@@ -987,7 +987,37 @@ class SystemConfigurationController extends Controller
 
         return view('users.admin.config.seo.seoConfig', compact('data'));
     }
-    public function updateSeoConfigSubmit(Request $request){
+    public function updateSeoConfigSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('manage_seo'),
+            403
+        );
+
+        $request->validate([
+            'meta_title' => 'required|string|max:255',
+            'meta_description' => 'required|string',
+            'meta_keywords' => 'required|string',
+            'header_scripts' => 'nullable|string',
+            'body_scripts' => 'nullable|string',
+        ]);
+
         
+        $seoDetails = SeoDetail::where('tenant_id', tenant()->id)->first();
+        if (!$seoDetails) {
+            return redirect()->back()->with('error', 'Seo config not found!');
+        }
+        $seoDetails->meta_title = $request->meta_title;
+        $seoDetails->meta_description = $request->meta_description;
+        $seoDetails->meta_keywords = $request->meta_keywords;
+        $seoDetails->header_scripts = $request->header_scripts;
+        $seoDetails->body_scripts = $request->body_scripts;
+        $seoDetails->save();
+
+                return redirect()->back()->with('success', 'Done!');
+
     }
 }

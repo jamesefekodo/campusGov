@@ -4,6 +4,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Config\HomepageSlider;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Claims\FinancialClaim;
@@ -164,6 +165,14 @@ if (!function_exists('tenantId')) {
         return tenant()?->id;
     }
 }
+
+if (!function_exists('homepageSliders')) {
+    function homepageSliders()
+    {
+        return HomepageSlider::where('tenant_id', tenant()->id)->get();
+    }
+}
+
 
 if (!function_exists('basicSystemInfo')) {
     function basicSystemInfo()

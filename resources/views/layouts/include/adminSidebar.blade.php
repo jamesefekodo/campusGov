@@ -390,11 +390,11 @@
                             ">Other
                             Pages</a>
                     </li>
-                    @if(Auth::user()->hasPermission('manage_seo'))
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/seo') ? 'sidebar-active' : '' }}"
-                            href="{{ route('seoConfig') }}">SEO</a>
-                    </li>
+                    @if (Auth::user()->hasPermission('manage_seo'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/seo') ? 'sidebar-active' : '' }}"
+                                href="{{ route('seoConfig') }}">SEO</a>
+                        </li>
                     @endif
                     {{-- <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/google_analytics') ? 'sidebar-active' : '' }}"
@@ -423,7 +423,7 @@
                 <span class="nav-icon">
                     <i class="fa-solid fa-circle-question"></i>
                 </span>
-                <span class="nav-link-text">Support
+                <span class="nav-link-text">Support/Help
                 </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down bi"></i>
@@ -438,14 +438,15 @@
                              ">Documentation
                         </a>
                     </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/help/chat') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('whatsAppSupportLines') }} --}}
-                             ">WhatsApp
-                            Chat
-                        </a>
-                    </li>
+
+                    @if (Auth::user()->hasPermission('manage_whatsapp_support'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/help/chat') ? 'sidebar-active' : '' }}"
+                                href="{{ route('whatsAppSupportLines') }}">WhatsApp
+                                Chat
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->
