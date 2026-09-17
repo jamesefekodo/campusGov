@@ -46,6 +46,8 @@
     @yield('content')
     {{-- </div> --}}
 
+        @include('layouts.include.supportModal')
+        <div style="margin-bottom:150px"></div>
 
 
     <script src="{{ asset('auth/script.js') }}"></script>

@@ -1,5 +1,5 @@
 <footer class="app-footer">
-    <div class="container footer p-3 text-center">
+    <div class="container footer p-3 text-center" style="font-size: 10px">
         <span class="me-3">
             {{ basicSystemInfo()->footer_plus }}
         </span>

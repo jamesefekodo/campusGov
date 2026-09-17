@@ -651,7 +651,7 @@
                                                                     @if (in_array($data['election']->status, ['draft', 'awaiting_approval', 'new', 'registration', 'screening', 'campaign']))
                                                                         <div class="d-flex justify-content-end">
                                                                             <span
-                                                                                class="badge bg-green text-white p-1 fs-6 mx-2 px-2"
+                                                                                class="badge bg-green text-white p-1 fs-6 mx-2 px-2 text-wrap"
                                                                                 data-toggle="modal"
                                                                                 data-target="#addPositionQualifiedCandidateModal_{{ $position->id }}"
                                                                                 style="cursor: pointer;">
@@ -664,6 +664,122 @@
                                                                 </div>
                                                             </div>
                                                         @endforeach
+
+                                                        {{-- ############################################################################## --}}
+                                                        <script>
+                                                            document.addEventListener('DOMContentLoaded', function() {
+
+                                                                // Program → Program Type
+                                                                document.addEventListener('change', function(e) {
+                                                                    if (!e.target.matches('.addCandidateGroup-program-select')) return;
+
+                                                                    const modal = e.target.closest('.modal');
+                                                                    if (!modal) return;
+
+                                                                    const programSelect = e.target;
+                                                                    const programTypeSelect = modal.querySelector('.addCandidateGroup-program-type-select');
+                                                                    if (!programTypeSelect) return;
+
+                                                                    const programSlug = programSelect.value;
+                                                                    loadProgramTypesForModal(modal, programSlug, '');
+                                                                });
+
+                                                                // Faculty → Department
+                                                                document.addEventListener('change', function(e) {
+                                                                    if (!e.target.matches('.addCandidateGroup-faculty-select')) return;
+
+                                                                    const modal = e.target.closest('.modal');
+                                                                    if (!modal) return;
+
+                                                                    const facultySelect = e.target;
+                                                                    const departmentSelect = modal.querySelector('.addCandidateGroup-department-select');
+                                                                    if (!departmentSelect) return;
+
+                                                                    const facultySlug = facultySelect.value;
+                                                                    loadDepartmentsForModal(modal, facultySlug, '');
+                                                                });
+
+                                                                function loadProgramTypesForModal(modal, programSlug, selected = '') {
+                                                                    const programTypeSelect = modal.querySelector('.addCandidateGroup-program-type-select');
+                                                                    if (!programTypeSelect) return;
+
+                                                                    if (!programSlug) {
+                                                                        programTypeSelect.innerHTML = '<option value="">- Select Program First -</option>';
+                                                                        programTypeSelect.disabled = true;
+                                                                        return;
+                                                                    }
+
+                                                                    programTypeSelect.disabled = true;
+                                                                    programTypeSelect.innerHTML = '<option value="">Loading...</option>';
+
+                                                                    fetch("{{ route('fetchProgramTypes') }}?program_slug=" + encodeURIComponent(programSlug))
+                                                                        .then(res => res.json())
+                                                                        .then(res => {
+                                                                            programTypeSelect.innerHTML = '<option value="">- Select -</option>';
+
+                                                                            if (!res.programTypes || res.programTypes.length === 0) {
+                                                                                programTypeSelect.innerHTML += '<option disabled>No program types found</option>';
+                                                                            } else {
+                                                                                res.programTypes.forEach(type => {
+                                                                                    const option = document.createElement('option');
+                                                                                    option.value = type.slug;
+                                                                                    option.textContent = type.type_name;
+                                                                                    if (selected === type.slug) option.selected = true;
+                                                                                    programTypeSelect.appendChild(option);
+                                                                                });
+                                                                            }
+
+                                                                            programTypeSelect.disabled = false;
+                                                                        })
+                                                                        .catch(err => {
+                                                                            console.error('Error loading program types:', err);
+                                                                            programTypeSelect.innerHTML = '<option value="">Unable to load program types</option>';
+                                                                            programTypeSelect.disabled = false;
+                                                                        });
+                                                                }
+
+                                                                function loadDepartmentsForModal(modal, facultySlug, selected = '') {
+                                                                    const departmentSelect = modal.querySelector('.addCandidateGroup-department-select');
+                                                                    if (!departmentSelect) return;
+
+                                                                    if (!facultySlug) {
+                                                                        departmentSelect.innerHTML = '<option value="">- Select Faculty First -</option>';
+                                                                        departmentSelect.disabled = true;
+                                                                        return;
+                                                                    }
+
+                                                                    departmentSelect.disabled = true;
+                                                                    departmentSelect.innerHTML = '<option value="">Loading...</option>';
+
+                                                                    fetch("{{ route('fetchDepartments') }}?faculty_slug=" + encodeURIComponent(facultySlug))
+                                                                        .then(res => res.json())
+                                                                        .then(res => {
+                                                                            departmentSelect.innerHTML = '<option value="">- Select -</option>';
+
+                                                                            if (!res.departments || res.departments.length === 0) {
+                                                                                departmentSelect.innerHTML += '<option disabled>No departments found</option>';
+                                                                            } else {
+                                                                                res.departments.forEach(dept => {
+                                                                                    const option = document.createElement('option');
+                                                                                    option.value = dept.slug;
+                                                                                    option.textContent = dept.name;
+                                                                                    if (selected === dept.slug) option.selected = true;
+                                                                                    departmentSelect.appendChild(option);
+                                                                                });
+                                                                            }
+
+                                                                            departmentSelect.disabled = false;
+                                                                        })
+                                                                        .catch(err => {
+                                                                            console.error('Error loading departments:', err);
+                                                                            departmentSelect.innerHTML = '<option value="">Unable to load departments</option>';
+                                                                            departmentSelect.disabled = false;
+                                                                        });
+                                                                }
+
+                                                            });
+                                                        </script>
+                                                        {{-- ####################################################################### --}}
                                                     </div>
                                                 @endif
 
@@ -718,7 +834,7 @@
                 </div>
 
             </div>
-        </div>
+        {{-- </div> --}}
 
         @if ($data['election']->voterGroups->isNotEmpty())
             @foreach ($data['election']->voterGroups as $group)

@@ -40,18 +40,13 @@ class AdminsManagementController extends Controller
             $searchKey = $request->input('searchKey');
 
             $admins = User::whereIn('account_type', [0, 1])
-                ->with([
-                    'adminProfile',
-                ])
+                ->where('users.tenant_id', tenant()->id) // qualify
+                ->with(['adminProfile'])
                 ->when($searchKey, function ($query) use ($searchKey) {
-
-                    // Split search into individual words
                     $terms = preg_split('/\s+/', trim($searchKey));
 
                     $query->where(function ($q) use ($terms) {
-
                         foreach ($terms as $term) {
-
                             if (empty($term)) {
                                 continue;
                             }
@@ -59,13 +54,12 @@ class AdminsManagementController extends Controller
                             $keyword = "%{$term}%";
 
                             $q->where(function ($subQuery) use ($keyword) {
-
                                 // Search User fields
-                                $subQuery->where('phone', 'like', $keyword)
-                                    ->orWhere('username', 'like', $keyword)
-                                    ->orWhere('email', 'like', $keyword)
+                                $subQuery->where('users.phone', 'like', $keyword)
+                                    ->orWhere('users.username', 'like', $keyword)
+                                    ->orWhere('users.email', 'like', $keyword)
 
-                                    // Search Admin Profile
+                                    // Search Admin Profile via relationship
                                     ->orWhereHas('adminProfile', function ($pq) use ($keyword) {
                                         $pq->where('name', 'like', $keyword)
                                             ->orWhere('position', 'like', $keyword)
@@ -76,19 +70,9 @@ class AdminsManagementController extends Controller
                         }
                     });
                 })
-
-                ->leftJoin(
-                    'admin_profiles',
-                    'users.username',
-                    '=',
-                    'admin_profiles.username'
-                )
-
+                ->leftJoin('admin_profiles', 'users.username', '=', 'admin_profiles.username')
                 ->orderBy('admin_profiles.name', 'asc')
-
-                // Keep User as the returned model
                 ->select('users.*')
-
                 ->paginate(20)
                 ->withQueryString();
 
@@ -97,6 +81,7 @@ class AdminsManagementController extends Controller
             $pageTitle = 'Search Results :: ' . $searchKey;
         } else {
             $admins = User::whereIn('account_type', [0, 1])
+                ->where('users.tenant_id', tenant()->id) // qualify table
                 ->leftJoin('admin_profiles', 'users.username', '=', 'admin_profiles.username')
                 ->orderByRaw('CASE WHEN users.account_type = 0 THEN 0 ELSE 1 END')
                 ->orderBy('admin_profiles.name', 'asc')
@@ -470,8 +455,9 @@ class AdminsManagementController extends Controller
         return redirect()->back()
             ->with('success', 'Password changed successfully!');
     }
-    public function toggleAdminAccountStatus($uuid, Request $request){
-         /** @var \App\Models\User $user */
+    public function toggleAdminAccountStatus($uuid, Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -484,11 +470,11 @@ class AdminsManagementController extends Controller
             return redirect()->back()->with('error', 'Records not found!');
         }
 
-        if($admin->account_status == 2){
+        if ($admin->account_status == 2) {
             $admin->update([
                 'account_status' => 3,
             ]);
-        }else{
+        } else {
             $admin->update([
                 'account_status' => 2,
             ]);

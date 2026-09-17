@@ -117,73 +117,86 @@
                             </h4>
                             <div class="row m-3 pb-5">
                                 <h5 class="font-weight-bold text-decoration-underline">Basic Info</h5>
-
-                                <div class="col-md-6">
-                                    <p class="m-0">
-                                        First Name: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->first_name }}</span>
-                                    </p>
-                                    <p class="m-0">
-                                        Middle Name: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->middle_name }}</span>
-                                    </p>
-                                    <p class="m-0">
-                                        Last Name: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->last_name }}</span>
-                                    </p>
-                                    <p class="m-0">
-                                        Phone: <span class="text-black">
-                                            {{ $data['member']->memberPersonalProfile->phone1 }}
-                                            @if ($data['member']->memberPersonalProfile->phone2)
-                                                /{{ $data['member']->memberPersonalProfile->phone2 }}
-                                            @endif
-                                        </span>
-                                    </p>
-                                    <p class="m-0">
-                                        Email: <span class="text-black">
-                                            {{ $data['member']->memberPersonalProfile->email1 }}
-                                            @if ($data['member']->memberPersonalProfile->email2)
-                                                /{{ $data['member']->memberPersonalProfile->email2 }}
-                                            @endif
-                                        </span>
-                                    </p>
-
-
+                                {{-- ############################# --}}
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">First Name:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->first_name }}
+                                    </span>
                                 </div>
-                                <div class="col-md-6">
-                                    <p class="m-0">
-                                        Gender: <span class="text-black">
-                                            @switch($data['member']->memberPersonalProfile->gender)
-                                                @case('male')
-                                                    Male
-                                                @break
-
-                                                @case('female')
-                                                    Female
-                                                @break
-
-                                                @default
-                                            @endswitch
-                                        </span>
-                                    </p>
-                                    <p class="m-0">
-                                        DOB: <span
-                                            class="text-black">{{ \Carbon\Carbon::parse($data['member']->memberPersonalProfile->dob)->format('l, d F, Y') }}</span>
-                                    </p>
-
-                                    <p class="m-0">
-                                        Nigerian: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->nationality }}</span>
-                                    </p>
-                                    <p class="m-0">
-                                        State of Origin: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->state_of_origin }}</span>
-                                    </p>
-                                    <p class="m-0">
-                                        L.G.A of Origin: <span
-                                            class="text-black">{{ $data['member']->memberPersonalProfile->lga_of_origin }}</span>
-                                    </p>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Middle Name:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->middle_name }}
+                                    </span>
                                 </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Last Name:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->last_name }}
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Phone:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->phone1 }}
+                                        @if ($data['member']->memberPersonalProfile->phone2)
+                                            /{{ $data['member']->memberPersonalProfile->phone2 }}
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Email:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->email1 }}
+                                        @if ($data['member']->memberPersonalProfile->email2)
+                                            /{{ $data['member']->memberPersonalProfile->email2 }}
+                                        @endif
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Gender:</span>
+                                    <span class="text-black">
+                                        @switch($data['member']->memberPersonalProfile->gender)
+                                            @case('male')
+                                                Male
+                                            @break
+
+                                            @case('female')
+                                                Female
+                                            @break
+
+                                            @default
+                                        @endswitch
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">DOB:</span>
+                                    <span class="text-black">
+                                        {{ \Carbon\Carbon::parse($data['member']->memberPersonalProfile->dob)->format('l, d F, Y') }}
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">Nationality:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->nationality }}
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">State of Origin:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->state_of_origin }}
+                                    </span>
+                                </div>
+                                <div class="col-md-6 p-1">
+                                    <span style="font-weight: bold">L.G.A of Origin:</span>
+                                    <span class="text-black">
+                                        {{ $data['member']->memberPersonalProfile->lga_of_origin }}
+                                    </span>
+                                </div>
+                                {{-- ############################ --}}
+
+
                                 <div class="col-md-12">
                                     <p class="m-0">
                                         Address 1: <span class="text-black">
@@ -222,125 +235,132 @@
                                 <hr class="m-3">
                                 <h5 class="font-weight-bold text-decoration-underline">Academic Info</h5>
                                 <div class="row col-md-12">
-                                    <div class="col-md-6">
-                                        <p class="m-1">
-                                            Academic Status: <span class="text-black">
-                                                @switch($data['member']->memberAcademicInfo->academic_status)
-                                                    @case('student')
-                                                        Student
-                                                    @break
+                                    {{-- ############################# --}}
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Academic Status:</span>
+                                        <span class="text-black">
+                                            @switch($data['member']->memberAcademicInfo->academic_status)
+                                                @case('student')
+                                                    Student
+                                                @break
 
-                                                    @case('extra_year')
-                                                        Extra Year
-                                                    @break
+                                                @case('extra_year')
+                                                    Extra Year
+                                                @break
 
-                                                    @case('alumni')
-                                                        Alumni
-                                                    @break
+                                                @case('alumni')
+                                                    Alumni
+                                                @break
 
-                                                    @case('withdrawn')
-                                                        Withdrawn
-                                                    @break
+                                                @case('withdrawn')
+                                                    Withdrawn
+                                                @break
 
-                                                    @case('suspended')
-                                                        Suspended
-                                                    @break
+                                                @case('suspended')
+                                                    Suspended
+                                                @break
 
-                                                    @case('expelled')
-                                                        Expelled
-                                                    @break
+                                                @case('expelled')
+                                                    Expelled
+                                                @break
 
-                                                    @default
-                                                        Unknown
-                                                @endswitch
-                                            </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Matric Number: <span class="text-black">
-                                                {{ $data['member']->memberAcademicInfo->matric_number }}
-                                            </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Level: <span class="text-black">
-                                                @php
-                                                    $academic = $data['member']->memberAcademicInfo;
-                                                @endphp
+                                                @default
+                                                    Unknown
+                                            @endswitch
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Matric Number:</span>
+                                        <span class="text-black text-uppercase">
+                                            {{ $data['member']->memberAcademicInfo->matric_number }}
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Level:</span>
+                                        <span class="text-black">
+                                            @php
+                                                $academic = $data['member']->memberAcademicInfo;
+                                            @endphp
 
-                                                <span style="font-weight: bold">
-                                                    @if ($academic?->academic_status == 'student')
-                                                        {{-- Current Level: --}}
-                                                    @elseif($academic?->academic_status == 'alumni')
-                                                        Graduated:
-                                                    @else
-                                                        {{ $academic?->academic_status }}
-                                                    @endif
-                                                </span>
-
+                                            <span style="font-weight: bold">
                                                 @if ($academic?->academic_status == 'student')
-
-                                                    {{ currentLevel($academic->theProgram, studentCurrentLevel($academic)) }}
+                                                    {{-- Current Level: --}}
                                                 @elseif($academic?->academic_status == 'alumni')
-                                                    {{ $academic->graduation_session
-                                                        ? $academic->graduation_session . '/' . ($academic->graduation_session + 1)
-                                                        : '-' }}
+                                                    Graduated:
                                                 @else
-                                                    {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
-
-                                                    @if ($academic?->graduation_session)
-                                                        ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
-                                                    @endif
-
+                                                    {{ $academic?->academic_status }}
                                                 @endif
                                             </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Department: <span class="text-black">
-                                                {{ $data['member']->memberAcademicInfo->theDepartment->name }}
-                                            </span>
-                                        </p>
-                                        @if ($data['member']->memberAcademicInfo->graduation_session)
-                                            <p class="m-1">
-                                                Graduation Session: <span class="text-black">
-                                                    {{ $data['member']->memberAcademicInfo->graduation_session }}/{{ $data['member']->memberAcademicInfo->graduation_session + 1 }}
-                                                </span>
-                                            </p>
-                                        @endif
+
+                                            @if ($academic?->academic_status == 'student')
+
+                                                {{ currentLevel($academic->theProgram, studentCurrentLevel($academic)) }}
+                                            @elseif($academic?->academic_status == 'alumni')
+                                                {{ $academic->graduation_session
+                                                    ? $academic->graduation_session . '/' . ($academic->graduation_session + 1)
+                                                    : '-' }}
+                                            @else
+                                                {{ ucfirst(str_replace('_', ' ', $academic?->academic_status ?? '-')) }}
+
+                                                @if ($academic?->graduation_session)
+                                                    ({{ $academic->graduation_session }}/{{ $academic->graduation_session + 1 }})
+                                                @endif
+
+                                            @endif
+                                        </span>
                                     </div>
-                                    <div class="col-md-6">
-                                        <p class="m-1">
-                                            Program: <span class="text-black">
-                                                {{ $data['member']->memberAcademicInfo->theProgram->name }}
-                                                @if ($data['member']->memberAcademicInfo->theProgram->short_name)
-                                                    ({{ $data['member']->memberAcademicInfo->theProgram->short_name }})
-                                                @endif
-                                                - {{ $data['member']->memberAcademicInfo->programType->type_name }}
-                                            </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Program Duration: <span class="text-black">
-                                                @php
-                                                    $academic = $data['member']->memberAcademicInfo;
-                                                @endphp
-
-                                                {{ getProgramDuration($academic->theProgram, $academic->programType, $academic->theDepartment) }}
-                                                Years
-                                            </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Faculty: <span class="text-black">
-                                                {{ $data['member']->memberAcademicInfo->theFaculty->name }}
-                                                @if ($data['member']->memberAcademicInfo->theFaculty->acronym)
-                                                    ({{ $data['member']->memberAcademicInfo->theFaculty->acronym }})
-                                                @endif
-                                            </span>
-                                        </p>
-                                        <p class="m-1">
-                                            Admission Session: <span class="text-black">
-                                                {{ $data['member']->memberAcademicInfo->admission_session }}/{{ $data['member']->memberAcademicInfo->admission_session + 1 }}
-                                            </span>
-                                        </p>
-
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Program:</span>
+                                        <span class="text-black">
+                                            {{ $data['member']->memberAcademicInfo->theProgram->name }}
+                                            @if ($data['member']->memberAcademicInfo->theProgram->short_name)
+                                                ({{ $data['member']->memberAcademicInfo->theProgram->short_name }})
+                                            @endif
+                                            - {{ $data['member']->memberAcademicInfo->programType->type_name }}
+                                        </span>
                                     </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Duration:</span>
+                                        <span class="text-black">
+                                            @php
+                                                $academic = $data['member']->memberAcademicInfo;
+                                            @endphp
+
+                                            {{ getProgramDuration($academic->theProgram, $academic->programType, $academic->theDepartment) }}
+                                            Years
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Faculty:</span>
+                                        <span class="text-black">
+                                            {{ $data['member']->memberAcademicInfo->theFaculty->name }}
+                                            @if ($data['member']->memberAcademicInfo->theFaculty->acronym)
+                                                ({{ $data['member']->memberAcademicInfo->theFaculty->acronym }})
+                                            @endif
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Department:</span>
+                                        <span class="text-black">
+                                            {{ $data['member']->memberAcademicInfo->theDepartment->name }}
+                                        </span>
+                                    </div>
+                                    <div class="col-md-6 p-1">
+                                        <span style="font-weight: bold">Admission Session:</span>
+                                        <span class="text-black">
+                                            {{ $data['member']->memberAcademicInfo->admission_session }}/{{ $data['member']->memberAcademicInfo->admission_session + 1 }}
+                                        </span>
+                                    </div>
+                                    @if ($data['member']->memberAcademicInfo->graduation_session)
+                                        <div class="col-md-6 p-1">
+                                            <span style="font-weight: bold">Graduation Session:</span>
+                                            <span class="text-black">
+                                                {{ $data['member']->memberAcademicInfo->graduation_session }}/{{ $data['member']->memberAcademicInfo->graduation_session + 1 }}
+                                            </span>
+                                        </div>
+                                    @endif
+
+                                    {{-- ########################## --}}
                                 </div>
                                 <div class="col-md-12">
 
@@ -435,7 +455,8 @@
                                                 @endphp
 
                                                 @if ($hasPendingApplication)
-                                                    <p class="fs-3 text-bold text-center"> <i class="fas fa-info-circle me-2"></i>
+                                                    <p class="fs-3 text-bold text-center"> <i
+                                                            class="fas fa-info-circle me-2"></i>
                                                         You have a pending request that is currently under review.
                                                     </p>
                                                 @else

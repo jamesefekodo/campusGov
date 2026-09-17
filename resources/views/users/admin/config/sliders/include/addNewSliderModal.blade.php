@@ -55,7 +55,7 @@
                                     <p style="color: red">{{ $errors->first('order') }}</p>
                                 </div>
                             </div>
-                            <hr class="javascript-form">
+                            {{-- <hr class="javascript-form"> --}}
                         </div>
                         <hr>
 

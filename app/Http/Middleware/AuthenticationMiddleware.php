@@ -262,7 +262,7 @@ class AuthenticationMiddleware
                 $profileSetupStatus = 'cleared';
             }
             $awaitingVerificationStatus = 'waiting';
-            if (in_array($accountType, [0, 1])) {
+            if (in_array($accountType, [0, 1, 90])) {
                 $awaitingVerificationStatus = 'cleared';
             }
 

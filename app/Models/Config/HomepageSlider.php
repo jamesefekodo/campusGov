@@ -19,7 +19,7 @@ class HomepageSlider extends Model
         'description',
     ];
 
-    // caset attributes
+    // cast attributes
     // protected function casts(): array
     // {
     //     return [

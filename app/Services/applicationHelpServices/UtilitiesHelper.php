@@ -10,6 +10,7 @@ use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Claims\FinancialClaim;
 use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Settings\BankAccount;
+use App\Models\Finance\Settings\ElectronicPaymentConfig;
 use App\Models\Finance\Settings\ElectronicPaymentMethod;
 use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentRegularization;
@@ -17,6 +18,7 @@ use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberReAdmissionApplication;
+use App\Models\Support\WhatsappSupportLine;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
@@ -170,6 +172,12 @@ if (!function_exists('homepageSliders')) {
     function homepageSliders()
     {
         return HomepageSlider::where('tenant_id', tenant()->id)->get();
+    }
+}
+if (!function_exists('whatsappSupportLines')) {
+    function whatsappSupportLines()
+    {
+        return WhatsappSupportLine::where('tenant_id', tenant()->id)->where('is_active', true)->orderBy('name')->get();
     }
 }
 
@@ -578,11 +586,16 @@ if (!function_exists('activeBankAccounts')) {
         return BankAccount::where('is_active', true)->orderBy('account_name')->get();
     }
 }
-
 if (!function_exists('electronicsPaymentMethods')) {
     function electronicsPaymentMethods()
     {
-        return ElectronicPaymentMethod::where('is_active', true)->get();
+        return ElectronicPaymentMethod::query()
+            ->where('is_active', true)
+            ->whereHas('apiConfig', function ($q) {
+                $q->where('tenant_id', tenant()->id)
+                  ->where('is_active', true);
+            })
+            ->get();
     }
 }
 

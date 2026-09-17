@@ -551,7 +551,7 @@ class SystemConfigurationController extends Controller
             403
         );
 
-        $sliders = HomepageSlider::orderBy('order')->get();
+        $sliders = HomepageSlider::where('tenant_id', tenant()->id)->orderBy('order')->get();
         $data = [
             'sliders' => $sliders,
         ];
@@ -711,6 +711,265 @@ class SystemConfigurationController extends Controller
         }
         return redirect()->back()->with('success', 'Done!');
     }
+    // public function editSliderSubmit($id, Request $request)
+    // {
+    //     /** @var \App\Models\User $user */
+    //     $user = Auth::user();
+
+    //     abort_unless(
+    //         $user->hasPermission('basic_system_config.update'),
+    //         403
+    //     );
+
+    //     $request->validate([
+    //         'background_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2097152',
+    //         'header' => 'required|string',
+    //         'order' => 'required',
+    //         'description' => 'nullable|string',
+    //     ]);
+
+    //     $slider = HomepageSlider::where('id', $id)->first();
+    //     if (!$slider) {
+    //         return redirect()->back()->with('error', 'Records not found!');
+    //     }
+
+    //     $slider->update([
+    //         'header' => trim($request->header),
+    //         'order' => trim($request->order),
+    //         'description' => trim($request->description),
+    //     ]);
+
+
+    //     if ($request->hasFile('background_image')) {
+
+    //         $file = $request->file('background_image');
+
+    //         $mime = $file->getMimeType();
+    //         $ext  = strtolower($file->getClientOriginalExtension());
+
+    //         $uploadPath = public_path(
+    //             'assets/tenant_' . tenant()->id . '/uploads/sliders'
+    //         );
+
+    //         File::ensureDirectoryExists($uploadPath);
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | Generate base filename
+    // |--------------------------------------------------------------------------
+    // */
+    //         $baseName = Str::slug($slider->header, '_');
+
+    //         $baseName = Str::of($baseName)
+    //             ->replaceMatches('/[^A-Za-z0-9]+/', '_')
+    //             ->trim('_')
+    //             ->toString();
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | Delete previous slider image(s)
+    // |--------------------------------------------------------------------------
+    // */
+    //         foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
+    //             if (is_file($existingFile)) {
+    //                 @unlink($existingFile);
+    //             }
+    //         }
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | Original uploaded temporary file
+    // |--------------------------------------------------------------------------
+    // */
+    //         $tmp = $file->getPathname();
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | GD + WebP processing
+    // |--------------------------------------------------------------------------
+    // */
+    //         $processed = false;
+
+    //         if (
+    //             function_exists('imagewebp') &&
+    //             function_exists('imagecreatetruecolor')
+    //         ) {
+
+    //             $src = match ($mime) {
+
+    //                 'image/jpeg' =>
+    //                 function_exists('imagecreatefromjpeg')
+    //                     ? @imagecreatefromjpeg($tmp)
+    //                     : null,
+
+    //                 'image/png' =>
+    //                 function_exists('imagecreatefrompng')
+    //                     ? @imagecreatefrompng($tmp)
+    //                     : null,
+
+    //                 'image/webp' =>
+    //                 function_exists('imagecreatefromwebp')
+    //                     ? @imagecreatefromwebp($tmp)
+    //                     : null,
+
+    //                 default => null,
+    //             };
+
+    //             if ($src) {
+
+    //                 $width  = imagesx($src);
+    //                 $height = imagesy($src);
+
+    //                 /*
+    //         |--------------------------------------------------------------------------
+    //         | Resize if larger than 800px
+    //         |--------------------------------------------------------------------------
+    //         */
+    //                 $maxSize = 800;
+
+    //                 $scale = min(
+    //                     1,
+    //                     $maxSize / max($width, $height)
+    //                 );
+
+    //                 if ($scale < 1) {
+
+    //                     $newW = (int) round($width * $scale);
+    //                     $newH = (int) round($height * $scale);
+
+    //                     $dst = imagecreatetruecolor($newW, $newH);
+
+    //                     /*
+    //             |--------------------------------------------------------------------------
+    //             | Preserve transparency
+    //             |--------------------------------------------------------------------------
+    //             */
+    //                     imagealphablending($dst, false);
+    //                     imagesavealpha($dst, true);
+
+    //                     $transparent = imagecolorallocatealpha(
+    //                         $dst,
+    //                         0,
+    //                         0,
+    //                         0,
+    //                         127
+    //                     );
+
+    //                     imagefill(
+    //                         $dst,
+    //                         0,
+    //                         0,
+    //                         $transparent
+    //                     );
+
+    //                     imagecopyresampled(
+    //                         $dst,
+    //                         $src,
+    //                         0,
+    //                         0,
+    //                         0,
+    //                         0,
+    //                         $newW,
+    //                         $newH,
+    //                         $width,
+    //                         $height
+    //                     );
+
+    //                     imagedestroy($src);
+
+    //                     $src = $dst;
+    //                 }
+
+    //                 /*
+    //         |--------------------------------------------------------------------------
+    //         | WebP output
+    //         |--------------------------------------------------------------------------
+    //         */
+    //                 $webpName = $baseName . '.webp';
+    //                 $webpPath = $uploadPath . '/' . $webpName;
+
+    //                 $quality = 90;
+
+    //                 do {
+
+    //                     // Remove previous attempt
+    //                     if (file_exists($webpPath)) {
+    //                         @unlink($webpPath);
+    //                     }
+
+    //                     $success = imagewebp(
+    //                         $src,
+    //                         $webpPath,
+    //                         $quality
+    //                     );
+
+    //                     clearstatcache(true, $webpPath);
+
+    //                     if (
+    //                         $success &&
+    //                         file_exists($webpPath) &&
+    //                         filesize($webpPath) <= 1048576
+    //                     ) {
+
+    //                         $processed = true;
+
+    //                         $slider->background_image = $webpName;
+
+    //                         break;
+    //                     }
+
+    //                     $quality -= 5;
+    //                 } while ($quality >= 40);
+
+    //                 /*
+    //         |--------------------------------------------------------------------------
+    //         | Cleanup GD resource
+    //         |--------------------------------------------------------------------------
+    //         */
+    //                 imagedestroy($src);
+
+    //                 /*
+    //         |--------------------------------------------------------------------------
+    //         | Remove failed WebP
+    //         |--------------------------------------------------------------------------
+    //         */
+    //                 if (!$processed && file_exists($webpPath)) {
+    //                     @unlink($webpPath);
+    //                 }
+    //             }
+    //         }
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | Fallback: save original uploaded file
+    // |--------------------------------------------------------------------------
+    // */
+    //         if (!$processed) {
+
+    //             $fileName = $baseName . '.' . $ext;
+
+    //             $file->move(
+    //                 $uploadPath,
+    //                 $fileName
+    //             );
+
+    //             $slider->background_image = $fileName;
+    //         }
+
+    //         /*
+    // |--------------------------------------------------------------------------
+    // | Save database record
+    // |--------------------------------------------------------------------------
+    // */
+    //         $slider->save();
+    //     }
+
+
+
+
+    //     return redirect()->back()->with('success', 'Done!');
+    // }
+
     public function editSliderSubmit($id, Request $request)
     {
         /** @var \App\Models\User $user */
@@ -723,23 +982,72 @@ class SystemConfigurationController extends Controller
 
         $request->validate([
             'background_image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2097152',
-            'header' => 'required|string',
-            'order' => 'required',
-            'description' => 'nullable|string',
+            'header'           => 'required|string',
+            'order'            => 'required',
+            'description'      => 'nullable|string',
         ]);
 
+        /*
+    |--------------------------------------------------------------------------
+    | Find Slider
+    |--------------------------------------------------------------------------
+    */
+
         $slider = HomepageSlider::where('id', $id)->first();
+
         if (!$slider) {
-            return redirect()->back()->with('error', 'Records not found!');
+            return redirect()->back()
+                ->with('error', 'Records not found!');
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | Store old image BEFORE updating the record
+    |--------------------------------------------------------------------------
+    */
+
+        $oldImage = $slider->background_image;
+
+        /*
+    |--------------------------------------------------------------------------
+    | Update slider information
+    |--------------------------------------------------------------------------
+    */
+
+        $slider->header = trim($request->header);
+        $slider->order = trim($request->order);
+        $slider->description = trim($request->description);
+
+        /*
+    |--------------------------------------------------------------------------
+    | Handle Background Image
+    |--------------------------------------------------------------------------
+    */
 
         if ($request->hasFile('background_image')) {
 
             $file = $request->file('background_image');
 
-            $mime = $file->getMimeType();
-            $ext  = strtolower($file->getClientOriginalExtension());
+            /*
+        |--------------------------------------------------------------------------
+        | Check uploaded file
+        |--------------------------------------------------------------------------
+        */
+
+            if (!$file->isValid()) {
+
+                return redirect()->back()
+                    ->with(
+                        'error',
+                        'Image upload failed: ' . $file->getErrorMessage()
+                    );
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Upload directory
+        |--------------------------------------------------------------------------
+        */
 
             $uploadPath = public_path(
                 'assets/tenant_' . tenant()->id . '/uploads/sliders'
@@ -748,41 +1056,48 @@ class SystemConfigurationController extends Controller
             File::ensureDirectoryExists($uploadPath);
 
             /*
-    |--------------------------------------------------------------------------
-    | Generate base filename
-    |--------------------------------------------------------------------------
-    */
-            $baseName = Str::slug($slider->header, '_');
+        |--------------------------------------------------------------------------
+        | Generate filename
+        |--------------------------------------------------------------------------
+        */
 
-            $baseName = Str::of($baseName)
-                ->replaceMatches('/[^A-Za-z0-9]+/', '_')
-                ->trim('_')
-                ->toString();
+            $baseName = Str::slug(
+                trim($request->header),
+                '_'
+            );
 
-            /*
-    |--------------------------------------------------------------------------
-    | Delete previous slider image(s)
-    |--------------------------------------------------------------------------
-    */
-            foreach (glob($uploadPath . '/' . $baseName . '.*') as $existingFile) {
-                if (is_file($existingFile)) {
-                    @unlink($existingFile);
-                }
+            if (empty($baseName)) {
+                $baseName = 'slider_' . $slider->id;
             }
 
             /*
-    |--------------------------------------------------------------------------
-    | Original uploaded temporary file
-    |--------------------------------------------------------------------------
-    */
-            $tmp = $file->getPathname();
+        |--------------------------------------------------------------------------
+        | Temporary uploaded file
+        |--------------------------------------------------------------------------
+        */
+
+            $tmp = $file->getRealPath();
+
+            $mime = $file->getMimeType();
+
+            $ext = strtolower(
+                $file->getClientOriginalExtension()
+            );
 
             /*
-    |--------------------------------------------------------------------------
-    | GD + WebP processing
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | New image information
+        |--------------------------------------------------------------------------
+        */
+
+            $newImageName = null;
             $processed = false;
+
+            /*
+        |--------------------------------------------------------------------------
+        | Try GD WebP processing
+        |--------------------------------------------------------------------------
+        */
 
             if (
                 function_exists('imagewebp') &&
@@ -809,37 +1124,52 @@ class SystemConfigurationController extends Controller
                     default => null,
                 };
 
+                /*
+            |--------------------------------------------------------------------------
+            | Image successfully loaded into GD
+            |--------------------------------------------------------------------------
+            */
+
                 if ($src) {
 
-                    $width  = imagesx($src);
+                    $width = imagesx($src);
                     $height = imagesy($src);
 
                     /*
-            |--------------------------------------------------------------------------
-            | Resize if larger than 800px
-            |--------------------------------------------------------------------------
-            */
-                    $maxSize = 800;
-
-                    $scale = min(
-                        1,
-                        $maxSize / max($width, $height)
-                    );
-
-                    if ($scale < 1) {
-
-                        $newW = (int) round($width * $scale);
-                        $newH = (int) round($height * $scale);
-
-                        $dst = imagecreatetruecolor($newW, $newH);
-
-                        /*
                 |--------------------------------------------------------------------------
-                | Preserve transparency
+                | Resize maximum dimension to 800px
                 |--------------------------------------------------------------------------
                 */
-                        imagealphablending($dst, false);
-                        imagesavealpha($dst, true);
+
+                    $maxSize = 800;
+
+                    if (max($width, $height) > $maxSize) {
+
+                        $scale = $maxSize / max($width, $height);
+
+                        $newWidth = (int) round($width * $scale);
+                        $newHeight = (int) round($height * $scale);
+
+                        $dst = imagecreatetruecolor(
+                            $newWidth,
+                            $newHeight
+                        );
+
+                        /*
+                    |--------------------------------------------------------------------------
+                    | Preserve transparency
+                    |--------------------------------------------------------------------------
+                    */
+
+                        imagealphablending(
+                            $dst,
+                            false
+                        );
+
+                        imagesavealpha(
+                            $dst,
+                            true
+                        );
 
                         $transparent = imagecolorallocatealpha(
                             $dst,
@@ -856,6 +1186,12 @@ class SystemConfigurationController extends Controller
                             $transparent
                         );
 
+                        /*
+                    |--------------------------------------------------------------------------
+                    | Resize
+                    |--------------------------------------------------------------------------
+                    */
+
                         imagecopyresampled(
                             $dst,
                             $src,
@@ -863,8 +1199,8 @@ class SystemConfigurationController extends Controller
                             0,
                             0,
                             0,
-                            $newW,
-                            $newH,
+                            $newWidth,
+                            $newHeight,
                             $width,
                             $height
                         );
@@ -875,29 +1211,51 @@ class SystemConfigurationController extends Controller
                     }
 
                     /*
-            |--------------------------------------------------------------------------
-            | WebP output
-            |--------------------------------------------------------------------------
-            */
+                |--------------------------------------------------------------------------
+                | WebP filename
+                |--------------------------------------------------------------------------
+                */
+
                     $webpName = $baseName . '.webp';
-                    $webpPath = $uploadPath . '/' . $webpName;
+
+                    $webpPath = $uploadPath . DIRECTORY_SEPARATOR . $webpName;
+
+                    /*
+                |--------------------------------------------------------------------------
+                | Compress until <= 1MB
+                |--------------------------------------------------------------------------
+                */
 
                     $quality = 90;
 
                     do {
 
-                        // Remove previous attempt
+                        /*
+                    | Remove previous attempt
+                    */
+
                         if (file_exists($webpPath)) {
                             @unlink($webpPath);
                         }
 
-                        $success = imagewebp(
+                        /*
+                    | Generate WebP
+                    */
+
+                        $success = @imagewebp(
                             $src,
                             $webpPath,
                             $quality
                         );
 
-                        clearstatcache(true, $webpPath);
+                        clearstatcache(
+                            true,
+                            $webpPath
+                        );
+
+                        /*
+                    | Check generated file
+                    */
 
                         if (
                             $success &&
@@ -907,65 +1265,174 @@ class SystemConfigurationController extends Controller
 
                             $processed = true;
 
-                            $slider->background_image = $webpName;
+                            $newImageName = $webpName;
 
                             break;
                         }
+
+                        /*
+                    | Reduce quality
+                    */
 
                         $quality -= 5;
                     } while ($quality >= 40);
 
                     /*
-            |--------------------------------------------------------------------------
-            | Cleanup GD resource
-            |--------------------------------------------------------------------------
-            */
+                |--------------------------------------------------------------------------
+                | Cleanup GD
+                |--------------------------------------------------------------------------
+                */
+
                     imagedestroy($src);
 
                     /*
-            |--------------------------------------------------------------------------
-            | Remove failed WebP
-            |--------------------------------------------------------------------------
-            */
-                    if (!$processed && file_exists($webpPath)) {
+                |--------------------------------------------------------------------------
+                | Remove failed WebP
+                |--------------------------------------------------------------------------
+                */
+
+                    if (
+                        !$processed &&
+                        file_exists($webpPath)
+                    ) {
+
                         @unlink($webpPath);
                     }
                 }
             }
 
             /*
-    |--------------------------------------------------------------------------
-    | Fallback: save original uploaded file
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | Fallback - Store Original File
+        |--------------------------------------------------------------------------
+        */
+
             if (!$processed) {
 
+                /*
+            | Prevent filename collisions
+            */
+
                 $fileName = $baseName . '.' . $ext;
+
+                $destination = $uploadPath . DIRECTORY_SEPARATOR . $fileName;
+
+                /*
+            | If the destination already exists,
+            | remove it before moving the new file.
+            */
+
+                if (file_exists($destination)) {
+                    @unlink($destination);
+                }
+
+                /*
+            | Move uploaded file
+            */
 
                 $file->move(
                     $uploadPath,
                     $fileName
                 );
 
-                $slider->background_image = $fileName;
+                $newImageName = $fileName;
             }
 
             /*
-    |--------------------------------------------------------------------------
-    | Save database record
-    |--------------------------------------------------------------------------
-    */
-            $slider->save();
+        |--------------------------------------------------------------------------
+        | Make sure new image actually exists
+        |--------------------------------------------------------------------------
+        */
+
+            if (
+                !$newImageName ||
+                !file_exists(
+                    $uploadPath . DIRECTORY_SEPARATOR . $newImageName
+                )
+            ) {
+
+                return redirect()->back()
+                    ->with(
+                        'error',
+                        'The image could not be saved.'
+                    );
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Set database filename
+        |--------------------------------------------------------------------------
+        */
+
+            $slider->background_image = $newImageName;
+
+            /*
+        |--------------------------------------------------------------------------
+        | Delete OLD image
+        |--------------------------------------------------------------------------
+        |
+        | Only delete the old image AFTER the new image has been
+        | successfully created.
+        |
+        */
+
+            if (
+                !empty($oldImage) &&
+                $oldImage !== $newImageName
+            ) {
+
+                $oldImagePath = $uploadPath . DIRECTORY_SEPARATOR . $oldImage;
+
+                if (is_file($oldImagePath)) {
+                    @unlink($oldImagePath);
+                }
+            }
+
+            /*
+        |--------------------------------------------------------------------------
+        | Also remove old files using the previous header filename
+        |--------------------------------------------------------------------------
+        |
+        | This handles cases where the slider header was changed.
+        |
+        */
+
+            if (!empty($oldImage)) {
+
+                $oldBaseName = pathinfo(
+                    $oldImage,
+                    PATHINFO_FILENAME
+                );
+
+                foreach (
+                    glob(
+                        $uploadPath .
+                            DIRECTORY_SEPARATOR .
+                            $oldBaseName .
+                            '.*'
+                    ) ?: [] as $existingFile
+                ) {
+
+                    if (
+                        is_file($existingFile) &&
+                        basename($existingFile) !== $newImageName
+                    ) {
+                        @unlink($existingFile);
+                    }
+                }
+            }
         }
 
+        /*
+    |--------------------------------------------------------------------------
+    | Save Slider
+    |--------------------------------------------------------------------------
+    */
 
-        $slider->update([
-            'header' => trim($request->header),
-            'order' => trim($request->order),
-            'description' => trim($request->description),
-        ]);
+        $slider->save();
 
-        return redirect()->back()->with('success', 'Done!');
+        return redirect()->back()
+            ->with('success', 'Done!');
     }
 
     public function seoConfig()
@@ -1005,7 +1472,7 @@ class SystemConfigurationController extends Controller
             'body_scripts' => 'nullable|string',
         ]);
 
-        
+
         $seoDetails = SeoDetail::where('tenant_id', tenant()->id)->first();
         if (!$seoDetails) {
             return redirect()->back()->with('error', 'Seo config not found!');
@@ -1017,7 +1484,6 @@ class SystemConfigurationController extends Controller
         $seoDetails->body_scripts = $request->body_scripts;
         $seoDetails->save();
 
-                return redirect()->back()->with('success', 'Done!');
-
+        return redirect()->back()->with('success', 'Done!');
     }
 }

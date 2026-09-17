@@ -18,6 +18,7 @@ use App\Http\Controllers\Frontend\FrontendController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\Misconduct\MisconductController;
+use App\Http\Controllers\Support\SupportController;
 use App\Http\Controllers\UserManagement\AdminsManagementController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
 use App\Models\Config\AccessControl\Role;
@@ -56,8 +57,11 @@ Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('un
 Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionController::class, 'paystackPaymentCallback'])->name('paystackPaymentCallback');
 Route::get('/callback/with_flutterwave', [PaymentTransasctionController::class, 'flutterwavePaymentCallback'])->name('flutterwavePaymentCallback');
 
+// ##############################################################################
+Route::get('/temporary_upload', [FrontendController::class, 'showUploadForm']);
+Route::post('/process_temporary_upload', [FrontendController::class, 'processTemporaryUpload'])->name('processTemporaryUpload');
 
-
+// ##############################################################################
 
 
 
@@ -451,7 +455,13 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
     // support/ help
-    Route::get('admin/help/chat', [SystemConfigurationController::class, 'whatsAppSupportLines'])->name('whatsAppSupportLines');
+    Route::get('admin/help/chat', [SupportController::class, 'whatsAppSupportLines'])->name('whatsAppSupportLines');
+    Route::post('admin/help/chat/add_new/submit', [SupportController::class, 'addNewWhatsAppSupportLineSubmit'])->name('addNewWhatsAppSupportLineSubmit');
+    Route::put('admin/help/chat/edit/{id}/submit', [SupportController::class, 'editWhatsAppSupportLineSubmit'])->name('editWhatsAppSupportLineSubmit');
+
+
+    
+    
 
 
     // policy setup

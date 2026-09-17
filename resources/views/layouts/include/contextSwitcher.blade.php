@@ -5,7 +5,25 @@
 
      $canSwitchContext =
          Auth::check() && (int) $user->account_type === 2 && (bool) $user->admin_privilege && $user->roles()->exists();
+
+     //  all notifications
+     $allNotifications =
+         countMemberProfilesAwaitingVerification() +
+         countPendingReAdmissionRequests() +
+         totalElectionsAwaitingApproval() +
+         totalElectionCandidatesAwaitingApproval() +
+         totalOngoingElection() +
+         totalElectionsAwaitingApproval() +
+         totalElectionCandidatesAwaitingApproval() +
+         totalOngoingElection();
+
+     if ($allNotifications > 0) {
+         $showAdminNotification = true;
+     } else {
+         $showAdminNotification = false;
+     }
  @endphp
+
 
  @if ($canSwitchContext)
      <div class="dropdown">
@@ -21,6 +39,11 @@
              @else
                  <i class="fas fa-user me-1"></i>
                  Personal Context
+             @endif
+             &nbsp; &nbsp;
+             @if ($showAdminNotification == true)
+                 <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                     style="font-size: 11px"><i class="fas fa-info"></i></span>
              @endif
          </button>
 
@@ -53,6 +76,12 @@
 
                          @if ($userType === 'admin')
                              <i class="fas fa-check float-end mt-1"></i>
+                         @endif
+
+                         &nbsp; &nbsp;
+                         @if ($showAdminNotification == true)
+                             <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                 style="font-size: 11px"><i class="fas fa-info"></i></span>
                          @endif
                      </button>
                  </form>

@@ -44,6 +44,9 @@
 
     <link rel="manifest" href="{{ asset('manifest.json') }}">
 
+    @livewireStyles
+
+
     <!-- Toastr CSS and JS -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
@@ -102,8 +105,8 @@
 
                     </div><!--//app-branding-->
 
-                   
-                    
+
+
 
                     {{-- @if (in_array(getUserType(), ['root', 'admin']))
                         @include('layouts.include.adminSidebar')
@@ -113,14 +116,14 @@
                     @endif --}}
 
                     @php
-    $userType = getUserType();
-@endphp
+                        $userType = getUserType();
+                    @endphp
 
-@if (in_array($userType, ['root', 'admin'], true))
-    @include('layouts.include.adminSidebar')
-@elseif ($userType === 'member')
-    @include('layouts.include.memberSidebar')
-@endif
+                    @if (in_array($userType, ['root', 'admin'], true))
+                        @include('layouts.include.adminSidebar')
+                    @elseif ($userType === 'member')
+                        @include('layouts.include.memberSidebar')
+                    @endif
 
 
 
@@ -133,7 +136,8 @@
         @yield('content')
 
 
-        {{-- @include('layouts.include.utilities.whatsappSupport') --}}
+        @include('layouts.include.supportModal')
+        <div style="margin-bottom:150px"></div>
 
     </div><!--//app-wrapper-->
     <br><br>
@@ -169,6 +173,7 @@
     {{-- @include('layouts.include.utilities.swalNotificationFunctions') --}}
 
 
+
     <script>
         document.querySelectorAll('form').forEach(form => {
 
@@ -186,6 +191,8 @@
 
         });
     </script>
+
+    @livewireScripts
 
 </body>
 

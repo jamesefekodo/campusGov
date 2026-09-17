@@ -334,7 +334,7 @@
                                                     <h4> <span
                                                             class="badge bg-secondary-subtle text-secondary fs-6">{{ $loop->iteration }}</span>
                                                         {{ $position->position }}</h4>
-                                                    <div class="row text-black text-capitalize mb-5">
+                                                    <div class="text-black text-capitalize mb-5">
                                                         <div class="">
                                                             <span class="fw-bold text-muted">Description:</span>
                                                             {{ $position->description }}
@@ -484,9 +484,9 @@
 
                 </div>
 
+                </div>
             </div>
-        </div>
 
-    </div><!--//container-fluid-->
+        </div><!--//container-fluid-->
     </div><!--//app-content-->
 @endsection

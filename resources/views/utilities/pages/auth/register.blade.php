@@ -10,8 +10,7 @@
 
                 <h2 class="m-2 text-center auth_header">Register</h2>
                 {{-- <p class="m-2 text-center">Please sign in to your account</p> --}}
-                <form class="" action="{{ route('submitUserRegistrationRequest') }}"
-                    method="POST">
+                <form class="" action="{{ route('submitUserRegistrationRequest') }}" method="POST">
                     @csrf
                     <input type="text" placeholder="Username" name="username" required />
                     <p style="color: red">{{ $errors->first('username') }}</p>
@@ -68,7 +67,7 @@
                     <p class=""><a href="{{ route('loginPage') }}">Login</a></p>
                     <p class=""><a
                             href="
-                        {{-- {{ route('forgotPassword') }} --}}
+                        {{ route('forgotPassword') }}
                          ">Forgot
                             Password</a>
                     </p>

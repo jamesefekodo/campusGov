@@ -1,5 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', 'Election Related Requests Pending Approval')
+@section('title', 'Processed Election Related Requests ')
 
 @section('content')
     <div class="app-content pt-3 mb-4">
@@ -157,6 +157,13 @@
                                                 </tbody>
                                             @endif
                                         </table>
+
+                                        {{-- Pagination --}}
+                                        @php
+                                            $paginatedArray = $data['alreadyProcessedCandidateRequests'];
+                                        @endphp
+
+                                        @include('layouts.include.pagination')
 
                                     </div>
 

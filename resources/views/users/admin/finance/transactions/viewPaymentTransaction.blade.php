@@ -156,7 +156,7 @@
                                                         ({{ $data['transaction']->election->academic_session }}/{{ $data['transaction']->election->academic_session + 1 }}))
                                                         <a href="{{ route('viewElectionCandidateApplication', ['uuid' => $data['transaction']->electionCandidateApplication->uuid]) }}"
                                                             target="_blank" class="badge bg-secondary text-white"
-                                                            title="View Donation">
+                                                            title="View Election">
                                                             <i class="fas fa-link"></i>
                                                         </a>
                                                     @endif

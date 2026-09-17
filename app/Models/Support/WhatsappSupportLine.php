@@ -15,6 +15,14 @@ class WhatsappSupportLine extends Model
         'tenant_id',
         'name',
         'number',
-        'status',
+        'is_active',
     ];
+
+    // cast attributes
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+        ];
+    }
 }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('name');
             $table->string('number');
-            $table->string('status')->default('active');
+            $table->boolean('is_active')->default(1);
             $table->timestamps();
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();

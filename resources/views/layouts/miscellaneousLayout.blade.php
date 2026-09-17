@@ -76,6 +76,7 @@
     <div class="mb-5">
         @yield('content')
 
+        <div style="margin-bottom:150px"></div>
     </div>
 
 
@@ -120,7 +121,8 @@
 
     {{-- Sweet Alert --}}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
-    {{-- @include('layouts.include.utilities.whatsappSupport') --}}
+
+        @include('layouts.include.supportModal')
 
     {{-- @include('layouts.include.utilities.swalNotificationFunctions') --}}
 

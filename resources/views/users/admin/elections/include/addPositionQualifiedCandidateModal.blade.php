@@ -20,8 +20,78 @@
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-
+                            {{-- ########################################################################### --}}
+                            <!-- Program -->
                             <div class="form-group col-md-4">
+                                <label for="addCandidateGroup-program-select_{{ $position->id }}">
+                                    Program <span class="text-red">*</span>
+                                </label>
+
+                                <select class="form-select addCandidateGroup-program-select"
+                                    data-position-id="{{ $position->id }}" name="program" required>
+                                    <option value="">- Select -</option>
+                                    @foreach ($data['activeProgram'] as $program)
+                                        <option value="{{ $program->slug }}"
+                                            {{ old('program') == $program->slug ? 'selected' : '' }}>
+                                            {{ $program->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <p class="text-danger">{{ $errors->first('program') }}</p>
+                            </div>
+
+                            <!-- Program Type -->
+                            <div class="form-group col-md-4">
+                                <label for="addCandidateGroup-program-type-select_{{ $position->id }}">
+                                    Program Type
+                                </label>
+
+                                <select class="form-select addCandidateGroup-program-type-select"
+                                    data-position-id="{{ $position->id }}" name="program_type" disabled>
+                                    <option value="">- Select Program First -</option>
+                                </select>
+
+                                <p class="text-danger">{{ $errors->first('program_type') }}</p>
+                            </div>
+
+                            <!-- Faculty -->
+                            <div class="form-group col-md-4">
+                                <label for="addCandidateGroup-faculty-select_{{ $position->id }}">
+                                    Faculty
+                                </label>
+
+                                <select class="form-select addCandidateGroup-faculty-select"
+                                    data-position-id="{{ $position->id }}" name="faculty">
+                                    <option value="">- Select -</option>
+                                    @foreach ($data['activeFaculties'] as $faculty)
+                                        <option value="{{ $faculty->slug }}"
+                                            {{ old('faculty') == $faculty->slug ? 'selected' : '' }}>
+                                            {{ $faculty->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+
+                                <p class="text-danger">{{ $errors->first('faculty') }}</p>
+                            </div>
+
+                            <!-- Department -->
+                            <div class="form-group col-md-4">
+                                <label for="addCandidateGroup-department-select_{{ $position->id }}">
+                                    Department
+                                </label>
+
+                                <select class="form-select addCandidateGroup-department-select"
+                                    data-position-id="{{ $position->id }}" name="department" disabled>
+                                    <option value="">- Select Faculty First -</option>
+                                </select>
+
+                                <p class="text-danger">{{ $errors->first('department') }}</p>
+                            </div>
+
+                            {{-- ##################################################################################### --}}
+
+                            {{-- <div class="form-group col-md-4">
                                 <label for="addCandidateGroup-program-select">
                                     Program <span class="text-red">*</span>
                                 </label>
@@ -96,7 +166,7 @@
                                 <p class="text-danger">
                                     {{ $errors->first('department') }}
                                 </p>
-                            </div>
+                            </div> --}}
 
                             <div class="form-group col-md-4">
                                 <label for="start_level">
@@ -180,7 +250,7 @@
 
                     {{-- scripts start --}}
                     {{-- Add Candidate Group scripts --}}
-                    <script>
+                    {{-- <script>
                         document.addEventListener('DOMContentLoaded', function() {
 
                             const addCandidateGroupProgramSelect =
@@ -420,7 +490,7 @@
                             }
 
                         });
-                    </script>
+                    </script> --}}
                     {{-- scripts end --}}
 
                 </div> <!-- Close modal_form_wrapper -->

@@ -1904,3 +1904,250 @@ body.modal-open {
     outline: 3px solid color-mix(in srgb, var(--system-primary) 25%, white);
 }
 /* electronic payment method end */
+
+/* dashboard start */
+.dashboard-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 20px;
+}
+
+.dashboard-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* center everything horizontally */
+    gap: 16px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.dashboard-logos {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+}
+
+.dashboard-logos img {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+}
+
+.dashboard-title {
+    flex: 1;
+    min-width: 0;
+    text-align: center; /* center text */
+}
+
+.dashboard-title-text {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.dashboard-acronym {
+    color: #6b7280;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.dashboard-chapter {
+    color: #6b7280;
+    font-weight: 500;
+    margin-left: 6px;
+}
+
+/* Mobile layout: logos on top, text below, all centered */
+@media (max-width: 576px) {
+    .dashboard-header-inner {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .dashboard-logos {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dashboard-logos img {
+        height: 36px;
+    }
+
+    .dashboard-title {
+        width: 100%;
+        text-align: center;
+    }
+
+    .dashboard-title-text {
+        font-size: 0.95rem;
+    }
+}
+
+.dashboard-cards {
+    padding: 16px 20px;
+    /* max-width: 1200px; */
+    margin: 0 auto;
+}
+
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.dashboard-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 1.25rem;
+}
+
+.card-content {
+    min-width: 0;
+}
+
+.card-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    line-height: 1.2;
+    margin-bottom: 4px;
+}
+
+.card-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Accent variants */
+.card-accent-primary .card-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.card-accent-secondary .card-icon {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+.card-accent-success .card-icon {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.card-accent-warning .card-icon {
+    background: #fffbeb;
+    color: #d97706;
+}
+
+.card-accent-danger .card-icon {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.card-accent-info .card-icon {
+    background: #ecfeff;
+    color: #0891b2;
+}
+
+@media (max-width: 576px) {
+    .dashboard-cards {
+        padding: 12px 14px;
+    }
+
+    .cards-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .dashboard-card {
+        padding: 14px;
+    }
+
+    .card-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .card-value {
+        font-size: 1.15rem;
+    }
+}
+
+.card-value-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.balance-text {
+    flex: 1;
+    min-width: 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.balance-toggle {
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.balance-toggle:hover {
+    background: #f3f4f6;
+    color: #111827;
+}
+
+@media (max-width: 576px) {
+    .balance-text {
+        font-size: 1.15rem;
+    }
+}
+/* dashboard end */

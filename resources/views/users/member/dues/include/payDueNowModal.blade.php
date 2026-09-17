@@ -492,7 +492,7 @@
 
                         <button type="submit" class="green-button submit-btn">
                             <span class="btn-text">
-                                Submit
+                                Proceed
                             </span>
 
                             <span class="btn-loading" style="display:none;">

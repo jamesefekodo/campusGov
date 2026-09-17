@@ -472,7 +472,7 @@ class PaymentTransasctionController extends Controller
                         ->orWhere('state_of_origin', 'like', "%$searchKey%")
                         ->orWhere('lga_of_origin', 'like', "%$searchKey%");
                 })
-                ->orderBy('updated_at', 'desc')
+                ->orderBy('paid_at', 'desc')
                 ->paginate(20)
                 ->withQueryString();
 
@@ -480,7 +480,7 @@ class PaymentTransasctionController extends Controller
             $requestType = 'search';
             $pageTitle = 'Search Results :: ' . $searchKey;
         } else {
-            $transactions = PaymentTransaction::orderBy('updated_at', 'desc')->paginate(20);
+            $transactions = PaymentTransaction::orderBy('paid_at', 'desc')->paginate(20);
             $totalTransactions = PaymentTransaction::count();
             $requestType = 'all';
             $pageTitle = 'Payment Transactions';
