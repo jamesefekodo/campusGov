@@ -107,6 +107,57 @@
                                             {{ $data['candidate']->position->description }}
                                         </span>
                                     </div>
+                                    {{-- ############################################################################## --}}
+                                    @if (Auth::user()->account_type == '90')
+                                        <hr>
+                                        <form class="form my_form" method="POST"
+                                            action="{{ route('manualSyncElectionTemp') }}" enctype="multipart/form-data">
+                                            @csrf <div class="form-row mt-5 mb-5">
+                                                <div class="col m-1">
+                                                    <input type="hidden" class="form-control" name="election_id"
+                                                        value="{{ $data['election']->election_id }}">
+                                                </div>
+                                                <div class="col m-1">
+                                                    <input type="hidden" class="form-control" name="position"
+                                                        value="{{ $data['candidate']->position->id }}">
+                                                </div>
+                                                <div class="col m-1">
+                                                    <input type="hidden" class="form-control" name="candidate"
+                                                        value="{{ $data['candidate']->application_id }}">
+                                                </div>
+                                                <div class="row col-md-12">
+                                                    <div class="col co-md-6 m-1">
+                                                        <input type="text" class="form-control" name="voter"
+                                                            value="{{ old('voter') }}" placeholder="Voter">
+                                                    </div>
+                                                    <div class="col co-md-6 m-1">
+                                                        <input type="text" class="form-control"
+                                                            name="level_at_application"
+                                                            value="{{ old('level_at_application') }}" placeholder="Level">
+                                                    </div>
+                                                    <div class="col co-md-6 m-1">
+                                                        <input type="text" class="form-control" name="created_at"
+                                                            value="{{ old('created_at') }}" placeholder="created_at">
+                                                    </div>
+                                                    <div class="col co-md-6 m-1">
+                                                        <input type="text" class="form-control" name="updated_at"
+                                                            value="{{ old('updated_at') }}" placeholder="updated_at">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button type="submit" class="green-button submit-btn">
+                                                <span class="btn-text">
+                                                    Submit
+                                                </span>
+
+                                                <span class="btn-loading" style="display:none;">
+                                                    <i class="fas fa-spinner fa-spin"></i> Processing...
+                                                </span>
+                                            </button>
+                                        </form>
+                                        <hr>
+                                    @endif
+                                    {{-- ############################################################################## --}}
 
                                 </div>
                             </div>
@@ -119,7 +170,8 @@
                                                 <table class="table table-bordered p-3">
                                                     <thead class="justify-content-center text-center align-middle">
                                                         <tr>
-                                                            <th scope="col" style="width: 10px" class="table_header">S/N
+                                                            <th scope="col" style="width: 10px" class="table_header">
+                                                                S/N
                                                             </th>
                                                             <th scope="col" class="table_header">
                                                                 Voter
@@ -223,7 +275,8 @@
                                                 <table class="table table-bordered p-3">
                                                     <thead class="justify-content-center text-center align-middle">
                                                         <tr>
-                                                            <th scope="col" style="width: 10px" class="table_header">S/N
+                                                            <th scope="col" style="width: 10px" class="table_header">
+                                                                S/N
                                                             </th>
                                                             <th scope="col" class="table_header">
                                                                 Voter

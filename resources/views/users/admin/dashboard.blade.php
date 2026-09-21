@@ -228,16 +228,19 @@
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                     <h5 class="dashboard-section-title mb-0">Members Analytics</h5>
 
+
                     <button type="button" class="btn btn-outline-primary" data-toggle="collapse"
                         data-target="#membersAnalyticsFilters">
                         <i class="fas fa-filter me-1"></i> Filter Analytics
                     </button>
                 </div>
 
+
                 <div class="collapse show" id="membersAnalyticsFilters">
                     <div class="dashboard-card mb-3">
                         <form method="GET" action="{{ url()->current() }}" class="row g-3 p-3">
                             {{-- Preserve any existing unrelated query parameters if needed. --}}
+
 
                             <div class="col-md-3">
                                 <label class="form-label">Academic Year</label>
@@ -250,6 +253,7 @@
                                     @endforeach
                                 </select>
                             </div>
+
 
                             <div class="col-md-3">
                                 <label class="form-label">Academic Status</label>
@@ -279,6 +283,7 @@
                                 </select>
                             </div>
 
+
                             <div class="col-md-3">
                                 <label class="form-label">Faculty</label>
                                 <select class="form-select" id="analytics-faculty-select" name="analytics_faculty">
@@ -292,6 +297,7 @@
                                 </select>
                             </div>
 
+
                             <div class="col-md-3">
                                 <label class="form-label">Department</label>
                                 <select class="form-select" id="analytics-department-select" name="analytics_department"
@@ -299,6 +305,7 @@
                                     <option value="">Select faculty first</option>
                                 </select>
                             </div>
+
 
                             <div class="col-md-3">
                                 <label class="form-label">Programme</label>
@@ -313,6 +320,7 @@
                                 </select>
                             </div>
 
+
                             <div class="col-md-3">
                                 <label class="form-label">Programme Type</label>
                                 <select class="form-select" id="analytics-program-type-select"
@@ -320,6 +328,7 @@
                                     <option value="">Select programme first</option>
                                 </select>
                             </div>
+
 
                             <div class="col-md-3">
                                 <label class="form-label">Gender</label>
@@ -333,6 +342,7 @@
                                 </select>
                             </div>
 
+
                             <div class="col-md-3 d-flex align-items-end gap-2">
                                 <button type="submit" class="green-button submit-btn w-100">
                                     <i class="fas fa-chart-bar me-1"></i> Apply
@@ -343,6 +353,7 @@
                     </div>
                 </div>
 
+
                 <div class="cards-grid mb-3">
                     <div class="dashboard-card card-accent-primary">
                         <div class="card-icon"><i class="fas fa-users"></i></div>
@@ -351,6 +362,7 @@
                             <div class="card-value">{{ number_format($data['membersAnalytics']['total_students']) }}</div>
                         </div>
                     </div>
+
 
                     <div class="dashboard-card card-accent-info">
                         <div class="card-icon"><i class="fas fa-filter"></i></div>
@@ -362,21 +374,23 @@
                     </div>
                 </div>
 
+
                 <div class="row g-3">
-                    <div class="col-lg-6">
+                    <div class="col-md-6">
                         <div class="dashboard-card h-100">
                             <div class="card-content w-100">
                                 <div class="card-label">Students by Level</div><canvas id="analyticsByLevel"></canvas>
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-md-6">
                         <div class="dashboard-card h-100">
                             <div class="card-content w-100">
                                 <div class="card-label">Students by Gender</div><canvas id="analyticsByGender"></canvas>
                             </div>
                         </div>
                     </div>
+
 
                     <div class="col-lg-6">
                         <div class="dashboard-card h-100">
@@ -386,7 +400,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-md-6">
                         <div class="dashboard-card h-100">
                             <div class="card-content w-100">
                                 <div class="card-label">Students by Programme Type</div><canvas
@@ -394,7 +408,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-6">
+                    <div class="col-md-6">
                         <div class="dashboard-card">
                             <div class="card-content w-100">
                                 <div class="card-label">Academic Status Distribution</div><canvas
@@ -402,7 +416,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-md-6">
                         <div class="dashboard-card h-100 w-100">
                             <div class="card-content w-100">
                                 <div class="card-label">Students by Faculty</div><canvas id="analyticsByFaculty"></canvas>
@@ -411,8 +425,9 @@
                     </div>
 
 
-                    <div class="col-lg-12">
-                        <div class="dashboard-card h-100">
+
+                    <div class="col-md-12">
+                        <div class="dashboard-card w-100">
                             <div class="card-content w-100">
                                 <div class="card-label">Students by Department</div><canvas
                                     id="analyticsByDepartment"></canvas>
@@ -421,6 +436,7 @@
                     </div>
                 </div>
             </section>
+
 
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
@@ -431,39 +447,150 @@
                         '#0891b2', '#db2777', '#65a30d', '#ea580c', '#4f46e5'
                     ];
 
+                    /*
+                     * Short labels only on smaller screens.
+                     *
+                     * On desktop, the chart has enough space for a longer name.
+                     */
+                    function getDepartmentLabelLimit() {
+                        const screenWidth = window.innerWidth;
+
+                        if (screenWidth < 576) {
+                            return 8;
+                        }
+
+                        if (screenWidth < 768) {
+                            return 14;
+                        }
+
+                        if (screenWidth < 992) {
+                            return 18;
+                        }
+
+                        return 28;
+                    }
+
+                    function getDepartmentFontSize() {
+                        return window.innerWidth < 576 ? 8 : 10;
+                    }
+
+                    /*
+                     * This retains full names for the tooltip but uses a shorter
+                     * version beneath the Department chart bars.
+                     */
+                    function prepareDepartmentChart(rows, limit = 10) {
+                        const isMobile = window.innerWidth < 576;
+
+                        /*
+                         * Mobile = 8 characters.
+                         * Tablet = 18 characters.
+                         * Desktop = 28 characters.
+                         */
+                        const labelLength = isMobile ?
+                            8 :
+                            window.innerWidth < 992 ?
+                            18 :
+                            28;
+
+                        const preparedRows = (rows || [])
+                            .slice()
+                            .sort(function(a, b) {
+                                return Number(b.count) - Number(a.count);
+                            })
+                            .slice(0, limit);
+
+                        return {
+                            labels: preparedRows.map(function(row) {
+                                const fullLabel = String(row.label || 'Not specified');
+
+                                /*
+                                 * Remove "Department of" only from the label under the chart.
+                                 * The hover tooltip still contains the complete original name.
+                                 */
+                                const cleanLabel = fullLabel
+                                    .replace(/^Department of\s+/i, '')
+                                    .replace(/^Department\s+/i, '')
+                                    .replace(/^Faculty of\s+/i, '')
+                                    .replace(/\sand\s/gi, ' & ')
+                                    .replace(/\s+/g, ' ')
+                                    .trim();
+
+                                if (cleanLabel.length <= labelLength) {
+                                    return cleanLabel;
+                                }
+
+                                return cleanLabel.substring(0, labelLength).trim() + '…';
+                            }),
+
+                            fullLabels: preparedRows.map(function(row) {
+                                return String(row.label || 'Not specified');
+                            }),
+
+                            counts: preparedRows.map(function(row) {
+                                return Number(row.count || 0);
+                            })
+                        };
+                    }
+                    /*
+                     * Your normal chart renderer.
+                     * This works for all charts except the Department chart.
+                     */
                     function renderChart(canvasId, rows, type = 'bar', horizontal = false) {
                         const canvas = document.getElementById(canvasId);
-                        if (!canvas || !rows) return;
+
+                        if (!canvas || !rows || !rows.length) {
+                            return;
+                        }
 
                         new Chart(canvas, {
                             type: type,
+
                             data: {
-                                labels: rows.map(row => row.label),
+                                labels: rows.map(function(row) {
+                                    return row.label;
+                                }),
+
                                 datasets: [{
                                     label: 'Members',
-                                    data: rows.map(row => row.count),
-                                    backgroundColor: rows.map((_, index) => palette[index % palette
-                                        .length] + 'B3'),
-                                    borderColor: rows.map((_, index) => palette[index % palette.length]),
+
+                                    data: rows.map(function(row) {
+                                        return row.count;
+                                    }),
+
+                                    backgroundColor: rows.map(function(_, index) {
+                                        return palette[index % palette.length] + 'B3';
+                                    }),
+
+                                    borderColor: rows.map(function(_, index) {
+                                        return palette[index % palette.length];
+                                    }),
+
                                     borderWidth: 1,
                                     borderRadius: type === 'bar' ? 5 : 0
                                 }]
                             },
+
                             options: {
                                 responsive: true,
                                 maintainAspectRatio: true,
                                 indexAxis: horizontal ? 'y' : 'x',
+
                                 plugins: {
                                     legend: {
                                         display: type === 'doughnut' || type === 'pie'
                                     },
+
                                     tooltip: {
                                         callbacks: {
-                                            label: context =>
-                                                `${context.label}: ${Number(context.raw).toLocaleString()} member(s)`
+                                            label: function(context) {
+                                                return context.label + ': ' +
+                                                    Number(context.raw).toLocaleString() +
+                                                    ' member(s)';
+                                            }
                                         }
                                     }
                                 },
+
                                 scales: type === 'doughnut' || type === 'pie' ? {} : {
                                     x: {
                                         ticks: {
@@ -472,8 +599,10 @@
                                             minRotation: 0
                                         }
                                     },
+
                                     y: {
                                         beginAtZero: true,
+
                                         ticks: {
                                             precision: 0
                                         }
@@ -483,10 +612,112 @@
                         });
                     }
 
+                    /*
+                     * Department-only renderer.
+                     *
+                     * No Chart.getChart(), no dynamic height, and no impact on
+                     * any other chart on the page.
+                     */
+                    function renderDepartmentChart(rows) {
+                        const canvas = document.getElementById('analyticsByDepartment');
+
+                        if (!canvas || !rows || !rows.length) {
+                            return;
+                        }
+
+                        const departmentData = prepareDepartmentChart(rows, 10);
+
+                        new Chart(canvas, {
+                            type: 'bar',
+
+                            data: {
+                                labels: departmentData.labels,
+
+                                datasets: [{
+                                    label: 'Members',
+                                    data: departmentData.counts,
+
+                                    backgroundColor: departmentData.counts.map(function(_, index) {
+                                        return palette[index % palette.length] + 'B3';
+                                    }),
+
+                                    borderColor: departmentData.counts.map(function(_, index) {
+                                        return palette[index % palette.length];
+                                    }),
+
+                                    borderWidth: 1,
+                                    borderRadius: 5
+                                }]
+                            },
+
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+
+                                    tooltip: {
+                                        callbacks: {
+                                            title: function(tooltipItems) {
+                                                const index = tooltipItems[0].index;
+
+                                                return departmentData.fullLabels[index];
+                                            },
+
+                                            label: function(tooltipItem) {
+                                                return 'Members: ' +
+                                                    Number(tooltipItem.yLabel).toLocaleString() +
+                                                    ' member(s)';
+                                            }
+                                        }
+                                    }
+                                },
+
+                                scales: {
+                                    xAxes: [{
+                                        ticks: {
+                                            /*
+                                             * Show all bars/labels. The 8-character mobile labels
+                                             * are short enough, and rotation prevents collisions.
+                                             */
+                                            autoSkip: false,
+
+                                            /*
+                                             * Mobile: deliberately slant labels.
+                                             * Tablet/desktop: remain horizontal.
+                                             */
+                                            maxRotation: window.innerWidth < 576 ? 55 : 0,
+                                            minRotation: window.innerWidth < 576 ? 55 : 0,
+
+                                            /*
+                                             * Mobile: smaller text.
+                                             * Larger screens: normal text.
+                                             */
+                                            fontSize: window.innerWidth < 576 ? 8 : 10
+                                        }
+                                    }],
+
+                                    yAxes: [{
+                                        ticks: {
+                                            beginAtZero: true,
+                                            precision: 0
+                                        }
+                                    }]
+                                }
+                            }
+                        });
+                    }
+
+                    /*
+                     * Render all charts.
+                     */
                     renderChart('analyticsByLevel', analytics.by_level, 'bar');
                     renderChart('analyticsByGender', analytics.by_gender, 'doughnut');
                     renderChart('analyticsByFaculty', analytics.by_faculty, 'bar', true);
-                    renderChart('analyticsByDepartment', analytics.by_department, 'bar', true);
+                    renderDepartmentChart(analytics.by_department);
                     renderChart('analyticsByProgram', analytics.by_program, 'bar', true);
                     renderChart('analyticsByProgramType', analytics.by_program_type, 'doughnut');
                     renderChart('analyticsByStatus', analytics.by_status, 'bar');
@@ -498,7 +729,9 @@
 
                     function loadAnalyticsDepartments(facultySlug, selected = '') {
                         if (!facultySlug) {
-                            departmentSelect.innerHTML = '<option value="">Select faculty first</option>';
+                            departmentSelect.innerHTML =
+                                '<option value="">Select faculty first</option>';
+
                             departmentSelect.disabled = true;
                             return;
                         }
@@ -507,25 +740,33 @@
                         departmentSelect.innerHTML = '<option value="">Loading...</option>';
 
                         fetch("{{ route('fetchDepartments') }}?faculty_slug=" + encodeURIComponent(facultySlug))
-                            .then(response => {
-                                if (!response.ok) throw new Error('Unable to load departments');
+                            .then(function(response) {
+                                if (!response.ok) {
+                                    throw new Error('Unable to load departments');
+                                }
+
                                 return response.json();
                             })
-                            .then(response => {
-                                departmentSelect.innerHTML = '<option value="">All departments</option>';
+                            .then(function(response) {
+                                departmentSelect.innerHTML =
+                                    '<option value="">All departments</option>';
 
-                                (response.departments || []).forEach(department => {
+                                (response.departments || []).forEach(function(department) {
                                     const option = document.createElement('option');
+
                                     option.value = department.slug;
                                     option.textContent = department.name;
                                     option.selected = selected === department.slug;
+
                                     departmentSelect.appendChild(option);
                                 });
 
                                 departmentSelect.disabled = false;
                             })
-                            .catch(() => {
-                                departmentSelect.innerHTML = '<option value="">Unable to load departments</option>';
+                            .catch(function() {
+                                departmentSelect.innerHTML =
+                                    '<option value="">Unable to load departments</option>';
+
                                 departmentSelect.disabled = false;
                             });
                     }
@@ -536,46 +777,61 @@
                         });
 
                         if (facultySelect.value) {
-                            loadAnalyticsDepartments(facultySelect.value, selectedDepartment);
+                            loadAnalyticsDepartments(
+                                facultySelect.value,
+                                selectedDepartment
+                            );
                         }
                     }
 
                     // Programme → Programme Type
                     const programSelect = document.getElementById('analytics-program-select');
-                    const programTypeSelect = document.getElementById('analytics-program-type-select');
+                    const programTypeSelect = document.getElementById(
+                        'analytics-program-type-select'
+                    );
                     const selectedProgramType = @json($data['selectedAnalyticsProgramType'] ?? '');
 
                     function loadAnalyticsProgramTypes(programSlug, selected = '') {
                         if (!programSlug) {
-                            programTypeSelect.innerHTML = '<option value="">Select programme first</option>';
+                            programTypeSelect.innerHTML =
+                                '<option value="">Select programme first</option>';
+
                             programTypeSelect.disabled = true;
                             return;
                         }
 
                         programTypeSelect.disabled = true;
-                        programTypeSelect.innerHTML = '<option value="">Loading...</option>';
+                        programTypeSelect.innerHTML =
+                            '<option value="">Loading...</option>';
 
                         fetch("{{ route('fetchProgramTypes') }}?program_slug=" + encodeURIComponent(programSlug))
-                            .then(response => {
-                                if (!response.ok) throw new Error('Unable to load programme types');
+                            .then(function(response) {
+                                if (!response.ok) {
+                                    throw new Error('Unable to load programme types');
+                                }
+
                                 return response.json();
                             })
-                            .then(response => {
-                                programTypeSelect.innerHTML = '<option value="">All programme types</option>';
+                            .then(function(response) {
+                                programTypeSelect.innerHTML =
+                                    '<option value="">All programme types</option>';
 
-                                (response.programTypes || []).forEach(type => {
+                                (response.programTypes || []).forEach(function(type) {
                                     const option = document.createElement('option');
+
                                     option.value = type.slug;
                                     option.textContent = type.type_name;
                                     option.selected = selected === type.slug;
+
                                     programTypeSelect.appendChild(option);
                                 });
 
                                 programTypeSelect.disabled = false;
                             })
-                            .catch(() => {
+                            .catch(function() {
                                 programTypeSelect.innerHTML =
                                     '<option value="">Unable to load programme types</option>';
+
                                 programTypeSelect.disabled = false;
                             });
                     }
@@ -586,7 +842,10 @@
                         });
 
                         if (programSelect.value) {
-                            loadAnalyticsProgramTypes(programSelect.value, selectedProgramType);
+                            loadAnalyticsProgramTypes(
+                                programSelect.value,
+                                selectedProgramType
+                            );
                         }
                     }
                 });

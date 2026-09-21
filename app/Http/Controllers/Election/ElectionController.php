@@ -16,6 +16,7 @@ use App\Models\Elections\ElectionPosition;
 use App\Models\Elections\ElectionPositionQualifiedCandidateGroup;
 use App\Models\Elections\ElectionStandardVote;
 use App\Models\Members\MemberPersonalProfile;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -1431,10 +1432,12 @@ class ElectionController extends Controller
             return redirect()->back()->with('error', 'Election result is not available!');
         }
         $standardVotes = $candidate->standardVotes()
+            ->orderByDesc('created_at')
             ->paginate(50)
             ->withQueryString();
 
         $monetaryVotes = $candidate->monetaryVotes()
+            ->orderByDesc('created_at')
             ->paginate(50)
             ->withQueryString();
 
@@ -1446,5 +1449,53 @@ class ElectionController extends Controller
         ];
 
         return view('users.admin.elections.results.viewElectionVoters', compact('data'));
+    }
+
+    public function manualSyncElectionTemp(Request $request)
+    {
+        $request->validate([
+            'election_id' => 'required',
+            'position' => 'required',
+            'candidate' => 'required',
+            'voter' => 'required',
+            'level_at_application' => 'required',
+            'created_at' => 'required',
+            'updated_at' => 'required',
+        ]);
+
+        $alreadyVoted = ElectionStandardVote::where('election_id', $request->election_id)->where('position', $request->position)->where('voter', $request->voter)->first();
+        if ($alreadyVoted) {
+            return redirect()->back()->with('error', 'Already exists!');
+        }
+
+        $userProfile = User::where('username', $request->voter)->first();
+        if (!$userProfile) {
+            return redirect()->back()->with('error', 'Voter profile not found!');
+        }
+
+        $vote = new ElectionStandardVote();
+        $vote->election_id = $request->election_id;
+        $vote->position = $request->position;
+        $vote->candidate = $request->candidate;
+        $vote->voter = $request->voter;
+        $vote->level_at_application = $request->level_at_application;
+
+        $vote->tenant_id = 1;
+
+        $vote->current_program = $userProfile->memberAcademicInfo->program;
+        $vote->current_program_type = $userProfile->memberAcademicInfo->program_type;
+        $vote->current_department = $userProfile->memberAcademicInfo->department;
+        $vote->current_faculty = $userProfile->memberAcademicInfo->faculty;
+
+
+
+
+
+
+        $vote->created_at = $request->created_at;
+        $vote->updated_at = $request->updated_at;
+        $vote->save();
+
+        return redirect()->back()->with('success', 'Done!');
     }
 }

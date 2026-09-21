@@ -34,7 +34,7 @@ class AdminsManagementController extends Controller
         $pageTitle = '';
         $admins = '';
         $totalAdmins = 0;
-
+        $membersWithAdminPermission = null;
 
         if (Route::currentRouteName() == 'administratorsSearch') {
             $searchKey = $request->input('searchKey');
@@ -73,12 +73,14 @@ class AdminsManagementController extends Controller
                 ->leftJoin('admin_profiles', 'users.username', '=', 'admin_profiles.username')
                 ->orderBy('admin_profiles.name', 'asc')
                 ->select('users.*')
-                ->paginate(20)
+                ->get()
                 ->withQueryString();
 
-            $totalAdmins = $admins->total();
+            // $totalAdmins = $admins->total();
             $requestType = 'search';
             $pageTitle = 'Search Results :: ' . $searchKey;
+
+            $membersWithAdminPermission = null;
         } else {
             $admins = User::whereIn('account_type', [0, 1])
                 ->where('users.tenant_id', tenant()->id) // qualify table
@@ -86,10 +88,11 @@ class AdminsManagementController extends Controller
                 ->orderByRaw('CASE WHEN users.account_type = 0 THEN 0 ELSE 1 END')
                 ->orderBy('admin_profiles.name', 'asc')
                 ->select('users.*')
-                ->paginate(20);
-            $totalAdmins = $admins->total();
+                ->get();
+            // $totalAdmins = $admins->total();
             $requestType = 'all';
             $pageTitle = 'Administrators';
+            $membersWithAdminPermission = User::whereHas('roles')->get();
         }
         $data = [
             'admins' => $admins,
@@ -97,6 +100,7 @@ class AdminsManagementController extends Controller
             'requestType' => $requestType,
             'searchKey' => $searchKey,
             'pageTitle' => $pageTitle,
+            'membersWithAdminPermission' => $membersWithAdminPermission,
         ];
         return view('users.admin.userManagement.administrators.administrators', compact('data'));
     }

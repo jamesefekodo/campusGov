@@ -86,7 +86,7 @@
                                                 <tbody>
                                                     @foreach ($data['admins'] as $admin)
                                                         <tr class=" align-middle text-center">
-                                                            <th>{{ ($data['admins']->currentPage() - 1) * $data['admins']->perPage() + $loop->iteration }}
+                                                            <th>{{ $loop->iteration }}
                                                             </th>
                                                             <td class="text-start">
 
@@ -182,22 +182,123 @@
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                href="{{ route('viewAdmin', ['uuid' => $admin->uuid]) }}"
-                                                                >
+                                                                    href="{{ route('viewAdmin', ['uuid' => $admin->uuid]) }}">
                                                                     <i class="fas fa-eye me-2"></i>
                                                                     View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
+                                                    {{-- membersWithAdminPermission start --}}
+                                                    @if ($data['membersWithAdminPermission'])
+                                                        @foreach ($data['membersWithAdminPermission'] as $member)
+                                                            <tr class=" align-middle text-center">
+                                                                <th>*
+                                                                </th>
+                                                                <td class="text-start">
+
+                                                                    <div class="d-flex align-items-center gap-3">
+                                                                        {{-- Avatar --}}
+                                                                        <div class="flex-shrink-0">
+                                                                            @php
+                                                                                $user = $member;
+                                                                            @endphp
+                                                                            @include('users.admin.userManagement.members.include.profilePictureAndAvatarDisplay')
+                                                                        </div>
+
+                                                                        {{-- Name & Code --}}
+                                                                        <div class="flex-grow-1 min-width-0 text-center">
+                                                                            <p
+                                                                                class="fw-bold mb-0 text-truncate text-capitalize">
+                                                                                @php
+                                                                                    $middleInitial = $member
+                                                                                        ->memberPersonalProfile
+                                                                                        ->middle_name
+                                                                                        ? strtoupper(
+                                                                                                substr(
+                                                                                                    $member
+                                                                                                        ->memberPersonalProfile
+                                                                                                        ->middle_name,
+                                                                                                    0,
+                                                                                                    1,
+                                                                                                ),
+                                                                                            ) . '. '
+                                                                                        : '';
+                                                                                @endphp
+
+                                                                                {{ strtolower($member->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($member->memberPersonalProfile->last_name) }}
+                                                                            </p>
+                                                                            <p class="text-muted mb-0 small text-truncate">
+                                                                                {{ strtoupper($member->memberAcademicInfo->matric_number) }}
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="badge bg-purple text-white">Member with
+                                                                        Admin Access</span>
+                                                                </td>
+                                                                <td>
+                                                                    -
+                                                                </td>
+                                                                <td>
+                                                                    <p class="fw-bold mb-0 text-truncate">
+                                                                        {{ strtolower($member->memberPersonalProfile->phone1 ?? '-') }}
+                                                                    </p>
+                                                                    <p class="text-muted mb-0 small text-truncate">
+                                                                        {{ strtolower($member->memberPersonalProfile->email1 ?? '-') }}
+                                                                    </p>
+                                                                </td>
+                                                                <td>
+                                                                    @switch($member->account_status)
+                                                                        @case('0')
+                                                                            <span class="badge bg-yellow text-black">
+                                                                                Unverified
+                                                                            </span>
+                                                                        @break
+
+                                                                        @case('1')
+                                                                            <span class="badge bg-blue text-white">
+                                                                                Awaiting Verification
+                                                                            </span>
+                                                                        @break
+
+                                                                        @case('2')
+                                                                            <span class="badge bg-green text-white">
+                                                                                Active
+                                                                            </span>
+                                                                        @break
+
+                                                                        @case('3')
+                                                                            <span class="badge bg-red text-white">
+                                                                                Disabled
+                                                                            </span>
+                                                                        @break
+
+                                                                        @default
+                                                                            <span class="badge bg-red text-white">
+                                                                                Unknown
+                                                                            </span>
+                                                                    @endswitch
+                                                                </td>
+                                                                <td>
+                                                                    <a class="btn btn-primary btn-sm"
+                                                                        href="{{ route('viewMember', ['uuid' => $member->uuid]) }}">
+                                                                        <i class="fas fa-eye me-2"></i>
+                                                                        View</a>
+                                                                </td>
+                                                            </tr>
+                                                        @endforeach
+                                                    @endif
+                                                    {{-- membersWithAdminPermission end --}}
                                                 </tbody>
                                             @endif
                                         </table>
                                         {{-- Pagination --}}
-                                        @php
+                                        {{-- @php
                                             $paginatedArray = $data['admins'];
                                         @endphp
 
-                                        @include('layouts.include.pagination')
+                                        @include('layouts.include.pagination') --}}
                                         {{-- Back Home --}}
                                         <div class="w-100 justify-content-center text-center mb-4">
                                             <div class="w-100 justify-content-center text-center mb-4">

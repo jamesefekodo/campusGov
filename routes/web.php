@@ -25,6 +25,13 @@ use App\Models\Config\AccessControl\Role;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
+
+
+
+    Route::post('manual_sync_election_temp', [ElectionController::class, 'manualSyncElectionTemp'])->name('manualSyncElectionTemp');
+
+
+
 // clear cache
 Route::get('/clear-cache', function () {
     Artisan::call('cache:clear');

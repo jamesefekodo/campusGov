@@ -10,7 +10,9 @@
             <div
                 class="inner_nav_menu
                 {{ Str::startsWith(request()->path(), 'admin/user_management/members/non_students') ? 'inner_nav_active' : '' }}">
-                Non-Students</div>
+                {{-- Non-Students --}}
+                Alumni
+            </div>
         </a>
         @if (Auth::user()->hasPermission('verify_users'))
             <a href="{{ route('memberAwaitingVerification') }}">

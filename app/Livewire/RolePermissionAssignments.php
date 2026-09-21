@@ -53,7 +53,7 @@ class RolePermissionAssignments extends Component
             ->get()
             ->groupBy('module');
 
-        return view('livewire.role-permission-manager', [
+        return view('livewire.role-permission-assignments', [
             'permissionsByModule' => $permissionsByModule,
         ]);
     }

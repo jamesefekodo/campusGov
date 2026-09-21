@@ -985,7 +985,7 @@ class MemberSelfProfileController extends Controller
     public function myPaymentTransactions()
     {
         $member = Auth::user();
-        $paymentTransactions = PaymentTransaction::where('registered_payer', $member->username)->orderBy('created_at', 'desc')->paginate(20);
+        $paymentTransactions = PaymentTransaction::where('registered_payer', $member->username)->orderBy('paid_at', 'desc')->paginate(20);
 
         $data = [
             'member' => $member,

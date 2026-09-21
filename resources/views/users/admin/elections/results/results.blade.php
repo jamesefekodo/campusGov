@@ -412,27 +412,164 @@
                                 </div>
 
                                 <script>
-                                    new Chart(document.getElementById('facultyChart'), {
-                                        type: 'bar',
-                                        data: {
-                                            labels: @json($data['votersByFaculty']->keys()->values()),
-                                            datasets: [{
-                                                label: 'Voters',
-                                                data: @json($data['votersByFaculty']->values()->values())
-                                            }]
-                                        },
-                                        options: {
-                                            responsive: true,
-                                            scales: {
-                                                y: {
-                                                    beginAtZero: true
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const allFacultyLabels = @json($data['votersByFaculty']->keys()->values());
+
+                                        const allFacultyCounts = @json($data['votersByFaculty']->values()->values());
+
+                                        /*
+                                         * Limit dashboard display to the ten faculties with the
+                                         * highest number of unique voters.
+                                         */
+                                        const maxFaculties = 10;
+
+                                        const facultyLabels = allFacultyLabels.slice(0, maxFaculties);
+                                        const facultyCounts = allFacultyCounts.slice(0, maxFaculties);
+
+                                        const facultyPalette = [
+                                            '#2563eb', // Blue
+                                            '#16a34a', // Green
+                                            '#f59e0b', // Amber
+                                            '#dc2626', // Red
+                                            '#7c3aed', // Purple
+                                            '#0891b2', // Cyan
+                                            '#db2777', // Pink
+                                            '#65a30d', // Lime
+                                            '#ea580c', // Orange
+                                            '#4f46e5' // Indigo
+                                        ];
+
+                                        function getFacultyLabelLimit() {
+                                            if (window.innerWidth < 576) {
+                                                return 10;
+                                            }
+
+                                            if (window.innerWidth < 992) {
+                                                return 20;
+                                            }
+
+                                            return 36;
+                                        }
+
+                                        function shortenFacultyName(name) {
+                                            const labelLimit = getFacultyLabelLimit();
+
+                                            /*
+                                             * Remove repetitive prefixes only from the visible label.
+                                             * Keep the original full name for the tooltip.
+                                             */
+                                            const cleanName = String(name)
+                                                .replace(/^Faculty of\s+/i, '')
+                                                .replace(/^Faculty\s+/i, '')
+                                                .replace(/\sand\s/gi, ' & ')
+                                                .replace(/\s+/g, ' ')
+                                                .trim();
+
+                                            if (cleanName.length <= labelLimit) {
+                                                return cleanName;
+                                            }
+
+                                            return cleanName.substring(0, labelLimit).trim() + '…';
+                                        }
+
+                                        const canvas = document.getElementById('facultyChart');
+
+                                        if (!canvas || facultyLabels.length === 0) {
+                                            return;
+                                        }
+
+                                        /*
+                                         * Adjust the height only for this Faculty chart.
+                                         */
+                                        const chartContainer = canvas.parentElement;
+
+                                        chartContainer.style.height = Math.max(
+                                            300,
+                                            facultyLabels.length * 38 + 70
+                                        ) + 'px';
+
+                                        new Chart(canvas, {
+                                            type: 'bar',
+
+                                            data: {
+                                                labels: facultyLabels.map(shortenFacultyName),
+
+                                                datasets: [{
+                                                    label: 'Unique voters',
+                                                    data: facultyCounts,
+
+                                                    backgroundColor: facultyCounts.map(function(_, index) {
+                                                        return facultyPalette[index % facultyPalette.length];
+                                                    }),
+
+                                                    borderColor: facultyCounts.map(function(_, index) {
+                                                        return facultyPalette[index % facultyPalette.length];
+                                                    }),
+
+                                                    borderWidth: 1,
+                                                    borderRadius: 5,
+
+                                                    hoverBackgroundColor: facultyCounts.map(function(_, index) {
+                                                        return facultyPalette[index % facultyPalette.length];
+                                                    })
+                                                }]
+                                            },
+
+                                            options: {
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+
+                                                /*
+                                                 * Horizontal layout keeps faculty names readable.
+                                                 */
+                                                indexAxis: 'y',
+
+                                                plugins: {
+                                                    legend: {
+                                                        display: false
+                                                    },
+
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            title: function(context) {
+                                                                return facultyLabels[
+                                                                    context[0].dataIndex
+                                                                ];
+                                                            },
+
+                                                            label: function(context) {
+                                                                return 'Unique voters: ' +
+                                                                    Number(context.raw).toLocaleString();
+                                                            }
+                                                        }
+                                                    }
+                                                },
+
+                                                scales: {
+                                                    x: {
+                                                        beginAtZero: true,
+
+                                                        ticks: {
+                                                            precision: 0
+                                                        }
+                                                    },
+
+                                                    y: {
+                                                        ticks: {
+                                                            autoSkip: false,
+
+                                                            font: {
+                                                                size: window.innerWidth < 576 ? 10 : 12
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
-                                        }
+                                        });
                                     });
                                 </script>
                             </div>
-                            <div class="col-md-8">
+                            {{-- <div class="col-md-8">
                                 <div class="card shadow-sm">
                                     <div class="card-header">
                                         <strong>Voters by Department</strong>
@@ -463,7 +600,206 @@
                                         }
                                     });
                                 </script>
+                            </div> --}}
+                            <div class="col-md-8">
+                                <div class="card shadow-sm h-100">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <strong>Voters by Department</strong>
+
+                                        <small class="text-muted">
+                                            Top 10 departments
+                                        </small>
+                                    </div>
+
+                                    <div class="card-body">
+                                        <div style="position: relative; height: 380px;">
+                                            <canvas id="departmentChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+
+                            <script>
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const allDepartmentLabels = @json($data['votersByDepartment']->keys()->values());
+
+                                    const allDepartmentCounts = @json($data['votersByDepartment']->values()->values());
+
+                                    /*
+                                     * Keep the top 10 departments because a long list makes
+                                     * a dashboard chart difficult to read.
+                                     */
+                                    const maxDepartments = 10;
+
+                                    const departmentLabels = allDepartmentLabels.slice(0, maxDepartments);
+                                    const departmentCounts = allDepartmentCounts.slice(0, maxDepartments);
+
+                                    /*
+                                     * One colour per department bar.
+                                     * The colours repeat safely if maxDepartments is ever increased.
+                                     */
+                                    const departmentPalette = [
+                                        '#2563eb', // Blue
+                                        '#16a34a', // Green
+                                        '#f59e0b', // Amber
+                                        '#dc2626', // Red
+                                        '#7c3aed', // Purple
+                                        '#0891b2', // Cyan
+                                        '#db2777', // Pink
+                                        '#65a30d', // Lime
+                                        '#ea580c', // Orange
+                                        '#4f46e5' // Indigo
+                                    ];
+
+                                    /*
+                                     * Label length is adjusted based on available screen width.
+                                     */
+                                    function getLabelLimit() {
+                                        if (window.innerWidth < 576) {
+                                            return 10;
+                                        }
+
+                                        if (window.innerWidth < 992) {
+                                            return 20;
+                                        }
+
+                                        return 36;
+                                    }
+
+                                    function shortenDepartmentName(name) {
+                                        const labelLimit = getLabelLimit();
+
+                                        /*
+                                         * Remove repeated text from chart labels only.
+                                         * The complete original department name remains in the tooltip.
+                                         */
+                                        const cleanName = String(name)
+                                            .replace(/^Department of\s+/i, '')
+                                            .replace(/^Department\s+/i, '')
+                                            .replace(/\sand\s/gi, ' & ')
+                                            .replace(/\s+/g, ' ')
+                                            .trim();
+
+                                        if (cleanName.length <= labelLimit) {
+                                            return cleanName;
+                                        }
+
+                                        return cleanName.substring(0, labelLimit).trim() + '…';
+                                    }
+
+                                    /*
+                                     * Set enough height for each horizontal bar.
+                                     * This affects only the Department chart container.
+                                     */
+                                    const canvas = document.getElementById('departmentChart');
+
+                                    if (!canvas || departmentLabels.length === 0) {
+                                        return;
+                                    }
+
+                                    const chartContainer = canvas.parentElement;
+
+                                    chartContainer.style.height = Math.max(
+                                        380,
+                                        departmentLabels.length * 38 + 70
+                                    ) + 'px';
+
+                                    new Chart(canvas, {
+                                        type: 'bar',
+
+                                        data: {
+                                            labels: departmentLabels.map(shortenDepartmentName),
+
+                                            datasets: [{
+                                                label: 'Unique voters',
+                                                data: departmentCounts,
+
+                                                /*
+                                                 * A separate solid colour for every bar.
+                                                 */
+                                                backgroundColor: departmentCounts.map(function(_, index) {
+                                                    return departmentPalette[
+                                                        index % departmentPalette.length
+                                                    ];
+                                                }),
+
+                                                borderColor: departmentCounts.map(function(_, index) {
+                                                    return departmentPalette[
+                                                        index % departmentPalette.length
+                                                    ];
+                                                }),
+
+                                                borderWidth: 1,
+                                                borderRadius: 5,
+
+                                                /*
+                                                 * Slightly darken bars on hover.
+                                                 */
+                                                hoverBackgroundColor: departmentCounts.map(function(_, index) {
+                                                    return departmentPalette[
+                                                        index % departmentPalette.length
+                                                    ];
+                                                })
+                                            }]
+                                        },
+
+                                        options: {
+                                            responsive: true,
+                                            maintainAspectRatio: false,
+
+                                            /*
+                                             * Horizontal bars prevent long department names
+                                             * from becoming slanted below the chart.
+                                             */
+                                            indexAxis: 'y',
+
+                                            plugins: {
+                                                legend: {
+                                                    display: false
+                                                },
+
+                                                tooltip: {
+                                                    callbacks: {
+                                                        /*
+                                                         * Full, original department name on hover.
+                                                         */
+                                                        title: function(context) {
+                                                            return departmentLabels[
+                                                                context[0].dataIndex
+                                                            ];
+                                                        },
+
+                                                        label: function(context) {
+                                                            return 'Unique voters: ' +
+                                                                Number(context.raw).toLocaleString();
+                                                        }
+                                                    }
+                                                }
+                                            },
+
+                                            scales: {
+                                                x: {
+                                                    beginAtZero: true,
+
+                                                    ticks: {
+                                                        precision: 0
+                                                    }
+                                                },
+
+                                                y: {
+                                                    ticks: {
+                                                        autoSkip: false,
+
+                                                        font: {
+                                                            size: window.innerWidth < 576 ? 10 : 12
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                                });
+                            </script>
 
                             <div class="col-md-4">
                                 <div class="card shadow-sm">
