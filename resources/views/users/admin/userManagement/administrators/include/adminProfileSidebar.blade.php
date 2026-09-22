@@ -32,8 +32,10 @@
         </span>
         {{ $data['admin']->last_seen_at
             ? (\Carbon\Carbon::parse($data['admin']->last_seen_at)->isToday()
-                ? \Carbon\Carbon::parse($data['admin']->last_seen_at)->format('h:i:s A')
-                : \Carbon\Carbon::parse($data['admin']->last_seen_at)->format('d M Y h:i:s A'))
+                ? 'Today, ' . \Carbon\Carbon::parse($data['admin']->last_seen_at)->format('h:i:s A')
+                : (\Carbon\Carbon::parse($data['admin']->last_seen_at)->isYesterday()
+                    ? 'Yesterday, ' . \Carbon\Carbon::parse($data['admin']->last_seen_at)->format('h:i:s A')
+                    : \Carbon\Carbon::parse($data['admin']->last_seen_at)->format('d M Y h:i:s A')))
             : '-' }}
     </p>
 
