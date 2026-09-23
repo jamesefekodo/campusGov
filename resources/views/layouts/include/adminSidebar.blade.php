@@ -62,41 +62,29 @@
                 </ul>
             </div>
         </li><!--//nav-item-->
-        <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/media') ? 'sidebar-active-section' : '' }}"
-                href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false"
-                aria-controls="submenu-2">
-                <span class="nav-icon">
-                    <i class="fas fa-newspaper"></i>
-                </span>
-                <span class="nav-link-text">Media</span>
-                <span class="submenu-arrow">
-                    <i class="fas fa-chevron-down"></i>
-                </span><!--//submenu-arrow-->
-            </a><!--//nav-link-->
-            <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
-                <ul class="submenu-list list-unstyled">
-                    {{-- @if (Auth::user()->hasPermission('media_platform.read'))
+        @if (Auth::user()->hasPermission('media_publication.read'))
+            <li class="nav-item has-submenu">
+                <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/media') ? 'sidebar-active-section' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false"
+                    aria-controls="submenu-2">
+                    <span class="nav-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </span>
+                    <span class="nav-link-text">Media</span>
+                    <span class="submenu-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </span><!--//submenu-arrow-->
+                </a><!--//nav-link-->
+                <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
+                    <ul class="submenu-list list-unstyled">
                         <li class="submenu-item"><a
-                                class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/social_media') ? 'sidebar-active' : '' }}"
-                                href="{{ route('recognizedSocialMediaPlatforms') }}">Recognized Platforms</a>
+                                class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/publications') ? 'sidebar-active' : '' }}"
+                                href="{{ route('mediaPublications') }}">Publications</a>
                         </li>
-                    @endif --}}
-                    <li class="submenu-item"><a
-                            class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/orders/all') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('orders') }} --}}
-                             ">News</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/orders/all') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('orders') }} --}}
-                             ">Articles</a>
-                    </li>
-                </ul>
-            </div>
-        </li><!--//nav-item-->
+                    </ul>
+                </div>
+            </li><!--//nav-item-->
+        @endif
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/users') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false"

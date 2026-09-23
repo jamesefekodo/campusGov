@@ -15,6 +15,7 @@ use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Media\MediaPublicationController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\Misconduct\MisconductController;
@@ -647,6 +648,10 @@ return view('admin.roles.permissions-edit', compact('role'));})->name('role.perm
 
     Route::get('admin/election/results/votes/view/{uuid}', [ElectionController::class, 'viewElectionVoters'])->name('viewElectionVoters');
 
+
+    // media publications
+    Route::get('admin/media/publications', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublications');
+    Route::get('admin/media/publications/search', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationsSearch');
 
 
 });

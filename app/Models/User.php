@@ -11,6 +11,7 @@ use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
+use App\Models\Media\MediaPublication;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
@@ -27,6 +28,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -312,5 +314,24 @@ class User extends Authenticatable
     public function tenantAdministrators()
     {
         return $this->hasMany(AdminProfile::class, 'username', 'username');
+    }
+
+    // media publications
+    public function authoredMediaPublications(): HasMany
+    {
+        return $this->hasMany(
+            MediaPublication::class,
+            'author',
+            'username'
+        );
+    }
+
+    public function approvedMediaPublications(): HasMany
+    {
+        return $this->hasMany(
+            MediaPublication::class,
+            'approved_by',
+            'username'
+        );
     }
 }
