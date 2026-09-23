@@ -5,17 +5,17 @@
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
             <div class="navigation">
-                @include('users.admin.elections.include.inner_nav')
+                @include('users.admin.media.publications.include.inner_nav')
             </div>
             @if (Auth::user()->hasPermission('elections.create'))
                 <div class="d-flex justify-content-end">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                            data-target="#addNewElectionModal">
+                            data-target="#addNewMediaPublicationModal">
                             <i class="fas fa-plus"></i> Create New</button>
                     </div>
                 </div>
-                @include('users.admin.elections.include.addNewElectionModal')
+                @include('users.admin.media.publications.include.addNewMediaPublicationModal')
             @endif
 
             <div class="individual-review-card-container">

@@ -5,6 +5,7 @@ use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Config\HomepageSlider;
+use App\Models\Config\SeoDetail;
 use App\Models\Elections\Election;
 use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Claims\FinancialClaim;
@@ -1126,5 +1127,14 @@ if (!function_exists('emailFromName')) {
         }
 
         return $name;
+    }
+}
+
+
+
+if (!function_exists('seoSettings')) {
+    function seoSettings()
+    {
+        return SeoDetail::where('tenant_id', tenant()->id)->first();
     }
 }

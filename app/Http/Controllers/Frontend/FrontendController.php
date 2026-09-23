@@ -35,10 +35,12 @@ class FrontendController extends Controller
             return $redirect;
         }
 
-        return redirect()->back()->with('error', 'Not aavailable!');
+        // return redirect()->back()->with('error', 'Not aavailable!');
 
         // return view('frontend2.homepage', compact('data'));
         // return 'Homepage is under construction. Please check back later.';
+
+        return view('users.guests.temporaryHomepage');
     }
 
    public function showUploadForm()

@@ -76,8 +76,8 @@ Route::post('/process_temporary_upload', [FrontendController::class, 'processTem
 Route::middleware(['authenticationMiddlewares'])->group(function () {
 
     Route::get('/', function () {
-        // return redirect()->route('homepage');
-        return redirect()->route('loginPage');
+        return redirect()->route('homepage');
+        // return redirect()->route('loginPage');
     });
     Route::get('/home', [FrontendController::class, 'homepage'])->name('homepage');
 
