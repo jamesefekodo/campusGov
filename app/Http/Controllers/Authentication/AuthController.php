@@ -168,8 +168,10 @@ class AuthController extends Controller
     }
     public function login()
     {
-        if (!empty(Auth::check() || getUserType() !== 'guest')) {
-            return $this->redirectToUserDashboard(Auth::user()->account_type);
+        if (Auth::check()) {
+            return $this->redirectToUserDashboard(
+                Auth::user()->account_type
+            );
         }
         return view('utilities.pages.auth.login');
     }
@@ -212,8 +214,10 @@ class AuthController extends Controller
     }
     public function register()
     {
-        if (!empty(Auth::check() || getUserType() !== 'guest')) {
-            return $this->redirectToUserDashboard(Auth::user()->account_type);
+        if (Auth::check()) {
+            return $this->redirectToUserDashboard(
+                Auth::user()->account_type
+            );
         }
 
         return view('utilities.pages.auth.register');
@@ -232,30 +236,30 @@ class AuthController extends Controller
 
         // Validate input
         $validator = Validator::make($request->all(), [
-            // 'username' => [
-            //     'required',
-            //     'unique:users,username',
-            //     'regex:/^\S*$/u',           // No spaces allowed
-            //     'max:20',                    // Maximum 20 characters
-            //     'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',  // No email format allowed
-            //     'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',  // No emoji or symbols
-            // ],
             'username' => [
                 'required',
-                function ($attribute, $value, $fail) {
-                    $exists = DB::table('users')
-                        ->where('username', $value)
-                        ->exists(); // no tenant_id filter
-
-                    if ($exists) {
-                        $fail('The username has already been taken.');
-                    }
-                },
-                'regex:/^\S*$/u',
-                'max:20',
-                'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',
+                'unique:users,username',
+                'regex:/^\S*$/u',           // No spaces allowed
+                'min:8',                    // Minimum 8 characters
+                'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',  // No email format
                 'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',
             ],
+            // 'username' => [
+            //     'required',
+            //     function ($attribute, $value, $fail) {
+            //         $exists = DB::table('users')
+            //             ->where('username', $value)
+            //             ->exists(); // no tenant_id filter
+
+            //         if ($exists) {
+            //             $fail('The username has already been taken.');
+            //         }
+            //     },
+            //     'regex:/^\S*$/u',
+            //     'min:8',
+            //     'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',
+            //     'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',
+            // ],
             'email' => 'required|email|unique:users,email|unique:member_personal_profiles,email2',
 
             'phone' => 'required|string|unique:users,phone|unique:member_personal_profiles,phone2',
@@ -267,8 +271,8 @@ class AuthController extends Controller
             'username.unique' => 'This username is already taken.',
             'username.regex' => 'The username cannot contain spaces.',
             'password.required' => 'The password is required.',
-            'password.min' => 'The password must be at least 20 characters long.',
-            'password.regex' => 'The password must include an uppercase letter, lowercase letter, number, and special character.',
+            'password.min' => 'The password must be at least 8 characters long.',
+            'password.regex' => 'The password must include at least one uppercase letter, one lowercase letter, one number, and one special character.',
             'confirm_password.same' => 'The confirmation password does not match.',
         ]);
 

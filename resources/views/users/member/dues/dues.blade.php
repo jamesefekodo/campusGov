@@ -121,11 +121,17 @@
 
 
 
-                                                @if ($transaction = $data['member']->successfulPaymentForDue($due->fee_id))
-                                                    <div class="d-flex justify-content-end align-items-center">
-                                                        <a {{-- href="{{ route('printPaymentReceipt', $transaction->uuid) }}" --}} class="btn btn-success">
-                                                            <i class="fas fa-print me-1"></i>
-                                                            Print Receipt
+                                                @if ($data['member']->successfulPaymentForDue($due->fee_id))
+                                                    <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                        @php
+                                                            $successfulPayment = $data[
+                                                                'member'
+                                                            ]->successfulPaymentForDue($due->fee_id);
+                                                        @endphp
+                                                        <a href="{{ route('memberDownloadPaymentReceipt', ['payment_transaction_id' => $successfulPayment->payment_transaction_id]) }}"
+                                                            class="btn btn-warning m-1 d-flex align-items-center">
+                                                            <i class="fas fa-download me-2"></i>
+                                                            <span>Download Receipt</span>
                                                         </a>
                                                     </div>
                                                 @elseif ($data['member']->pendingPaymentForDue($due->fee_id))
@@ -176,6 +182,19 @@
                                                             @endswitch
                                                         @endif
                                                         {{-- refresh status end --}}
+                                                    </div>
+                                                @elseif ($data['member']->approvedDueWaiver($due->fee_id))
+                                                    <div class="d-flex justify-content-end flex-wrap mt-3">
+                                                        @php
+                                                            $approvedWaiver = $data['member']->approvedDueWaiver(
+                                                                $due->fee_id,
+                                                            );
+                                                        @endphp
+                                                        <a href="{{ route('memberDownloadDuePaymentWaiverNotice', ['uuid' => $approvedWaiver->uuid]) }}"
+                                                            class="btn btn-warning m-1 d-flex align-items-center">
+                                                            <i class="fas fa-download me-2"></i>
+                                                            <span>Waiver Notice</span>
+                                                        </a>
                                                     </div>
                                                 @else
                                                     {{-- Pay Now --}}

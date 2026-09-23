@@ -1,4 +1,6 @@
-@if ($data['member']->photo && file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
+@if (
+    $data['member']->photo &&
+        file_exists(public_path('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo)))
     <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/users/members/photo/' . $data['member']->photo) }}"
         alt="{{ $data['member']->username }}" class="img-fluid w-100">
 @else
@@ -26,39 +28,38 @@
     <span style="font-weight: bold">
         Level:
     </span>
-    @php
-        $data['member'] = $data['member']->memberAcademicInfo;
-    @endphp
 
     <span style="font-weight: bold">
-        @if ($data['member']?->academic_status == 'student')
+        @if ($data['member']?->memberAcademicInfo?->academic_status == 'student')
             {{-- Current Level: --}}
-        @elseif($data['member']?->academic_status == 'alumni')
+        @elseif($data['member']?->memberAcademicInfo?->academic_status == 'alumni')
             Graduated:
         @else
             Status:
         @endif
     </span>
 
-    @if ($data['member']?->academic_status == 'student')
+    @if ($data['member']?->memberAcademicInfo?->academic_status == 'student')
 
-        {{ currentLevel($data['member']->theProgram, studentCurrentLevel($data['member'])) }}
-    @elseif($data['member']?->academic_status == 'alumni')
-        {{ $data['member']->graduation_session
-            ? $data['member']->graduation_session . '/' . ($data['member']->graduation_session + 1)
+        {{ currentLevel($data['member']?->memberAcademicInfo?->theProgram, studentCurrentLevel($data['member']?->memberAcademicInfo)) }}
+    @elseif($data['member']?->memberAcademicInfo?->academic_status == 'alumni')
+        {{ $data['member']?->memberAcademicInfo->graduation_session
+            ? $data['member']?->memberAcademicInfo->graduation_session .
+                '/' .
+                ($data['member']?->memberAcademicInfo->graduation_session + 1)
             : '-' }}
     @else
-        {{ ucfirst(str_replace('_', ' ', $data['member']?->academic_status ?? '-')) }}
+        {{ ucfirst(str_replace('_', ' ', $data['member']?->memberAcademicInfo?->academic_status ?? '-')) }}
 
-        @if ($data['member']?->graduation_session)
-            ({{ $data['member']->graduation_session }}/{{ $data['member']->graduation_session + 1 }})
+        @if ($data['member']?->memberAcademicInfo?->graduation_session)
+            ({{ $data['member']?->memberAcademicInfo->graduation_session }}/{{ $data['member']?->memberAcademicInfo->graduation_session + 1 }})
         @endif
 
     @endif
 </p>
 <p class="text-capitalize"><span style="font-weight: bold">Account Status:
     </span>
-    @switch($data['member']->account_status)
+    @switch($data['member']?->account_status)
         @case(0)
             Unverified
         @break
@@ -78,6 +79,7 @@
         @default
             Unknown
     @endswitch
+
 </p>
 
 <a href="{{ route('logoutRequest') }}" id="disableLink">

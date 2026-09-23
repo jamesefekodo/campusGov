@@ -417,62 +417,122 @@ class PaymentTransasctionController extends Controller
 
         if (Route::currentRouteName() == 'paymentTransactionsSearch') {
             $searchKey = $request->input('searchKey');
-            $transactions = PaymentTransaction::with([
-                'due' => function ($query) use ($searchKey) {
-                    $query->where('title', 'like', "%$searchKey%")
-                        ->orWhere('fee_id', 'like', "%$searchKey%")
-                        ->orWhere('description', 'like', "%$searchKey%");
-                },
-                'payerPersonalProfile' => function ($query) use ($searchKey) {
-                    $query->where('phone1', 'like', "%$searchKey%")
-                        ->orWhere('email1', 'like', "%$searchKey%")
-                        ->orWhere('phone2', 'like', "%$searchKey%")
-                        ->orWhere('email2', 'like', "%$searchKey%")
-                        ->orWhere('first_name', 'like', "%$searchKey%")
-                        ->orWhere('middle_name', 'like', "%$searchKey%")
-                        ->orWhere('last_name', 'like', "%$searchKey%")
-                        ->orWhere('gender', 'like', "%$searchKey%")
-                        ->orWhere('nationality', 'like', "%$searchKey%")
-                        ->orWhere('state_of_origin', 'like', "%$searchKey%")
-                        ->orWhere('lga_of_origin', 'like', "%$searchKey%");
-                }
-            ])
+            // $transactions = PaymentTransaction::with([
+            //     'due' => function ($query) use ($searchKey) {
+            //         $query->where('title', 'like', "%$searchKey%")
+            //             ->orWhere('fee_id', 'like', "%$searchKey%")
+            //             ->orWhere('description', 'like', "%$searchKey%");
+            //     },
+            //     'payerPersonalProfile' => function ($query) use ($searchKey) {
+            //         $query->where('phone1', 'like', "%$searchKey%")
+            //             ->orWhere('email1', 'like', "%$searchKey%")
+            //             ->orWhere('phone2', 'like', "%$searchKey%")
+            //             ->orWhere('email2', 'like', "%$searchKey%")
+            //             ->orWhere('first_name', 'like', "%$searchKey%")
+            //             ->orWhere('middle_name', 'like', "%$searchKey%")
+            //             ->orWhere('last_name', 'like', "%$searchKey%")
+            //             ->orWhere('gender', 'like', "%$searchKey%")
+            //             ->orWhere('nationality', 'like', "%$searchKey%")
+            //             ->orWhere('state_of_origin', 'like', "%$searchKey%")
+            //             ->orWhere('lga_of_origin', 'like', "%$searchKey%");
+            //     },
+            //     'registeredPayer',
+            //     'payerAcademicInfo',
+            //     'invoice',
+            //     'donation',
+            //     'election',
+            // ])
+            //     ->where(function ($query) use ($searchKey) {
+            //         $query->where('payment_transaction_id', 'like', "%$searchKey%")
+            //             ->orWhere('service_provider_id', 'like', "%$searchKey%")
+            //             ->orWhere('paystack_reference', 'like', "%$searchKey%")
+            //             ->orWhere('payment_mode', 'like', "%$searchKey%")
+            //             ->orWhere('registered_payer', 'like', "%$searchKey%")
+            //             ->orWhere('non_registered_payer', 'like', "%$searchKey%")
+            //             ->orWhere('payment_purpose', 'like', "%$searchKey%")
+            //             ->orWhere('electronic_payment_method', 'like', "%$searchKey%")
+            //             ->orWhere('manual_payment_method', 'like', "%$searchKey%")
+            //             ->orWhere('payment_status', 'like', "%$searchKey%")
+            //             ->orWhere('approval_status', 'like', "%$searchKey%")
+            //             ->orWhere('due_id', 'like', "%$searchKey%")
+            //             ->orWhere('invoice_number', 'like', "%$searchKey%")
+            //             ->orWhere('donation_id', 'like', "%$searchKey%")
+            //             ->orWhere('election_id', 'like', "%$searchKey%");
+            //     })
+            //     ->orWhereHas('due', function ($query) use ($searchKey) {
+            //         $query->where('title', 'like', "%$searchKey%")
+            //             ->orWhere('fee_id', 'like', "%$searchKey%")
+            //             ->orWhere('description', 'like', "%$searchKey%");
+            //     })
+            //     ->orWhereHas('payerPersonalProfile', function ($query) use ($searchKey) {
+            //         $query->where('phone1', 'like', "%$searchKey%")
+            //             ->orWhere('email1', 'like', "%$searchKey%")
+            //             ->orWhere('phone2', 'like', "%$searchKey%")
+            //             ->orWhere('email2', 'like', "%$searchKey%")
+            //             ->orWhere('first_name', 'like', "%$searchKey%")
+            //             ->orWhere('middle_name', 'like', "%$searchKey%")
+            //             ->orWhere('last_name', 'like', "%$searchKey%")
+            //             ->orWhere('gender', 'like', "%$searchKey%")
+            //             ->orWhere('nationality', 'like', "%$searchKey%")
+            //             ->orWhere('state_of_origin', 'like', "%$searchKey%")
+            //             ->orWhere('lga_of_origin', 'like', "%$searchKey%");
+            //     })
+            //     ->orderBy('paid_at', 'desc')
+            //     ->paginate(20)
+            //     ->withQueryString();
+
+            $transactions = PaymentTransaction::query()
+                ->with([
+                    // Always load these relationships fully
+                    'due',
+                    'invoice',
+                    'donation',
+                    'election',
+                    'electionCandidateApplication.position',
+                    'monetaryVote',
+                    'registeredPayer.memberAcademicInfo.userProfile.memberPersonalProfile',
+                    'payerPersonalProfile',
+                ])
                 ->where(function ($query) use ($searchKey) {
-                    $query->where('payment_transaction_id', 'like', "%$searchKey%")
-                        ->orWhere('service_provider_id', 'like', "%$searchKey%")
-                        ->orWhere('paystack_reference', 'like', "%$searchKey%")
-                        ->orWhere('payment_mode', 'like', "%$searchKey%")
-                        ->orWhere('registered_payer', 'like', "%$searchKey%")
-                        ->orWhere('non_registered_payer', 'like', "%$searchKey%")
-                        ->orWhere('payment_purpose', 'like', "%$searchKey%")
-                        ->orWhere('electronic_payment_method', 'like', "%$searchKey%")
-                        ->orWhere('manual_payment_method', 'like', "%$searchKey%")
-                        ->orWhere('payment_status', 'like', "%$searchKey%")
-                        ->orWhere('approval_status', 'like', "%$searchKey%")
-                        ->orWhere('due_id', 'like', "%$searchKey%")
-                        ->orWhere('invoice_number', 'like', "%$searchKey%")
-                        ->orWhere('donation_id', 'like', "%$searchKey%")
-                        ->orWhere('election_id', 'like', "%$searchKey%");
+                    // Direct columns on payment_transactions
+                    $query->where('payment_transaction_id', 'like', "%{$searchKey}%")
+                        ->orWhere('service_provider_id', 'like', "%{$searchKey}%")
+                        ->orWhere('paystack_reference', 'like', "%{$searchKey}%")
+                        ->orWhere('payment_mode', 'like', "%{$searchKey}%")
+                        ->orWhere('registered_payer', 'like', "%{$searchKey}%")
+                        ->orWhere('non_registered_payer', 'like', "%{$searchKey}%")
+                        ->orWhere('payment_purpose', 'like', "%{$searchKey}%")
+                        ->orWhere('electronic_payment_method', 'like', "%{$searchKey}%")
+                        ->orWhere('manual_payment_method', 'like', "%{$searchKey}%")
+                        ->orWhere('payment_status', 'like', "%{$searchKey}%")
+                        ->orWhere('approval_status', 'like', "%{$searchKey}%")
+                        ->orWhere('due_id', 'like', "%{$searchKey}%")
+                        ->orWhere('invoice_number', 'like', "%{$searchKey}%")
+                        ->orWhere('donation_id', 'like', "%{$searchKey}%")
+                        ->orWhere('election_id', 'like', "%{$searchKey}%")
+
+                        // Search through related models
+                        ->orWhereHas('due', function ($dueQuery) use ($searchKey) {
+                            $dueQuery->where('title', 'like', "%{$searchKey}%")
+                                ->orWhere('fee_id', 'like', "%{$searchKey}%")
+                                ->orWhere('description', 'like', "%{$searchKey}%");
+                        })
+
+                        ->orWhereHas('payerPersonalProfile', function ($profileQuery) use ($searchKey) {
+                            $profileQuery->where('phone1', 'like', "%{$searchKey}%")
+                                ->orWhere('email1', 'like', "%{$searchKey}%")
+                                ->orWhere('phone2', 'like', "%{$searchKey}%")
+                                ->orWhere('email2', 'like', "%{$searchKey}%")
+                                ->orWhere('first_name', 'like', "%{$searchKey}%")
+                                ->orWhere('middle_name', 'like', "%{$searchKey}%")
+                                ->orWhere('last_name', 'like', "%{$searchKey}%")
+                                ->orWhere('gender', 'like', "%{$searchKey}%")
+                                ->orWhere('nationality', 'like', "%{$searchKey}%")
+                                ->orWhere('state_of_origin', 'like', "%{$searchKey}%")
+                                ->orWhere('lga_of_origin', 'like', "%{$searchKey}%");
+                        });
                 })
-                ->orWhereHas('due', function ($query) use ($searchKey) {
-                    $query->where('title', 'like', "%$searchKey%")
-                        ->orWhere('fee_id', 'like', "%$searchKey%")
-                        ->orWhere('description', 'like', "%$searchKey%");
-                })
-                ->orWhereHas('payerPersonalProfile', function ($query) use ($searchKey) {
-                    $query->where('phone1', 'like', "%$searchKey%")
-                        ->orWhere('email1', 'like', "%$searchKey%")
-                        ->orWhere('phone2', 'like', "%$searchKey%")
-                        ->orWhere('email2', 'like', "%$searchKey%")
-                        ->orWhere('first_name', 'like', "%$searchKey%")
-                        ->orWhere('middle_name', 'like', "%$searchKey%")
-                        ->orWhere('last_name', 'like', "%$searchKey%")
-                        ->orWhere('gender', 'like', "%$searchKey%")
-                        ->orWhere('nationality', 'like', "%$searchKey%")
-                        ->orWhere('state_of_origin', 'like', "%$searchKey%")
-                        ->orWhere('lga_of_origin', 'like', "%$searchKey%");
-                })
-                ->orderBy('paid_at', 'desc')
+                ->orderByDesc('paid_at', 'desc')
                 ->paginate(20)
                 ->withQueryString();
 
@@ -1162,7 +1222,7 @@ class PaymentTransasctionController extends Controller
             'approval_status' => 'required|string|in:approved,declined',
         ]);
 
-        if ($waiver->initiated_by === $waiver->username) {
+        if ($waiver->initiated_by === $user->username) {
             return redirect()->back()->with(
                 'error',
                 'You cannot approve a payment regularization request that you initiated. Kindly contact another executive to approve this request.'
@@ -1285,7 +1345,7 @@ class PaymentTransasctionController extends Controller
             $due->payable_amount;
         }
 
-        // if it is a donation 
+        // if it is a donation
         $amountHeContributed = null;
         $numberOfContributions = 0;
         if ($payment->donation) {
@@ -1371,8 +1431,10 @@ class PaymentTransasctionController extends Controller
                     if ($request->filled('end_date')) {
                         $start = Carbon::parse($value);
                         $end   = Carbon::parse($request->end_date);
-                        if ($start->copy()->addYear()->lt($end)) {
-                            $fail('The date gap must not be more than one year.');
+
+                        // Allow max gap of 1 year and 3 months (15 months)
+                        if ($start->copy()->addMonths(15)->lt($end)) {
+                            $fail('The date gap must not be more than 1 year and 3 months.');
                         }
                     }
                 },
@@ -1667,8 +1729,8 @@ class PaymentTransasctionController extends Controller
     | Data
     |--------------------------------------------------------------------------
     */
-        // 
-        // 
+        //
+        //
 
         if ($request->page_type == 'claims_page') {
             $pageType = 'claims_page';
@@ -2372,7 +2434,7 @@ class PaymentTransasctionController extends Controller
         }
 
 
-        // if it is a donation 
+        // if it is a donation
         $amountHeContributed = null;
         $numberOfContributions = 0;
         if ($payment->donation) {

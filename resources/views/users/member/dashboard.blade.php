@@ -399,7 +399,7 @@
                                             @if ($outstandingDue)
                                                 <h4 class="text-danger m-2 mt-3">
                                                     <i class="fas fa-exclamation-triangle me-2"></i>
-                                                    Please pay all your outstanding dues before applying for re-admission.
+                                                   Please pay all your outstanding dues before applying for re-admission. For dues paid before the introduction of this system, kindly present a valid receipt to the executives for regularization. Then, the re-admission form will be made available on this page.
                                                 </h4>
                                             @else
                                                 <p>

@@ -12,25 +12,40 @@
                 {{-- <p class="m-2 text-center">Please sign in to your account</p> --}}
                 <form class="" action="{{ route('submitUserRegistrationRequest') }}" method="POST">
                     @csrf
-                    <input type="text" placeholder="Username" name="username" required />
-                    <p style="color: red">{{ $errors->first('username') }}</p>
-                    <input type="text" placeholder="Phone" name="phone" required />
-                    <p style="color: red">{{ $errors->first('phone') }}</p>
-                    <input type="email" placeholder="Email" name="email" required />
-                    <p style="color: red">{{ $errors->first('email') }}</p>
+
+                    <input type="text" placeholder="Username" name="username" value="{{ old('username') }}" required class="mb-2" />
+                    @error('username')
+                        <p style="color: red">{{ $message }}</p>
+                    @enderror
+
+                    <input type="text" placeholder="Phone" name="phone" value="{{ old('phone') }}" required class="mb-2" />
+                    @error('phone')
+                        <p style="color: red">{{ $message }}</p>
+                    @enderror
+
+                    <input type="email" placeholder="Email" name="email" value="{{ old('email') }}" required class="mb-2" />
+                    @error('email')
+                        <p style="color: red">{{ $message }}</p>
+                    @enderror
 
                     <div class="password-container">
                         <input type="password" id="password" placeholder="Password" name="password" autocomplete="off"
                             value="{{ old('password') }}" required />
                         <i class="fa fa-eye" id="togglePassword" style="cursor: pointer;"></i>
                     </div>
-                    <p style="color: red">{{ $errors->first('password') }}</p>
+                    @error('password')
+                        <p style="color: red">{{ $message }}</p>
+                    @enderror
 
                     <div class="password-container">
                         <input type="password" id="password2" placeholder="Confirm Password" name="confirm_password"
                             autocomplete="off" value="{{ old('confirm_password') }}" required />
                         <i class="fa fa-eye" id="togglePassword2" style="cursor: pointer;"></i>
                     </div>
+
+                    @error('confirm_password')
+                        <p style="color: red">{{ $message }}</p>
+                    @enderror
                     {{-- password rules --}}
                     <div id="password-rules" class="mt-3">
                         <ul>

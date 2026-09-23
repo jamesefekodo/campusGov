@@ -32,7 +32,7 @@
                                         </span>
                                     </div>
                                     <div class="col-md-6 p-1">
-                                        <span style="font-weight: bold">Paid By:</span>
+                                        <span style="font-weight: bold">Beneficiary:</span>
                                         <span class="text-black">
                                             {{ $data['waiver']->payer?->memberPersonalProfile->first_name . ' ' . $data['waiver']->payer?->memberPersonalProfile->last_name }}
                                             <a href="{{ route('viewMember', ['uuid' => $data['waiver']->payer->uuid]) }}"

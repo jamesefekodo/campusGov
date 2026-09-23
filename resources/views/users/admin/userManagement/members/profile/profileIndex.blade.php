@@ -160,7 +160,26 @@
                                         </div>
                                     </div>
                                 </a>
-                                <a href="#">
+                                {{-- <a href="#">
+                                    <div class="review-info-card">
+                                        <div class="review-info-icon">
+                                            <i class="fas fa-receipt"></i>
+                                        </div>
+                                        <div class="review-info-content">
+                                            <p class="review-card-info-title">
+                                                Payment Transactions
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a> --}}
+
+                                <a href="#" class="payment-transactions-card">
+                                    <form method="GET" action="{{ route('paymentTransactionsSearch') }}"
+                                        class="d-inline">
+                                        @csrf
+                                        <input type="hidden" name="searchKey" value="{{ $data['member']->username }}">
+                                    </form>
+
                                     <div class="review-info-card">
                                         <div class="review-info-icon">
                                             <i class="fas fa-receipt"></i>
@@ -172,6 +191,18 @@
                                         </div>
                                     </div>
                                 </a>
+
+                                <script>
+                                    document.addEventListener('DOMContentLoaded', function() {
+                                        const cardLink = document.querySelector('.payment-transactions-card');
+                                        const form = cardLink.querySelector('form');
+
+                                        cardLink.addEventListener('click', function(e) {
+                                            e.preventDefault();
+                                            form.submit();
+                                        });
+                                    });
+                                </script>
 
                                 <a href="{{ route('viewMemberMisconducts', ['uuid' => $data['member']->uuid]) }}">
                                     <div class="review-info-card">

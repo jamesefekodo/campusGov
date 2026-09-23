@@ -124,12 +124,14 @@
                                                                                 </span>
                                                                             @endif
                                                                         @endif
-
-                                                                        <a href="{{ route('viewDue', ['uuid' => $transaction->due->uuid]) }}"
-                                                                            target="_blank" class="badge bg-secondary text-white"
-                                                                            title="View Due">
-                                                                            <i class="fas fa-link"></i>
-                                                                        </a>
+                                                                        @if ($transaction->due)
+                                                                            <a href="{{ route('viewDue', ['uuid' => $transaction->due->uuid]) }}"
+                                                                                target="_blank"
+                                                                                class="badge bg-secondary text-white"
+                                                                                title="View Due">
+                                                                                <i class="fas fa-link"></i>
+                                                                            </a>
+                                                                        @endif
                                                                     @break
 
                                                                     @case('donation')
@@ -173,8 +175,9 @@
                                                                     @break
 
                                                                     @case('voting')
-                                                                        Voting 
-                                                                        @if ($transaction->monetaryVote) -
+                                                                        Voting
+                                                                        @if ($transaction->monetaryVote)
+                                                                            -
                                                                             {{ $transaction->monetaryVote->no_of_votes }} votes for
                                                                             {{ $transaction->monetaryVote->thePosition }} —
                                                                             {{ $transaction->election->title }}
@@ -183,6 +186,7 @@
                                                                     @break
 
                                                                     @default
+                                                                    {{ $transaction->payment_purpose }}
                                                                 @endswitch
                                                             </td>
                                                             <td class="text-start">

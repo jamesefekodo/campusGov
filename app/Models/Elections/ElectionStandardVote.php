@@ -19,7 +19,7 @@ class ElectionStandardVote extends Model
     use HasFactory;
     protected $table = 'election_standard_votes';
     protected $fillable = [
-        // 'tenant_id',
+        'tenant_id',
         'election_id',
         'position',
         'candidate',
@@ -29,8 +29,8 @@ class ElectionStandardVote extends Model
         'current_faculty',
         'current_department',
         'level_at_application',
-        'created_at',
-        'updated_at',
+        // 'created_at',
+        // 'updated_at',
 
     ];
 

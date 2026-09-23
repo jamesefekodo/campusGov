@@ -593,7 +593,7 @@ if (!function_exists('electronicsPaymentMethods')) {
             ->where('is_active', true)
             ->whereHas('apiConfig', function ($q) {
                 $q->where('tenant_id', tenant()->id)
-                  ->where('is_active', true);
+                    ->where('is_active', true);
             })
             ->get();
     }
@@ -1059,5 +1059,72 @@ if (!function_exists('resolveAcademicContextForDue')) {
     }
 }
 
+if (!function_exists('emailSafeLogo')) {
+    function emailSafeLogo(string $backgroundColor = '#f0f0f0'): string
+    {
+        $defaultSettings = basicSystemInfo();
+        $logoPath = null;
+        $tenantId = tenantId();
 
+        if (
+            $defaultSettings &&
+            $defaultSettings->association_logo &&
+            $tenantId &&
+            file_exists(public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo))
+        ) {
+            $logoPath = public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo);
+        } else {
+            $logoPath = public_path('system/images/transcend_logo.webp');
+        }
 
+        $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+        $source = $ext === 'webp' ? imagecreatefromwebp($logoPath) : imagecreatefrompng($logoPath);
+
+        $width = imagesx($source);
+        $height = imagesy($source);
+
+        $flattened = imagecreatetruecolor($width, $height);
+
+        // Parse hex colour into RGB
+        $hex = ltrim($backgroundColor, '#');
+        $r = hexdec(substr($hex, 0, 2));
+        $g = hexdec(substr($hex, 2, 2));
+        $b = hexdec(substr($hex, 4, 2));
+        $bgColor = imagecolorallocate($flattened, $r, $g, $b);
+
+        imagefill($flattened, 0, 0, $bgColor);
+        imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
+
+        $outputDir = public_path('system/images/email-safe');
+        if (!is_dir($outputDir)) {
+            @mkdir($outputDir, 0775, true);
+        }
+
+        $outputPath = $outputDir . '/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png';
+        imagepng($flattened, $outputPath);
+
+        imagedestroy($source);
+        imagedestroy($flattened);
+
+        return asset('system/images/email-safe/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png');
+    }
+}
+
+if (!function_exists('emailFromName')) {
+    function emailFromName(): string
+    {
+        $settings = basicSystemInfo();
+
+        if (!$settings) {
+            return config('app.name');
+        }
+
+        $name = $settings->association_acronym ?? config('app.name');
+
+        if (!empty($settings->school_acronym)) {
+            $name .= ' | ' . $settings->school_acronym;
+        }
+
+        return $name;
+    }
+}

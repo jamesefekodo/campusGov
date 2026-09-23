@@ -266,7 +266,7 @@ class MemberSelfProfileController extends Controller
         return view('users.member.registration.registrationIndex', compact('data'));
     }
 
-    public function memberCreatePersonalProfile()
+    public function memberCreatePersonalProfile(Request $request)
     {
         $member = Auth::user();
         $data = [

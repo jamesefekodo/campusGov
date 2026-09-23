@@ -207,7 +207,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/payment/transactions', [MemberSelfProfileController::class, 'myPaymentTransactions'])->name('myPaymentTransactions');
     Route::get('member/payment/transactions/view/{payment_transaction_id}', [MemberSelfProfileController::class, 'viewMyPaymentTransaction'])->name('viewMyPaymentTransaction');
     Route::get('member/payment/transactions/download/{payment_transaction_id}', [PaymentTransasctionController::class, 'downloadPaymentReceipt'])->name('memberDownloadPaymentReceipt');
-
+    Route::get('member/payment/association_dues/waiver_notice/download/{uuid}', [MembersManagementController::class, 'downloadDuePaymentWaiverNotice'])->name('memberDownloadDuePaymentWaiverNotice');
 
 
 
@@ -382,10 +382,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/user_management/admin/view/account_status/toggle/{uuid}', [AdminsManagementController::class, 'toggleAdminAccountStatus'])->name('toggleAdminAccountStatus');
 
 
-    
-    
 
-    
+
+
+
 
         Route::get('admin/profile/view', [AdminsManagementController::class, 'adminSelfProfile'])->name('adminSelfProfile');
         Route::post('admin/profile/view', [MemberSelfProfileController::class, 'changeSelfPasswordSubmit'])->name('adminChangeSelfPasswordSubmit');
@@ -453,12 +453,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/config/basics/sliders/add_new/submit', [SystemConfigurationController::class, 'addNewSliderSubmit'])->name('addNewSliderSubmit');
     Route::put('admin/config/basics/sliders/update/{id}/submit', [SystemConfigurationController::class, 'editSliderSubmit'])->name('editSliderSubmit');
 
-    
-    // seo settings 
+
+    // seo settings
     Route::get('admin/config/seo', [SystemConfigurationController::class, 'seoConfig'])->name('seoConfig');
     Route::put('admin/config/seo/update/submit', [SystemConfigurationController::class, 'updateSeoConfigSubmit'])->name('updateSeoConfigSubmit');
 
-    
+
 
 
     // support/ help
@@ -467,8 +467,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/help/chat/edit/{id}/submit', [SupportController::class, 'editWhatsAppSupportLineSubmit'])->name('editWhatsAppSupportLineSubmit');
 
 
-    
-    
+
+
 
 
     // policy setup
