@@ -54,18 +54,18 @@
                                                         Departments:
                                                     </span>
                                                     <span class="text-black">
-                                                        0
+                                                        {{ $data['faculty']->departments->count() }}
                                                     </span>
                                                 </p>
                                             </div>
-                                             <div class="col-md-6">
+                                            <div class="col-md-6">
                                                 <p class="m-1 p-0">
                                                     <span class="text-mute">
                                                         Students:
                                                     </span>
                                                     <span class="text-black">
-                                                        0
-                                                    </span>
+                                                        {{ $data['studentMembers'] }} Undergraduates +
+                                                        {{ $data['alumniMembers'] }} Alumni </span>
                                                 </p>
                                             </div>
 
@@ -176,7 +176,8 @@
                                                                 </a>
                                                             </div>
                                                             <div class="m-1">
-                                                                <a class="btn btn-primary" href="{{ route('pastFacultyHeads', ['uuid' => $data['faculty']->uuid]) }}">
+                                                                <a class="btn btn-primary"
+                                                                    href="{{ route('pastFacultyHeads', ['uuid' => $data['faculty']->uuid]) }}">
                                                                     <i class="fas fa-address-book"></i> Past Heads
                                                                 </a>
                                                             </div>

@@ -61,7 +61,8 @@
                                                         Students:
                                                     </span>
                                                     <span class="text-black">
-                                                        0
+                                                        {{ $data['studentMembers'] }} Undergraduates +
+                                                        {{ $data['alumniMembers'] }} Alumni
                                                     </span>
                                                 </p>
                                             </div>
@@ -174,8 +175,7 @@
                                                             </div>
                                                             <div class="m-1">
                                                                 <a class="btn btn-primary"
-                                                                href="{{ route('pastDepartmentHeads', ['uuid' => $data['department']->uuid]) }}"
-                                                                >
+                                                                    href="{{ route('pastDepartmentHeads', ['uuid' => $data['department']->uuid]) }}">
                                                                     <i class="fas fa-address-book"></i> Past Heads
                                                                 </a>
                                                             </div>
@@ -194,7 +194,7 @@
                             </div>
                             {{-- Back Home --}}
                             <div class="w-100 justify-content-center text-center my-4">
-                                <a class="btn btn-primary" href="{{ route('faculties') }}"> <i
+                                <a class="btn btn-primary" href="{{ route('departments') }}"> <i
                                         class="fas fa-chevron-left"></i>
                                     Back
                                 </a>

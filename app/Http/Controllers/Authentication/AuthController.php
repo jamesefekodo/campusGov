@@ -357,14 +357,29 @@ class AuthController extends Controller
         if (
             $user->email_verification !== true
         ) {
-            if (
-                $user->email_verification_code === null ||
-                $user->email_verification_code === '' ||
-                Carbon::parse($user->email_verification_code_expires_at)->lt(now())
-            ) {
+            // if (
+            //     $user->email_verification_code === null ||
+            //     $user->email_verification_code === '' ||
+            //     Carbon::parse($user->email_verification_code_expires_at)->lt(now())
+            // ) {
+            //     $otp = $this->generateEmailVerificationCode($user);
+            //     $this->sendEmailVerificationCodeEmailtoUser($user->email, $otp);
+            // }
+
+            $hasValidCode = !empty($user->email_verification_code)
+                && $user->email_verification_code_expires_at
+                && Carbon::parse($user->email_verification_code_expires_at)->gt(now());
+
+            if ($hasValidCode) {
+                // Use the existing active code
+                $otp = $user->email_verification_code;
+            } else {
+                // Generate a new code because it's missing, empty, or expired
                 $otp = $this->generateEmailVerificationCode($user);
-                $this->sendEmailVerificationCodeEmailtoUser($user->email, $otp);
             }
+
+            // Send the email with whichever code is active/generated
+            $this->sendEmailVerificationCodeEmailtoUser($user->email, $otp);
 
             return view('utilities.pages.auth.userAccountValidation');
         } else {

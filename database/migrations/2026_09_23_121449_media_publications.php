@@ -27,7 +27,11 @@ return new class extends Migration
             $table->string('approved_by')->nullable(); // Foreign
             $table->string('approval_status')->default('pending');
             $table->dateTime('published_at')->nullable();
-            $table->boolean('is_active')->default(1);
+            $table->boolean('is_active')->default(0);
+
+            $table->dateTime('last_update')->nullable();
+            $table->string('last_update_by')->nullable(); // Foreign
+
 
             $table->timestamps();
 
@@ -37,6 +41,7 @@ return new class extends Migration
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
             $table->foreign('author')->references('username')->on('users')->onUpdate('cascade')->nullOnDelete();
             $table->foreign('approved_by')->references('username')->on('users')->onUpdate('cascade')->nullOnDelete();
+            $table->foreign('last_update_by')->references('username')->on('users')->onUpdate('cascade')->nullOnDelete();
         });
     }
 

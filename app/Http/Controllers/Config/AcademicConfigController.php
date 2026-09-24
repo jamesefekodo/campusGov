@@ -11,6 +11,7 @@ use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramDurationOverride;
 use App\Models\AcademicConfig\ProgramType;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Members\MemberAcademicInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
@@ -142,8 +143,14 @@ class AcademicConfigController extends Controller
             return redirect()->back()->with('error', 'Faculty record not found!');
         }
 
+        $studentMembers = MemberAcademicInfo::where('faculty', $faculty->slug)->where('academic_status', 'student')->count();
+        $alumniMembers = MemberAcademicInfo::where('faculty', $faculty->slug)->where('academic_status', 'alumni')->count();
+
+
         $data = [
             'faculty' => $faculty,
+            'studentMembers' => $studentMembers,
+            'alumniMembers' => $alumniMembers,
         ];
 
         return view('users.admin.academicConfig.faculties.viewFaculties', compact('data'));
@@ -673,10 +680,15 @@ class AcademicConfigController extends Controller
             return redirect()->back()->with('error', 'Department record not found!');
         }
 
+        $studentMembers = MemberAcademicInfo::where('department', $department->slug)->where('academic_status', 'student')->count();
+        $alumniMembers = MemberAcademicInfo::where('department', $department->slug)->where('academic_status', 'alumni')->count();
+
 
         $data = [
             'department' => $department,
             'activeFaculties' => Faculty::where('is_active', true)->orderBy('name')->get(),
+            'studentMembers' => $studentMembers,
+            'alumniMembers' => $alumniMembers,
         ];
         return view('users.admin.academicConfig.departments.viewDepartment', compact('data'));
     }
@@ -1199,9 +1211,16 @@ class AcademicConfigController extends Controller
             return redirect()->back()->with('error', 'Program record not found!');
         }
         $activeDepartments = Department::where('is_active', true)->orderBy('name')->get();
+
+        $studentMembers = MemberAcademicInfo::where('program', $program->slug)->where('academic_status', 'student')->count();
+        $alumniMembers = MemberAcademicInfo::where('program', $program->slug)->where('academic_status', 'alumni')->count();
+
+
         $data = [
             'program' => $program,
             'activeDepartments' => $activeDepartments,
+            'studentMembers' => $studentMembers,
+            'alumniMembers' => $alumniMembers,
         ];
 
         return view('users.admin.academicConfig.programs.viewProgram', compact('data'));
@@ -1298,6 +1317,27 @@ class AcademicConfigController extends Controller
                 'is_active' => $request->is_active,
             ]
         );
+        return redirect()->back()->with('success', 'Done!');
+    }
+    public function removeProgramModal($uuid)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('program.delete'),
+            403
+        );
+
+        $type = ProgramType::where('uuid', $uuid)->first();
+        if (!$type) {
+            return redirect()->back()->with('error', 'Program record not found!');
+        }
+        $typeExists = MemberAcademicInfo::where('program_type', $type->slug)->exists();
+        if ($typeExists) {
+            return redirect()->back()->with('error', 'Already used in members academic info, please remove first!');
+        }
+        $type->delete();
         return redirect()->back()->with('success', 'Done!');
     }
     public function addNewProgramProgramDurationDurationSubmit($uuid, Request $request)

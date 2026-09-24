@@ -15,6 +15,8 @@
 
         $associationAcronym = $systemInfo->association_acronym ?? config('app.name');
 
+        $schoolAcronym = $systemInfo->school_acronym ?? null;
+
         $primaryColour = $systemInfo->primary_colour ?: '#3b5edd';
         $secondaryColour = $systemInfo->secondary_colour ?: '#7a97ff';
         $tertiaryColour = $systemInfo->tertiary_colour ?: $secondaryColour;
@@ -434,7 +436,9 @@
 
                 <div class="landing-brand-text">
                     <span class="landing-brand-acronym">
-                        {{ $associationAcronym }}
+                        {{ $associationAcronym }} @if ($schoolAcronym)
+                            - {{ $schoolAcronym }}
+                        @endif
                     </span>
 
                     <span class="landing-brand-subtitle">
@@ -452,7 +456,10 @@
 
                 <h1 class="landing-heading">
                     Welcome to<br>
-                    <span>{{ $associationName }}</span>
+                    <span>{{ $associationName }} </span>
+                    @if ($schoolAcronym)
+                        - {{ $schoolAcronym }} Chapter
+                    @endif
                 </h1>
 
                 <p class="landing-description">

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class TagsForPublication extends Model
 {
@@ -21,6 +22,15 @@ class TagsForPublication extends Model
         'name',
         'slug',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->slug)) {
+                $model->slug = 'publ-tag-' . date('Ymd') . '-' . Str::lower(Str::random(10));
+            }
+        });
+    }
 
     /**
      * The tenant that owns this tag.

@@ -19,6 +19,7 @@ use App\Http\Controllers\Media\MediaPublicationController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
 use App\Http\Controllers\Misconduct\MisconductController;
+use App\Http\Controllers\Sharing\SharingController;
 use App\Http\Controllers\Support\SupportController;
 use App\Http\Controllers\UserManagement\AdminsManagementController;
 use App\Http\Controllers\UserManagement\MembersManagementController;
@@ -70,6 +71,8 @@ Route::get('/temporary_upload', [FrontendController::class, 'showUploadForm']);
 Route::post('/process_temporary_upload', [FrontendController::class, 'processTemporaryUpload'])->name('processTemporaryUpload');
 
 // ##############################################################################
+// sharing
+    Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'sharedMediaPublication'])->name('sharedMediaPublication');
 
 
 
@@ -434,6 +437,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_config/programs/edit/submit/{uuid}', [AcademicConfigController::class, 'updateAcademicProgramSubmit'])->name('updateAcademicProgramSubmit');
     Route::post('admin/academic_config/programs/type/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramType'])->name('addNewProgramType');
     Route::put('admin/academic_config/programs/type/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramType'])->name('editProgramType');
+    Route::get('admin/academic_config/programs/type/remove/submit/{uuid}', [AcademicConfigController::class, 'removeProgramModal'])->name('removeProgramModal');
+
+
+
     Route::post('admin/academic_config/programs/duration_override/add_new/submit/{uuid}', [AcademicConfigController::class, 'addNewProgramProgramDurationDurationSubmit'])->name('addNewProgramProgramDurationDurationSubmit');
     Route::put('admin/academic_config/programs/duration_override/edit/submit/{uuid}', [AcademicConfigController::class, 'editProgramDurationOverrideSubmit'])->name('editProgramDurationOverrideSubmit');
     Route::get('admin/academic_config/programs/duration_override/delete/{uuid}', [AcademicConfigController::class, 'removeProgramDurationOverride'])->name('removeProgramDurationOverride');
@@ -650,8 +657,29 @@ return view('admin.roles.permissions-edit', compact('role'));})->name('role.perm
 
 
     // media publications
-    Route::get('admin/media/publications', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublications');
-    Route::get('admin/media/publications/search', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationsSearch');
+    Route::get('admin/media/publications/home', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublications');
+    Route::get('admin/media/publications/home/search', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationsSearch');
+    Route::post('admin/media/publications/add_new/submit', [MediaPublicationController::class, 'addNewMediaPublicationSubmit'])->name('addNewMediaPublicationSubmit');
+    Route::get('admin/media/publications/view/{uuid}', [MediaPublicationController::class, 'viewMediaPublication'])->name('viewMediaPublication');
+
+
+    Route::get('admin/media/publications/approval', [MediaPublicationController::class, 'mediaPublicationsPendingApproval'])->name('mediaPublicationsPendingApproval');
+    Route::get('admin/media/publications/approval/search', [MediaPublicationController::class, 'mediaPublicationsPendingApproval'])->name('mediaPublicationsPendingApprovalSearch');
+
+    Route::get('admin/media/publications/draft', [MediaPublicationController::class, 'mediaPublicationsDraft'])->name('mediaPublicationsDraft');
+    Route::get('admin/media/publications/draft/search', [MediaPublicationController::class, 'mediaPublicationsDraft'])->name('mediaPublicationsDraftSearch');
+
+
+
+    
+    
+    Route::get('admin/media/publication/tag', [MediaPublicationController::class, 'mediaPublicationTags'])->name('mediaPublicationTags');
+    Route::post('admin/media/publication/tag/add_new/submit', [MediaPublicationController::class, 'addNewPublicationTagSubmit'])->name('addNewPublicationTagSubmit');
+    Route::put('admin/media/publication/tag/update/submit/{slug}', [MediaPublicationController::class, 'editPublicationTagSubmit'])->name('editPublicationTagSubmit');
+    Route::get('admin/media/publication/tag/remove/{slug}', [MediaPublicationController::class, 'removePublicationTag'])->name('removePublicationTag');
+
+
+
 
 
 });

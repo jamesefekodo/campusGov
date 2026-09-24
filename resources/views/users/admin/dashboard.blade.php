@@ -438,7 +438,7 @@
             </section>
 
 
-            <script>
+            {{-- <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const analytics = @json($data['membersAnalytics'] ?? []);
 
@@ -846,6 +846,253 @@
                                 programSelect.value,
                                 selectedProgramType
                             );
+                        }
+                    }
+                });
+            </script> --}}
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const analytics = @json($data['membersAnalytics'] ?? []);
+
+                    // Modern, slightly muted palette
+                    const palette = [
+                        '#4361ee', '#2ec4b6', '#f4a261', '#e63946', '#8338ec',
+                        '#00b4d8', '#ff6b9d', '#588157', '#ffb703', '#5a189a'
+                    ];
+
+                    function isMobile() {
+                        return window.innerWidth < 576;
+                    }
+
+                    function baseFontSize() {
+                        return isMobile() ? 10 : 12;
+                    }
+
+                    /*
+                     * Shorten a label for display, but keep the full version
+                     * for the tooltip. Long labels get flagged in red so it's
+                     * visually obvious they were trimmed.
+                     */
+                    function shortenLabel(label, maxLength) {
+                        const clean = String(label || 'Not specified')
+                            .replace(/^Department of\s+/i, '')
+                            .replace(/^Department\s+/i, '')
+                            .replace(/^Faculty of\s+/i, '')
+                            .replace(/\sand\s/gi, ' & ')
+                            .replace(/\s+/g, ' ')
+                            .trim();
+
+                        const wasTrimmed = clean.length > maxLength;
+                        const display = wasTrimmed ? clean.substring(0, maxLength).trim() + '…' : clean;
+
+                        return {
+                            display,
+                            wasTrimmed,
+                            full: clean
+                        };
+                    }
+
+                    function labelLimitForWidth() {
+                        const w = window.innerWidth;
+                        if (w < 576) return 10;
+                        if (w < 768) return 16;
+                        if (w < 992) return 22;
+                        return 30;
+                    }
+
+                    /*
+                     * Universal chart renderer — works for bar, doughnut, pie.
+                     * Always forces the value axis to start at zero, regardless
+                     * of Chart.js version quirks, and flags long labels red.
+                     */
+                    function renderChart(canvasId, rows, type = 'bar', horizontal = false, limit = null) {
+                        const canvas = document.getElementById(canvasId);
+                        if (!canvas || !rows || !rows.length) return;
+
+                        let dataset = rows.slice().sort((a, b) => Number(b.count) - Number(a.count));
+                        if (limit) dataset = dataset.slice(0, limit);
+
+                        const maxLen = labelLimitForWidth();
+                        const prepared = dataset.map(row => shortenLabel(row.label, maxLen));
+                        const counts = dataset.map(row => Number(row.count || 0));
+
+                        const isDonutLike = type === 'doughnut' || type === 'pie';
+
+                        new Chart(canvas, {
+                            type: type,
+                            data: {
+                                labels: prepared.map(p => p.display),
+                                datasets: [{
+                                    label: 'Members',
+                                    data: counts,
+                                    backgroundColor: counts.map((_, i) => palette[i % palette.length] +
+                                        'CC'),
+                                    borderColor: counts.map((_, i) => palette[i % palette.length]),
+                                    borderWidth: 1.5,
+                                    borderRadius: type === 'bar' ? 6 : 0,
+                                    maxBarThickness: 48
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: true,
+                                indexAxis: horizontal ? 'y' : 'x',
+                                layout: {
+                                    padding: 8
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: isDonutLike,
+                                        labels: {
+                                            font: {
+                                                size: baseFontSize()
+                                            }
+                                        }
+                                    },
+                                    tooltip: {
+                                        callbacks: {
+                                            title: (items) => prepared[items[0].dataIndex]?.full ?? '',
+                                            label: (ctx) => ' ' + Number(ctx.raw).toLocaleString() + ' member(s)'
+                                        }
+                                    }
+                                },
+                                scales: isDonutLike ? {} : {
+                                    x: {
+                                        beginAtZero: true,
+                                        min: 0,
+                                        ticks: {
+                                            autoSkip: false,
+                                            maxRotation: horizontal ? 0 : (isMobile() ? 55 : 30),
+                                            minRotation: horizontal ? 0 : (isMobile() ? 55 : 0),
+                                            font: {
+                                                size: baseFontSize()
+                                            },
+                                            color: function(context) {
+                                                const idx = context.index;
+                                                return prepared[idx]?.wasTrimmed ? '#e63946' : '#495057';
+                                            }
+                                        }
+                                    },
+                                    y: {
+                                        beginAtZero: true,
+                                        min: 0,
+                                        ticks: {
+                                            precision: 0,
+                                            font: {
+                                                size: baseFontSize()
+                                            },
+                                            color: horizontal ? function(context) {
+                                                const idx = context.index;
+                                                return prepared[idx]?.wasTrimmed ? '#e63946' : '#495057';
+                                            } : '#495057'
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+
+                    // Render all charts through the one unified, zero-safe renderer
+                    renderChart('analyticsByLevel', analytics.by_level, 'bar');
+                    renderChart('analyticsByGender', analytics.by_gender, 'doughnut');
+                    renderChart('analyticsByFaculty', analytics.by_faculty, 'bar', true);
+                    renderChart('analyticsByDepartment', analytics.by_department, 'bar', false, 10);
+                    renderChart('analyticsByProgram', analytics.by_program, 'bar', true);
+                    renderChart('analyticsByProgramType', analytics.by_program_type, 'doughnut');
+                    renderChart('analyticsByStatus', analytics.by_status, 'bar');
+
+                    // Faculty → Department
+                    const facultySelect = document.getElementById('analytics-faculty-select');
+                    const departmentSelect = document.getElementById('analytics-department-select');
+                    const selectedDepartment = @json($data['selectedAnalyticsDepartment'] ?? '');
+
+                    function loadAnalyticsDepartments(facultySlug, selected = '') {
+                        if (!facultySlug) {
+                            departmentSelect.innerHTML = '<option value="">Select faculty first</option>';
+                            departmentSelect.disabled = true;
+                            return;
+                        }
+
+                        departmentSelect.disabled = true;
+                        departmentSelect.innerHTML = '<option value="">Loading...</option>';
+
+                        fetch("{{ route('fetchDepartments') }}?faculty_slug=" + encodeURIComponent(facultySlug))
+                            .then(response => {
+                                if (!response.ok) throw new Error('Unable to load departments');
+                                return response.json();
+                            })
+                            .then(response => {
+                                departmentSelect.innerHTML = '<option value="">All departments</option>';
+                                (response.departments || []).forEach(department => {
+                                    const option = document.createElement('option');
+                                    option.value = department.slug;
+                                    option.textContent = department.name;
+                                    option.selected = selected === department.slug;
+                                    departmentSelect.appendChild(option);
+                                });
+                                departmentSelect.disabled = false;
+                            })
+                            .catch(() => {
+                                departmentSelect.innerHTML = '<option value="">Unable to load departments</option>';
+                                departmentSelect.disabled = false;
+                            });
+                    }
+
+                    if (facultySelect && departmentSelect) {
+                        facultySelect.addEventListener('change', function() {
+                            loadAnalyticsDepartments(this.value);
+                        });
+
+                        if (facultySelect.value) {
+                            loadAnalyticsDepartments(facultySelect.value, selectedDepartment);
+                        }
+                    }
+
+                    // Programme → Programme Type
+                    const programSelect = document.getElementById('analytics-program-select');
+                    const programTypeSelect = document.getElementById('analytics-program-type-select');
+                    const selectedProgramType = @json($data['selectedAnalyticsProgramType'] ?? '');
+
+                    function loadAnalyticsProgramTypes(programSlug, selected = '') {
+                        if (!programSlug) {
+                            programTypeSelect.innerHTML = '<option value="">Select programme first</option>';
+                            programTypeSelect.disabled = true;
+                            return;
+                        }
+
+                        programTypeSelect.disabled = true;
+                        programTypeSelect.innerHTML = '<option value="">Loading...</option>';
+
+                        fetch("{{ route('fetchProgramTypes') }}?program_slug=" + encodeURIComponent(programSlug))
+                            .then(response => {
+                                if (!response.ok) throw new Error('Unable to load programme types');
+                                return response.json();
+                            })
+                            .then(response => {
+                                programTypeSelect.innerHTML = '<option value="">All programme types</option>';
+                                (response.programTypes || []).forEach(type => {
+                                    const option = document.createElement('option');
+                                    option.value = type.slug;
+                                    option.textContent = type.type_name;
+                                    option.selected = selected === type.slug;
+                                    programTypeSelect.appendChild(option);
+                                });
+                                programTypeSelect.disabled = false;
+                            })
+                            .catch(() => {
+                                programTypeSelect.innerHTML =
+                                    '<option value="">Unable to load programme types</option>';
+                                programTypeSelect.disabled = false;
+                            });
+                    }
+
+                    if (programSelect && programTypeSelect) {
+                        programSelect.addEventListener('change', function() {
+                            loadAnalyticsProgramTypes(this.value);
+                        });
+
+                        if (programSelect.value) {
+                            loadAnalyticsProgramTypes(programSelect.value, selectedProgramType);
                         }
                     }
                 });

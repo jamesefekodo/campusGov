@@ -17,6 +17,7 @@ use App\Models\Finance\Settings\ManualPaymentMethod;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
+use App\Models\Media\MediaPublication;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberReAdmissionApplication;
 use App\Models\Support\WhatsappSupportLine;
@@ -1138,3 +1139,23 @@ if (!function_exists('seoSettings')) {
         return SeoDetail::where('tenant_id', tenant()->id)->first();
     }
 }
+
+
+if (!function_exists('countMediaPublicationsPendingApproval')) {
+    function countMediaPublicationsPendingApproval()
+    {
+        return MediaPublication::where('approval_status', 'pending')
+            ->count();
+    }
+}
+
+
+if (!function_exists('countMyDraftedMediaPublications')) {
+    function countMyDraftedMediaPublications()
+    {
+        return MediaPublication::where('author', Auth::user()->username)->where('approval_status', 'draft')
+            ->count();
+    }
+}
+
+

@@ -851,7 +851,7 @@
 
                         Swal.fire({
                             title: 'Are you sure?',
-                            text: "This policy will be permanently deleted.",
+                            text: "This item will be permanently deleted.",
                             icon: 'warning',
                             showCancelButton: true,
                             confirmButtonColor: '#d33',

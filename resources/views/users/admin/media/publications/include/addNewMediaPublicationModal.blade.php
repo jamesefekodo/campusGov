@@ -1,5 +1,160 @@
-<div class="modal fade" id="addNewMediaPublicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle"
-    aria-hidden="true">
+<style>
+    .smart-image-upload {
+        width: 100%;
+        cursor: pointer;
+    }
+
+    .image-preview-wrapper {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 16 / 7;
+        min-height: 220px;
+        overflow: hidden;
+        border: 2px dashed #ced4da;
+        border-radius: 12px;
+        background: #f8f9fa;
+        transition: all .2s ease;
+    }
+
+    .image-preview-wrapper:hover {
+        border-color: #198754;
+    }
+
+    .image-preview {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        background: #f8f9fa;
+    }
+
+    .image-upload-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+        background: rgba(0, 0, 0, .35);
+        opacity: 0;
+        transition: opacity .2s ease;
+    }
+
+    .image-preview-wrapper:hover .image-upload-overlay {
+        opacity: 1;
+    }
+
+    .image-upload-overlay i {
+        display: block;
+    }
+
+    .image-upload-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 8px;
+        padding: 8px 10px;
+        background: #f8f9fa;
+        border-radius: 7px;
+        font-size: 13px;
+    }
+
+    #imageFileName {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .smart-image-upload.dragging .image-preview-wrapper {
+        border-color: #198754;
+        background: #e9f7ef;
+    }
+</style>
+
+<style>
+    .smart-tags-wrapper {
+        position: relative;
+        /* Acts as the anchor for the absolute dropdown */
+    }
+
+    .smart-tags-container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px !important;
+        cursor: text;
+        min-height: 42px;
+    }
+
+    .tag-pills-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .tag-pill {
+        background-color: #f1f3f5;
+        color: #333;
+        padding: 2px 8px 2px 10px;
+        border-radius: 4px;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid #dee2e6;
+    }
+
+    .tag-pill .remove-tag {
+        cursor: pointer;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+
+    .tag-pill .remove-tag:hover {
+        color: #dc3545;
+    }
+
+    .tags-text-input {
+        flex-grow: 1;
+        min-width: 120px;
+        outline: none;
+        font-size: 0.95rem;
+        background: transparent;
+    }
+
+    .smart-tags-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0 0 6px 6px;
+        max-height: 180px;
+        overflow-y: auto;
+        z-index: 9999;
+        /* Ensures it floats above card boundaries and other inputs */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .tag-suggestion-item {
+        padding: 10px 14px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #f8f9fa;
+    }
+
+    .tag-suggestion-item:hover {
+        background-color: #f1f3f5;
+        color: #0d6efd;
+    }
+</style>
+
+<div class="modal fade" id="addNewMediaPublicationModal" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalLongTitle" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header modal_header" style="width: 100%">
@@ -15,195 +170,189 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" action="{{ route('addNewElectionSubmit') }}"
+                    <form class="form my_form" method="POST" action="{{ route('addNewMediaPublicationSubmit') }}"
                         enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <div class="form-group col-md-8">
+                            <div class="form-group col-md-12">
                                 <label for="title">Title: <span class="text-red">*</span></label>
                                 <input type="text" class="form-control" name="title" value="{{ old('title') }}"
                                     required>
                                 <p style="color: red">{{ $errors->first('title') }}</p>
                             </div>
-                            <div class="form-group col-md-4">
-                                <label for="academic_session">Admission Session<span class="text-red">*</span>:</label>
-                                <select name="academic_session" class="form-control">
-                                    <option value="" disabled selected>Select</option>
-                                    @php
-                                        // $startYear = currentAcademicYear() - highestProgramDuration();
-                                        $startYear = currentAcademicYear();
-                                        $endYear = currentAcademicYear() + 1;
-                                    @endphp
 
-                                    @for ($year = $endYear; $year >= $startYear; $year--)
-                                        <option value="{{ $year }}"
-                                            {{ old('academic_session', currentAcademicYear()) == $year ? 'selected' : '' }}>
-                                            {{ $year }}/{{ $year + 1 }}
-                                        </option>
-                                    @endfor
-                                </select>
-                                <p style="color: red">{{ $errors->first('academic_session') }}</p>
+                            <div class="form-group col-md-12">
+                                <label for="image">
+                                    Publication Image: <span class="text-red">*</span>
+                                </label>
+
+                                <div class="smart-image-upload" id="imageUploadBox">
+
+                                    <input type="file" name="image" id="image" name="cover_image"
+                                        accept="image/jpeg,image/png,image/webp" hidden required>
+
+                                    <div class="image-preview-wrapper" id="imagePreviewWrapper">
+                                        <img src="{{ asset('system/images/wide_img_placeholder.jpeg') }}"
+                                            id="imagePreview" class="image-preview" alt="Image preview">
+
+                                        <div class="image-upload-overlay">
+                                            <div>
+                                                <i class="fas fa-cloud-upload-alt fa-2x mb-2"></i>
+                                                <div class="fw-bold">Click to upload image</div>
+                                                <small>JPG, PNG or WEBP • Recommended wide image</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p style="color: red">{{ $errors->first('cover_image') }}</p>
+
+
+                                    <div class="image-upload-info">
+                                        <span id="imageFileName">No image selected</span>
+                                        <button type="button" class="btn btn-sm btn-outline-danger d-none"
+                                            id="removeImage">
+                                            <i class="fas fa-times"></i> Remove
+                                        </button>
+                                    </div>
+
+                                </div>
+
+                                <small class="text-muted">
+                                    Recommended aspect ratio: <strong>16:9</strong>.
+                                    Maximum file size: <strong>2MB</strong>.
+                                </small>
+
+                                <p style="color: red">{{ $errors->first('image') }}</p>
                             </div>
                             <div class="form-group col-md-12">
-                                <label for="description">Description: <span class="text-red">*</span></label>
-                                <input type="text" class="form-control" name="description"
-                                    value="{{ old('description') }}" required>
-                                <p style="color: red">{{ $errors->first('description') }}</p>
+                                <label for="content">Post Content:<span class="text-red">*</span></label>
+                                <textarea id="content" name="content" required>
+                                    {{ old('content') }}
+                                </textarea>
+                                <p style="color: red">
+                                    {{ $errors->first('content') }}</p>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="voting_method">
-                                    Voting Method:<span class="text-red">*</span>
+                            <div class="form-group col-md-12">
+                                <label for="tags_input">Tags: <span class="text-red">*</span></label>
+
+                                <!-- Added wrapper for absolute dropdown positioning -->
+                                <div class="smart-tags-wrapper position-relative">
+                                    <div class="smart-tags-container form-control h-auto" id="smartTagsContainer">
+                                        <div class="tag-pills-list" id="tagPillsList"></div>
+                                        <input type="text" id="tagsInput"
+                                            class="tags-text-input border-0 p-0 shadow-none"
+                                            placeholder="Type or select tags...">
+                                    </div>
+
+                                    <!-- Suggestions Dropdown -->
+                                    <div class="smart-tags-dropdown d-none" id="tagsDropdown">
+                                        @foreach ($data['mediaTags'] as $tag)
+                                            <div class="tag-suggestion-item" data-tag-name="{{ $tag->name }}">
+                                                {{ $tag->name }}</div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <input type="hidden" name="tags" id="tagsHiddenInput" value="{{ old('tags') }}"
+                                    required>
+
+                                <small class="text-muted">Type a tag and press comma (<strong>,</strong>) or Enter, or
+                                    select from the list.</small>
+                                <p style="color: red">{{ $errors->first('tags') }}</p>
+                            </div>
+
+                            <div class="d-flex align-items-center mt-2">
+                                <hr class="flex-grow-1">
+                                <span class="mx-2 text-blue">SEO</span>
+                                <hr class="flex-grow-1">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label for="meta_description">Meta Description: <span class="text-red">*</span></label>
+                                <input type="text" class="form-control" name="meta_description"
+                                    value="{{ old('meta_description') }}" required>
+                                <p style="color: red">{{ $errors->first('meta_description') }}</p>
+                            </div>
+                            <div class="form-group col-md-12">
+                                <label for="meta_keywords">Meta Keywords: <span class="text-red">*</span></label>
+                                <input type="text" class="form-control" name="meta_keywords"
+                                    value="{{ old('meta_keywords') }}" required>
+                                <p style="color: red">{{ $errors->first('meta_keywords') }}</p>
+                            </div>
+                            <div class="form-group col-md-12 mt-4">
+                                <label class="form-label fw-bold mb-2">
+                                    Publication Status
+                                    <span class="text-danger">*</span>
                                 </label>
 
-                                <select class="form-select" name="voting_method" id="voting_method" required>
-                                    <option value="" selected disabled>-Select-</option>
-
-                                    <option value="standard"
-                                        {{ old('voting_method') == 'standard' ? 'selected' : '' }}>
-                                        Standard
-                                    </option>
-
-                                    <option value="monetary"
-                                        {{ old('voting_method') == 'monetary' ? 'selected' : '' }}>
-                                        Monetary
-                                    </option>
-                                </select>
-
-                                <p style="color: red">
-                                    {{ $errors->first('voting_method') }}
+                                <p class="text-muted small mb-3">
+                                    Choose how you would like this content to be saved.
                                 </p>
+
+                                <div class="row g-3">
+
+                                    {{-- Input: Submit for Approval --}}
+                                    <div class="col-md-6">
+                                        <input type="radio" name="status" id="submit_for_approval"
+                                            value="submit_for_approval" class="status-radio"
+                                            {{ old('status') === 'submit_for_approval' ? 'checked' : '' }} required>
+
+                                        <label for="submit_for_approval" class="status-card">
+                                            <div class="status-card-icon status-card-icon-primary">
+                                                <i class="fas fa-paper-plane"></i>
+                                            </div>
+
+                                            <div>
+                                                <h6 class="status-card-title">
+                                                    Submit for Approval
+                                                </h6>
+
+                                                <p class="status-card-description">
+                                                    Send this content for review. It will be published only after it has
+                                                    been approved.
+                                                </p>
+                                            </div>
+
+                                            <div class="status-card-check">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    {{-- Input: Save as Draft --}}
+                                    <div class="col-md-6">
+                                        <input type="radio" name="status" id="draft" value="draft"
+                                            class="status-radio" {{ old('status') === 'draft' ? 'checked' : '' }}
+                                            required>
+
+                                        <label for="draft" class="status-card">
+                                            <div class="status-card-icon status-card-icon-secondary">
+                                                <i class="fas fa-file-pen"></i>
+                                            </div>
+
+                                            <div>
+                                                <h6 class="status-card-title">
+                                                    Save as Draft
+                                                </h6>
+
+                                                <p class="status-card-description">
+                                                    Save this content privately and continue editing it later before
+                                                    submitting it for approval.
+                                                </p>
+                                            </div>
+
+                                            <div class="status-card-check">
+                                                <i class="fas fa-check"></i>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                </div>
+
+                                @error('status')
+                                    <p class="text-danger mt-2 mb-0">{{ $message }}</p>
+                                @enderror
                             </div>
 
-
-                            <div class="form-group col-md-6" id="cost_per_vote_container"
-                                style="{{ old('voting_method') == 'monetary' ? '' : 'display: none;' }}">
-
-                                <label for="cost_per_vote">
-                                    Cost Per Vote:<span class="text-red">*</span>
-                                </label>
-
-                                <input type="number" step="0.01" min="0" class="form-control"
-                                    name="cost_per_vote" id="cost_per_vote" value="{{ old('cost_per_vote') }}"
-                                    {{ old('voting_method') == 'monetary' ? 'required' : '' }}>
-
-                                <p style="color: red">
-                                    {{ $errors->first('cost_per_vote') }}
-                                </p>
-                            </div>
-
-
-                            <script>
-                                document.addEventListener('DOMContentLoaded', function() {
-
-                                    const votingMethod = document.getElementById('voting_method');
-                                    const costContainer = document.getElementById('cost_per_vote_container');
-                                    const costInput = document.getElementById('cost_per_vote');
-
-                                    function toggleCostPerVote() {
-
-                                        if (votingMethod.value === 'monetary') {
-
-                                            costContainer.style.display = 'block';
-                                            costInput.required = true;
-
-                                        } else {
-
-                                            costContainer.style.display = 'none';
-                                            costInput.required = false;
-                                            costInput.value = '';
-                                        }
-                                    }
-
-                                    votingMethod.addEventListener('change', toggleCostPerVote);
-
-                                    // Handle old input after validation failure
-                                    toggleCostPerVote();
-                                });
-                            </script>
-                            <div class="form-group col-md-6">
-                                <label for="public_visibility">Public Visibility:<span class="text-red">*</span></label>
-                                <select class="form-select" name="public_visibility" required>
-                                    <option selected disabled>
-                                        -Select-</option>
-                                    <option value=0 {{ old('public_visibility') == '0' ? 'selected' : '' }}>
-                                        No</option>
-                                    <option value=1 {{ old('public_visibility') == '1' ? 'selected' : '' }}>
-                                        Yes</option>
-                                </select>
-                                <p style="color: red">
-                                    {{ $errors->first('public_visibility') }}</p>
-                            </div>
-                            <div class="d-flex align-items-center mt-2">
-                                <hr class="flex-grow-1">
-                                <span class="mx-2 text-blue">Form Sales Period</span>
-                                <hr class="flex-grow-1">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="form_sales_starts">Form Sales Starts<span class="text-red">*</span></label>
-                                <input type="datetime-local" class="form-control" name="form_sales_starts"
-                                    value="{{ old('form_sales_starts') }}" required>
-                                <p style="color: red">{{ $errors->first('form_sales_starts') }}</p>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="form_sales_ends">Form Sales Ends<span class="text-red">*</span></label>
-                                <input type="datetime-local" class="form-control" name="form_sales_ends"
-                                    value="{{ old('form_sales_ends') }}" required>
-                                <p style="color: red">{{ $errors->first('form_sales_ends') }}</p>
-                            </div>
-
-                            <div class="d-flex align-items-center mt-2">
-                                <hr class="flex-grow-1">
-                                <span class="mx-2 text-blue">Screening Period</span>
-                                <hr class="flex-grow-1">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="screening_starts">Screening Starts</label>
-                                <input type="datetime-local" class="form-control" name="screening_starts"
-                                    value="{{ old('screening_starts') }}">
-                                <p style="color: red">{{ $errors->first('screening_starts') }}</p>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="screening_ends">Screening Ends</label>
-                                <input type="datetime-local" class="form-control" name="screening_ends"
-                                    value="{{ old('screening_ends') }}">
-                                <p style="color: red">{{ $errors->first('screening_ends') }}</p>
-                            </div>
-
-                            <div class="d-flex align-items-center mt-2">
-                                <hr class="flex-grow-1">
-                                <span class="mx-2 text-blue">Screening Period</span>
-                                <hr class="flex-grow-1">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="campaign_starts">Screening Starts</label>
-                                <input type="datetime-local" class="form-control" name="campaign_starts"
-                                    value="{{ old('campaign_starts') }}">
-                                <p style="color: red">{{ $errors->first('campaign_starts') }}</p>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="campaign_ends">Screening Ends</label>
-                                <input type="datetime-local" class="form-control" name="campaign_ends"
-                                    value="{{ old('campaign_ends') }}">
-                                <p style="color: red">{{ $errors->first('campaign_ends') }}</p>
-                            </div>
-
-                            <div class="d-flex align-items-center">
-                                <hr class="flex-grow-1">
-                                <span class="mx-2 text-blue">Voting Period</span>
-                                <hr class="flex-grow-1">
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="voting_starts">Voting Starts<span class="text-red">*</span></label>
-                                <input type="datetime-local" class="form-control" name="voting_starts"
-                                    value="{{ old('voting_starts') }}" required>
-                                <p style="color: red">{{ $errors->first('voting_starts') }}</p>
-                            </div>
-                            <div class="form-group col-md-6">
-                                <label for="voting_ends">Voting Ends<span class="text-red">*</span></label>
-                                <input type="datetime-local" class="form-control" name="voting_ends"
-                                    value="{{ old('voting_ends') }}" required>
-                                <p style="color: red">{{ $errors->first('voting_ends') }}</p>
-                            </div>
                         </div>
                         <hr>
 
@@ -226,3 +375,276 @@
         </div>
     </div>
 </div>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const uploadBox = document.getElementById('imageUploadBox');
+        const fileInput = document.getElementById('image');
+        const preview = document.getElementById('imagePreview');
+        const fileName = document.getElementById('imageFileName');
+        const removeButton = document.getElementById('removeImage');
+
+        const placeholder = "{{ asset('system/images/slider_placeholder.webp') }}";
+
+        // Click anywhere on upload area
+        uploadBox.addEventListener('click', function(e) {
+
+            // Don't open file picker when clicking Remove
+            if (e.target.closest('#removeImage')) {
+                return;
+            }
+
+            fileInput.click();
+        });
+
+
+        // File selected
+        fileInput.addEventListener('change', function() {
+
+            if (this.files && this.files.length > 0) {
+                showImage(this.files[0]);
+            }
+        });
+
+
+        function showImage(file) {
+
+            // Validate file type
+            const allowedTypes = [
+                'image/jpeg',
+                'image/png',
+                'image/webp'
+            ];
+
+            if (!allowedTypes.includes(file.type)) {
+                alert('Please select a JPG, PNG or WEBP image.');
+                resetImage();
+                return;
+            }
+
+
+            // Validate size - 2MB
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Image size must not exceed 2MB.');
+                resetImage();
+                return;
+            }
+
+
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+
+                preview.src = e.target.result;
+
+                fileName.textContent = file.name;
+
+                removeButton.classList.remove('d-none');
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+
+        // Remove selected image
+        removeButton.addEventListener('click', function(e) {
+
+            e.stopPropagation();
+
+            resetImage();
+        });
+
+
+        function resetImage() {
+
+            fileInput.value = '';
+
+            preview.src = placeholder;
+
+            fileName.textContent = 'No image selected';
+
+            removeButton.classList.add('d-none');
+        }
+
+
+        // Drag & Drop
+        uploadBox.addEventListener('dragover', function(e) {
+
+            e.preventDefault();
+
+            uploadBox.classList.add('dragging');
+        });
+
+
+        uploadBox.addEventListener('dragleave', function() {
+
+            uploadBox.classList.remove('dragging');
+        });
+
+
+        uploadBox.addEventListener('drop', function(e) {
+
+            e.preventDefault();
+
+            uploadBox.classList.remove('dragging');
+
+            const files = e.dataTransfer.files;
+
+            if (files.length > 0) {
+
+                const file = files[0];
+
+                // Put dropped file into input
+                const dataTransfer = new DataTransfer();
+
+                dataTransfer.items.add(file);
+
+                fileInput.files = dataTransfer.files;
+
+                showImage(file);
+            }
+        });
+
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        $('#content').summernote({
+            height: 200, // Set editor height
+            toolbar: [
+                // [groupName, [list of buttons]]
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['height', ['height']],
+                ['insert', []],
+                ['view', []]
+            ]
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const wrapper = document.querySelector('.smart-tags-wrapper');
+        const container = document.getElementById('smartTagsContainer');
+        const tagsInput = document.getElementById('tagsInput');
+        const pillsList = document.getElementById('tagPillsList');
+        const hiddenInput = document.getElementById('tagsHiddenInput');
+        const dropdown = document.getElementById('tagsDropdown');
+        const suggestionItems = dropdown.querySelectorAll('.tag-suggestion-item');
+
+        let tags = [];
+
+        // Initialize from old() value if present
+        if (hiddenInput.value) {
+            tags = hiddenInput.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
+            renderPills();
+        }
+
+        // Focus text box when container is clicked
+        container.addEventListener('click', () => tagsInput.focus());
+
+        // Show dropdown on focus or typing
+        tagsInput.addEventListener('focus', function() {
+            filterAndShowDropdown();
+        });
+
+        tagsInput.addEventListener('input', function() {
+            filterAndShowDropdown();
+        });
+
+        function filterAndShowDropdown() {
+            const query = tagsInput.value.trim().toLowerCase();
+            let visibleCount = 0;
+
+            suggestionItems.forEach(item => {
+                const text = item.getAttribute('data-tag-name').toLowerCase();
+                // Match text query and ensure tag isn't already added as a pill
+                if (text.includes(query) && !tags.includes(item.getAttribute('data-tag-name'))) {
+                    item.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            if (visibleCount > 0) {
+                dropdown.classList.remove('d-none');
+            } else {
+                dropdown.classList.add('d-none');
+            }
+        }
+
+        // Handle typing delimiters (comma or enter)
+        tagsInput.addEventListener('keydown', function(e) {
+            if (e.key === ',' || e.key === 'Enter') {
+                e.preventDefault();
+                addTag(tagsInput.value);
+            } else if (e.key === 'Backspace' && tagsInput.value === '' && tags.length > 0) {
+                tags.pop();
+                updateAndRender();
+                filterAndShowDropdown();
+            }
+        });
+
+        // Click suggestion item to add
+        suggestionItems.forEach(item => {
+            // Use mousedown instead of click to prevent blur event from firing first
+            item.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                addTag(this.getAttribute('data-tag-name'));
+                dropdown.classList.add('d-none');
+            });
+        });
+
+        // Hide dropdown when clicking outside the wrapper
+        document.addEventListener('click', function(e) {
+            if (!wrapper.contains(e.target)) {
+                dropdown.classList.add('d-none');
+            }
+        });
+
+        function addTag(text) {
+            const cleaned = text.replace(/,/g, '').trim();
+            if (cleaned && !tags.includes(cleaned)) {
+                tags.push(cleaned);
+                updateAndRender();
+            }
+            tagsInput.value = '';
+            dropdown.classList.add('d-none');
+        }
+
+        window.removeTag = function(index) {
+            tags.splice(index, 1);
+            updateAndRender();
+            if (document.activeElement === tagsInput) {
+                filterAndShowDropdown();
+            }
+        };
+
+        function updateAndRender() {
+            hiddenInput.value = tags.join(',');
+            renderPills();
+        }
+
+        function renderPills() {
+            pillsList.innerHTML = '';
+            tags.forEach((tag, index) => {
+                const pill = document.createElement('div');
+                pill.className = 'tag-pill';
+                pill.innerHTML = `
+                <span>${tag}</span>
+                <span class="remove-tag" onclick="removeTag(${index})"><i class="fas fa-times"></i></span>
+            `;
+                pillsList.appendChild(pill);
+            });
+        }
+    });
+</script>

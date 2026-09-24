@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Str;
 
 class MediaPublication extends Model
 {
@@ -33,6 +34,8 @@ class MediaPublication extends Model
         'approved_by',
         'published_at',
         'is_active',
+        'last_update',
+        'last_update_by',
     ];
 
     protected $casts = [
@@ -41,6 +44,17 @@ class MediaPublication extends Model
         'views' => 'integer',
         'shares' => 'integer',
     ];
+
+
+    // uuid
+    protected static function booted(): void
+    {
+        static::creating(function ($model) {
+            if (empty($model->uuid)) {
+                $model->uuid = 'medpub-' . date('Ymd') . '-' . Str::uuid();
+            }
+        });
+    }
 
     /**
      * The tenant that owns this publication.
@@ -93,5 +107,10 @@ class MediaPublication extends Model
         )
             ->using(PublicationTag::class)
             ->withTimestamps();
+    }
+
+     public function lastUpdateUser(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'last_update_by', 'username');
     }
 }

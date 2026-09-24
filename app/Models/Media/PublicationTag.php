@@ -4,13 +4,13 @@ namespace App\Models\Media;
 
 use App\Models\Media\MediaPublication;
 use App\Models\Media\TagsForPublication;
-use Illuminate\Database\Eloquent\Model;
+// use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\Pivot; // <-- Change this
 
-class PublicationTag extends Model
+class PublicationTag extends Pivot
 {
     protected $table = 'publication_tags';
-
     protected $fillable = [
         'media_publication_id',
         'tag_for_publication_id',

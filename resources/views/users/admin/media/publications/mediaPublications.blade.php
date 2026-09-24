@@ -1,6 +1,20 @@
 @extends('layouts.userLayout')
 @section('title', $data['pageTitle'])
 
+
+@php
+    if (request()->routeIs('mediaPublicationsPendingApproval', 'mediaPublicationsPendingApprovalSearch')) {
+        $searchRoute = route('mediaPublicationsPendingApprovalSearch');
+        $backRoute = route('mediaPublicationsPendingApproval');
+    } elseif (request()->routeIs('mediaPublicationsDraft', 'mediaPublicationsDraftSearch')) {
+        $searchRoute = route('mediaPublicationsDraftSearch');
+        $backRoute = route('mediaPublicationsDraft');
+    } else {
+        $searchRoute = route('mediaPublicationsSearch');
+        $backRoute = route('mediaPublications');
+    }
+@endphp
+
 @section('content')
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
@@ -8,7 +22,7 @@
                 @include('users.admin.media.publications.include.inner_nav')
             </div>
             @if (Auth::user()->hasPermission('elections.create'))
-                <div class="d-flex justify-content-end">
+                <div class="d-flex justify-content-end me-3">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
                             data-target="#addNewMediaPublicationModal">
@@ -18,8 +32,12 @@
                 @include('users.admin.media.publications.include.addNewMediaPublicationModal')
             @endif
 
-            <div class="individual-review-card-container">
-                <div class="col-md-12 individual-review-card">
+            <div class="individual-review-card-container row">
+                <div class="col-md-1 individual-review-card text-black">
+                    {{-- sidde menu --}}
+                    @include('users.admin.media.publications.include.publicationSideMenu')
+                </div>
+                <div class="col-md-11 individual-review-card">
                     <div class="table_head">
                         <div class="table_head_item col-md-8">
                             <div class="table_title">
@@ -29,7 +47,7 @@
 
                         <div class="table_head_item col-md-4">
                             <div class="custom_search">
-                                <form type="GET" action="{{ route('mediaPublicationsSearch') }}">
+                                <form type="GET" action="{{ $searchRoute }}">
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
@@ -53,19 +71,19 @@
                                                     <th scope="col" style="width: 10px" class="table_header">S/N
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Election
+                                                        Title
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         Description
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Voting Method
+                                                        Tags
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Application Period
+                                                        Author
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Voting Period
+                                                        Created at
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         Status
@@ -89,124 +107,83 @@
                                                     @foreach ($data['publications'] as $publication)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
-                                                            {{-- <td class="text-start"> <span class="nav-link-text">
-                                                                    {{ $election->title }}
-                                                                    {{ $election->academic_session . '/' . $election->academic_session + 1 }}
-                                                                    &nbsp;
-                                                                    @if ($election->status == 'awaiting_approval')
+                                                            <td>
+                                                                {{ $publication->title }}
+                                                            </td>
+                                                            <td>
+                                                                {!! implode(' ', array_slice(explode(' ', strip_tags($publication->content)), 0, 10)) .
+                                                                    (str_word_count(strip_tags($publication->content)) > 10 ? ' ...' : '') !!}
+                                                            </td>
+                                                            <td>
+                                                                @if ($publication->tags)
+                                                                    @foreach ($publication->tags as $tag)
                                                                         <span
-                                                                            class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                                                            style="font-size: 11px"> <i
-                                                                                class="fas fa-info p-1"></i>
-                                                                    @endif
-                                                            </td>
-                                                            <td class="text-start">
-                                                                {{ $election->description }}
-                                                            </td>
-                                                            <td class="text-start text-capitalize">
-                                                                {{ $election->voting_method }}
-                                                            </td>
-                                                            <td class="text-start">
-                                                                @php
-                                                                    $formSalesStarts = \Carbon\Carbon::parse(
-                                                                        $election->form_sales_starts,
-                                                                    );
-                                                                    $formSalesEnds = \Carbon\Carbon::parse(
-                                                                        $election->form_sales_ends,
-                                                                    );
-                                                                @endphp
-
-                                                                {{ $formSalesStarts->format('l, d F, Y') }}
-
-                                                                @if ($formSalesStarts->isSameDay($formSalesEnds))
-                                                                    {{ $formSalesStarts->format('g:i A') }} to
-                                                                    {{ $formSalesEnds->format('g:i A') }}
-                                                                @else
-                                                                    to {{ $formSalesEnds->format('l, d F, Y') }}
-                                                                @endif
-                                                            </td>
-                                                            <td class="text-start">
-                                                                @php
-                                                                    $votingStarts = \Carbon\Carbon::parse(
-                                                                        $election->voting_starts,
-                                                                    );
-                                                                    $votingEnds = \Carbon\Carbon::parse(
-                                                                        $election->voting_ends,
-                                                                    );
-                                                                @endphp
-
-                                                                {{ $votingStarts->format('l, d F, Y') }}
-
-                                                                @if ($votingStarts->isSameDay($votingEnds))
-                                                                    {{ $votingStarts->format('g:i A') }} to
-                                                                    {{ $votingEnds->format('g:i A') }}
-                                                                @else
-                                                                    to {{ $votingEnds->format('l, d F, Y') }}
+                                                                            class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
+                                                                            {{ $tag->name }}
+                                                                        </span>
+                                                                    @endforeach
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                @switch($election->status)
+                                                                @if ($publication->author)
+                                                                    @if ($publication->authorUser?->memberPersonalProfile)
+                                                                        {{ trim(
+                                                                            $publication->authorUser->memberPersonalProfile->first_name .
+                                                                                ' ' .
+                                                                                ($publication->authorUser->memberPersonalProfile->middle_name
+                                                                                    ? $publication->authorUser->memberPersonalProfile->middle_name . ' '
+                                                                                    : '') .
+                                                                                $publication->authorUser->memberPersonalProfile->last_name,
+                                                                        ) }}
+
+                                                                        <a href="{{ route('viewMember', ['uuid' => $publication->authorUser->uuid]) }}"
+                                                                            target="_blank"
+                                                                            class="badge bg-secondary text-white"
+                                                                            title="View Initiator">
+                                                                            <i class="fas fa-link"></i>
+                                                                        </a>
+                                                                    @else
+                                                                        {{ $publication->author }}
+                                                                    @endif
+                                                                @endif
+                                                            </td>
+                                                            <td>
+                                                                {{ \Carbon\Carbon::parse($publication->created_at)->format('l, d F, Y h:i A') }}
+                                                            </td>
+                                                            <td>
+                                                                @switch($publication->approval_status)
                                                                     @case('draft')
                                                                         <span
                                                                             class="badge bg-secondary-subtle text-secondary">Draft</span>
                                                                     @break
 
-                                                                    @case('awaiting_approval')
+                                                                    @case('pending')
                                                                         <span class="badge bg-warning-subtle text-warning">Awaiting
                                                                             Approval</span>
                                                                     @break
 
-                                                                    @case('new')
+                                                                    @case('approved')
                                                                         <span
-                                                                            class="badge bg-primary-subtle text-primary">New</span>
+                                                                            class="badge bg-success-subtle text-success">Approved</span>
                                                                     @break
 
-                                                                    @case('registration')
+                                                                    @case('declined')
                                                                         <span
-                                                                            class="badge bg-primary-subtle text-primary">Registration</span>
-                                                                    @break
-
-                                                                    @case('screening')
-                                                                        <span
-                                                                            class="badge bg-warning-subtle text-warning">Screening</span>
-                                                                    @break
-
-                                                                    @case('campaign')
-                                                                        <span
-                                                                            class="badge bg-warning-subtle text-warning">Campaign</span>
-                                                                    @break
-
-                                                                    @case('voting')
-                                                                        <span class="badge bg-blue text-white">Ongoing</span>
-                                                                    @break
-
-                                                                    @case('completed')
-                                                                        <span
-                                                                            class="badge bg-success-subtle text-success">Completed</span>
-                                                                    @break
-
-                                                                    @case('cancelled')
-                                                                        <span
-                                                                            class="badge bg-danger-subtle text-danger">Cancelled</span>
-                                                                    @break
-
-                                                                    @case('suspended')
-                                                                        <span
-                                                                            class="badge bg-danger-subtle text-danger">Suspended</span>
+                                                                            class="badge bg-danger-subtle text-danger">Declined</span>
                                                                     @break
 
                                                                     @default
                                                                         <span
-                                                                            class="badge bg-danger-subtle text-danger">{{ $election->status }}</span>
+                                                                            class="badge bg-danger-subtle text-danger">{{ $publication->approval_status }}</span>
                                                                 @endswitch
-                                                                @if ($election->status == 'voting')
-                                                                    <span class="badge bg-danger text-white"><i class="fas fa-exclamation-circle"></i></span>
+                                                                @if ($publication->is_active == true)
+                                                                    <span class="badge bg-green text-white">Published</span>
                                                                 @endif
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewElection', ['uuid' => $election->uuid]) }}">View</a>
-                                                            </td> --}}
+                                                                    href="{{ route('viewMediaPublication', ['uuid' => $publication->uuid]) }}">View</a>
+                                                            </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
@@ -226,7 +203,7 @@
                                                 @break
 
                                                 @case('search')
-                                                    <a class="btn btn-success" href="{{ route('allElections') }}"> <i
+                                                    <a class="btn btn-success" href="{{ $backRoute }}"> <i
                                                             class="fas fa-chevron-left"></i>
                                                         Back
                                                     </a>

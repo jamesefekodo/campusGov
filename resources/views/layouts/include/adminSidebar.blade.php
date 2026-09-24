@@ -70,7 +70,12 @@
                     <span class="nav-icon">
                         <i class="fas fa-newspaper"></i>
                     </span>
-                    <span class="nav-link-text">Media</span>
+                    <span class="nav-link-text">Media @if (countMediaPublicationsPendingApproval() + countMyDraftedMediaPublications() > 0)
+                            &nbsp;
+                            <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                style="font-size: 11px">{{ countMediaPublicationsPendingApproval() + countMyDraftedMediaPublications() }}
+                        @endif
+                    </span>
                     <span class="submenu-arrow">
                         <i class="fas fa-chevron-down"></i>
                     </span><!--//submenu-arrow-->
@@ -78,8 +83,15 @@
                 <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                     <ul class="submenu-list list-unstyled">
                         <li class="submenu-item"><a
-                                class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/publications') ? 'sidebar-active' : '' }}"
-                                href="{{ route('mediaPublications') }}">Publications</a>
+                                class="submenu-link  {{ Str::startsWith(request()->path(), 'admin/media/publication') ? 'sidebar-active' : '' }}"
+                                href="{{ route('mediaPublications') }}">Publications
+                                @if (countMediaPublicationsPendingApproval() + countMyDraftedMediaPublications() > 0)
+                                    &nbsp;
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ countMediaPublicationsPendingApproval() + countMyDraftedMediaPublications() }}
+                                @endif
+                            </a>
                         </li>
                     </ul>
                 </div>
