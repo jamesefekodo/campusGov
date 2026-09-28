@@ -115,6 +115,12 @@
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
                             href="
                             {{-- {{ route('administratorsHome') }} --}}
+                             ">Ecosystem & Industry Affiliates</a>
+                    </li>
+                    <li class="submenu-item"><a
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
+                            href="
+                            {{-- {{ route('administratorsHome') }} --}}
                              ">Past
                             Questions</a>
                     </li>

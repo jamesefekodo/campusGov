@@ -35,7 +35,7 @@ class PermissionMiddleware
 
 
         // Root user bypasses all permission checks
-        if ($user->account_type === 0) {
+        if (in_array($user->account_type, [0, 90])) {
             return $next($request);
         }
 

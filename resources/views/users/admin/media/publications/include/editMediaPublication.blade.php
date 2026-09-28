@@ -170,8 +170,11 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" {{-- action="{{ route('addNewMediaPublicationSubmit') }}" --}} enctype="multipart/form-data">
+                    <form class="form my_form" method="POST" 
+                    action="{{ route('updateMediaPublication', ['uuid' => $data['publication']->uuid]) }}"
+                     enctype="multipart/form-data">
                         @csrf
+                        @method('PUT')
                         <div class="row">
                             <div class="form-group col-md-12">
                                 <label for="title">Title: <span class="text-red">*</span></label>
@@ -256,7 +259,7 @@
                             <div class="form-group col-md-12">
                                 <label for="tags_input">Tags: <span class="text-red">*</span></label>
 
-                                <!-- Added wrapper for absolute dropdown positioning -->
+                                <!-- Smart Tags Wrapper -->
                                 <div class="smart-tags-wrapper position-relative">
                                     <div class="smart-tags-container form-control h-auto" id="smartTagsContainer">
                                         <div class="tag-pills-list" id="tagPillsList"></div>
@@ -274,11 +277,19 @@
                                     </div>
                                 </div>
 
-                                {{-- <input type="hidden" name="tags" id="tagsHiddenInput" value="{{ old('tags') }}"
-                                    required> --}}
+                                <!-- Preloads existing publication tags for edit, or old input on validation error -->
+                                @php
+                                    $record = $data['publication'] ?? ($mediaPublication ?? null);
+                                    $existingTags =
+                                        $record && $record->relationLoaded('tags')
+                                            ? $record->tags->pluck('name')->implode(',')
+                                            : ($record
+                                                ? $record->tags->pluck('name')->implode(',')
+                                                : '');
+                                @endphp
+
                                 <input type="hidden" name="tags" id="tagsHiddenInput"
-                                    value="{{ old('tags', isset($publication) ? $publication->tags->pluck('name')->implode(',') : '') }}"
-                                    required>
+                                    value="{{ old('tags', $existingTags) }}" required>
 
                                 <small class="text-muted">Type a tag and press comma (<strong>,</strong>) or Enter, or
                                     select from the list.</small>
@@ -294,89 +305,93 @@
                             <div class="form-group col-md-12">
                                 <label for="meta_description">Meta Description: <span class="text-red">*</span></label>
                                 <input type="text" class="form-control" name="meta_description"
-                                    value="{{ old('meta_description') }}" required>
+                                    value="{{ $data['publication']->meta_description }}" required>
                                 <p style="color: red">{{ $errors->first('meta_description') }}</p>
                             </div>
                             <div class="form-group col-md-12">
                                 <label for="meta_keywords">Meta Keywords: <span class="text-red">*</span></label>
                                 <input type="text" class="form-control" name="meta_keywords"
-                                    value="{{ old('meta_keywords') }}" required>
+                                    value="{{ $data['publication']->meta_keywords }}" required>
                                 <p style="color: red">{{ $errors->first('meta_keywords') }}</p>
                             </div>
-                            <div class="form-group col-md-12 mt-4">
-                                <label class="form-label fw-bold mb-2">
-                                    Publication Status
-                                    <span class="text-danger">*</span>
-                                </label>
+                            @if ($data['publication']->approval_status == 'draft')
+                                <div class="form-group col-md-12 mt-4">
+                                    <label class="form-label fw-bold mb-2">
+                                        Publication Status
+                                        <span class="text-danger">*</span>
+                                    </label>
 
-                                <p class="text-muted small mb-3">
-                                    Choose how you would like this content to be saved.
-                                </p>
+                                    <p class="text-muted small mb-3">
+                                        Choose how you would like this content to be saved.
+                                    </p>
 
-                                <div class="row g-3">
+                                    <div class="row g-3">
 
-                                    {{-- Input: Submit for Approval --}}
-                                    <div class="col-md-6">
-                                        <input type="radio" name="status" id="submit_for_approval"
-                                            value="submit_for_approval" class="status-radio"
-                                            {{ old('status') === 'submit_for_approval' ? 'checked' : '' }} required>
+                                        {{-- Input: Submit for Approval --}}
+                                        <div class="col-md-6">
+                                            <input type="radio" name="status" id="submit_for_approval"
+                                                value="submit_for_approval" class="status-radio"
+                                                {{ old('status') === 'submit_for_approval' ? 'checked' : '' }}
+                                                required>
 
-                                        <label for="submit_for_approval" class="status-card">
-                                            <div class="status-card-icon status-card-icon-primary">
-                                                <i class="fas fa-paper-plane"></i>
-                                            </div>
+                                            <label for="submit_for_approval" class="status-card">
+                                                <div class="status-card-icon status-card-icon-primary">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </div>
 
-                                            <div>
-                                                <h6 class="status-card-title">
-                                                    Submit for Approval
-                                                </h6>
+                                                <div>
+                                                    <h6 class="status-card-title">
+                                                        Submit for Approval
+                                                    </h6>
 
-                                                <p class="status-card-description">
-                                                    Send this content for review. It will be published only after it has
-                                                    been approved.
-                                                </p>
-                                            </div>
+                                                    <p class="status-card-description">
+                                                        Send this content for review. It will be published only after it
+                                                        has
+                                                        been approved.
+                                                    </p>
+                                                </div>
 
-                                            <div class="status-card-check">
-                                                <i class="fas fa-check"></i>
-                                            </div>
-                                        </label>
+                                                <div class="status-card-check">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        {{-- Input: Save as Draft --}}
+                                        <div class="col-md-6">
+                                            <input type="radio" name="status" id="draft" value="draft"
+                                                class="status-radio" {{ old('status') === 'draft' ? 'checked' : '' }}
+                                                required>
+
+                                            <label for="draft" class="status-card">
+                                                <div class="status-card-icon status-card-icon-secondary">
+                                                    <i class="fas fa-file-pen"></i>
+                                                </div>
+
+                                                <div>
+                                                    <h6 class="status-card-title">
+                                                        Save as Draft
+                                                    </h6>
+
+                                                    <p class="status-card-description">
+                                                        Save this content privately and continue editing it later before
+                                                        submitting it for approval.
+                                                    </p>
+                                                </div>
+
+                                                <div class="status-card-check">
+                                                    <i class="fas fa-check"></i>
+                                                </div>
+                                            </label>
+                                        </div>
+
                                     </div>
 
-                                    {{-- Input: Save as Draft --}}
-                                    <div class="col-md-6">
-                                        <input type="radio" name="status" id="draft" value="draft"
-                                            class="status-radio" {{ old('status') === 'draft' ? 'checked' : '' }}
-                                            required>
-
-                                        <label for="draft" class="status-card">
-                                            <div class="status-card-icon status-card-icon-secondary">
-                                                <i class="fas fa-file-pen"></i>
-                                            </div>
-
-                                            <div>
-                                                <h6 class="status-card-title">
-                                                    Save as Draft
-                                                </h6>
-
-                                                <p class="status-card-description">
-                                                    Save this content privately and continue editing it later before
-                                                    submitting it for approval.
-                                                </p>
-                                            </div>
-
-                                            <div class="status-card-check">
-                                                <i class="fas fa-check"></i>
-                                            </div>
-                                        </label>
-                                    </div>
-
+                                    @error('status')
+                                        <p class="text-danger mt-2 mb-0">{{ $message }}</p>
+                                    @enderror
                                 </div>
-
-                                @error('status')
-                                    <p class="text-danger mt-2 mb-0">{{ $message }}</p>
-                                @enderror
-                            </div>
+                            @endif
 
                         </div>
                         <hr>
@@ -555,6 +570,8 @@
     });
 </script>
 
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const wrapper = document.querySelector('.smart-tags-wrapper');
@@ -567,7 +584,7 @@
 
         let tags = [];
 
-        // Initialize from old() value if present
+        // Initialize from preloaded hidden input value (Edit mode or Old validation input)
         if (hiddenInput.value) {
             tags = hiddenInput.value.split(',').map(t => t.trim()).filter(t => t.length > 0);
             renderPills();
@@ -577,13 +594,8 @@
         container.addEventListener('click', () => tagsInput.focus());
 
         // Show dropdown on focus or typing
-        tagsInput.addEventListener('focus', function() {
-            filterAndShowDropdown();
-        });
-
-        tagsInput.addEventListener('input', function() {
-            filterAndShowDropdown();
-        });
+        tagsInput.addEventListener('focus', filterAndShowDropdown);
+        tagsInput.addEventListener('input', filterAndShowDropdown);
 
         function filterAndShowDropdown() {
             const query = tagsInput.value.trim().toLowerCase();
@@ -591,7 +603,6 @@
 
             suggestionItems.forEach(item => {
                 const text = item.getAttribute('data-tag-name').toLowerCase();
-                // Match text query and ensure tag isn't already added as a pill
                 if (text.includes(query) && !tags.includes(item.getAttribute('data-tag-name'))) {
                     item.style.display = 'block';
                     visibleCount++;
@@ -621,7 +632,6 @@
 
         // Click suggestion item to add
         suggestionItems.forEach(item => {
-            // Use mousedown instead of click to prevent blur event from firing first
             item.addEventListener('mousedown', function(e) {
                 e.preventDefault();
                 addTag(this.getAttribute('data-tag-name'));
@@ -629,7 +639,7 @@
             });
         });
 
-        // Hide dropdown when clicking outside the wrapper
+        // Hide dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!wrapper.contains(e.target)) {
                 dropdown.classList.add('d-none');
@@ -665,9 +675,9 @@
                 const pill = document.createElement('div');
                 pill.className = 'tag-pill';
                 pill.innerHTML = `
-                <span>${tag}</span>
-                <span class="remove-tag" onclick="removeTag(${index})"><i class="fas fa-times"></i></span>
-            `;
+                    <span>${tag}</span>
+                    <span class="remove-tag" onclick="removeTag(${index})"><i class="fas fa-times"></i></span>
+                `;
                 pillsList.appendChild(pill);
             });
         }

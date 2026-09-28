@@ -38,4 +38,5 @@ class SharingController extends Controller
                 ]);
         }
     }
+
 }

@@ -117,10 +117,13 @@
                                                             <td>
                                                                 @if ($publication->tags)
                                                                     @foreach ($publication->tags as $tag)
-                                                                        <span
-                                                                            class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
-                                                                            {{ $tag->name }}
-                                                                        </span>
+                                                                        <a
+                                                                            href="{{ route('mediaPublicationWihTag', ['slug' => $tag->slug]) }}">
+                                                                            <span
+                                                                                class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
+                                                                                {{ $tag->name }}
+                                                                            </span>
+                                                                        </a>
                                                                     @endforeach
                                                                 @endif
                                                             </td>
@@ -203,6 +206,7 @@
                                                 @break
 
                                                 @case('search')
+                                                @case('byTag')
                                                     <a class="btn btn-success" href="{{ $backRoute }}"> <i
                                                             class="fas fa-chevron-left"></i>
                                                         Back

@@ -9,6 +9,7 @@ use App\Models\Elections\Election;
 use App\Models\Finance\Claims\Invoice;
 use App\Models\Finance\Donations\Donation;
 use App\Models\Finance\Transactions\PaymentTransaction;
+use App\Models\Media\MediaPublication;
 use App\Models\User;
 use Carbon\Carbon;
 use Closure;
@@ -193,6 +194,16 @@ class AuthenticationMiddleware
                 'status' => 'screening'
             ]);
         #############################
+        // media publication ensure that only approved posts are published
+        // Set is_active to true for approved publications that aren't already active
+        MediaPublication::where('approval_status', 'approved')
+            ->where('is_active', false)
+            ->update(['is_active' => true]);
+
+        // Set is_active to false for non-approved publications that are still active
+        MediaPublication::where('approval_status', '!=', 'approved')
+            ->where('is_active', true)
+            ->update(['is_active' => false]);
         $response = $next($request);
 
         // Disable caching for HTML
@@ -221,7 +232,7 @@ class AuthenticationMiddleware
             // auto update last seen start
             if (
                 ! $userRec->last_seen_at
-                || $userRec->last_seen_at->diffInSeconds(now()) > 300 // 5 minutes
+                || $userRec->last_seen_at->diffInSeconds(now()) > 180 // 3 minutes
             ) {
                 $userRec->forceFill(['last_seen_at' => now()])->save();
             }

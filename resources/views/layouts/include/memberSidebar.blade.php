@@ -77,19 +77,19 @@
                     <i class="fas fa-chevron-down"></i>
                 </span><!--//submenu-arrow-->
             </a><!--//nav-link--> --}}
-            <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
-                <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link  {{ Str::startsWith(request()->path(), 'student/members_directory/members') ? 'sidebar-active' : '' }}"
-                            href="
+        <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
+            <ul class="submenu-list list-unstyled">
+                <li class="submenu-item"><a
+                        class="submenu-link  {{ Str::startsWith(request()->path(), 'student/members_directory/members') ? 'sidebar-active' : '' }}"
+                        href="
                             {{-- {{ route('membersDirectory') }} --}}
                             ">Members</a>
-                    </li>
-                </ul>
-            </div>
+                </li>
+            </ul>
+        </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'student/publications') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/publications') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false"
                 aria-controls="submenu-2">
                 <span class="nav-icon">
@@ -103,10 +103,8 @@
             <div id="submenu-2" class="collapse submenu submenu-2" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
-                            class="submenu-link  {{ Str::startsWith(request()->path(), 'student/publications/publications') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('studentPublications') }} --}}
-                             ">Publications</a>
+                            class="submenu-link  {{ Str::startsWith(request()->path(), 'member/publications/publications') ? 'sidebar-active' : '' }}"
+                            href="{{ route('memberMediaPublications') }}">Publications</a>
                     </li>
                 </ul>
             </div>

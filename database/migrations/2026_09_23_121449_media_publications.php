@@ -32,6 +32,9 @@ return new class extends Migration
             $table->dateTime('last_update')->nullable();
             $table->string('last_update_by')->nullable(); // Foreign
 
+            $table->dateTime('last_approval_update')->nullable();
+
+
 
             $table->timestamps();
 

@@ -30,7 +30,7 @@ use Illuminate\Support\Facades\Route;
 
 
 
-    Route::post('manual_sync_election_temp', [ElectionController::class, 'manualSyncElectionTemp'])->name('manualSyncElectionTemp');
+Route::post('manual_sync_election_temp', [ElectionController::class, 'manualSyncElectionTemp'])->name('manualSyncElectionTemp');
 
 
 
@@ -72,7 +72,7 @@ Route::post('/process_temporary_upload', [FrontendController::class, 'processTem
 
 // ##############################################################################
 // sharing
-    Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'sharedMediaPublication'])->name('sharedMediaPublication');
+Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'sharedMediaPublication'])->name('sharedMediaPublication');
 
 
 
@@ -123,15 +123,29 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::get('/verify/payments/waiver/{uuid}', [PaymentTransasctionController::class, 'verifyAssociationDuePaymentWaiver'])->name('verifyAssociationDuePaymentWaiver');
     Route::get('/verify/payments/receipt/{payment_transaction_id}', [PaymentTransasctionController::class, 'verifyPaymentReceipt'])->name('verifyPaymentReceipt');
 
-Route::middleware('auth')
-    ->post(
-        '/user-context/{context}',
-        [PermissionAccessController::class, 'switchUserContext']
-    )
-    ->whereIn('context', ['personal', 'admin'])
-    ->name('user.context.switch');
 
+    // publication
+
+    Route::post('/publications/{uuid}/like', [MediaPublicationController::class, 'togglePublicationLike'])->name('publication.like.toggle');
+    Route::post('/publications/{publicationUuid}/comments', [MediaPublicationController::class, 'storeComment'])->name('publication.comment.store');
+    Route::post('/publications/{publicationUuid}/comments/{commentUuid}/reply', [MediaPublicationController::class, 'storeReply'])->name('publication.comment.reply.store');
+    Route::post('/publication-comments/{commentUuid}/like',[MediaPublicationController::class, 'toggleCommentLike'])->name('publication.comment.like.toggle');
+    Route::put('/publication-comments/{commentUuid}',[MediaPublicationController::class, 'updateComment'])->name('publication.comment.update');
+    Route::delete('/publication-comments/{commentUuid}',[MediaPublicationController::class, 'destroyComment'])->name('publication.comment.destroy');
+
+
+    Route::post('/user-context/{context}', [PermissionAccessController::class, 'switchUserContext'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
 });
+
+// Route::middleware('auth')
+//     ->post(
+//         '/user-context/{context}',
+//         [PermissionAccessController::class, 'switchUserContext']
+//     )
+//     ->whereIn('context', ['personal', 'admin'])
+//     ->name('user.context.switch');
+
+// });
 
 // member routes
 
@@ -268,6 +282,13 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/elections/candidates/{uuid}', [MemberElectionController::class, 'memberElectionCandidates'])->name('memberElectionCandidates');
     Route::get('member/elections/candidates/position/{uuid}', [MemberElectionController::class, 'memberViewElectionCandidatesForPosition'])->name('memberViewElectionCandidatesForPosition');
 
+
+    // publicatons
+    
+    Route::get('member/publications/publications', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublications');
+    Route::get('member/publications/publications/search', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationsSearch');
+    Route::get('member/publications/publications/tags/{slug}', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationWihTag');
+    Route::get('member/publications/publications/view/{uuid}', [MediaPublicationController::class, 'memberViewMediaPublication'])->name('memberViewMediaPublication');
 });
 
 
@@ -391,8 +412,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
 
 
-        Route::get('admin/profile/view', [AdminsManagementController::class, 'adminSelfProfile'])->name('adminSelfProfile');
-        Route::post('admin/profile/view', [MemberSelfProfileController::class, 'changeSelfPasswordSubmit'])->name('adminChangeSelfPasswordSubmit');
+    Route::get('admin/profile/view', [AdminsManagementController::class, 'adminSelfProfile'])->name('adminSelfProfile');
+    Route::post('admin/profile/view', [MemberSelfProfileController::class, 'changeSelfPasswordSubmit'])->name('adminChangeSelfPasswordSubmit');
 
 
 
@@ -500,7 +521,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // permissions
     Route::get('/roles/{role:uuid}/permissions', function (Role $role) {
-return view('admin.roles.permissions-edit', compact('role'));})->name('role.permissions.edit');
+        return view('admin.roles.permissions-edit', compact('role'));
+    })->name('role.permissions.edit');
 
 
     // recognizedSocialMediaPlatforms
@@ -661,7 +683,17 @@ return view('admin.roles.permissions-edit', compact('role'));})->name('role.perm
     Route::get('admin/media/publications/home/search', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationsSearch');
     Route::post('admin/media/publications/add_new/submit', [MediaPublicationController::class, 'addNewMediaPublicationSubmit'])->name('addNewMediaPublicationSubmit');
     Route::get('admin/media/publications/view/{uuid}', [MediaPublicationController::class, 'viewMediaPublication'])->name('viewMediaPublication');
+    Route::put('admin/media/publications/update/{uuid}', [MediaPublicationController::class, 'updateMediaPublication'])->name('updateMediaPublication');
+    Route::put('admin/media/publications/review/{uuid}', [MediaPublicationController::class, 'reviewMediaPublicationSubmit'])->name('reviewMediaPublicationSubmit');
 
+    Route::get('admin/media/publications/home/tag', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationWihTag');
+
+    Route::get('admin/media/publications/delete/{uuid}', [MediaPublicationController::class, 'deleteMediaPublication'])->name('deleteMediaPublication');
+    
+
+    
+
+    //
 
     Route::get('admin/media/publications/approval', [MediaPublicationController::class, 'mediaPublicationsPendingApproval'])->name('mediaPublicationsPendingApproval');
     Route::get('admin/media/publications/approval/search', [MediaPublicationController::class, 'mediaPublicationsPendingApproval'])->name('mediaPublicationsPendingApprovalSearch');
@@ -671,15 +703,10 @@ return view('admin.roles.permissions-edit', compact('role'));})->name('role.perm
 
 
 
-    
-    
+
+
     Route::get('admin/media/publication/tag', [MediaPublicationController::class, 'mediaPublicationTags'])->name('mediaPublicationTags');
     Route::post('admin/media/publication/tag/add_new/submit', [MediaPublicationController::class, 'addNewPublicationTagSubmit'])->name('addNewPublicationTagSubmit');
     Route::put('admin/media/publication/tag/update/submit/{slug}', [MediaPublicationController::class, 'editPublicationTagSubmit'])->name('editPublicationTagSubmit');
     Route::get('admin/media/publication/tag/remove/{slug}', [MediaPublicationController::class, 'removePublicationTag'])->name('removePublicationTag');
-
-
-
-
-
 });

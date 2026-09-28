@@ -23,6 +23,11 @@ class RoleMiddleware
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
+        // Root user bypasses all permission checks
+        if (in_array($user->account_type, [0, 90])) {
+            return $next($request);
+        }
+
         if (!$user->hasAnyRole($roles)) {
             abort(403);
         }

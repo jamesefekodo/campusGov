@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Authentication
         $middleware->appendToGroup('authenticationMiddlewares', [
-            // $authMiddleware,
+            $authMiddleware,
             $tenancy,
             $tenancyEnvConfig,
         ]);
@@ -38,8 +38,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // Admin
         $middleware->appendToGroup('adminMiddlewares', [
             $adminMiddleware,
-            // $permissionMiddleware,
-            // $roleMiddleware,
+            $permissionMiddleware,
+            $roleMiddleware,
         ]);
 
         // student

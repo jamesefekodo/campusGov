@@ -41,9 +41,25 @@
                                         </div>
 
                                         <div class="col-md-12 row px-3">
-                                            <div class="col-md-6 p-1">
+                                            <div class="col-md-12 p-1">
                                                 <span class="text-black">
                                                     {!! $data['publication']->content !!}
+                                                </span>
+                                            </div>
+                                            <div class="col-md-12 p-1">
+                                                <hr>
+                                                <span class="text-black">
+                                                    @if ($data['publication']->tags)
+                                                        @foreach ($data['publication']->tags as $tag)
+                                                            <a
+                                                                href="{{ route('mediaPublicationWihTag', ['slug' => $tag->slug]) }}">
+                                                                <span
+                                                                    class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
+                                                                    {{ $tag->name }}
+                                                                </span>
+                                                            </a>
+                                                        @endforeach
+                                                    @endif
                                                 </span>
                                             </div>
 
@@ -155,207 +171,164 @@
                                                     @endif
                                                 </span>
                                             </div>
+                                            @if ($data['publication']->approved_by)
+                                                <div class="col-md-6 p-1">
+                                                    <span style="font-weight: bold">Last Status Updated:</span>
+                                                    <span class="text-black">
+                                                        @if ($data['publication']->approved_by)
+                                                            @if ($data['publication']->approvedByUser?->memberPersonalProfile)
+                                                                {{ trim(
+                                                                    $data['publication']->approvedByUser->memberPersonalProfile->first_name .
+                                                                        ' ' .
+                                                                        ($data['publication']->approvedByUser->memberPersonalProfile->middle_name
+                                                                            ? $data['publication']->approvedByUser->memberPersonalProfile->middle_name . ' '
+                                                                            : '') .
+                                                                        $data['publication']->approvedByUser->memberPersonalProfile->last_name,
+                                                                ) }}
+
+                                                                <a href="{{ route('viewMember', ['uuid' => $data['publication']->approvedByUser->uuid]) }}"
+                                                                    target="_blank" class="badge bg-secondary text-white"
+                                                                    title="View Initiator">
+                                                                    <i class="fas fa-link"></i>
+                                                                </a>
+                                                            @else
+                                                                {{ $data['publication']->approved_by }}
+                                                            @endif
+                                                        @endif -
+                                                        @php
+                                                            $updatedAt = \Carbon\Carbon::parse(
+                                                                $data['publication']->last_approval_update,
+                                                            );
+                                                        @endphp
+
+                                                        @if ($updatedAt->isToday())
+                                                            Today, {{ $updatedAt->format('h:i A') }}
+                                                        @elseif ($updatedAt->isYesterday())
+                                                            Yesterday, {{ $updatedAt->format('h:i A') }}
+                                                        @else
+                                                            {{ $updatedAt->format('l, d F, Y h:i A') }}
+                                                        @endif
+                                                    </span>
+                                                </div>
+                                            @endif
                                         </div>
 
 
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            @if (Auth::user()->hasPermission('media_publication.update') || $data['publication']->author)
+                                            @if (Auth::user()->hasPermission('media_publication.update') || $data['publication']->author == Auth::user()->username)
                                                 <button class="btn btn-warning m-1 d-flex align-items-center"
                                                     data-toggle="modal" data-target="#editMediaPublication">
                                                     <i class="fas fa-edit me-2"></i>
                                                     <span>Update</span>
                                                 </button>
                                             @endif
+                                            @if (Auth::user()->hasPermission('media_publication.delete') && $data['publication']->approval_status !== 'approved')
+                                                <button class="btn btn-danger m-1 d-flex align-items-center delete-confirm "
+                                                    data-toggle="modal"
+                                                    data-url="{{ route('deleteMediaPublication', ['uuid' => $data['publication']->uuid]) }}">
+                                                    <i class="fas fa-edit me-2"></i>
+                                                    <span>Delete</span>
+                                                </button>
+
+                                                <script>
+                                                    document.addEventListener('DOMContentLoaded', function() {
+
+                                                        document.querySelectorAll('.delete-confirm').forEach(button => {
+
+                                                            button.addEventListener('click', function() {
+
+                                                                const url = this.dataset.url;
+
+                                                                Swal.fire({
+                                                                    title: 'Are you sure?',
+                                                                    text: 'This media publication and all comments, replies, and reactions associated with it will be permanently deleted.',
+                                                                    icon: 'warning',
+                                                                    showCancelButton: true,
+                                                                    confirmButtonColor: '#d33',
+                                                                    cancelButtonColor: '#6c757d',
+                                                                    confirmButtonText: 'Yes, delete!',
+                                                                    cancelButtonText: 'Cancel',
+                                                                    reverseButtons: true
+                                                                }).then((result) => {
+
+                                                                    if (result.isConfirmed) {
+                                                                        window.location.href = url;
+                                                                    }
+
+                                                                });
+
+                                                            });
+
+                                                        });
+
+                                                    });
+                                                </script>
+                                            @endif
 
 
                                         </div>
                                         @include('users.admin.media.publications.include.editMediaPublication')
 
+                                        @if (Auth::user()->hasPermission('media_publication.update'))
+                                            @php
+                                                $status = $data['publication']->approval_status;
+                                            @endphp
 
+                                            @include('users.admin.media.publications.include.reviewPublicationModal')
 
-                                        <div class="d-flex align-items-center mt-4">
-                                            <hr class="flex-grow-1">
-                                            <span class="mx-2 text-black">Payments
-                                            </span>
-                                            <hr class="flex-grow-1">
-                                        </div>
-
-                                        <div class="row g-3 mt-2 mb-4">
-                                            <div class="col-md-4">
+                                            @if ($status == 'pending')
                                                 <div
-                                                    class="card shadow-sm border-0 bg-primary-subtle bg-opacity-10 h-100 m-2">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3">
-                                                                <i class="fas fa-users fa-2x text-blue"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="text-muted small">Total Expected Payers</div>
-                                                                <div class="fs-1 fw-bold text-blue">
-                                                                    {{-- {{ $data['due']->expectedPayerCount() }} --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        {{-- <div class="d-flex gap-2 mt-auto">
-                                                            <a
-                                                            href="{{ route('due.expectedPayers', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-primary flex-fill">
-                                                                <i class="fas fa-eye me-1"></i> View
-                                                            </a>
-                                                            <a
-                                                            href="{{ route('due.expectedPayers.download', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-outline-primary flex-fill">
-                                                                <i class="fas fa-download me-1"></i> Download
-                                                            </a>
-                                                        </div> --}}
+                                                    class="alert alert-warning d-flex justify-content-between align-items-center mb-3 mt-3">
+                                                    <div>
+                                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                        This media publication is waiting for approval. Click the button
+                                                        below to review, approve, or decline it.
                                                     </div>
+                                                    <a {{-- href="{{ route('admin.media.approval.review', $data['publication']->id) }}" --}} class="btn btn-sm btn-primary"
+                                                        data-toggle="modal" data-target="#reviewPublicationModal">
+                                                        Review Publication
+                                                    </a>
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-4">
-                                                <div class="card shadow-sm border-0 bg-info-subtle bg-opacity-10 h-100 m-2">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3">
-                                                                <i class="fas fa-check-circle fa-2x text-info"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="text-muted small">Successful Payments</div>
-                                                                <div class="fs-4 fw-bold text-info">
-                                                                    {{-- {{ $data['due']->successfulPaymentCount() }} --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-2 mt-auto">
-                                                            {{-- <form type="GET"
-                                                                action="{{ route('paymentTransactionsSearch') }}"
-                                                                target="_blank" class="w-100">
-                                                                @csrf
-                                                                <div class="input-group-append">
-                                                                    <input type="hidden" class="table_search my-2 my-sm-0"
-                                                                        name="searchKey"
-                                                                        value="{{ $data['due']->fee_id }}">
-                                                                    <button type="submit"
-                                                                        class="btn btn-sm btn-info flex-fill w-100">
-                                                                        <i class="fas fa-eye me-1"></i> View
-                                                                    </button>
-                                                                </div>
-                                                            </form> --}}
-                                                            {{-- <a href="{{ route('due.successfulPayments.download', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-outline-info flex-fill">
-                                                                <i class="fas fa-download me-1"></i> Download
-                                                            </a> --}}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-md-4">
+                                            @elseif ($status == 'approved')
+                                                <!-- Action to unpublish/recall back to pending or draft -->
                                                 <div
-                                                    class="card shadow-sm border-0 bg-warning-subtle bg-opacity-10 h-100 m-2">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3">
-                                                                <i class="fas fa-hand-holding-heart fa-2x text-warning"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="text-muted small">Waived</div>
-                                                                <div class="fs-4 fw-bold text-warning">
-                                                                    {{-- {{ $data['due']->approvedWaiverCount() }} --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-2 mt-auto">
-                                                            {{-- <form type="GET"
-                                                                action="{{ route('paymentWaiverRequestsSearch') }}"
-                                                                target="_blank" class="w-100">
-                                                                @csrf
-                                                                <div class="input-group-append">
-                                                                    <input type="hidden"
-                                                                        class="table_search my-2 my-sm-0" name="searchKey"
-                                                                        value="{{ $data['due']->fee_id }}">
-                                                                    <button type="submit"
-                                                                        class="btn btn-sm btn-warning flex-fill w-100">
-                                                                        <i class="fas fa-eye me-1"></i> View
-                                                                    </button>
-                                                                </div>
-                                                            </form> --}}
-                                                            {{-- <a href="{{ route('due.paidOrWaived.download', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-outline-warning flex-fill">
-                                                                <i class="fas fa-download me-1"></i> Download
-                                                            </a> --}}
-                                                        </div>
+                                                    class="alert alert-info d-flex justify-content-between align-items-center mb-3 mt-3">
+                                                    <div>
+                                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                        This media publication is currently approved and published. Click
+                                                        the button below to revoke approval and unpublish it.
                                                     </div>
+                                                    <a {{-- href="{{ route('admin.media.approval.review', $data['publication']->id) }}" --}} class="btn btn-sm btn-primary"
+                                                        data-toggle="modal" data-target="#reviewPublicationModal">
+                                                        Review Publication
+                                                    </a>
                                                 </div>
-                                            </div>
-
-                                            <div class="col-md-4">
+                                            @elseif ($status == 'declined')
+                                                <!-- Action to re-approve -->
                                                 <div
-                                                    class="card shadow-sm border-0 bg-success-subtle bg-opacity-10 h-100 m-2">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3">
-                                                                <i class="fas fa-hand-holding-heart fa-2x text-success"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="text-muted small">Paid or Waived</div>
-                                                                <div class="fs-4 fw-bold text-success">
-                                                                    {{-- {{ $data['due']->membersPaidOrWaived()->count() }} --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-2 mt-auto">
-                                                            {{-- <a href="{{ route('due.outstanding', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-success flex-fill">
-                                                                <i class="fas fa-eye me-1"></i> View
-                                                            </a> --}}
-                                                            <a href="
-                                                            {{-- {{ route('due.paidOrWaived.download', ['uuid' => $data['due']->uuid]) }} --}}
-                                                             "
-                                                                class="btn btn-sm btn-success flex-fill">
-                                                                <i class="fas fa-print me-1"></i> Print
-                                                            </a>
-                                                        </div>
+                                                    class="alert alert-info d-flex justify-content-between align-items-center mb-3 mt-3">
+                                                    <div>
+                                                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                                                        This publication is currently declined. Click the button below to
+                                                        override this decision and approve it.
                                                     </div>
+                                                    <a {{-- href="{{ route('admin.media.approval.review', $data['publication']->id) }}" --}} class="btn btn-sm btn-primary"
+                                                        data-toggle="modal" data-target="#reviewPublicationModal">
+                                                        Review Publication
+                                                    </a>
                                                 </div>
-                                            </div>
+                                            @endif
+                                        @endif
 
-                                            <div class="col-md-4">
-                                                <div class="card shadow-sm border-0 bg-danger bg-opacity-10 h-100 m-2">
-                                                    <div class="card-body d-flex flex-column">
-                                                        <div class="d-flex align-items-center mb-3">
-                                                            <div class="me-3">
-                                                                <i
-                                                                    class="fas fa-exclamation-triangle fa-2x text-danger"></i>
-                                                            </div>
-                                                            <div>
-                                                                <div class="text-muted small">Outstanding</div>
-                                                                <div class="fs-4 fw-bold text-danger">
-                                                                    {{-- {{ $data['due']->membersUnpaidAndUnwaived()->count() }} --}}
-                                                                    {{-- {{ $data['due']->expectedPayerCount() - $data['due']->membersPaidOrWaived()->count() }} --}}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-2 mt-auto">
-                                                            {{-- <a href="{{ route('due.outstanding', ['uuid' => $data['due']->uuid]) }}"
-                                                                class="btn btn-sm btn-danger flex-fill">
-                                                                <i class="fas fa-eye me-1"></i> View
-                                                            </a> --}}
-                                                            <a {{-- href="{{ route('due.outstanding.download', ['uuid' => $data['due']->uuid]) }}" --}}
-                                                                class="btn btn-sm btn-danger flex-fill w-100">
-                                                                <i class="fas fa-print me-1"></i> Print
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        {{-- ######################################################## --}}
+                                        @include('users.admin.media.publications.include.mediaPublicationComments')
+                                        {{-- ########################################################## --}}
                                     </div>
                                 </div>
                             </div>
                             {{-- Back Home --}}
                             <div class="w-100 justify-content-center text-center my-4">
-                                <a class="btn btn-primary" href="{{ route('associationDues') }}"> <i
+                                <a class="btn btn-primary" href="{{ route('mediaPublications') }}"> <i
                                         class="fas fa-chevron-left"></i>
                                     Back
                                 </a>
@@ -366,35 +339,6 @@
                 </div>
             </div>
 
-
-
-            {{-- <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    document.querySelectorAll('.delete-confirm').forEach(button => {
-                        button.addEventListener('click', function() {
-
-                            const url = this.dataset.url;
-
-                            Swal.fire({
-                                title: 'Are you sure?',
-                                text: "This policy will be permanently deleted.",
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonColor: '#d33',
-                                cancelButtonColor: '#6c757d',
-                                confirmButtonText: 'Yes, delete it!',
-                                cancelButtonText: 'Cancel',
-                                reverseButtons: true
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = url;
-                                }
-                            });
-
-                        });
-                    });
-                });
-            </script> --}}
 
         </div><!--//container-fluid-->
     </div><!--//app-content-->

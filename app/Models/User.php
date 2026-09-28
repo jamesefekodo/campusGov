@@ -13,6 +13,9 @@ use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
 use App\Models\Media\MediaPublication;
 use App\Models\Media\MemberSocialMediaHandle;
+use App\Models\Media\PublicationComment;
+use App\Models\Media\PublicationCommentLike;
+use App\Models\Media\PublicationLike;
 use App\Models\Members\MemberAcademicHistory;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberAward;
@@ -331,6 +334,42 @@ class User extends Authenticatable
         return $this->hasMany(
             MediaPublication::class,
             'approved_by',
+            'username'
+        );
+    }
+
+    /*
+ * Posts liked by this user.
+ */
+    public function publicationLikes(): HasMany
+    {
+        return $this->hasMany(
+            PublicationLike::class,
+            'username',
+            'username'
+        );
+    }
+
+    /*
+ * Comments and replies created by this user.
+ */
+    public function publicationComments(): HasMany
+    {
+        return $this->hasMany(
+            PublicationComment::class,
+            'username',
+            'username'
+        );
+    }
+
+    /*
+ * Comment/reply likes made by this user.
+ */
+    public function publicationCommentLikes(): HasMany
+    {
+        return $this->hasMany(
+            PublicationCommentLike::class,
+            'username',
             'username'
         );
     }

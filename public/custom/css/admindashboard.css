@@ -2267,8 +2267,10 @@ body.modal-open {
     width: 100%;
     height: auto;
     max-height: 550px;
-    object-fit: cover;
+    object-fit: contain;
+    background-color: #fff; 
     display: block;
+    margin: 0 auto;
 }
 
 .publication-cover-placeholder {
