@@ -3,6 +3,7 @@
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
+use App\Http\Controllers\AcademicResources\PastQuestionController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +27,8 @@ use App\Http\Controllers\UserManagement\MembersManagementController;
 use App\Models\Config\AccessControl\Role;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+
+
 
 
 
@@ -284,7 +287,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
 
     // publicatons
-    
+
     Route::get('member/publications/publications', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublications');
     Route::get('member/publications/publications/search', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationsSearch');
     Route::get('member/publications/publications/tags/{slug}', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationWihTag');
@@ -689,9 +692,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/media/publications/home/tag', [MediaPublicationController::class, 'mediaPublications'])->name('mediaPublicationWihTag');
 
     Route::get('admin/media/publications/delete/{uuid}', [MediaPublicationController::class, 'deleteMediaPublication'])->name('deleteMediaPublication');
-    
 
-    
+
+
 
     //
 
@@ -702,11 +705,17 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/media/publications/draft/search', [MediaPublicationController::class, 'mediaPublicationsDraft'])->name('mediaPublicationsDraftSearch');
 
 
-
-
-
     Route::get('admin/media/publication/tag', [MediaPublicationController::class, 'mediaPublicationTags'])->name('mediaPublicationTags');
     Route::post('admin/media/publication/tag/add_new/submit', [MediaPublicationController::class, 'addNewPublicationTagSubmit'])->name('addNewPublicationTagSubmit');
     Route::put('admin/media/publication/tag/update/submit/{slug}', [MediaPublicationController::class, 'editPublicationTagSubmit'])->name('editPublicationTagSubmit');
     Route::get('admin/media/publication/tag/remove/{slug}', [MediaPublicationController::class, 'removePublicationTag'])->name('removePublicationTag');
+
+
+    Route::get('admin/media/publication/tag', [MediaPublicationController::class, 'mediaPublicationTags'])->name('mediaPublicationTags');
+
+    // academic resources
+    // past questions
+    Route::get('admin/academic_resources/past_questions', [PastQuestionController::class, 'pastQuestionsHome'])->name('pastQuestionsHome');
+    Route::get('admin/academic_resources/past_questions/new', [PastQuestionController::class, 'createPastQuestion'])->name('createPastQuestion');
+    Route::post('admin/academic_resources/past_questions/create/submit', [PastQuestionController::class, 'addNewPastQuestionSubmit'])->name('addNewPastQuestionSubmit');
 });

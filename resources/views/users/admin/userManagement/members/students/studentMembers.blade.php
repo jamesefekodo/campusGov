@@ -93,7 +93,7 @@
 
                                             @if ($data['members']->isEmpty())
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="7" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No records found!
                                                         </h3>

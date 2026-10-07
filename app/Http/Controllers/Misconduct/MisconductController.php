@@ -111,10 +111,9 @@ class MisconductController extends Controller
             'attachment_1' => 'nullable|file|mimes:png,webp,jpg,jpeg|max:1024',
             'attachment_2' => 'nullable|file|mimes:png,webp,jpg,jpeg|max:1024',
         ]);
-        $prefix = 'MISCD';
 
         do {
-            $caseId = 'MISCD-' . now()->format('Ym') . '-' . Str::lower(Str::random(10));
+            $caseId = 'miscd-' . now()->format('Ym') . '-' . Str::lower(Str::random(10));
         } while (MemberMisconduct::where('case_id', $caseId)->exists());
 
         $case = new MemberMisconduct();

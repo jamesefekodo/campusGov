@@ -232,7 +232,7 @@ class AuthenticationMiddleware
             // auto update last seen start
             if (
                 ! $userRec->last_seen_at
-                || $userRec->last_seen_at->diffInSeconds(now()) > 180 // 3 minutes
+                || $userRec->last_seen_at->diffInSeconds(now()) > 60 // 1 minutes
             ) {
                 $userRec->forceFill(['last_seen_at' => now()])->save();
             }

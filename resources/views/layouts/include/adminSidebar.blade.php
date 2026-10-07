@@ -98,7 +98,7 @@
             </li><!--//nav-item-->
         @endif
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/users') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/academic_resources') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-3" aria-expanded="false"
                 aria-controls="submenu-3">
                 <span class="nav-icon">
@@ -112,17 +112,8 @@
             <div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('administratorsHome') }} --}}
-                             ">Ecosystem & Industry Affiliates</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('administratorsHome') }} --}}
-                             ">Past
-                            Questions</a>
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions') ? 'sidebar-active' : '' }}"
+                            href="{{ route('pastQuestionsHome') }}">Past Questions</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/customers') ? 'sidebar-active' : '' }}"
@@ -137,6 +128,13 @@
                             {{-- {{ route('customersHome') }} --}}
                              ">Recommended
                             Books</a>
+                    </li>
+                    <li class="submenu-item"><a
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
+                            href="
+                            {{-- {{ route('administratorsHome') }} --}}
+                             ">Ecosystem
+                            & Industry Affiliates</a>
                     </li>
                 </ul>
             </div>

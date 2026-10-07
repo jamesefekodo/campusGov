@@ -157,22 +157,68 @@ class User extends Authenticatable
 
     }
 
-    public function hasAnyRole(array $roles): bool
+    // public function hasAnyRole(array $roles): bool
+    // {
+    //     if ($this->account_type === 0) {
+    //         return true;
+    //     }
+
+    //     return $this->roles()
+    //         ->whereIn('slug', $roles)
+    //         ->exists();
+
+    //     // usage ...
+    //     //  $user->hasAnyRole([
+    //     //  'admin',
+    //     //  'speaker'
+    //     // ]);
+    // }
+
+    public function hasAnyRole(array $roles = []): bool
     {
-        if ($this->account_type === 0) {
+        /*
+     * Root association account and platform root account
+     * have access to every role-protected route.
+     */
+        if (in_array((int) $this->account_type, [0, 90], true)) {
             return true;
         }
 
-        return $this->roles()
-            ->whereIn('slug', $roles)
-            ->exists();
+        /*
+     * If middleware is simply "role" with no role slug:
+     *
+     * Allow the user only when they have at least one assigned role.
+     *
+     * Example:
+     * Route::middleware(['auth', 'role'])
+     */
+        if (empty($roles)) {
+            return $this->roles()->exists();
+        }
 
-        // usage ...
-        //  $user->hasAnyRole([
-        //  'admin',
-        //  'speaker'
-        // ]);
+        /*
+     * Clean the incoming role-slug values.
+     */
+        $roles = array_values(array_filter(
+            array_map('trim', $roles)
+        ));
+
+        /*
+     * If only empty values were passed, still require
+     * at least one assigned role.
+     */
+        if (empty($roles)) {
+            return $this->roles()->exists();
+        }
+
+        /*
+     * Allow access only if the user has one of the requested roles.
+     */
+        return $this->roles()
+            ->whereIn('roles.slug', $roles)
+            ->exists();
     }
+
 
     public function hasPermission(string $permission): bool
     {

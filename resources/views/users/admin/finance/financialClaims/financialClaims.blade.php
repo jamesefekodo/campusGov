@@ -16,10 +16,10 @@
 @section('content')
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
-            @if (financialClaimPendingApproval() > 0)
-                @include('users.admin.finance.financialClaims.include.inner_nav')
-            @endif
             <div class="navigation">
+                @if (financialClaimPendingApproval() > 0)
+                    @include('users.admin.finance.financialClaims.include.inner_nav')
+                @endif
             </div>
             @if (Auth::user()->hasPermission('financial_claim.create') && $showAddNew == true)
                 <div class="d-flex justify-content-end">
