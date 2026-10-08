@@ -6,10 +6,7 @@
 
 <div class="past-question-contributions mt-5">
 
-    <div
-        id="pastQuestionContributionMessage"
-        class="alert d-none"
-        role="alert">
+    <div id="pastQuestionContributionMessage" class="alert d-none" role="alert">
     </div>
 
     <div class="d-flex align-items-center justify-content-between mb-3">
@@ -17,9 +14,7 @@
             <i class="fas fa-lightbulb text-info me-2"></i>
             Contributions
 
-            <span
-                id="contributionsCount"
-                class="badge bg-secondary ms-1">
+            <span id="contributionsCount" class="badge bg-secondary ms-1">
 
                 {{ $pastQuestion->contributions_count ?? $contributions->count() }}
             </span>
@@ -27,32 +22,22 @@
     </div>
 
     @auth
-        <form
-            method="POST"
+        <form method="POST"
             action="{{ route('pastQuestion.contribution.store', [
                 'pastQuestion' => $pastQuestion->uuid,
             ]) }}"
-            id="createContributionForm"
-            class="card border-0 shadow-sm mb-4 js-contribution-form">
+            id="createContributionForm" class="card border-0 shadow-sm mb-4 js-contribution-form">
 
             @csrf
 
             <div class="card-body">
-                <label
-                    for="newContribution"
-                    class="form-label fw-semibold">
+                <label for="newContribution" class="form-label fw-semibold">
 
                     Add a contribution
                 </label>
 
-                <textarea
-                    name="content"
-                    id="newContribution"
-                    class="form-control contribution-editor"
-                    rows="7"
-                    maxlength="30000"
-                    placeholder="Share a correction, explanation, answer, reference or useful note..."
-                    required></textarea>
+                <textarea name="content" id="newContribution" class="form-control contribution-editor" rows="7" maxlength="30000"
+                    placeholder="Share a correction, explanation, answer, reference or useful note..." required></textarea>
 
                 @error('content')
                     <div class="text-danger mt-1">
@@ -61,9 +46,7 @@
                 @enderror
 
                 <div class="d-flex justify-content-end mt-3">
-                    <button
-                        type="submit"
-                        class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary">
 
                         <i class="fas fa-paper-plane me-1"></i>
                         Add Contribution
@@ -76,9 +59,7 @@
             <i class="fas fa-lock me-1"></i>
 
             Please
-            <a
-                href="{{ route('loginPage') }}"
-                class="fw-semibold">
+            <a href="{{ route('loginPage') }}" class="fw-semibold">
 
                 log in
             </a>
@@ -90,20 +71,15 @@
 
         @forelse ($contributions as $contribution)
             @php
-                $isOwner = Auth::check()
-                    && Auth::user()->username === $contribution->username;
+                $isOwner = Auth::check() && Auth::user()->username === $contribution->username;
 
-                $isLiked = Auth::check()
-                    && $contribution->likes
-                        ->where('username', Auth::user()->username)
-                        ->isNotEmpty();
+                $isLiked =
+                    Auth::check() && $contribution->likes->where('username', Auth::user()->username)->isNotEmpty();
 
                 $creatorName = $contribution->creator_name;
             @endphp
 
-            <article
-                class="contribution-item border-bottom py-4"
-                id="contribution-{{ $contribution->uuid }}">
+            <article class="contribution-item border-bottom py-4" id="contribution-{{ $contribution->uuid }}">
 
                 <div class="d-flex gap-3">
 
@@ -129,9 +105,7 @@
                             @endif
                         </div>
 
-                        <div
-                            class="contribution-content mt-2 mb-2"
-                            id="contribution-text-{{ $contribution->uuid }}">
+                        <div class="contribution-content mt-2 mb-2" id="contribution-text-{{ $contribution->uuid }}">
 
                             {!! $contribution->content !!}
                         </div>
@@ -139,8 +113,7 @@
                         <div class="d-flex flex-wrap align-items-center gap-3">
 
                             @auth
-                                <form
-                                    method="POST"
+                                <form method="POST"
                                     action="{{ route('pastQuestion.contribution.like.toggle', [
                                         'contribution' => $contribution->uuid,
                                     ]) }}"
@@ -149,8 +122,7 @@
 
                                     @csrf
 
-                                    <button
-                                        type="submit"
+                                    <button type="submit"
                                         class="btn btn-sm btn-link p-0 text-decoration-none {{ $isLiked ? 'text-danger' : 'text-muted' }}">
 
                                         <i class="{{ $isLiked ? 'fas' : 'far' }} fa-heart"></i>
@@ -174,8 +146,7 @@
                             @endauth
 
                             @if ($isOwner)
-                                <button
-                                    type="button"
+                                <button type="button"
                                     class="btn btn-sm btn-link p-0 text-primary edit-contribution-button"
                                     data-target="edit-contribution-{{ $contribution->uuid }}">
 
@@ -183,8 +154,7 @@
                                     Edit
                                 </button>
 
-                                <form
-                                    method="POST"
+                                <form method="POST"
                                     action="{{ route('pastQuestion.contribution.destroy', [
                                         'contribution' => $contribution->uuid,
                                     ]) }}"
@@ -194,9 +164,7 @@
                                     @csrf
                                     @method('DELETE')
 
-                                    <button
-                                        type="submit"
-                                        class="btn btn-sm btn-link p-0 text-danger">
+                                    <button type="submit" class="btn btn-sm btn-link p-0 text-danger">
 
                                         <i class="fas fa-trash me-1"></i>
                                         Delete
@@ -207,8 +175,7 @@
                         </div>
 
                         @if ($isOwner)
-                            <form
-                                method="POST"
+                            <form method="POST"
                                 action="{{ route('pastQuestion.contribution.update', [
                                     'contribution' => $contribution->uuid,
                                 ]) }}"
@@ -218,25 +185,16 @@
                                 @csrf
                                 @method('PUT')
 
-                                <textarea
-                                    name="content"
-                                    rows="7"
-                                    maxlength="30000"
-                                    class="form-control contribution-editor"
-                                    required>{!! $contribution->content !!}</textarea>
+                                <textarea name="content" rows="7" maxlength="30000" class="form-control contribution-editor" required>{!! $contribution->content !!}</textarea>
 
                                 <div class="d-flex gap-2 mt-2">
-                                    <button
-                                        type="submit"
-                                        class="btn btn-primary btn-sm">
+                                    <button type="submit" class="btn btn-primary btn-sm">
 
                                         <i class="fas fa-check me-1"></i>
                                         Update
                                     </button>
 
-                                    <button
-                                        type="button"
-                                        class="btn btn-light border btn-sm cancel-contribution-edit"
+                                    <button type="button" class="btn btn-light border btn-sm cancel-contribution-edit"
                                         data-target="edit-contribution-{{ $contribution->uuid }}">
 
                                         Cancel
@@ -249,14 +207,13 @@
                 </div>
             </article>
         @empty
-            <div
-                id="emptyContributionsMessage"
-                class="text-center border rounded-3 py-5 px-3">
+            <div id="emptyContributionsMessage" class="text-center border rounded-3 py-5 px-3">
 
                 <i class="far fa-lightbulb fa-2x text-muted mb-3"></i>
 
                 <p class="text-muted mb-0">
-                    No contributions yet. Be the first to share something useful.
+                    No contributions yet. Be the first to share something useful, like solutions, additions,
+                    corrections, and so on.
                 </p>
             </div>
         @endforelse
@@ -419,11 +376,11 @@
         );
     }
 
-    $(document).ready(function () {
+    $(document).ready(function() {
         initialiseContributionEditor('#newContribution');
 
         $('.edit-contribution-form .contribution-editor')
-            .each(function () {
+            .each(function() {
                 initialiseContributionEditor(this);
             });
     });
@@ -432,25 +389,16 @@
 
 <script>
     window.pastQuestionContributionConfig = {
-        updateUrl: @json(route(
-            'pastQuestion.contribution.update',
-            ['contribution' => '__UUID__']
-        )),
+        updateUrl: @json(route('pastQuestion.contribution.update', ['contribution' => '__UUID__'])),
 
-        deleteUrl: @json(route(
-            'pastQuestion.contribution.destroy',
-            ['contribution' => '__UUID__']
-        )),
+        deleteUrl: @json(route('pastQuestion.contribution.destroy', ['contribution' => '__UUID__'])),
 
-        likeUrl: @json(route(
-            'pastQuestion.contribution.like.toggle',
-            ['contribution' => '__UUID__']
-        ))
+        likeUrl: @json(route('pastQuestion.contribution.like.toggle', ['contribution' => '__UUID__']))
     };
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const csrfToken = document
             .querySelector('meta[name="csrf-token"]')
             ?.getAttribute('content');
@@ -487,7 +435,7 @@
 
             messageBox.classList.remove('d-none');
 
-            setTimeout(function () {
+            setTimeout(function() {
                 messageBox.classList.add('d-none');
             }, 4000);
         }
@@ -523,7 +471,7 @@
         function commitSummernote(form) {
             $(form)
                 .find('.contribution-editor')
-                .each(function () {
+                .each(function() {
                     if ($(this).next('.note-editor').length) {
                         $(this).summernote('commit');
                     }
@@ -571,8 +519,8 @@
                 contribution.uuid
             );
 
-            const ownerControls = contribution.is_owner
-                ? `
+            const ownerControls = contribution.is_owner ?
+                `
                     <button
                         type="button"
                         class="btn btn-sm btn-link p-0 text-primary edit-contribution-button"
@@ -599,11 +547,11 @@
                             Delete
                         </button>
                     </form>
-                `
-                : '';
+                ` :
+                '';
 
-            const editForm = contribution.is_owner
-                ? `
+            const editForm = contribution.is_owner ?
+                `
                     <form
                         method="POST"
                         action="${updateUrl}"
@@ -638,8 +586,8 @@
                             </button>
                         </div>
                     </form>
-                `
-                : '';
+                ` :
+                '';
 
             return `
                 <article
@@ -902,7 +850,7 @@
             }
         }
 
-        document.addEventListener('submit', function (event) {
+        document.addEventListener('submit', function(event) {
             const form = event.target.closest(
                 '#createContributionForm, ' +
                 '.js-contribution-like-form, ' +
@@ -922,8 +870,8 @@
                 )
             ) {
                 if (!confirm(
-                    'Delete this contribution permanently?'
-                )) {
+                        'Delete this contribution permanently?'
+                    )) {
                     return;
                 }
             }
@@ -931,7 +879,7 @@
             submitAjaxForm(form);
         });
 
-        document.addEventListener('click', function (event) {
+        document.addEventListener('click', function(event) {
             const editButton = event.target.closest(
                 '.edit-contribution-button'
             );
@@ -951,7 +899,7 @@
                     if (!target.classList.contains('d-none')) {
                         initialiseEditEditor(target);
 
-                        setTimeout(function () {
+                        setTimeout(function() {
                             $(target)
                                 .find('.contribution-editor')
                                 .summernote('focus');

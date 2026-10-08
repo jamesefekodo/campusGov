@@ -1,10 +1,12 @@
-<div
-    class="modal fade"
-    id="pastQuestionFilterModal"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="pastQuestionFilterModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="pastQuestionFilterModal" tabindex="-1" role="dialog"
+    aria-labelledby="pastQuestionFilterModalLabel" aria-hidden="true">
+    @php
+        if (request()->routeIs('pastQuestionsHome')) {
+            $theRoute = route('pastQuestionsHome');
+        } else {
+            $theRoute = route('memberPastQuestions');
+        }
+    @endphp
 
     <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -14,17 +16,13 @@
                     Filter Past Questions
                 </h5>
 
-                <button
-                    type="button"
-                    class="close"
-                    data-dismiss="modal"
-                    aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
 
-            <form method="GET" action="{{ route('pastQuestionsHome') }}">
+            <form method="GET" action="{{ $theRoute }}">
                 <div class="modal-body">
 
                     <div class="row">
@@ -34,16 +32,12 @@
                                 Faculty
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-faculty"
-                                name="faculty">
+                            <select class="form-select form-control" id="past-question-faculty" name="faculty">
 
                                 <option value="">All Faculties</option>
 
                                 @foreach ($data['activeFaculties'] as $faculty)
-                                    <option
-                                        value="{{ $faculty->slug }}"
+                                    <option value="{{ $faculty->slug }}"
                                         {{ $data['selectedFaculty'] === $faculty->slug ? 'selected' : '' }}>
 
                                         {{ $faculty->name }}
@@ -57,10 +51,7 @@
                                 Department
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-department"
-                                name="department"
+                            <select class="form-select form-control" id="past-question-department" name="department"
                                 disabled>
 
                                 <option value="">
@@ -74,16 +65,12 @@
                                 Program
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-program"
-                                name="program">
+                            <select class="form-select form-control" id="past-question-program" name="program">
 
                                 <option value="">All Programs</option>
 
                                 @foreach ($data['activePrograms'] as $program)
-                                    <option
-                                        value="{{ $program->slug }}"
+                                    <option value="{{ $program->slug }}"
                                         {{ $data['selectedProgram'] === $program->slug ? 'selected' : '' }}>
 
                                         {{ $program->name }}
@@ -97,10 +84,7 @@
                                 Program Type
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-program-type"
-                                name="program_type"
+                            <select class="form-select form-control" id="past-question-program-type" name="program_type"
                                 disabled>
 
                                 <option value="">
@@ -114,23 +98,16 @@
                                 Semester
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-semester"
-                                name="semester">
+                            <select class="form-select form-control" id="past-question-semester" name="semester">
 
                                 <option value="">All Semesters</option>
 
-                                <option
-                                    value="first"
-                                    {{ $data['selectedSemester'] === 'first' ? 'selected' : '' }}>
+                                <option value="first" {{ $data['selectedSemester'] === 'first' ? 'selected' : '' }}>
 
                                     First Semester
                                 </option>
 
-                                <option
-                                    value="second"
-                                    {{ $data['selectedSemester'] === 'second' ? 'selected' : '' }}>
+                                <option value="second" {{ $data['selectedSemester'] === 'second' ? 'selected' : '' }}>
 
                                     Second Semester
                                 </option>
@@ -142,16 +119,13 @@
                                 Academic Year
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-academic-year"
+                            <select class="form-select form-control" id="past-question-academic-year"
                                 name="academic_year">
 
                                 <option value="">All Academic Years</option>
 
                                 @foreach ($data['academicYears'] as $academicYear)
-                                    <option
-                                        value="{{ $academicYear }}"
+                                    <option value="{{ $academicYear }}"
                                         {{ (string) $data['selectedAcademicYear'] === (string) $academicYear ? 'selected' : '' }}>
 
                                         {{ $academicYear }}
@@ -165,22 +139,17 @@
                                 Question Type
                             </label>
 
-                            <select
-                                class="form-select form-control"
-                                id="past-question-type"
-                                name="question_type">
+                            <select class="form-select form-control" id="past-question-type" name="question_type">
 
                                 <option value="">Exam and Test</option>
 
-                                <option
-                                    value="exam"
+                                <option value="exam"
                                     {{ $data['selectedQuestionType'] === 'exam' ? 'selected' : '' }}>
 
                                     Examination
                                 </option>
 
-                                <option
-                                    value="test"
+                                <option value="test"
                                     {{ $data['selectedQuestionType'] === 'test' ? 'selected' : '' }}>
 
                                     Test
@@ -193,22 +162,15 @@
                                 Course / Keyword
                             </label>
 
-                            <input
-                                type="search"
-                                class="form-control"
-                                id="past-question-search"
-                                name="searchKey"
-                                value="{{ $data['searchKey'] }}"
-                                placeholder="e.g. CSC 101">
+                            <input type="search" class="form-control" id="past-question-search" name="searchKey"
+                                value="{{ $data['searchKey'] }}" placeholder="e.g. EEC 433">
                         </div>
 
                     </div>
                 </div>
 
                 <div class="modal-footer">
-                    <a
-                        href="{{ route('pastQuestionsHome') }}"
-                        class="btn btn-outline-danger">
+                    <a href="{{ $theRoute }}" class="btn btn-outline-danger">
 
                         <i class="fas fa-undo"></i>
                         Clear
@@ -226,7 +188,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const facultySelect = document.getElementById('past-question-faculty');
         const departmentSelect = document.getElementById('past-question-department');
 
@@ -274,10 +236,10 @@
                     departmentSelect.innerHTML +=
                         '<option value="" disabled>No departments found</option>';
                 } else {
-                    result.departments.forEach(function (department) {
-                        const isSelected = selected === department.slug
-                            ? ' selected'
-                            : '';
+                    result.departments.forEach(function(department) {
+                        const isSelected = selected === department.slug ?
+                            ' selected' :
+                            '';
 
                         departmentSelect.innerHTML +=
                             '<option value="' + escapeHtml(department.slug) + '"' +
@@ -328,10 +290,10 @@
                     programTypeSelect.innerHTML +=
                         '<option value="" disabled>No program types found</option>';
                 } else {
-                    result.programTypes.forEach(function (programType) {
-                        const isSelected = selected === programType.slug
-                            ? ' selected'
-                            : '';
+                    result.programTypes.forEach(function(programType) {
+                        const isSelected = selected === programType.slug ?
+                            ' selected' :
+                            '';
 
                         programTypeSelect.innerHTML +=
                             '<option value="' + escapeHtml(programType.slug) + '"' +
@@ -350,11 +312,11 @@
             }
         }
 
-        facultySelect.addEventListener('change', function () {
+        facultySelect.addEventListener('change', function() {
             loadDepartments(this.value);
         });
 
-        programSelect.addEventListener('change', function () {
+        programSelect.addEventListener('change', function() {
             loadProgramTypes(this.value);
         });
 

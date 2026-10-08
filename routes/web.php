@@ -300,11 +300,14 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
 
     // publicatons
-
     Route::get('member/publications/publications', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublications');
     Route::get('member/publications/publications/search', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationsSearch');
     Route::get('member/publications/publications/tags/{slug}', [MediaPublicationController::class, 'memberMediaPublications'])->name('memberMediaPublicationWihTag');
     Route::get('member/publications/publications/view/{uuid}', [MediaPublicationController::class, 'memberViewMediaPublication'])->name('memberViewMediaPublication');
+
+    // past questions
+    Route::get('member/academic_resources/past_questions', [PastQuestionController::class, 'memberPastQuestions'])->name('memberPastQuestions');
+    Route::get('member/academic_resources/past_questions/view/{uuid}', [PastQuestionController::class, 'memberViewPastQuestion'])->name('memberViewPastQuestion');
 });
 
 

@@ -60,9 +60,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('guestViePastQuestion', [
-                    'uuid' => $pastQuestion->uuid
-                ]);
+                return redirect()->route('/');
         }
     }
 

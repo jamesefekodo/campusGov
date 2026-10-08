@@ -286,11 +286,11 @@ class PastQuestionController extends Controller
      | should be limited to the signed-in user's tenant, uncomment
      | and adapt this based on your User model.
      */
-        /*
+
     if ($user->tenant_id) {
         $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
     }
-    */
+    
 
         if ($selectedFaculty) {
             $pastQuestionsQuery->where('faculty', $selectedFaculty);
@@ -922,5 +922,141 @@ class PastQuestionController extends Controller
                     'Unable to delete the past question.'
                 );
         }
+    }
+    public function memberPastQuestions(Request $request){
+       $selectedFaculty = $request->input('faculty');
+        $selectedDepartment = $request->input('department');
+        $selectedProgram = $request->input('program');
+        $selectedProgramType = $request->input('program_type');
+        $selectedSemester = $request->input('semester');
+        $selectedAcademicYear = $request->input('academic_year');
+        $selectedQuestionType = $request->input('question_type');
+        $searchKey = trim((string) $request->input('searchKey'));
+
+        $isFiltering = $request->filled('faculty')
+            || $request->filled('department')
+            || $request->filled('program')
+            || $request->filled('program_type')
+            || $request->filled('semester')
+            || $request->filled('academic_year')
+            || $request->filled('question_type')
+            || $request->filled('searchKey');
+
+        $pastQuestionsQuery = PastQuestion::query()
+            ->where('approval_status', 'approved');
+
+        /*
+     | If your application uses tenant scoping and past_questions
+     | should be limited to the signed-in user's tenant, uncomment
+     | and adapt this based on your User model.
+     */
+    $user = Auth::user();
+    if ($user->tenant_id) {
+        $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
+    }
+
+        if ($selectedFaculty) {
+            $pastQuestionsQuery->where('faculty', $selectedFaculty);
+        }
+
+        if ($selectedDepartment) {
+            $pastQuestionsQuery->where('department', $selectedDepartment);
+        }
+
+        if ($selectedProgram) {
+            $pastQuestionsQuery->where('program', $selectedProgram);
+        }
+
+        if ($selectedProgramType) {
+            $pastQuestionsQuery->where('program_type', $selectedProgramType);
+        }
+
+        if ($selectedSemester) {
+            $pastQuestionsQuery->where('semester', $selectedSemester);
+        }
+
+        if ($selectedAcademicYear) {
+            $pastQuestionsQuery->where('academic_year', $selectedAcademicYear);
+        }
+
+        if ($selectedQuestionType !== null && $selectedQuestionType !== '') {
+            $pastQuestionsQuery->where(
+                'is_exam',
+                $selectedQuestionType === 'exam'
+            );
+        }
+
+        if ($searchKey !== '') {
+            $pastQuestionsQuery->where(function ($query) use ($searchKey) {
+                $query->where('course_code', 'like', '%' . $searchKey . '%')
+                    ->orWhere('course_title', 'like', '%' . $searchKey . '%')
+                    ->orWhere('content', 'like', '%' . $searchKey . '%');
+            });
+        }
+
+        $pastQuestions = $pastQuestionsQuery
+            ->with([
+                'programRelation',
+                'programTypeRelation',
+                'facultyRelation',
+                'departmentRelation',
+            ])
+            ->latest('academic_year')
+            ->latest('created_at')
+            ->paginate(20)
+            ->withQueryString();
+
+        $activeFaculties = Faculty::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $activePrograms = Program::query()
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        $academicYears = PastQuestion::query()
+            ->where('approval_status', 'approved')
+            ->whereNotNull('academic_year')
+            ->distinct()
+            ->orderByDesc('academic_year')
+            ->pluck('academic_year');
+
+        $data = [
+            'pastQuestions' => $pastQuestions,
+            'totalPastQuestions' => $pastQuestions->total(),
+            'requestType' => $isFiltering ? 'filter' : 'all',
+
+            'searchKey' => $searchKey,
+
+            'selectedFaculty' => $selectedFaculty,
+            'selectedDepartment' => $selectedDepartment,
+            'selectedProgram' => $selectedProgram,
+            'selectedProgramType' => $selectedProgramType,
+            'selectedSemester' => $selectedSemester,
+            'selectedAcademicYear' => $selectedAcademicYear,
+            'selectedQuestionType' => $selectedQuestionType,
+
+            'activeFaculties' => $activeFaculties,
+            'activePrograms' => $activePrograms,
+            'academicYears' => $academicYears,
+
+            'pageTitle' => $isFiltering
+                ? 'Filtered Past Questions'
+                : 'Past Questions',
+        ];
+        return view('users.member.academicResources.pastQuestions.pastQuestions', compact('data'));
+    }
+    public function memberViewPastQuestion($uuid){
+        $pastQuestion = PastQuestion::where('uuid', $uuid)->where('approval_status', 'approved')->first();
+        if(!$pastQuestion){
+            return redirect()->back()->with('error', 'Recods not found!');
+        }
+        $data = [
+            'pastQuestion' => $pastQuestion,
+        ];
+
+        return view('users.member.academicResources.pastQuestions.viewPastQuestion', compact('data'));
     }
 }
