@@ -20,7 +20,7 @@
                         <img src="{{ asset('system/images/odu_logo.png') }}" alt="Odu Systems"
                             style="height: 36px; object-fit: contain;" onerror="this.style.display='none'">
                     </div>
-                    <h6 class="fw-bold mb-1">Built by Odu Systems</h6>
+                    <h6 class="fw-bold mb-1">Odu Systems</h6>
                     <p class="text-muted mb-3" style="font-size: 12px;">
                         Web apps, mobile solutions, system design & hardware integration.
                     </p>

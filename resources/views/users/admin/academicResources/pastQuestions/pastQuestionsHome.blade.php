@@ -6,10 +6,11 @@
     <div class="app-content pt-3 mb-4">
         <div class="container-fluid">
 
-            <div class="navigation">
-                {{-- Optional: add an academic-resources inner navigation partial here --}}
-                {{-- @include('users.admin.academicResources.include.inner_nav') --}}
-            </div>
+            @if (countPastQuestionsPendingApproval() > 0 && Auth::user()->hasPermission('past_questions.update'))
+                <div class="navigation">
+                    @include('users.admin.academicResources.pastQuestions.include.inner_nav')
+                </div>
+            @endif
 
             @if (Auth::user()->hasPermission('past_questions.create'))
                 <div class="d-flex justify-content-end me-3">
@@ -204,7 +205,7 @@
 
                                                         <td>
                                                             <a class="btn btn-primary btn-sm"
-                                                                href="{{ route('pastQuestionsView', ['uuid' => $pastQuestion->uuid]) }}">
+                                                                href="{{ route('viewPastQuestion', ['uuid' => $pastQuestion->uuid]) }}">
 
                                                                 View
                                                             </a>

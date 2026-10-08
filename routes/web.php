@@ -76,6 +76,9 @@ Route::post('/process_temporary_upload', [FrontendController::class, 'processTem
 // ##############################################################################
 // sharing
 Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'sharedMediaPublication'])->name('sharedMediaPublication');
+Route::get('/sharing/past_questions/{uuid}', [SharingController::class, 'sharePastQuestion'])->name('sharePastQuestion');
+
+
 
 
 
@@ -128,16 +131,26 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 
 
     // publication
-
     Route::post('/publications/{uuid}/like', [MediaPublicationController::class, 'togglePublicationLike'])->name('publication.like.toggle');
     Route::post('/publications/{publicationUuid}/comments', [MediaPublicationController::class, 'storeComment'])->name('publication.comment.store');
     Route::post('/publications/{publicationUuid}/comments/{commentUuid}/reply', [MediaPublicationController::class, 'storeReply'])->name('publication.comment.reply.store');
-    Route::post('/publication-comments/{commentUuid}/like',[MediaPublicationController::class, 'toggleCommentLike'])->name('publication.comment.like.toggle');
-    Route::put('/publication-comments/{commentUuid}',[MediaPublicationController::class, 'updateComment'])->name('publication.comment.update');
-    Route::delete('/publication-comments/{commentUuid}',[MediaPublicationController::class, 'destroyComment'])->name('publication.comment.destroy');
+    Route::post('/publication-comments/{commentUuid}/like', [MediaPublicationController::class, 'toggleCommentLike'])->name('publication.comment.like.toggle');
+    Route::put('/publication-comments/{commentUuid}', [MediaPublicationController::class, 'updateComment'])->name('publication.comment.update');
+    Route::delete('/publication-comments/{commentUuid}', [MediaPublicationController::class, 'destroyComment'])->name('publication.comment.destroy');
 
 
-    Route::post('/user-context/{context}', [PermissionAccessController::class, 'switchUserContext'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
+    // past questions
+    Route::post('/past-questions/{pastQuestion:uuid}/contributions', [PastQuestionController::class, 'storeContribution'])->name('pastQuestion.contribution.store');
+
+    Route::put('/past-question-contributions/{contribution:uuid}', [PastQuestionController::class, 'updateContribution'])->name('pastQuestion.contribution.update');
+
+    Route::delete('/past-question-contributions/{contribution:uuid}', [PastQuestionController::class, 'destroyContribution'])->name('pastQuestion.contribution.destroy');
+
+    Route::post('/past-question-contributions/{contribution:uuid}/like', [PastQuestionController::class, 'toggleLikeContribution'])->name('pastQuestion.contribution.like.toggle');
+
+
+    // context switching
+    Route::post('/user-context/{context}', [PermissionAccessController::class, 'toggleLikeContribution'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
 });
 
 // Route::middleware('auth')
@@ -715,7 +728,21 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // academic resources
     // past questions
-    Route::get('admin/academic_resources/past_questions', [PastQuestionController::class, 'pastQuestionsHome'])->name('pastQuestionsHome');
-    Route::get('admin/academic_resources/past_questions/new', [PastQuestionController::class, 'createPastQuestion'])->name('createPastQuestion');
-    Route::post('admin/academic_resources/past_questions/create/submit', [PastQuestionController::class, 'addNewPastQuestionSubmit'])->name('addNewPastQuestionSubmit');
+    Route::get('admin/academic_resources/past_questions/home', [PastQuestionController::class, 'pastQuestionsHome'])->name('pastQuestionsHome');
+    Route::get('admin/academic_resources/past_questions/home/new', [PastQuestionController::class, 'createPastQuestion'])->name('createPastQuestion');
+    Route::post('admin/academic_resources/past_questions/home/create/submit', [PastQuestionController::class, 'addNewPastQuestionSubmit'])->name('addNewPastQuestionSubmit');
+
+    Route::get('admin/academic_resources/past_questions/view/{uuid}', [PastQuestionController::class, 'viewPastQuestion'])->name('viewPastQuestion');
+    Route::put('admin/academic_resources/past_questions/review/submit/{uuid}', [PastQuestionController::class, 'reviewPastQuestionSubmit'])->name('reviewPastQuestionSubmit');
+
+    Route::put('admin/academic_resources/past_questions/update/submit/{uuid}', [PastQuestionController::class, 'updatePastQuestionSubmit'])->name('updatePastQuestionSubmit');
+    Route::get('admin/academic_resources/past_questions/delete/{uuid}', [PastQuestionController::class, 'deletePastQuestion'])->name('deletePastQuestion');
+
+
+
+    Route::get('admin/academic_resources/past_questions/edit/{uuid}', [PastQuestionController::class, 'editPastQuestion'])->name('editPastQuestion');
+
+
+
+    Route::get('admin/academic_resources/past_questions/approval', [PastQuestionController::class, 'pastQuestionsApproval'])->name('pastQuestionsApproval');
 });

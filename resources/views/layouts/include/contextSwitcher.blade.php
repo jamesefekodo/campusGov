@@ -16,10 +16,11 @@
          totalElectionsAwaitingApproval() +
          totalElectionCandidatesAwaitingApproval() +
          totalOngoingElection() +
-
-        //  publications
-        countMediaPublicationsPendingApproval() +
-        countMyDraftedMediaPublications();
+         //  publications
+         countMediaPublicationsPendingApproval() +
+         countMyDraftedMediaPublications() +
+         // past questions
+         countPastQuestionsPendingApproval();
 
      if ($allNotifications > 0) {
          $showAdminNotification = true;
@@ -39,7 +40,7 @@
              type="button" data-bs-toggle="dropdown">
              @if ($userType === 'admin')
                  <i class="fas fa-user-shield me-1"></i>
-                 Administrator 
+                 Administrator
              @else
                  <i class="fas fa-user me-1"></i>
                  Personal Functions

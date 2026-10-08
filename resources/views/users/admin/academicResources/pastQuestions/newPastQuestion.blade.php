@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="">
                 <div class="navigation">
-                    {{--  --}}
+                   {{-- @include('users.admin.academicResources.pastQuestions.include.inner_nav') --}}
                 </div>
                 <div class="row">
                     <div class="individual-review-card-container">
@@ -181,12 +181,6 @@
                                                             <p style="color: red">
                                                                 {{ $errors->first('content') }}</p>
                                                         </div>
-
-                                                        @php
-                                                            $imagePlaceholder = asset(
-                                                                'system/images/wide_img_placeholder.jpeg',
-                                                            );
-                                                        @endphp
 
                                                         @php
                                                             $imagePlaceholder = asset(

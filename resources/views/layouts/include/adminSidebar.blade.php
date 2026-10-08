@@ -104,16 +104,27 @@
                 <span class="nav-icon">
                     <i class="fas fa-users"></i>
                 </span>
-                <span class="nav-link-text">Academic Resources</span>
+                <span class="nav-link-text">Academic Resources @if (countPastQuestionsPendingApproval() > 0)
+                        &nbsp;
+                        <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                            style="font-size: 11px">{{ countPastQuestionsPendingApproval() }}
+                    @endif
+                </span>
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down bi"></i>
                 </span><!--//submenu-arrow-->
             </a><!--//nav-link-->
             <div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions') ? 'sidebar-active' : '' }}"
-                            href="{{ route('pastQuestionsHome') }}">Past Questions</a>
+                    <li class="submenu-item">
+                        <a class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions') ? 'sidebar-active' : '' }}"
+                            href="{{ route('pastQuestionsHome') }}">Past Questions
+                            @if (countPastQuestionsPendingApproval() > 0)
+                                &nbsp;
+                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                    style="font-size: 11px">{{ countPastQuestionsPendingApproval() }}
+                            @endif
+                        </a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/customers') ? 'sidebar-active' : '' }}"

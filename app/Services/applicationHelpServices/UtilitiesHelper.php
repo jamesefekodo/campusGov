@@ -3,6 +3,7 @@
 use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\ProgramDurationOverride;
+use App\Models\AcademicResources\PastQuestion;
 use App\Models\Config\BasicSystemSetting;
 use App\Models\Config\HomepageSlider;
 use App\Models\Config\SeoDetail;
@@ -1159,3 +1160,10 @@ if (!function_exists('countMyDraftedMediaPublications')) {
 }
 
 
+if (!function_exists('countPastQuestionsPendingApproval')) {
+    function countPastQuestionsPendingApproval()
+    {
+        return PastQuestion::where('approval_status', 'pending')
+            ->count();
+    }
+}

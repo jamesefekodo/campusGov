@@ -6,6 +6,7 @@ use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
 use App\Models\AcademicConfig\Program;
 use App\Models\AcademicConfig\ProgramType;
+use App\Models\AcademicResources\PastQuestionContribution;
 use App\Models\Tenancy\Tenant;
 use App\Models\Traits\BelongsToTenant;
 use App\Models\User;
@@ -126,5 +127,13 @@ class PastQuestion extends Model
             'program_type',
             'slug'
         );
+    }
+
+    public function contributions()
+    {
+        return $this->hasMany(
+            PastQuestionContribution::class,
+            'past_question_id'
+        )->latest();
     }
 }
