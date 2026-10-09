@@ -52,8 +52,7 @@
                                                     @if ($data['book']->tags)
                                                         @foreach ($data['book']->tags as $tag)
                                                             <a
-                                                                href="{{ route('recommendedBooksWihTag', ['slug' => $tag->slug]) }}"
-                                                                >
+                                                                href="{{ route('recommendedBooksWihTag', ['slug' => $tag->slug]) }}">
                                                                 <span
                                                                     class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
                                                                     {{ $tag->name }}
@@ -66,33 +65,31 @@
 
                                             @include('users.admin.academicResources.recommendedBooks.include.shareRecommendedBook')
 
-                                            {{-- <div class="col-md-6 p-1">
-                                                <span style="font-weight: bold">Author:</span>
+                                            <div class="col-md-6 p-1">
+                                                <span style="font-weight: bold">Created by:</span>
                                                 <span class="text-black">
-                                                    @if ($data['publication']->author)
-                                                        @if ($data['publication']->authorUser?->memberPersonalProfile)
+                                                    @if ($data['book']->created_by)
+                                                        @if ($data['book']->createdBy?->memberPersonalProfile)
                                                             {{ trim(
-                                                                $data['publication']->authorUser->memberPersonalProfile->first_name .
+                                                                $data['book']->createdBy->memberPersonalProfile->first_name .
                                                                     ' ' .
-                                                                    ($data['publication']->authorUser->memberPersonalProfile->middle_name
-                                                                        ? $data['publication']->authorUser->memberPersonalProfile->middle_name . ' '
+                                                                    ($data['book']->createdBy->memberPersonalProfile->middle_name
+                                                                        ? $data['book']->createdBy->memberPersonalProfile->middle_name . ' '
                                                                         : '') .
-                                                                    $data['publication']->authorUser->memberPersonalProfile->last_name,
+                                                                    $data['book']->createdBy->memberPersonalProfile->last_name,
                                                             ) }}
 
-                                                            <a href="{{ route('viewMember', ['uuid' => $data['publication']->authorUser->uuid]) }}"
+                                                            <a href="{{ route('viewMember', ['uuid' => $data['book']->createdBy->uuid]) }}"
                                                                 target="_blank" class="badge bg-secondary text-white"
                                                                 title="View Initiator">
                                                                 <i class="fas fa-link"></i>
                                                             </a>
                                                         @else
-                                                            {{ $data['publication']->author }}
+                                                            {{ $data['book']->created_by }}
                                                         @endif
                                                     @endif -
                                                     @php
-                                                        $createdAt = \Carbon\Carbon::parse(
-                                                            $data['publication']->created_at,
-                                                        );
+                                                        $createdAt = \Carbon\Carbon::parse($data['book']->created_at);
                                                     @endphp
 
                                                     @if ($createdAt->isToday())
@@ -104,129 +101,33 @@
                                                     @endif
                                                 </span>
                                             </div>
-                                            <div class="col-md-6 p-1">
-                                                <span style="font-weight: bold">Last Update:</span>
-                                                <span class="text-black">
-                                                    @if ($data['publication']->last_update_by)
-                                                        @if ($data['publication']->lastUpdateUser?->memberPersonalProfile)
-                                                            {{ trim(
-                                                                $data['publication']->lastUpdateUser->memberPersonalProfile->first_name .
-                                                                    ' ' .
-                                                                    ($data['publication']->lastUpdateUser->memberPersonalProfile->middle_name
-                                                                        ? $data['publication']->lastUpdateUser->memberPersonalProfile->middle_name . ' '
-                                                                        : '') .
-                                                                    $data['publication']->lastUpdateUser->memberPersonalProfile->last_name,
-                                                            ) }}
 
-                                                            <a href="{{ route('viewMember', ['uuid' => $data['publication']->lastUpdateUser->uuid]) }}"
-                                                                target="_blank" class="badge bg-secondary text-white"
-                                                                title="View Initiator">
-                                                                <i class="fas fa-link"></i>
-                                                            </a>
-                                                        @else
-                                                            {{ $data['publication']->last_update_by }}
-                                                        @endif
-                                                    @endif -
-                                                    @php
-                                                        $updatedAt = \Carbon\Carbon::parse(
-                                                            $data['publication']->last_update,
-                                                        );
-                                                    @endphp
-
-                                                    @if ($updatedAt->isToday())
-                                                        Today, {{ $updatedAt->format('h:i A') }}
-                                                    @elseif ($updatedAt->isYesterday())
-                                                        Yesterday, {{ $updatedAt->format('h:i A') }}
-                                                    @else
-                                                        {{ $updatedAt->format('l, d F, Y h:i A') }}
-                                                    @endif
-                                                </span>
-                                            </div>
                                             <div class="col-md-6 p-1">
                                                 <span style="font-weight: bold">Status:</span>
                                                 <span class="text-black">
-                                                    @switch($data['publication']->approval_status)
-                                                        @case('draft')
-                                                            <span class="badge bg-secondary-subtle text-secondary">Draft</span>
-                                                        @break
-
-                                                        @case('pending')
-                                                            <span class="badge bg-warning-subtle text-warning">Awaiting
-                                                                Approval</span>
-                                                        @break
-
-                                                        @case('approved')
-                                                            <span class="badge bg-success-subtle text-success">Approved</span>
-                                                        @break
-
-                                                        @case('declined')
-                                                            <span class="badge bg-danger-subtle text-danger">Declined</span>
-                                                        @break
-
-                                                        @default
-                                                            <span
-                                                                class="badge bg-danger-subtle text-danger">{{ $data['publication']->approval_status }}</span>
-                                                    @endswitch
-                                                    @if ($data['publication']->is_active == true)
-                                                        <span class="badge bg-green text-white">Published</span>
+                                                    @if ($data['book']->is_published == true)
+                                                        <span class="badge bg-success-subtle text-success">Published</span>
+                                                    @else
+                                                        <span
+                                                            class="badge bg-danger-subtle text-danger">Not-Published</span>
                                                     @endif
                                                 </span>
                                             </div>
-                                            @if ($data['publication']->approved_by)
-                                                <div class="col-md-6 p-1">
-                                                    <span style="font-weight: bold">Last Status Updated:</span>
-                                                    <span class="text-black">
-                                                        @if ($data['publication']->approved_by)
-                                                            @if ($data['publication']->approvedByUser?->memberPersonalProfile)
-                                                                {{ trim(
-                                                                    $data['publication']->approvedByUser->memberPersonalProfile->first_name .
-                                                                        ' ' .
-                                                                        ($data['publication']->approvedByUser->memberPersonalProfile->middle_name
-                                                                            ? $data['publication']->approvedByUser->memberPersonalProfile->middle_name . ' '
-                                                                            : '') .
-                                                                        $data['publication']->approvedByUser->memberPersonalProfile->last_name,
-                                                                ) }}
-
-                                                                <a href="{{ route('viewMember', ['uuid' => $data['publication']->approvedByUser->uuid]) }}"
-                                                                    target="_blank" class="badge bg-secondary text-white"
-                                                                    title="View Initiator">
-                                                                    <i class="fas fa-link"></i>
-                                                                </a>
-                                                            @else
-                                                                {{ $data['publication']->approved_by }}
-                                                            @endif
-                                                        @endif -
-                                                        @php
-                                                            $updatedAt = \Carbon\Carbon::parse(
-                                                                $data['publication']->last_approval_update,
-                                                            );
-                                                        @endphp
-
-                                                        @if ($updatedAt->isToday())
-                                                            Today, {{ $updatedAt->format('h:i A') }}
-                                                        @elseif ($updatedAt->isYesterday())
-                                                            Yesterday, {{ $updatedAt->format('h:i A') }}
-                                                        @else
-                                                            {{ $updatedAt->format('l, d F, Y h:i A') }}
-                                                        @endif
-                                                    </span>
-                                                </div>
-                                            @endif --}}
                                         </div>
 
 
-                                        {{-- <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            @if (Auth::user()->hasPermission('media_publication.update') || $data['publication']->author == Auth::user()->username)
+                                        <div class="d-flex justify-content-end flex-wrap mt-3">
+                                            @if (Auth::user()->hasPermission('recommended_book.update') || $data['book']->created_by == Auth::user()->username)
                                                 <button class="btn btn-warning m-1 d-flex align-items-center"
-                                                    data-toggle="modal" data-target="#editMediaPublication">
+                                                    data-toggle="modal" data-target="#editRecommendedBookModal">
                                                     <i class="fas fa-edit me-2"></i>
                                                     <span>Update</span>
                                                 </button>
                                             @endif
-                                            @if (Auth::user()->hasPermission('media_publication.delete') && $data['publication']->approval_status !== 'approved')
+                                            @if (Auth::user()->hasPermission('recommended_book.delete') && $data['book']->is_published !== true)
                                                 <button class="btn btn-danger m-1 d-flex align-items-center delete-confirm "
                                                     data-toggle="modal"
-                                                    data-url="{{ route('deleteMediaPublication', ['uuid' => $data['publication']->uuid]) }}">
+                                                    data-url="{{ route('deleteRecommendedBook', ['slug' => $data['book']->slug]) }}">
                                                     <i class="fas fa-edit me-2"></i>
                                                     <span>Delete</span>
                                                 </button>
@@ -242,7 +143,7 @@
 
                                                                 Swal.fire({
                                                                     title: 'Are you sure?',
-                                                                    text: 'This media publication and all comments, replies, and reactions associated with it will be permanently deleted.',
+                                                                    text: 'Delete this book recommendation.',
                                                                     icon: 'warning',
                                                                     showCancelButton: true,
                                                                     confirmButtonColor: '#d33',
@@ -268,7 +169,7 @@
 
 
                                         </div>
-                                        @include('users.admin.media.publications.include.editMediaPublication') --}}
+                                        @include('users.admin.academicResources.recommendedBooks.include.editRecommendedBookModal')
 
 
                                     </div>

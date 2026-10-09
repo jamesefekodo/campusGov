@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Sharing;
 
 use App\Http\Controllers\Controller;
 use App\Models\AcademicResources\PastQuestion;
+use App\Models\AcademicResources\RecommendedBook;
 use App\Models\Media\MediaPublication;
 use Illuminate\Http\Request;
 

@@ -751,6 +751,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/academic_resources/recommended_books/tag/{slug}', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooksWihTag');
     Route::post('admin/academic_resources/recommended_books/add_new/submit', [RecommendedBooksController::class, 'addNewRecommendedBookSubmit'])->name('addNewRecommendedBookSubmit');
     Route::get('admin/academic_resources/recommended_books/view/{slug}', [RecommendedBooksController::class, 'viewRecommendedBook'])->name('viewRecommendedBook');
+    Route::put('admin/academic_resources/recommended_books/update/submit/{slug}', [RecommendedBooksController::class, 'updateRecommendedBookSubmit'])->name('updateRecommendedBookSubmit');
+    Route::get('admin/academic_resources/recommended_books/delete/{slug}', [RecommendedBooksController::class, 'deleteRecommendedBook'])->name('deleteRecommendedBook');
+
+
     
 
     Route::get('admin/academic_resources/recommended_book/tag', [RecommendedBooksController::class, 'recommendedBooksTags'])->name('recommendedBooksTags');
