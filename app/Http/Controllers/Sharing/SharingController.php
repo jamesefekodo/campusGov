@@ -64,4 +64,29 @@ class SharingController extends Controller
         }
     }
 
+    public function sharedRecommendedBook($slug){
+        $book = RecommendedBook::where('slug', $slug)
+        ->where('is_published', true)
+        ->first();
+
+        if (!$book) {
+            return redirect()->route('homepage')->with('error', 'Records not found!');
+        }
+
+         switch (getUserType()) {
+            case 'root':
+            case 'admin':
+                return redirect()->route('viewRecommendedBook', [
+                    'slug' => $book->slug
+                ]);
+
+            case 'member':
+                return redirect()->route('memberViewRecommendedBook', [
+                    'slug' => $book->slug
+                ]);
+
+            default:
+                return redirect()->route('/');
+        }
+    }
 }

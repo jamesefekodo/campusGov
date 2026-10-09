@@ -4,6 +4,7 @@ use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\AcademicResources\PastQuestionController;
+use App\Http\Controllers\AcademicResources\RecommendedBooksController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
@@ -77,7 +78,7 @@ Route::post('/process_temporary_upload', [FrontendController::class, 'processTem
 // sharing
 Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'sharedMediaPublication'])->name('sharedMediaPublication');
 Route::get('/sharing/past_questions/{uuid}', [SharingController::class, 'sharePastQuestion'])->name('sharePastQuestion');
-
+Route::get('/sharing/recommended_books/{slug}', [SharingController::class, 'sharedRecommendedBook'])->name('sharedRecommendedBook');
 
 
 
@@ -745,6 +746,15 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/academic_resources/past_questions/approval', [PastQuestionController::class, 'pastQuestionsApproval'])->name('pastQuestionsApproval');
 
-    Route::get('admin/academic_resources/recommended_books', [PastQuestionController::class, 'recommendedBooks'])->name('recommendedBooks');
-    Route::get('admin/academic_resources/recommended_books/search', [PastQuestionController::class, 'recommendedBooks'])->name('recommendedBooksSearch');
+    Route::get('admin/academic_resources/recommended_books', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooks');
+    Route::get('admin/academic_resources/recommended_books/search', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooksSearch');
+    Route::get('admin/academic_resources/recommended_books/tag/{slug}', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooksWihTag');
+    Route::post('admin/academic_resources/recommended_books/add_new/submit', [RecommendedBooksController::class, 'addNewRecommendedBookSubmit'])->name('addNewRecommendedBookSubmit');
+    Route::get('admin/academic_resources/recommended_books/view/{slug}', [RecommendedBooksController::class, 'viewRecommendedBook'])->name('viewRecommendedBook');
+    
+
+    Route::get('admin/academic_resources/recommended_book/tag', [RecommendedBooksController::class, 'recommendedBooksTags'])->name('recommendedBooksTags');
+    Route::post('admin/academic_resources/recommended_book/tag/add_new/submit', [RecommendedBooksController::class, 'addNewBookTagSubmit'])->name('addNewBookTagSubmit');
+    Route::put('admin/academic_resources/recommended_book/tag/edit/submit/{slug}', [RecommendedBooksController::class, 'editBookTagSubmit'])->name('editBookTagSubmit');
+    Route::get('admin/academic_resources/recommended_book/tag/delete/{slug}', [RecommendedBooksController::class, 'removeBookTag'])->name('removeBookTag');
 });

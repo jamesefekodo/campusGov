@@ -70,7 +70,7 @@
                                                                 {{ $tag->name }}
                                                             </td>
                                                             <td>
-                                                                number of publications and view button
+                                                               {{ $tag->publications->count() }}
                                                             </td>
                                                             <td>
                                                                 <span

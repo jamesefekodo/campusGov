@@ -8,13 +8,14 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class RecommendedBook extends Model
 {
     use BelongsToTenant;
     use HasFactory;
 
-    protected $table = 'recommended_courses';
+    protected $table = 'recommended_books';
 
     protected $fillable = [
         'slug',
@@ -23,6 +24,7 @@ class RecommendedBook extends Model
         'description',
         'cover_image',
         'is_published',
+        'file_url',
     ];
 
     protected $casts = [
@@ -46,5 +48,16 @@ class RecommendedBook extends Model
             'created_by',
             'username'
         );
+    }
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TagsForRecommendedBooks::class,
+            'recommended_book_tags',
+            'recommended_book_id',
+            'tag_for_book_id'
+        )
+            ->using(RecommendedBookTag::class)
+            ->withTimestamps();
     }
 }

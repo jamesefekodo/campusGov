@@ -61,7 +61,7 @@ class ElectionController extends Controller
         CASE
             WHEN status = 'voting' THEN 0
             ELSE 1
-        END ")->orderByDesc('updated_at')->paginate(20)->withQueryString();
+        END ")->orderByDesc('created_at')->paginate(20)->withQueryString();
 
             $totalElections = $elections->total();
             $requestType = 'search';

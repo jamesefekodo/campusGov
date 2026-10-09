@@ -116,16 +116,19 @@
             </a><!--//nav-link-->
             <div id="submenu-3" class="collapse submenu submenu-3" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item">
-                        <a class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions') ? 'sidebar-active' : '' }}"
-                            href="{{ route('pastQuestionsHome') }}">Past Questions
-                            @if (countPastQuestionsPendingApproval() > 0)
-                                &nbsp;
-                                <span class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
-                                    style="font-size: 11px">{{ countPastQuestionsPendingApproval() }}
-                            @endif
-                        </a>
-                    </li>
+                    @if (Auth::user()->hasPermission('past_questions.read'))
+                        <li class="submenu-item">
+                            <a class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions') ? 'sidebar-active' : '' }}"
+                                href="{{ route('pastQuestionsHome') }}">Past Questions
+                                @if (countPastQuestionsPendingApproval() > 0)
+                                    &nbsp;
+                                    <span
+                                        class="position-relative top-0 translate-middle badge rounded-pill bg-red ml-1"
+                                        style="font-size: 11px">{{ countPastQuestionsPendingApproval() }}
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/customers') ? 'sidebar-active' : '' }}"
                             href="
@@ -133,12 +136,15 @@
                              ">Recommended
                             Courses</a>
                     </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/recommended_books') ? 'sidebar-active' : '' }}"
-                            href="
+                    @if (Auth::user()->hasPermission('recommended_book.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/recommended_book') ? 'sidebar-active' : '' }}"
+                                href="
                             {{ route('recommendedBooks') }}
-                             ">Recommended Books</a>
-                    </li>
+                             ">Recommended
+                                Books</a>
+                        </li>
+                    @endif
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
                             href="
@@ -324,7 +330,7 @@
                 </ul>
             </div>
         </li><!--//nav-item-->
-          <li class="nav-item has-submenu">
+        <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-11" aria-expanded="false"
                 aria-controls="submenu-11">
@@ -348,7 +354,7 @@
             </div>
         </li><!--//nav-item-->
         </li><!--//nav-item-->
-          <li class="nav-item has-submenu">
+        <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-12" aria-expanded="false"
                 aria-controls="submenu-12">
@@ -366,13 +372,15 @@
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
                             href="
                             {{-- {{ route('couponsHome') }} --}}
-                             ">Student Representatives</a>
+                             ">Student
+                            Representatives</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
                             href="
                             {{-- {{ route('couponsHome') }} --}}
-                             ">Advisory Council</a>
+                             ">Advisory
+                            Council</a>
                     </li>
                 </ul>
             </div>
