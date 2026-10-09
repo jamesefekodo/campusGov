@@ -134,11 +134,10 @@
                             Courses</a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/customers') ? 'sidebar-active' : '' }}"
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/recommended_books') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('customersHome') }} --}}
-                             ">Recommended
-                            Books</a>
+                            {{ route('recommendedBooks') }}
+                             ">Recommended Books</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"

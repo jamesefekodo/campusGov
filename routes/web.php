@@ -741,11 +741,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_resources/past_questions/update/submit/{uuid}', [PastQuestionController::class, 'updatePastQuestionSubmit'])->name('updatePastQuestionSubmit');
     Route::get('admin/academic_resources/past_questions/delete/{uuid}', [PastQuestionController::class, 'deletePastQuestion'])->name('deletePastQuestion');
 
-
-
     Route::get('admin/academic_resources/past_questions/edit/{uuid}', [PastQuestionController::class, 'editPastQuestion'])->name('editPastQuestion');
 
-
-
     Route::get('admin/academic_resources/past_questions/approval', [PastQuestionController::class, 'pastQuestionsApproval'])->name('pastQuestionsApproval');
+
+    Route::get('admin/academic_resources/recommended_books', [PastQuestionController::class, 'recommendedBooks'])->name('recommendedBooks');
+    Route::get('admin/academic_resources/recommended_books/search', [PastQuestionController::class, 'recommendedBooks'])->name('recommendedBooksSearch');
 });
