@@ -37,10 +37,10 @@
                         </a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/academic_resources/recommended_book') ? 'sidebar-active' : '' }}
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/academic_resources/recommended_book') ? 'sidebar-active' : '' }}
                              "
                             href="
-                            {{-- {{ route('studentRecommendedBooks') }} --}}
+                            {{ route('memberRecommendedBooks') }}
                              ">Recommended
                             Books &nbsp;
                         </a>

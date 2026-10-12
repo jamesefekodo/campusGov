@@ -333,8 +333,9 @@ class RecommendedBooksController extends Controller
         }
         return redirect()->back()->with('success', 'Done!');
     }
-    public function deleteRecommendedBook($slug){
-          /** @var \App\Models\User $user */
+    public function deleteRecommendedBook($slug)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -345,27 +346,99 @@ class RecommendedBooksController extends Controller
         if (!$book) {
             return redirect()->back()->with('error', 'No records found!');
         }
-            // Check if the book has a cover image attribute
-            $coverImageName = $book->cover_image ?? null;
+        // Check if the book has a cover image attribute
+        $coverImageName = $book->cover_image ?? null;
 
-            if ($coverImageName) {
-                // Build the full public path to the image
-                $coverPath = public_path(
-                    'assets/tenant_' .
-                        tenant()->id .
-                        '/uploads/academicResources/recommendedBooks/' .
-                        $coverImageName
-                );
+        if ($coverImageName) {
+            // Build the full public path to the image
+            $coverPath = public_path(
+                'assets/tenant_' .
+                    tenant()->id .
+                    '/uploads/academicResources/recommendedBooks/' .
+                    $coverImageName
+            );
 
-                // Delete the file from storage if it physically exists
-                if (file_exists($coverPath)) {
-                    @unlink($coverPath);
-                }
+            // Delete the file from storage if it physically exists
+            if (file_exists($coverPath)) {
+                @unlink($coverPath);
             }
+        }
 
-            // Delete the book record from the database
-            $book->delete();
+        // Delete the book record from the database
+        $book->delete();
         return redirect()->route('recommendedBooks')->with('success', 'Done!');
+    }
+    // member
+    public function memberRecommendedBooks(Request $request)
+    {
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $recommendedBooks = '';
+        $totalRecommendedBooks = 0;
 
+
+        if (Route::currentRouteName() == 'memberRecommendedBooksSearch') {
+            $searchKey = $request->input('searchKey');
+            $recommendedBooks = RecommendedBook::where('is_published', true)->when($searchKey, function ($query) use ($searchKey) {
+                $query->where(function ($q) use ($searchKey) {
+                    $q->where('created_by', 'like', "%{$searchKey}%")
+                        ->orWhere('title', 'like', "%{$searchKey}%")
+                        ->orWhere('description', 'like', "%{$searchKey}%");
+                });
+            })
+                ->orderByDesc('updated_at')->paginate(20)->withQueryString();
+
+            $totalRecommendedBooks = $recommendedBooks->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } elseif (Route::currentRouteName() == 'memberRecommendedBooksFilter') {
+            $tag = TagsForRecommendedBooks::where(
+                'slug',
+                $request->slug
+            )->first();
+
+            if (!$tag) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Tag not found!');
+            }
+            $recommendedBooks = $tag->recommendedBooks()
+                ->where('is_published', true)
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalRecommendedBooks = $recommendedBooks->total();
+            $requestType = 'with_tag';
+            $pageTitle = 'Books with the tag :: ' . $tag->name;
+        } else {
+            $recommendedBooks = RecommendedBook::where('is_published', true)
+                ->orderByDesc('updated_at')
+                ->paginate(20);
+            $totalRecommendedBooks = RecommendedBook::where('is_published', true)->count();
+            $requestType = 'all';
+            $pageTitle = 'Recommended Books';
+        }
+        $data = [
+            'recommendedBooks' => $recommendedBooks,
+            'totalRecommendedBooks' => $totalRecommendedBooks,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+
+        return view('users.member.academicResources.recommendedBooks.recommendedBooks', compact('data'));
+    }
+    public function memberViewRecommendedBook($slug)
+    {
+        $recommendedBook = RecommendedBook::where('is_published', true)->where('slug', $slug)->first();
+        if (!$recommendedBook) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $data = [
+            'book' => $recommendedBook,
+        ];
+        return view('users.member.academicResources.recommendedBooks.viewRecommendedBook', compact('data'));
     }
 }

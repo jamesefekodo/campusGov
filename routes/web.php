@@ -309,6 +309,14 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     // past questions
     Route::get('member/academic_resources/past_questions', [PastQuestionController::class, 'memberPastQuestions'])->name('memberPastQuestions');
     Route::get('member/academic_resources/past_questions/view/{uuid}', [PastQuestionController::class, 'memberViewPastQuestion'])->name('memberViewPastQuestion');
+
+    // recommended books
+    
+    Route::get('member/academic_resources/recommended_books', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooks');
+    Route::get('member/academic_resources/recommended_books/search', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooksSearch');
+    Route::get('member/academic_resources/recommended_books/filter/tag/{slug}', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooksFilter');
+    Route::get('member/academic_resources/recommended_books/view/{slug}', [RecommendedBooksController::class, 'memberViewRecommendedBook'])->name('memberViewRecommendedBook');
+
 });
 
 
