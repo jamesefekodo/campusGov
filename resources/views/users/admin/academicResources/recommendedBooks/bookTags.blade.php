@@ -7,7 +7,7 @@
             <div class="navigation">
                 {{-- ### --}}
             </div>
-            @if (Auth::user()->hasPermission('elections.create'))
+            @if (Auth::user()->hasPermission('recommended_book.manage_tags'))
                 <div class="d-flex justify-content-end me-3">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
@@ -27,7 +27,7 @@
                     <div class="table_head">
                         <div class="table_head_item col-md-8">
                             <div class="table_title">
-                                Media Publication :: Tags
+                                Recommended Books :: Tags
                             </div>
                         </div>
                     </div>

@@ -1,10 +1,11 @@
 <?php
 
+use App\Http\Controllers\AcademicResources\PastQuestionController;
+use App\Http\Controllers\AcademicResources\RecommendedBooksController;
+use App\Http\Controllers\AcademicResources\RecommendedCourseController;
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
-use App\Http\Controllers\AcademicResources\PastQuestionController;
-use App\Http\Controllers\AcademicResources\RecommendedBooksController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
 use App\Http\Controllers\DashboardController;
@@ -754,6 +755,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     Route::get('admin/academic_resources/past_questions/approval', [PastQuestionController::class, 'pastQuestionsApproval'])->name('pastQuestionsApproval');
 
+    // recommended books
     Route::get('admin/academic_resources/recommended_books', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooks');
     Route::get('admin/academic_resources/recommended_books/search', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooksSearch');
     Route::get('admin/academic_resources/recommended_books/tag/{slug}', [RecommendedBooksController::class, 'recommendedBooks'])->name('recommendedBooksWihTag');
@@ -761,12 +763,22 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/academic_resources/recommended_books/view/{slug}', [RecommendedBooksController::class, 'viewRecommendedBook'])->name('viewRecommendedBook');
     Route::put('admin/academic_resources/recommended_books/update/submit/{slug}', [RecommendedBooksController::class, 'updateRecommendedBookSubmit'])->name('updateRecommendedBookSubmit');
     Route::get('admin/academic_resources/recommended_books/delete/{slug}', [RecommendedBooksController::class, 'deleteRecommendedBook'])->name('deleteRecommendedBook');
-
-
     
 
     Route::get('admin/academic_resources/recommended_book/tag', [RecommendedBooksController::class, 'recommendedBooksTags'])->name('recommendedBooksTags');
     Route::post('admin/academic_resources/recommended_book/tag/add_new/submit', [RecommendedBooksController::class, 'addNewBookTagSubmit'])->name('addNewBookTagSubmit');
     Route::put('admin/academic_resources/recommended_book/tag/edit/submit/{slug}', [RecommendedBooksController::class, 'editBookTagSubmit'])->name('editBookTagSubmit');
     Route::get('admin/academic_resources/recommended_book/tag/delete/{slug}', [RecommendedBooksController::class, 'removeBookTag'])->name('removeBookTag');
+
+    // recommended courses
+    Route::get('admin/academic_resources/recommended_courses', [RecommendedCourseController::class, 'recommendedCourses'])->name('recommendedCourses');
+    Route::get('admin/academic_resources/recommended_courses/search', [RecommendedCourseController::class, 'recommendedCourses'])->name('recommendedCoursesSearch');
+    Route::get('admin/academic_resources/recommended_courses/tag/{slug}', [RecommendedCourseController::class, 'recommendedCourses'])->name('recommendedCoursesWihTag');
+
+    Route::get('admin/academic_resources/recommended_course/tag', [RecommendedCourseController::class, 'recommendedCourseTags'])->name('recommendedCourseTags');
+    Route::post('admin/academic_resources/recommended_course/tag/add_new/submit', [RecommendedCourseController::class, 'addNewCourseTagSubmit'])->name('addNewCourseTagSubmit');
+    Route::put('admin/academic_resources/recommended_course/tag/edit/submit/{slug}', [RecommendedCourseController::class, 'editCourseTagSubmit'])->name('editCourseTagSubmit');
+
+    
+    
 });

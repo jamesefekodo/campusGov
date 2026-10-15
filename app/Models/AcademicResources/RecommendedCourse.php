@@ -17,7 +17,7 @@ class RecommendedCourse extends Model
    use BelongsToTenant;
     use HasFactory;
 
-    protected $table = 'recommended_books';
+    protected $table = 'recommended_courses';
 
     protected $fillable = [
         'slug',

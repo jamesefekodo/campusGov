@@ -129,13 +129,13 @@
                             </a>
                         </li>
                     @endif
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/customers') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('customersHome') }} --}}
-                             ">Recommended
-                            Courses</a>
-                    </li>
+                    @if (Auth::user()->hasPermission('recommended_course.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/recommended_courses') ? 'sidebar-active' : '' }}"
+                                href="{{ route('recommendedCourses') }}">Recommended
+                                Courses</a>
+                        </li>
+                    @endif
                     @if (Auth::user()->hasPermission('recommended_book.read'))
                         <li class="submenu-item"><a
                                 class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/recommended_book') ? 'sidebar-active' : '' }}"

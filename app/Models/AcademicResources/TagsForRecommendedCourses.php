@@ -44,7 +44,7 @@ class TagsForRecommendedCourses extends Model
     /**
      * Publications using this tag.
      */
-    public function recommendedBooks(): BelongsToMany
+    public function recommendedCourses(): BelongsToMany
     {
         return $this->belongsToMany(
             RecommendedCourse::class,
