@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Sharing;
 use App\Http\Controllers\Controller;
 use App\Models\AcademicResources\PastQuestion;
 use App\Models\AcademicResources\RecommendedBook;
+use App\Models\AcademicResources\RecommendedCourse;
 use App\Models\Media\MediaPublication;
 use Illuminate\Http\Request;
 
@@ -84,6 +85,31 @@ class SharingController extends Controller
             case 'member':
                 return redirect()->route('memberViewRecommendedBook', [
                     'slug' => $book->slug
+                ]);
+
+            default:
+                return redirect()->route('/');
+        }
+    }
+    public function sharedRecommendedCourse($slug){
+          $course = RecommendedCourse::where('slug', $slug)
+        ->where('is_published', true)
+        ->first();
+
+        if (!$course) {
+            return redirect()->route('homepage')->with('error', 'Records not found!');
+        }
+
+         switch (getUserType()) {
+            case 'root':
+            case 'admin':
+                return redirect()->route('viewRecommendedCourse', [
+                    'slug' => $course->slug
+                ]);
+
+            case 'member':
+                return redirect()->route('memberViewRecommendedCourse', [
+                    'slug' => $course->slug
                 ]);
 
             default:

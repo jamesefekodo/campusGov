@@ -280,9 +280,6 @@ class RecommendedBooksController extends Controller
             'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:300',
         ]);
 
-        do {
-            $bookSlug = 'rec-bk-' . now()->format('mY') . '-' . random_int(1000000000, 9999999999);
-        } while (RecommendedBook::where('slug', $bookSlug)->exists());
 
         $book->title = trim($request->title);
         $book->description = $request->description;

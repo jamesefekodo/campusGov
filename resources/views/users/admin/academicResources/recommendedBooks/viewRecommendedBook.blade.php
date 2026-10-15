@@ -30,7 +30,7 @@
                                         <div class="publication-cover-wrapper mb-4">
                                             @if ($hasCoverImage)
                                                 <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/academicResources/recommendedBooks/' . $coverImage) }}"
-                                                    alt="{{ $data['publication']->header ?? 'Publication cover image' }}"
+                                                    alt="{{ $data['book']->title ?? 'Book cover image' }}"
                                                     class="publication-cover-image" loading="lazy">
                                             @else
                                                 <div class="publication-cover-placeholder">

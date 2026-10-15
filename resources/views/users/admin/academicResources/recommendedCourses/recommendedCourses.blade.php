@@ -11,11 +11,11 @@
                 <div class="d-flex justify-content-end me-3">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                            data-target="#addNewRecommendedBookModal">
+                            data-target="#addNewRecommendedCourseModal">
                             <i class="fas fa-plus"></i> Create New</button>
                     </div>
                 </div>
-                {{-- @include('users.admin.academicResources.recommendedBooks.include.addNewRecommendedBookModal') --}}
+                @include('users.admin.academicResources.recommendedCourses.include.addNewRecommendedCourseModal')
             @endif
 
             <div class="individual-review-card-container row">
@@ -87,8 +87,8 @@
                                                     @foreach ($data['recommendedCourses'] as $course)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
-                                                            {{-- <td class="text-start">
-                                                                {{ $book->title }}
+                                                            <td class="text-start">
+                                                                {{ $course->title }}
                                                             </td>
                                                             <td class="">
                                                                 @php
@@ -97,10 +97,10 @@
                                                                         tenant()->id .
                                                                         '/uploads/academicResources/recommendedCourses';
 
-                                                                    $coverImageRelativePath = $book->cover_image
+                                                                    $coverImageRelativePath = $course->cover_image
                                                                         ? $coverImageDirectory .
                                                                             '/' .
-                                                                            $book->cover_image
+                                                                            $course->cover_image
                                                                         : null;
 
                                                                     $coverImageUrl = $coverImageRelativePath
@@ -116,18 +116,18 @@
 
                                                                 @if ($coverImageExists)
                                                                     <img src="{{ $coverImageUrl }}"
-                                                                        alt="{{ $book->title }} cover"
+                                                                        alt="{{ $course->title }} cover"
                                                                         class="recommended-book-thumbnail"
                                                                         data-image-url="{{ $coverImageUrl }}"
-                                                                        data-image-title="{{ $book->title }}"
+                                                                        data-image-title="{{ $course->title }}"
                                                                         onclick="openImageModal(this)">
                                                                 @else
                                                                     <span class="text-muted">No cover image</span>
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                @if ($book->tags)
-                                                                    @foreach ($book->tags as $tag)
+                                                                @if ($course->tags)
+                                                                    @foreach ($course->tags as $tag)
                                                                         <a
                                                                             href="{{ route('recommendedCoursesWihTag', ['slug' => $tag->slug]) }}"
                                                                             >
@@ -139,16 +139,17 @@
                                                                     @endforeach
                                                                 @endif
                                                             </td>
+
                                                             <td>
-                                                                @if($book->is_published == true)
+                                                                @if($course->is_published == true)
                                                                 <span class="badge bg-success-subtle text-success">Published</span>
                                                                 @else
                                                                 <span class="badge bg-danger-subtle text-danger">Not-Published</span>
                                                                 @endif
-                                                            </td> --}}
+                                                            </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    {{-- href="{{ route('viewRecommendedBook', ['slug' => $book->slug]) }}" --}}
+                                                                    href="{{ route('viewRecommendedCourse', ['slug' => $course->slug]) }}"
                                                                     >View</a>
                                                             </td>
                                                         </tr>

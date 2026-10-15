@@ -82,7 +82,8 @@
                                                                 </span>
                                                                 <a href="javascript:void(0)"
                                                                     class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm m-1"
-                                                                    data-toggle="modal" {{-- data-url="{{ route('removeBookTag', ['slug' => $tag->slug]) }}" --}}
+                                                                    data-toggle="modal" 
+                                                                    data-url="{{ route('removeCourseTag', ['slug' => $tag->slug]) }}"
                                                                     style="cursor: pointer;">
                                                                     <i class="fas fa-trash me-1"></i>Remove
                                                                 </a>

@@ -4,10 +4,10 @@ namespace App\Models\AcademicResources;
 
 use App\Models\AcademicResources\RecommendedCourse;
 use App\Models\AcademicResources\TagsForRecommendedCourses;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class RecommendedCourseTag extends Model
+class RecommendedCourseTag extends Pivot
 {
     protected $table = 'recommended_course_tags';
     protected $fillable = [

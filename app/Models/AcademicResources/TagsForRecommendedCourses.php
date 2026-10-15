@@ -49,8 +49,10 @@ class TagsForRecommendedCourses extends Model
         return $this->belongsToMany(
             RecommendedCourse::class,
             'recommended_course_tags',
-            'recommended_course_id',
-            'tag_for_course_id'
-        )->withTimestamps();
+            'tag_for_course_id',        // Foreign key on pivot for this model
+            'recommended_course_id'     // Related key on pivot for RecommendedCourse
+        )
+            ->using(RecommendedCourseTag::class)
+            ->withTimestamps();
     }
 }
