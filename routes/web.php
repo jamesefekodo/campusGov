@@ -313,11 +313,17 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/past_questions/view/{uuid}', [PastQuestionController::class, 'memberViewPastQuestion'])->name('memberViewPastQuestion');
 
     // recommended books
-
     Route::get('member/academic_resources/recommended_books', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooks');
     Route::get('member/academic_resources/recommended_books/search', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooksSearch');
     Route::get('member/academic_resources/recommended_books/filter/tag/{slug}', [RecommendedBooksController::class, 'memberRecommendedBooks'])->name('memberRecommendedBooksFilter');
     Route::get('member/academic_resources/recommended_books/view/{slug}', [RecommendedBooksController::class, 'memberViewRecommendedBook'])->name('memberViewRecommendedBook');
+
+
+    // recommended courses
+    Route::get('member/academic_resources/recommended_courses', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCourses');
+    Route::get('member/academic_resources/recommended_courses/search', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCoursesSearch');
+    Route::get('member/academic_resources/recommended_courses/filter/tag/{slug}', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCoursesFilter');
+    Route::get('member/academic_resources/recommended_courses/view/{slug}', [RecommendedCourseController::class, 'memberViewRecommendedCourse'])->name('memberViewRecommendedCourse');
 
 });
 

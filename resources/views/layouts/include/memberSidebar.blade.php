@@ -46,12 +46,9 @@
                         </a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/academic_resources/recommended_course') ? 'sidebar-active' : '' }}
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/academic_resources/recommended_course') ? 'sidebar-active' : '' }}
                              "
-                            href="
-                            {{-- {{ route('studentRecommendedCourses') }} --}}
-                             ">Recommended
-                            Courses</a>
+                            href="{{ route('memberRecommendedCourses') }}">Recommended Courses</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'student/academic_resources/engineering_tech_bodies') ? 'sidebar-active' : '' }}

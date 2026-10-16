@@ -358,4 +358,81 @@ class RecommendedCourseController extends Controller
         $course->delete();
         return redirect()->route('recommendedCourses')->with('success', 'Done!');
     }
+
+
+
+    // member view
+    public function memberRecommendedCourses(Request $request){
+          $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $recommendedCourses = '';
+        $totalRecommendedCourses = 0;
+        $courseTags = TagsForRecommendedCourses::orderBy('name')->get();
+
+
+        if (Route::currentRouteName() == 'memberRecommendedCoursesSearch') {
+            $searchKey = $request->input('searchKey');
+            $recommendedCourses = RecommendedCourse::when($searchKey, function ($query) use ($searchKey) {
+                $query->where(function ($q) use ($searchKey) {
+                    $q->where('created_by', 'like', "%{$searchKey}%")
+                        ->orWhere('title', 'like', "%{$searchKey}%")
+                        ->orWhere('description', 'like', "%{$searchKey}%");
+                });
+            })
+                ->orderByDesc('updated_at')->paginate(20)->withQueryString();
+
+            $totalRecommendedCourses = $recommendedCourses->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } elseif (Route::currentRouteName() == 'memberRecommendedCoursesFilter') {
+            $tag = TagsForRecommendedCourses::where(
+                'slug',
+                $request->slug
+            )->first();
+
+            if (!$tag) {
+                return redirect()
+                    ->back()
+                    ->with('error', 'Tag not found!');
+            }
+
+            $recommendedCourses = $tag->recommendedCourses()
+            ->where('is_published', true)
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalRecommendedCourses = $recommendedCourses->total();
+            $requestType = 'with_tag';
+            $pageTitle = 'Courses with the tag :: ' . $tag->name;
+        } else {
+            $recommendedCourses = RecommendedCourse::where('is_published', true)
+                ->orderByDesc('updated_at')
+                ->paginate(20);
+            $totalRecommendedCourses = RecommendedCourse::where('is_published', true)->count();
+            $requestType = 'all';
+            $pageTitle = 'Recommended Courses';
+        }
+        $data = [
+            'recommendedCourses' => $recommendedCourses,
+            'totalRecommendedCourses' => $totalRecommendedCourses,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+            'courseTags' => $courseTags,
+        ];
+
+        return view('users.member.academicResources.recommendedCourses.recommendedCourses', compact('data'));
+    }
+    public function memberViewRecommendedCourse($slug){
+         $recommendedCourse = RecommendedCourse::where('is_published', true)->where('slug', $slug)->first();
+        if (!$recommendedCourse) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+        $data = [
+            'course' => $recommendedCourse,
+        ];
+        return view('users.member.academicResources.recommendedCourses.viewRecommendedCourses', compact('data'));
+    }
 }
