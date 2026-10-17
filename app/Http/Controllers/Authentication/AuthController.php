@@ -185,19 +185,10 @@ class AuthController extends Controller
 
         if (Auth::attempt(['username' => $request->login_id, 'password' => $request->password]) || Auth::attempt(['email' => $request->login_id, 'password' => $request->password],)) {
             $user = Auth::user();
-            $currentSessionId = Session::getId();
-            $now = Carbon::now();
-            $ipAddress = $request->ip();
-            $userAgent = $request->header('User-Agent');
-
-            // Determine device type
-            if (preg_match('/Mobile|Android|iP(hone|od|ad)|Opera Mini/i', $userAgent)) {
-                $deviceType = 'Mobile';
-            } elseif (preg_match('/Tablet|iPad/i', $userAgent)) {
-                $deviceType = 'Tablet';
-            } else {
-                $deviceType = 'Desktop';
-            }
+            // $currentSessionId = Session::getId();
+            // $now = Carbon::now();
+            // $ipAddress = $request->ip();
+            // $userAgent = $request->header('User-Agent');
 
             if ($user) {
                 if ($user->require_login_mfa == 1) {
