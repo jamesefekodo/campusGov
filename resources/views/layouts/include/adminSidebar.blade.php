@@ -148,7 +148,7 @@
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('administratorsHome') }} --}}
+                            {{ route('industryAffiliates') }}
                              ">Ecosystem
                             & Industry Affiliates</a>
                     </li>

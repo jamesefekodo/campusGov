@@ -345,6 +345,9 @@ class AuthController extends Controller
     public function verifyUserEmail()
     {
         $user = Auth::user();
+        if (!$user) {
+            return redirect('/')->with('error', 'Please login first!');
+        }
         if (
             $user->email_verification !== true
         ) {

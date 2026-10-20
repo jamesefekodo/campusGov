@@ -347,7 +347,7 @@ class AuthenticationMiddleware
             $applicableToUserColumn = null;
 
             // Determine the applicable column based on account type or admin privilege
-            if (in_array($user->account_type, [0, 1]) || $user->admin_privilege) {
+            if (in_array($user->account_type, [0, 1, 90]) || $user->admin_privilege) {
                 $applicableToUserColumn = 'applicable_to_administrator';
             } elseif ($user->account_type == 2) {
                 $applicableToUserColumn = 'applicable_to_member';
