@@ -146,7 +146,7 @@
                         </li>
                     @endif
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/users/administrators') ? 'sidebar-active' : '' }}"
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/academic_resources/industry_affiliates') ? 'sidebar-active' : '' }}"
                             href="
                             {{ route('industryAffiliates') }}
                              ">Ecosystem

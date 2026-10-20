@@ -325,6 +325,10 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/recommended_courses/filter/tag/{slug}', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCoursesFilter');
     Route::get('member/academic_resources/recommended_courses/view/{slug}', [RecommendedCourseController::class, 'memberViewRecommendedCourse'])->name('memberViewRecommendedCourse');
 
+    // industry affiliates
+    Route::get('member/academic_resources/industry_affiliates', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('industryAffiliates');
+    
+
 });
 
 
