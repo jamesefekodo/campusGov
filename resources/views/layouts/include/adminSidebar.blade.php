@@ -145,13 +145,15 @@
                                 Books</a>
                         </li>
                     @endif
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/academic_resources/industry_affiliates') ? 'sidebar-active' : '' }}"
-                            href="
+                    @if (Auth::user()->hasPermission('archive.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/academic_resources/industry_affiliates') ? 'sidebar-active' : '' }}"
+                                href="
                             {{ route('industryAffiliates') }}
                              ">Ecosystem
-                            & Industry Affiliates</a>
-                    </li>
+                                & Industry Affiliates</a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->

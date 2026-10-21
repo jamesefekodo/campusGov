@@ -2,6 +2,7 @@
 
 namespace App\Models\AcademicResources;
 
+use App\Models\AcademicResources\IndustryAffiliate;
 use App\Models\Tenancy\Tenant;
 use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,10 +44,10 @@ class TagsForIndustryAffiliate extends Model
     /**
      * Publications using this tag.
      */
-    public function recommendedBooks(): BelongsToMany
+    public function industryAffiliates(): BelongsToMany
     {
         return $this->belongsToMany(
-            RecommendedBook::class,
+            IndustryAffiliate::class,
             'recommended_course_tags',
             'tag_for_course_id',
             'recommended_course_id'
