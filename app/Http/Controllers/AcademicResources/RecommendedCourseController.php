@@ -13,8 +13,9 @@ use Illuminate\Support\Str;
 
 class RecommendedCourseController extends Controller
 {
-    public function recommendedCourses(Request $request){
-           /** @var \App\Models\User $user */
+    public function recommendedCourses(Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -82,8 +83,9 @@ class RecommendedCourseController extends Controller
 
         return view('users.admin.academicResources.recommendedCourses.recommendedCourses', compact('data'));
     }
-    public function recommendedCourseTags(){
-         /** @var \App\Models\User $user */
+    public function recommendedCourseTags()
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -98,8 +100,9 @@ class RecommendedCourseController extends Controller
 
         return view('users.admin.academicResources.recommendedCourses.courseTags', compact('data'));
     }
-    public function addNewCourseTagSubmit(Request $request){
-           /** @var \App\Models\User $user */
+    public function addNewCourseTagSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -107,7 +110,7 @@ class RecommendedCourseController extends Controller
             403
         );
 
-         request()->validate([
+        request()->validate([
             'name' => 'required|string',
         ]);
 
@@ -116,8 +119,9 @@ class RecommendedCourseController extends Controller
         $tag->save();
         return redirect()->back()->with('success', 'Done!');
     }
-    public function editCourseTagSubmit($slug, Request $request){
-      /** @var \App\Models\User $user */
+    public function editCourseTagSubmit($slug, Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -125,7 +129,7 @@ class RecommendedCourseController extends Controller
             403
         );
 
-         request()->validate([
+        request()->validate([
             'name' => 'required|string',
         ]);
 
@@ -159,8 +163,9 @@ class RecommendedCourseController extends Controller
 
         return redirect()->back()->with('success', 'Done!');
     }
-    public function addNewRecommendedCourseSubmit(Request $request){
-          /** @var \App\Models\User $user */
+    public function addNewRecommendedCourseSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -229,8 +234,9 @@ class RecommendedCourseController extends Controller
         }
         return redirect()->back()->with('success', 'Done!');
     }
-    public function viewRecommendedCourse($slug){
-         /** @var \App\Models\User $user */
+    public function viewRecommendedCourse($slug)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -253,8 +259,9 @@ class RecommendedCourseController extends Controller
 
         return view('users.admin.academicResources.recommendedCourses.viewRecommendedCourses', compact('data'));
     }
-    public function updateRecommendedCoursesubmit($slug, Request $request){
-         /** @var \App\Models\User $user */
+    public function updateRecommendedCoursesubmit($slug, Request $request)
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -324,7 +331,8 @@ class RecommendedCourseController extends Controller
         }
         return redirect()->back()->with('success', 'Done!');
     }
-    public function deleteRecommendedCourse($slug){
+    public function deleteRecommendedCourse($slug)
+    {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
@@ -337,7 +345,7 @@ class RecommendedCourseController extends Controller
             return redirect()->back()->with('error', 'No records found!');
         }
         // Check if the course has a cover image attribute
-        $coverImageName = $book->cover_image ?? null;
+        $coverImageName = $course->cover_image ?? null;
 
         if ($coverImageName) {
             // Build the full public path to the image
@@ -362,8 +370,9 @@ class RecommendedCourseController extends Controller
 
 
     // member view
-    public function memberRecommendedCourses(Request $request){
-          $requestType = '';
+    public function memberRecommendedCourses(Request $request)
+    {
+        $requestType = '';
         $searchKey = '';
         $pageTitle = '';
         $recommendedCourses = '';
@@ -373,14 +382,17 @@ class RecommendedCourseController extends Controller
 
         if (Route::currentRouteName() == 'memberRecommendedCoursesSearch') {
             $searchKey = $request->input('searchKey');
-            $recommendedCourses = RecommendedCourse::when($searchKey, function ($query) use ($searchKey) {
-                $query->where(function ($q) use ($searchKey) {
-                    $q->where('created_by', 'like', "%{$searchKey}%")
-                        ->orWhere('title', 'like', "%{$searchKey}%")
-                        ->orWhere('description', 'like', "%{$searchKey}%");
-                });
-            })
-                ->orderByDesc('updated_at')->paginate(20)->withQueryString();
+            $recommendedCourses = RecommendedCourse::where('is_published', true)
+                ->when($searchKey, function ($query) use ($searchKey) {
+                    $query->where(function ($q) use ($searchKey) {
+                        $q->where('created_by', 'like', "%{$searchKey}%")
+                            ->orWhere('title', 'like', "%{$searchKey}%")
+                            ->orWhere('description', 'like', "%{$searchKey}%");
+                    });
+                })
+                ->orderByDesc('updated_at')
+                ->paginate(20)
+                ->withQueryString();
 
             $totalRecommendedCourses = $recommendedCourses->total();
             $requestType = 'search';
@@ -398,7 +410,7 @@ class RecommendedCourseController extends Controller
             }
 
             $recommendedCourses = $tag->recommendedCourses()
-            ->where('is_published', true)
+                ->where('is_published', true)
                 ->paginate(20)
                 ->withQueryString();
 
@@ -424,8 +436,9 @@ class RecommendedCourseController extends Controller
 
         return view('users.member.academicResources.recommendedCourses.recommendedCourses', compact('data'));
     }
-    public function memberViewRecommendedCourse($slug){
-         $recommendedCourse = RecommendedCourse::where('is_published', true)->where('slug', $slug)->first();
+    public function memberViewRecommendedCourse($slug)
+    {
+        $recommendedCourse = RecommendedCourse::where('is_published', true)->where('slug', $slug)->first();
         if (!$recommendedCourse) {
             return redirect()->back()->with('error', 'No records found!');
         }

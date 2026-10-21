@@ -82,6 +82,8 @@ Route::get('/sharing/media_publication/{uuid}', [SharingController::class, 'shar
 Route::get('/sharing/past_questions/{uuid}', [SharingController::class, 'sharePastQuestion'])->name('sharePastQuestion');
 Route::get('/sharing/recommended_books/{slug}', [SharingController::class, 'sharedRecommendedBook'])->name('sharedRecommendedBook');
 Route::get('/sharing/recommended_courses/{slug}', [SharingController::class, 'sharedRecommendedCourse'])->name('sharedRecommendedCourse');
+Route::get('/sharing/industry_affiliate/{slug}', [SharingController::class, 'sharedIndustryAffiliate'])->name('sharedIndustryAffiliate');
+
 
 
 
@@ -324,8 +326,15 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/recommended_courses', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCourses');
     Route::get('member/academic_resources/recommended_courses/search', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCoursesSearch');
     Route::get('member/academic_resources/recommended_courses/filter/tag/{slug}', [RecommendedCourseController::class, 'memberRecommendedCourses'])->name('memberRecommendedCoursesFilter');
-    Route::get('member/academic_resources/recommended_courses/view/{slug}', [RecommendedCourseController::class, 'memberViewRecommendedCourse'])->name('memberViewRecommendedCourse');    
+    Route::get('member/academic_resources/recommended_courses/view/{slug}', [RecommendedCourseController::class, 'memberViewRecommendedCourse'])->name('memberViewRecommendedCourse');
 
+    // member Industry Affiliates
+       Route::get('member/academic_resources/industry_affiliates', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliates');
+    Route::get('member/academic_resources/industry_affiliates/search', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliatesSearch');
+    Route::get('member/academic_resources/industry_affiliates/filter/tag/{slug}', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliatesFilter');
+    Route::get('member/academic_resources/industry_affiliates/view/{slug}', [IndustryAffiliationController::class, 'memberViewIndustryAffiliate'])->name('memberViewIndustryAffiliate');
+
+    
 });
 
 
@@ -800,6 +809,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/academic_resources/industry_affiliates', [IndustryAffiliationController::class, 'industryAffiliates'])->name('industryAffiliates');
     Route::get('admin/academic_resources/industry_affiliates/search', [IndustryAffiliationController::class, 'industryAffiliates'])->name('industryAffiliatesSearch');
     Route::get('admin/academic_resources/industry_affiliates/tag/{slug}', [IndustryAffiliationController::class, 'industryAffiliates'])->name('industryAffiliatesWihTag');
+    Route::post('admin/academic_resources/industry_affiliates/add_new', [IndustryAffiliationController::class, 'addNewIndustryAffiliateSubmit'])->name('addNewIndustryAffiliateSubmit');
+    Route::get('admin/academic_resources/industry_affiliates/view/{slug}', [IndustryAffiliationController::class, 'viewIndustryAffiliates'])->name('viewIndustryAffiliates');
+    Route::put('admin/academic_resources/industry_affiliates/edit/submit/{slug}', [IndustryAffiliationController::class, 'updateIndustryAffiliateSubmit'])->name('updateIndustryAffiliateSubmit');
+    Route::get('admin/academic_resources/industry_affiliates/delete/{slug}', [IndustryAffiliationController::class, 'deleteIndustryAffiliate'])->name('deleteIndustryAffiliate');
+
 
     Route::get('admin/academic_resources/industry_affiliate/tag', [IndustryAffiliationController::class, 'industryAffiliatesTags'])->name('industryAffiliatesTags');
     Route::post('admin/academic_resources/industry_affiliate/tag/add_new/submit', [IndustryAffiliationController::class, 'addNewIndAffiliateSubmit'])->name('addNewIndAffiliateSubmit');
@@ -807,5 +821,5 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/academic_resources/industry_affiliate/tag/{slug}/delete/submit', [IndustryAffiliationController::class, 'removeIndustryAffiliatesTag'])->name('removeIndustryAffiliatesTag');
 
 
-    
+
 });

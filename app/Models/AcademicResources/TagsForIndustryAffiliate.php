@@ -48,9 +48,11 @@ class TagsForIndustryAffiliate extends Model
     {
         return $this->belongsToMany(
             IndustryAffiliate::class,
-            'recommended_course_tags',
-            'tag_for_course_id',
-            'recommended_course_id'
-        )->withTimestamps();
+            'industry_affiliate_tags',
+            'tag_for_industry_id',
+            'industry_affiliate_id'
+        )
+            ->using(IndustryAffiliateTag::class)
+            ->withTimestamps();
     }
 }

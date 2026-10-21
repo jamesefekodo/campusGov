@@ -49,13 +49,14 @@ class IndustryAffiliate extends Model
             'username'
         );
     }
+
     public function tags(): BelongsToMany
     {
         return $this->belongsToMany(
             TagsForIndustryAffiliate::class,
-            'recommended_course_tags',
-            'recommended_course_id',
-            'tag_for_course_id'
+            'industry_affiliate_tags',
+            'industry_affiliate_id',
+            'tag_for_industry_id'
         )
             ->using(IndustryAffiliateTag::class)
             ->withTimestamps();

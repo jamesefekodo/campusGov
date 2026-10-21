@@ -83,7 +83,7 @@
                                                                 <a href="javascript:void(0)"
                                                                     class="badge bg-red text-white pe-2 ps-3 py-2 rounded-3 delete-confirm m-1"
                                                                     data-toggle="modal"
-                                                                    {{-- data-url="{{ route('removeIndustryAffiliatesTag', ['slug' => $tag->slug]) }}" --}}
+                                                                    data-url="{{ route('removeIndustryAffiliatesTag', ['slug' => $tag->slug]) }}"
                                                                     style="cursor: pointer;">
                                                                     <i class="fas fa-trash me-1"></i>Remove
                                                                 </a>
@@ -130,7 +130,7 @@
 
                                         @if ($data['industryTags']->isNotEmpty())
                                             @foreach ($data['industryTags'] as $tag)
-                                                @include('users.admin.academicResources.industryAffiliates.include.editIndustryAffiliateModal')
+                                                @include('users.admin.academicResources.industryAffiliates.include.editIndustryAffiliateModalTag')
                                             @endforeach
                                         @endif
                                         {{-- Pagination --}}

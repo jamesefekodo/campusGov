@@ -51,12 +51,11 @@
                             href="{{ route('memberRecommendedCourses') }}">Recommended Courses</a>
                     </li>
                     <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'student/academic_resources/engineering_tech_bodies') ? 'sidebar-active' : '' }}
-                             "
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'member/academic_resources/industry_affiliates') ? 'sidebar-active' : '' }}"
                             href="
-                            {{-- {{ route('studentEngineeringTechBodies') }} --}}
-                             ">Engineering
-                            & Tech Bodies</a>
+                            {{ route('memberIndustryAffiliates') }}
+                             ">Ecosystem
+                            & Industry Affiliates</a>
                     </li>
                 </ul>
             </div>

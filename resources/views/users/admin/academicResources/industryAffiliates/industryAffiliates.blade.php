@@ -11,11 +11,11 @@
                 <div class="d-flex justify-content-end me-3">
                     <div class="m-1">
                         <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                            data-target="#addNewRecommendedCourseModal">
+                            data-target="#addNewIndustryAffiliateModal">
                             <i class="fas fa-plus"></i> Create New</button>
                     </div>
                 </div>
-                {{-- @include('users.admin.academicResources.industryAffiliates.include.addNewRecommendedCourseModal') --}}
+                @include('users.admin.academicResources.industryAffiliates.include.addNewIndustryAffiliateModal')
             @endif
 
             <div class="individual-review-card-container row">
@@ -84,23 +84,23 @@
                                                 </tr>
                                             @else
                                                 <tbody>
-                                                    @foreach ($data['industryAffiliates'] as $course)
+                                                    @foreach ($data['industryAffiliates'] as $affiliate)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="text-start">
-                                                                {{ $course->title }}
+                                                                {{ $affiliate->title }}
                                                             </td>
                                                             <td class="">
                                                                 @php
                                                                     $coverImageDirectory =
                                                                         'assets/tenant_' .
                                                                         tenant()->id .
-                                                                        '/uploads/academicResources/industryAffiliates';
+                                                                        '/uploads/academicResources/industryAffilate';
 
-                                                                    $coverImageRelativePath = $course->cover_image
+                                                                    $coverImageRelativePath = $affiliate->cover_image
                                                                         ? $coverImageDirectory .
                                                                             '/' .
-                                                                            $course->cover_image
+                                                                            $affiliate->cover_image
                                                                         : null;
 
                                                                     $coverImageUrl = $coverImageRelativePath
@@ -116,21 +116,20 @@
 
                                                                 @if ($coverImageExists)
                                                                     <img src="{{ $coverImageUrl }}"
-                                                                        alt="{{ $course->title }} cover"
+                                                                        alt="{{ $affiliate->title }} cover"
                                                                         class="recommended-book-thumbnail"
                                                                         data-image-url="{{ $coverImageUrl }}"
-                                                                        data-image-title="{{ $course->title }}"
+                                                                        data-image-title="{{ $affiliate->title }}"
                                                                         onclick="openImageModal(this)">
                                                                 @else
                                                                     <span class="text-muted">No cover image</span>
                                                                 @endif
                                                             </td>
                                                             <td>
-                                                                @if ($course->tags)
-                                                                    @foreach ($course->tags as $tag)
+                                                                @if ($affiliate->tags)
+                                                                    @foreach ($affiliate->tags as $tag)
                                                                         <a
-                                                                            href="{{ route('industryAffiliatesWihTag', ['slug' => $tag->slug]) }}"
-                                                                            >
+                                                                            href="{{ route('industryAffiliatesWihTag', ['slug' => $tag->slug]) }}">
                                                                             <span
                                                                                 class="badge rounded-pill bg-secondary text-white px-2 py-1 m-1 shadow-sm">
                                                                                 {{ $tag->name }}
@@ -141,16 +140,17 @@
                                                             </td>
 
                                                             <td>
-                                                                @if($course->is_published == true)
-                                                                <span class="badge bg-success-subtle text-success">Published</span>
+                                                                @if ($affiliate->is_published == true)
+                                                                    <span
+                                                                        class="badge bg-success-subtle text-success">Published</span>
                                                                 @else
-                                                                <span class="badge bg-danger-subtle text-danger">Not-Published</span>
+                                                                    <span
+                                                                        class="badge bg-danger-subtle text-danger">Not-Published</span>
                                                                 @endif
                                                             </td>
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewRecommendedCourse', ['slug' => $course->slug]) }}"
-                                                                    >View</a>
+                                                                    href="{{ route('viewIndustryAffiliates', ['slug' => $affiliate->slug]) }}">View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
