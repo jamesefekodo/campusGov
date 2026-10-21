@@ -4,6 +4,7 @@ use App\Http\Controllers\AcademicResources\IndustryAffiliationController;
 use App\Http\Controllers\AcademicResources\PastQuestionController;
 use App\Http\Controllers\AcademicResources\RecommendedBooksController;
 use App\Http\Controllers\AcademicResources\RecommendedCourseController;
+use App\Http\Controllers\Archive\ArchiveController;
 use App\Http\Controllers\Authentication\AuthController;
 use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
@@ -83,6 +84,7 @@ Route::get('/sharing/past_questions/{uuid}', [SharingController::class, 'sharePa
 Route::get('/sharing/recommended_books/{slug}', [SharingController::class, 'sharedRecommendedBook'])->name('sharedRecommendedBook');
 Route::get('/sharing/recommended_courses/{slug}', [SharingController::class, 'sharedRecommendedCourse'])->name('sharedRecommendedCourse');
 Route::get('/sharing/industry_affiliate/{slug}', [SharingController::class, 'sharedIndustryAffiliate'])->name('sharedIndustryAffiliate');
+Route::get('/sharing/archive_file/{uuid}', [SharingController::class, 'sharedArchiveFile'])->name('sharedArchiveFile');
 
 
 
@@ -334,7 +336,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/industry_affiliates/filter/tag/{slug}', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliatesFilter');
     Route::get('member/academic_resources/industry_affiliates/view/{slug}', [IndustryAffiliationController::class, 'memberViewIndustryAffiliate'])->name('memberViewIndustryAffiliate');
 
-    
+
 });
 
 
@@ -820,6 +822,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_resources/industry_affiliate/tag/{slug}/edit/submit', [IndustryAffiliationController::class, 'editIndustryAffilateTagSubmit'])->name('editIndustryAffilateTagSubmit');
     Route::get('admin/academic_resources/industry_affiliate/tag/{slug}/delete/submit', [IndustryAffiliationController::class, 'removeIndustryAffiliatesTag'])->name('removeIndustryAffiliatesTag');
 
-
-
+// archive
+    Route::get('admin/archive', [ArchiveController::class, 'archive'])->name('archive');
+    Route::get('admin/archive/search', [ArchiveController::class, 'archive'])->name('archiveSearch');
+    Route::post('admin/archive/search', [ArchiveController::class, 'addNewArchiveFileSubmit'])->name('addNewArchiveFileSubmit');
+    Route::get('admin/archive/view/{uuid}', [ArchiveController::class, 'viewArchiveFile'])->name('viewArchiveFile');
+    Route::put('admin/archive/edit/submit/{uuid}', [ArchiveController::class, 'updateArchiveFileSubmit'])->name('updateArchiveFileSubmit');
+    Route::get('admin/archive/delete/{uuid}', [ArchiveController::class, 'deleteArchiveFile'])->name('deleteArchiveFile');
 });

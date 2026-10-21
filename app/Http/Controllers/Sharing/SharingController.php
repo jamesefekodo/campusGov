@@ -8,6 +8,7 @@ use App\Models\AcademicResources\PastQuestion;
 use App\Models\AcademicResources\RecommendedBook;
 use App\Models\AcademicResources\RecommendedCourse;
 use App\Models\Media\MediaPublication;
+use App\Models\Archive\ArchiveFile;
 use Illuminate\Http\Request;
 
 class SharingController extends Controller
@@ -136,6 +137,30 @@ class SharingController extends Controller
             case 'member':
                 return redirect()->route('memberViewIndustryAffiliate', [
                     'slug' => $affiliate->slug
+                ]);
+
+            default:
+                return redirect()->route('/');
+        }
+    }
+    public function sharedArchiveFile($uuid){
+          $file = ArchiveFile::where('uuid', $uuid)
+        ->first();
+
+        if (!$file) {
+            return redirect()->route('homepage')->with('error', 'Records not found!');
+        }
+
+         switch (getUserType()) {
+            case 'root':
+            case 'admin':
+                return redirect()->route('viewArchiveFile', [
+                    'uuid' => $file->uuid
+                ]);
+
+            case 'member':
+                return redirect()->route('memberViewArchiveFile', [
+                    'uuid' => $file->uuid
                 ]);
 
             default:

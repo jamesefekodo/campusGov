@@ -117,14 +117,14 @@
 
 
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
-                                            @if (Auth::user()->hasPermission('archive.update') || $data['affiliate']->created_by == Auth::user()->username)
+                                            @if (Auth::user()->hasPermission('industry_affiliate.update') || $data['affiliate']->created_by == Auth::user()->username)
                                                 <button class="btn btn-warning m-1 d-flex align-items-center"
                                                     data-toggle="modal" data-target="#editIndustryAffiliateModal">
                                                     <i class="fas fa-edit me-2"></i>
                                                     <span>Update</span>
                                                 </button>
                                             @endif
-                                            @if (Auth::user()->hasPermission('archive.delete') && $data['affiliate']->is_published !== true)
+                                            @if (Auth::user()->hasPermission('industry_affiliate.delete') && $data['affiliate']->is_published !== true)
                                                 <button class="btn btn-danger m-1 d-flex align-items-center delete-confirm "
                                                     data-toggle="modal"
                                                     data-url="{{ route('deleteIndustryAffiliate', ['slug' => $data['affiliate']->slug]) }}"

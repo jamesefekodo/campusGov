@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('created_by'); // Foreign
             $table->string('title');
             $table->text('description');
+            $table->string('file');
             $table->boolean('members_can_see')->default(false);
             $table->string('last_update_by')->nullable(); // Foreign
             $table->timestamps();

@@ -333,7 +333,7 @@
             </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/archive') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-11" aria-expanded="false"
                 aria-controls="submenu-11">
                 <span class="nav-icon">
@@ -346,12 +346,14 @@
             </a><!--//nav-link-->
             <div id="submenu-11" class="collapse submenu submenu-11" data-bs-parent="#menu-accordion">
                 <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('couponsHome') }} --}}
+                    @if (Auth::user()->hasPermission('archive.read'))
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/archive') ? 'sidebar-active' : '' }}"
+                                href="
+                            {{ route('archive') }}
                              ">Archive</a>
-                    </li>
+                        </li>
+                    @endif
                 </ul>
             </div>
         </li><!--//nav-item-->
