@@ -83,10 +83,6 @@
                                                     </th>
 
                                                     <th scope="col" class="table_header">
-                                                        Status
-                                                    </th>
-
-                                                    <th scope="col" class="table_header">
                                                         View
                                                     </th>
                                                 </tr>
@@ -151,40 +147,6 @@
                                                                 </span>
                                                             @endif
                                                         </td>
-
-                                                        <td>
-                                                            @switch($pastQuestion->approval_status)
-                                                                @case('draft')
-                                                                    <span class="badge bg-secondary-subtle text-secondary">
-                                                                        Draft
-                                                                    </span>
-                                                                @break
-
-                                                                @case('pending')
-                                                                    <span class="badge bg-warning-subtle text-warning">
-                                                                        Awaiting Approval
-                                                                    </span>
-                                                                @break
-
-                                                                @case('approved')
-                                                                    <span class="badge bg-success-subtle text-success">
-                                                                        Approved
-                                                                    </span>
-                                                                @break
-
-                                                                @case('declined')
-                                                                    <span class="badge bg-danger-subtle text-danger">
-                                                                        Declined
-                                                                    </span>
-                                                                @break
-
-                                                                @default
-                                                                    <span class="badge bg-danger-subtle text-danger">
-                                                                        {{ ucfirst($pastQuestion->approval_status) }}
-                                                                    </span>
-                                                            @endswitch
-                                                        </td>
-
                                                         <td>
                                                             <a class="btn btn-primary btn-sm"
                                                                 href="{{ route('memberViewPastQuestion', ['uuid' => $pastQuestion->uuid]) }}">
@@ -196,7 +158,7 @@
                                                     </tr>
                                                     @empty
                                                         <tr>
-                                                            <td colspan="9" class="text-center">
+                                                            <td colspan="8" class="text-center">
                                                                 <h3 class="p-1 m-1 text-red">
                                                                     No Past Questions Found!
                                                                 </h3>
