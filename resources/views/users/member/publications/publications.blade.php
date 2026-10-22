@@ -253,13 +253,13 @@
                                                 </div>
 
                                                 {{-- Publication status --}}
-                                                @if ($publication->published_at)
+                                                {{-- @if ($publication->published_at)
                                                     <span
                                                         class="badge bg-success position-absolute top-0 end-0 m-3 shadow-sm">
                                                         <i class="fas fa-circle-check me-1"></i>
                                                         Published
                                                     </span>
-                                                @endif
+                                                @endif --}}
                                             </div>
 
                                             <div class="card-body d-flex flex-column p-4">
@@ -281,7 +281,7 @@
 
                                                         <small class="text-muted">
                                                             <i class="fas fa-share-nodes me-1 text-primary"></i>
-                                                            {{ number_format($publication->views ?? 0) }}
+                                                            {{ number_format($publication->shares ?? 0) }}
                                                         </small>
 
                                                     </div>

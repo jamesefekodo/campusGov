@@ -25,21 +25,68 @@
                                                 )
                                                 : null;
                                             $hasCoverImage = $coverPath && file_exists($coverPath);
+
+                                            $coverUrl = $coverImage
+                                                ? asset(
+                                                    'assets/tenant_' .
+                                                        tenantId() .
+                                                        '/uploads/media/publications/' .
+                                                        $coverImage,
+                                                )
+                                                : null;
                                         @endphp
 
-                                        <div class="publication-cover-wrapper mb-4">
+                                        <div class="mb-4 rounded overflow-hidden bg-light text-center">
                                             @if ($hasCoverImage)
-                                                <img src="{{ asset('assets/tenant_' . tenantId() . '/uploads/media/publications/' . $coverImage) }}"
+                                                <img src="{{ $coverUrl }}"
                                                     alt="{{ $data['publication']->header ?? 'Publication cover image' }}"
-                                                    class="publication-cover-image" loading="lazy">
+                                                    class="img-fluid publication-cover-preview" loading="lazy"
+                                                    data-bs-toggle="modal" data-bs-target="#publicationCoverModal">
                                             @else
-                                                <div class="publication-cover-placeholder">
-                                                    <i class="fas fa-image"></i>
-                                                    <span>No cover image available</span>
+                                                <div
+                                                    class="ratio ratio-16x9 d-flex flex-column align-items-center justify-content-center text-secondary">
+                                                    <i class="fas fa-image fs-2"></i>
+                                                    <span class="small">No cover image available</span>
                                                 </div>
                                             @endif
                                         </div>
 
+                                        @if ($hasCoverImage)
+                                            <div class="modal fade" id="publicationCoverModal" tabindex="-1"
+                                                aria-labelledby="publicationCoverModalLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-xl modal-dialog-centered">
+                                                    <div class="modal-content bg-transparent border-0">
+                                                        <div class="modal-header border-0">
+                                                            <h5 class="modal-title text-white"
+                                                                id="publicationCoverModalLabel">
+                                                                {{ $data['publication']->title }}
+                                                            </h5>
+                                                            <button type="button" class="btn-close btn-close-white"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+
+                                                        <div class="modal-body p-0 text-center">
+                                                            <img src="{{ $coverUrl }}"
+                                                                alt="{{ $data['publication']->header ?? 'Publication cover image' }}"
+                                                                class="img-fluid rounded shadow">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <style>
+                                            .publication-cover-preview {
+                                                cursor: zoom-in;
+                                                max-height: 420px;
+                                                object-fit: contain;
+                                            }
+
+                                            @media (max-width: 576px) {
+                                                .publication-cover-preview {
+                                                    max-height: 260px;
+                                                }
+                                            }
+                                        </style>
                                         <div class="col-md-12 row px-3">
                                             <div class="col-md-12 p-1">
                                                 <span class="text-black">

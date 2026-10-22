@@ -2255,8 +2255,7 @@ body.modal-open {
 .publication-cover-wrapper {
     width: 100%;
     max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline: auto;
     border-radius: 12px;
     overflow: hidden;
     background: #f1f3f5;
@@ -2264,13 +2263,14 @@ body.modal-open {
 }
 
 .publication-cover-image {
+    display: block;
     width: 100%;
+    max-width: 100%;
     height: auto;
     max-height: 550px;
     object-fit: contain;
-    background-color: #fff; 
-    display: block;
-    margin: 0 auto;
+    background-color: #fff;
+    margin-inline: auto;
 }
 
 .publication-cover-placeholder {
@@ -2300,8 +2300,14 @@ body.modal-open {
 }
 
 @media (max-width: 576px) {
+    .publication-cover-wrapper {
+        aspect-ratio: 16 / 9;
+    }
+
     .publication-cover-image {
-        max-height: 260px;
+        height: 100%;
+        max-height: none;
+        object-fit: cover;
     }
 }
 
