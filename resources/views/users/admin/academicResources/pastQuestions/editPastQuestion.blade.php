@@ -101,7 +101,7 @@
                                                             <p class="text-danger">{{ $errors->first('department') }}</p>
                                                         </div>
                                                         <div class="form-group col-md-4">
-                                                            <label for="academic_year">Admission Session<span
+                                                            <label for="academic_year">Academic Session<span
                                                                     class="text-red">*</span>:</label>
                                                             <select name="academic_year" class="form-control" required>
                                                                 <option value="" disabled selected>Select</option>

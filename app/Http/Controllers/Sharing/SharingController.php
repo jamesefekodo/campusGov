@@ -64,7 +64,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('/');
+                return redirect()->route('homepage');
         }
     }
 
@@ -90,7 +90,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('/');
+                return redirect()->route('homepage');
         }
     }
     public function sharedRecommendedCourse($slug){
@@ -115,7 +115,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('/');
+                return redirect()->route('homepage');
         }
     }
     public function sharedIndustryAffiliate($slug){
@@ -140,7 +140,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('/');
+                return redirect()->route('homepage');
         }
     }
     public function sharedArchiveFile($uuid){
@@ -164,7 +164,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('/');
+                return redirect()->route('homepage');
         }
     }
 }

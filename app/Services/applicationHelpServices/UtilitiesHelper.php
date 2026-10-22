@@ -1104,7 +1104,16 @@ if (!function_exists('emailSafeLogo')) {
         }
 
         $outputPath = $outputDir . '/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png';
-        imagepng($flattened, $outputPath);
+        // imagepng($flattened, $outputPath);
+        if (!imagepng($flattened, $outputPath)) {
+            imagedestroy($source);
+            imagedestroy($flattened);
+
+            throw new \RuntimeException(
+                "Failed to generate email-safe logo at: {$outputPath}"
+            );
+        }
+
 
         imagedestroy($source);
         imagedestroy($flattened);

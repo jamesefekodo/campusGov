@@ -49,9 +49,6 @@
                                                         Description
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Member Access
-                                                    </th>
-                                                    <th scope="col" class="table_header">
                                                         Last Update
                                                     </th>
                                                     <th scope="col" class="table_header">
@@ -62,7 +59,7 @@
 
                                             @if ($data['archiveFiles']->isEmpty())
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="5" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -78,20 +75,6 @@
                                                             </td>
                                                             <td class="">
                                                                 {{ \Illuminate\Support\Str::words($file->description, 10, '...') }}
-                                                            </td>
-                                                            <td class="">
-                                                                @switch($file->members_can_see)
-                                                                    @case(true)
-                                                                        <span class="badge bg-warning text-black">
-                                                                            Visible to both members and administrators
-                                                                        </span>
-                                                                    @break
-
-                                                                    @default
-                                                                        <span class="badge bg-green text-white">
-                                                                            Visible to only administrators
-                                                                        </span>
-                                                                @endswitch
                                                             </td>
                                                             <td class="text-start">
                                                                 {{ \Carbon\Carbon::parse($file->updated_at)->format('l, d F, Y') }}
