@@ -32,7 +32,7 @@
                                                     @if ($data['pastQuestion']->level)
                                                         - Year {{ $data['pastQuestion']->level }}
                                                     @endif
--
+                                                    -
                                                     {{ $data['pastQuestion']->academic_year . '/' . $data['pastQuestion']->academic_year + 1 }}
                                                 </span>
                                             </div>
@@ -338,8 +338,8 @@
                 }
 
                 /*
-                                                                                 * Make the Bootstrap modal almost full screen.
-                                                                                 */
+                                                                                     * Make the Bootstrap modal almost full screen.
+                                                                                     */
                 .past-question-modal-dialog {
                     width: calc(100% - 30px);
                     max-width: 1500px;
