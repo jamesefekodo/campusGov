@@ -19,9 +19,7 @@ return new class extends Migration
             $table->string('arm_slug'); // foreign
             $table->string('position_slug'); // foreign
             $table->string('tenure_slug'); // foreign
-            $table->string('name');
-            $table->text('description');
-            $table->integer('sort_order');
+            $table->text('description')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

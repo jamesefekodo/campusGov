@@ -4,6 +4,7 @@ namespace App\Models\Leadership\StudentRepresentative;
 
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipArm;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipPosition;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
 use App\Models\Tenancy\Tenant;
 use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,9 +25,7 @@ class StudentLeadershipRepresentative extends Model
         'arm_slug',
         'position_slug',
         'tenure_slug',
-        'name',
         'description',
-        'sort_order',
         'is_active',
     ];
 
@@ -52,12 +51,30 @@ class StudentLeadershipRepresentative extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
-    public function arm()
+    public function arm(): BelongsTo
     {
-        return $this->hasMany(StudentLeadershipArm::class, 'slug', 'arm_slug');
+        return $this->belongsTo(
+            StudentLeadershipArm::class,
+            'arm_slug',
+            'slug'
+        );
     }
-    public function position()
+
+    public function position(): BelongsTo
     {
-        return $this->hasMany(StudentLeadershipPosition::class, 'position_slug', 'slug');
+        return $this->belongsTo(
+            StudentLeadershipPosition::class,
+            'position_slug',
+            'slug'
+        );
+    }
+
+    public function tenure(): BelongsTo
+    {
+        return $this->belongsTo(
+            StudentLeadershipTenure::class,
+            'tenure_slug',
+            'slug'
+        );
     }
 }

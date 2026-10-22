@@ -357,38 +357,38 @@
                 </ul>
             </div>
         </li><!--//nav-item-->
-        </li><!--//nav-item-->
-        <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
-                href="#" data-bs-toggle="collapse" data-bs-target="#submenu-12" aria-expanded="false"
-                aria-controls="submenu-12">
-                <span class="nav-icon">
-                    <i class="fas fa-users-gear"></i>
-                </span>
-                <span class="nav-link-text">Leadership</span>
-                <span class="submenu-arrow">
-                    <i class="fas fa-chevron-down"></i>
-                </span><!--//submenu-arrow-->
-            </a><!--//nav-link-->
-            <div id="submenu-12" class="collapse submenu submenu-12" data-bs-parent="#menu-accordion">
-                <ul class="submenu-list list-unstyled">
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('couponsHome') }} --}}
-                             ">Student
-                            Representatives</a>
-                    </li>
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
-                            href="
+
+        @if (Auth::user()->hasPermission('leadership.manage'))
+            <li class="nav-item has-submenu">
+                <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#submenu-12" aria-expanded="false"
+                    aria-controls="submenu-12">
+                    <span class="nav-icon">
+                        <i class="fas fa-users-gear"></i>
+                    </span>
+                    <span class="nav-link-text">Leadership</span>
+                    <span class="submenu-arrow">
+                        <i class="fas fa-chevron-down"></i>
+                    </span><!--//submenu-arrow-->
+                </a><!--//nav-link-->
+                <div id="submenu-12" class="collapse submenu submenu-12" data-bs-parent="#menu-accordion">
+                    <ul class="submenu-list list-unstyled">
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/leadership/student_reps') ? 'sidebar-active' : '' }}"
+                                href="{{ route('studentLeadership') }}">Student
+                                Representatives</a>
+                        </li>
+                        <li class="submenu-item"><a
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
+                                href="
                             {{-- {{ route('couponsHome') }} --}}
                              ">Advisory
-                            Council</a>
-                    </li>
-                </ul>
-            </div>
-        </li><!--//nav-item-->
+                                Council</a>
+                        </li>
+                    </ul>
+                </div>
+            </li><!--//nav-item-->
+        @endif
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/academic_config') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-8" aria-expanded="false"

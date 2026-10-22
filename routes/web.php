@@ -20,6 +20,7 @@ use App\Http\Controllers\Finance\InvoiceController;
 use App\Http\Controllers\Finance\PaymentSettingsController;
 use App\Http\Controllers\Finance\PaymentTransasctionController;
 use App\Http\Controllers\Frontend\FrontendController;
+use App\Http\Controllers\Leadership\LeadershipController;
 use App\Http\Controllers\Media\MediaPublicationController;
 use App\Http\Controllers\Media\SocialMediaController;
 use App\Http\Controllers\Member\MemberSelfProfileController;
@@ -338,12 +339,12 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
 
     // archive files
-    
+
     Route::get('member/archive', [ArchiveController::class, 'memberArchive'])->name('memberArchive');
     Route::get('member/archive/search', [ArchiveController::class, 'memberArchive'])->name('memberArchiveSearch');
     Route::get('member/archive/file/view/{uuid}', [ArchiveController::class, 'memberViewArchiveFile'])->name('memberViewArchiveFile');
 
-    
+
 
 });
 
@@ -837,4 +838,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/archive/file/view/{uuid}', [ArchiveController::class, 'viewArchiveFile'])->name('viewArchiveFile');
     Route::put('admin/archive/file/edit/submit/{uuid}', [ArchiveController::class, 'updateArchiveFileSubmit'])->name('updateArchiveFileSubmit');
     Route::get('admin/archive/file/delete/{uuid}', [ArchiveController::class, 'deleteArchiveFile'])->name('deleteArchiveFile');
+
+
+    // leadership
+
+    Route::get('admin/leadership/student_reps', [LeadershipController::class, 'studentLeadership'])->name('studentLeadership');
+
 });

@@ -9,6 +9,7 @@ use App\Models\Traits\BelongsToTenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class StudentLeadershipArm extends Model
@@ -47,12 +48,21 @@ class StudentLeadershipArm extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
-    public function positions()
+    public function positions(): HasMany
     {
-        return $this->hasMany(StudentLeadershipPosition::class, 'arm_slug', 'slug');
+        return $this->hasMany(
+            StudentLeadershipPosition::class,
+            'arm_slug',
+            'slug'
+        );
     }
-      public function representatives()
+
+    public function representatives(): HasMany
     {
-        return $this->hasMany(StudentLeadershipRepresentative::class, 'arm_slug', 'slug');
+        return $this->hasMany(
+            StudentLeadershipRepresentative::class,
+            'arm_slug',
+            'slug'
+        );
     }
 }
