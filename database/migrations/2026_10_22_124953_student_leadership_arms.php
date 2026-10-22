@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('student_leadership_bodies', function (Blueprint $table) {
+        Schema::create('student_leadership_arms', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('tenant_id')->nullable();
+            $table->unsignedBigInteger('tenant_id')->nullable(); // foreign
             $table->string('slug')->unique();
             $table->text('description');
             $table->integer('sort_order');
@@ -22,8 +22,6 @@ return new class extends Migration
 
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
-            $table->foreign('created_by')->references('username')->on('users')->onUpdate('cascade');
-            $table->foreign('last_update_by')->references('username')->on('users')->onUpdate('cascade');
         });
     }
 
@@ -32,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('student_leadership_bodies');
+        Schema::dropIfExists('student_leadership_arms');
     }
 };
