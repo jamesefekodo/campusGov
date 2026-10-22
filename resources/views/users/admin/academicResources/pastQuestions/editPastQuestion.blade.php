@@ -100,7 +100,7 @@
 
                                                             <p class="text-danger">{{ $errors->first('department') }}</p>
                                                         </div>
-                                                        <div class="form-group col-md-4">
+                                                        <div class="form-group col-md-3">
                                                             <label for="academic_year">Academic Session<span
                                                                     class="text-red">*</span>:</label>
                                                             <select name="academic_year" class="form-control" required>
@@ -119,7 +119,36 @@
                                                             </select>
                                                             <p style="color: red">{{ $errors->first('academic_year') }}</p>
                                                         </div>
-                                                        <div class="form-group col-md-4">
+                                                        <div class="form-group col-md-3">
+                                                            <label for="level">Level (Year)<span
+                                                                    class="text-red">*</span>:</label>
+                                                            <select name="level" class="form-control" required>
+                                                                <option value="" disabled selected>Select</option>
+
+                                                                <option value="1"
+                                                                    {{ $data['pastQuestion']->level == '1' ? 'selected' : '' }}>
+                                                                    Year 1
+                                                                </option>
+                                                                <option value="2"
+                                                                    {{ $data['pastQuestion']->level == '2' ? 'selected' : '' }}>
+                                                                    Year 2
+                                                                </option>
+                                                                <option value="3"
+                                                                    {{ $data['pastQuestion']->level == '3' ? 'selected' : '' }}>
+                                                                    Year 3
+                                                                </option>
+                                                                <option value="4"
+                                                                    {{ $data['pastQuestion']->level == '4' ? 'selected' : '' }}>
+                                                                    Year 4
+                                                                </option>
+                                                                <option value="5"
+                                                                    {{ $data['pastQuestion']->level == '5' ? 'selected' : '' }}>
+                                                                    Year 5
+                                                                </option>
+                                                            </select>
+                                                            <p style="color: red">{{ $errors->first('level') }}</p>
+                                                        </div>
+                                                        <div class="form-group col-md-2">
                                                             <label for="semester">Semester<span
                                                                     class="text-red">*</span>:</label>
                                                             <select name="semester" class="form-control" required>
@@ -179,8 +208,10 @@
                                                         <div class="form-group col-md-6">
                                                             <label for="course_title">Course Title: <span
                                                                     class="text-red">*</span></label>
-                                                            <input type="text" class="form-control" name="course_title"
-                                                                value="{{ $data['pastQuestion']->course_title }}" required>
+                                                            <input type="text" class="form-control"
+                                                                name="course_title"
+                                                                value="{{ $data['pastQuestion']->course_title }}"
+                                                                required>
                                                             <p style="color: red">{{ $errors->first('course_title') }}</p>
                                                         </div>
                                                         <div class="form-group col-md-12">
@@ -444,8 +475,8 @@
                 }
 
                 /*
-             * Existing image state
-             */
+                 * Existing image state
+                 */
                 .smart-image-upload.has-existing-image {
                     border-color: #b8d8c9;
                 }
@@ -465,8 +496,8 @@
                 }
 
                 /*
-             * Removed image state
-             */
+                 * Removed image state
+                 */
                 .image-upload-item.is-removed .smart-image-upload {
                     border-color: #dc3545;
                 }
@@ -495,8 +526,8 @@
                 }
 
                 /*
-             * Empty slot state
-             */
+                 * Empty slot state
+                 */
                 .image-upload-item[data-existing-image="false"] .image-preview-wrapper {
                     background-color: #f8fafb;
                 }
@@ -506,8 +537,8 @@
                 }
 
                 /*
-             * Error message
-             */
+                 * Error message
+                 */
                 .image-error {
                     min-height: 20px;
                     margin: 5px 0 0;
@@ -515,8 +546,8 @@
                 }
 
                 /*
-             * Animation
-             */
+                 * Animation
+                 */
                 @keyframes imageItemIn {
                     from {
                         opacity: 0;
@@ -530,8 +561,8 @@
                 }
 
                 /*
-             * Tablet and mobile
-             */
+                 * Tablet and mobile
+                 */
                 @media (max-width: 991px) {
                     .image-preview-wrapper {
                         height: 230px;
@@ -565,8 +596,8 @@
                 }
 
                 /*
-             * Accessibility / reduced motion
-             */
+                 * Accessibility / reduced motion
+                 */
                 @media (prefers-reduced-motion: reduce) {
 
                     .image-upload-item,

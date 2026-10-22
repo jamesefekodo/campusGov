@@ -43,6 +43,7 @@ class PastQuestion extends Model
         'image_5',
         'image_6',
         'created_by',
+        'level',
         'approved_by',
         'approval_status',
         'last_update',

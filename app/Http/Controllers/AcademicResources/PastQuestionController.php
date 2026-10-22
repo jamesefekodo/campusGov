@@ -287,10 +287,10 @@ class PastQuestionController extends Controller
      | and adapt this based on your User model.
      */
 
-    if ($user->tenant_id) {
-        $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
-    }
-    
+        if ($user->tenant_id) {
+            $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
+        }
+
 
         if ($selectedFaculty) {
             $pastQuestionsQuery->where('faculty', $selectedFaculty);
@@ -425,6 +425,7 @@ class PastQuestionController extends Controller
             'is_exam' => 'required',
             'course_code' => 'required',
             'course_title' => 'required',
+            'level' => 'required',
             'content' => [
                 'nullable',
                 'string',
@@ -496,6 +497,8 @@ class PastQuestionController extends Controller
         $pastQuestion->academic_year = $request->input('academic_year');
         $pastQuestion->is_exam = $request->boolean('is_exam');
         $pastQuestion->content = $request->input('content');
+
+        $pastQuestion->level = $request->input('level');
 
         $pastQuestion->created_by = $user->username;
         $pastQuestion->approval_status = 'pending';
@@ -595,6 +598,10 @@ class PastQuestionController extends Controller
             return redirect()->back()->with('error', 'Records not found!');
         }
 
+        if ($pastQuestion->approval_status == 'pending' && $pastQuestion->created_by == Auth::user()->username) {
+            return redirect()->back()->with('error', 'You cannot review a past question uploaded by you, please contact another administrator for review');
+        }
+
         $request->validate([
             'approval_status' => 'required',
         ]);
@@ -669,10 +676,11 @@ class PastQuestionController extends Controller
             'is_exam' => 'required',
             'course_code' => 'required',
             'course_title' => 'required',
+            'level' => 'required',
             'content' => [
                 'nullable',
                 'string',
-                'required_without:image_1',
+                // 'required_without:image_1',
             ],
 
             'image_1' => [
@@ -680,7 +688,7 @@ class PastQuestionController extends Controller
                 'image',
                 'mimes:jpg,jpeg,png,webp',
                 'max:2048',
-                'required_without:content',
+                // 'required_without:content',
             ],
 
             'image_2' => [
@@ -732,6 +740,8 @@ class PastQuestionController extends Controller
         $pastQuestion->academic_year = $request->input('academic_year');
         $pastQuestion->is_exam = $request->boolean('is_exam');
         $pastQuestion->content = $request->input('content');
+        $pastQuestion->level = $request->input('level');
+
 
         $pastQuestion->last_update_by = $user->username;
         $pastQuestion->last_update = Carbon::now();
@@ -923,8 +933,9 @@ class PastQuestionController extends Controller
                 );
         }
     }
-    public function memberPastQuestions(Request $request){
-       $selectedFaculty = $request->input('faculty');
+    public function memberPastQuestions(Request $request)
+    {
+        $selectedFaculty = $request->input('faculty');
         $selectedDepartment = $request->input('department');
         $selectedProgram = $request->input('program');
         $selectedProgramType = $request->input('program_type');
@@ -950,10 +961,10 @@ class PastQuestionController extends Controller
      | should be limited to the signed-in user's tenant, uncomment
      | and adapt this based on your User model.
      */
-    $user = Auth::user();
-    if ($user->tenant_id) {
-        $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
-    }
+        $user = Auth::user();
+        if ($user->tenant_id) {
+            $pastQuestionsQuery->where('tenant_id', $user->tenant_id);
+        }
 
         if ($selectedFaculty) {
             $pastQuestionsQuery->where('faculty', $selectedFaculty);
@@ -1048,9 +1059,10 @@ class PastQuestionController extends Controller
         ];
         return view('users.member.academicResources.pastQuestions.pastQuestions', compact('data'));
     }
-    public function memberViewPastQuestion($uuid){
+    public function memberViewPastQuestion($uuid)
+    {
         $pastQuestion = PastQuestion::where('uuid', $uuid)->where('approval_status', 'approved')->first();
-        if(!$pastQuestion){
+        if (!$pastQuestion) {
             return redirect()->back()->with('error', 'Recods not found!');
         }
         $data = [

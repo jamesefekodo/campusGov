@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="">
                 <div class="navigation">
-                   {{-- @include('users.admin.academicResources.pastQuestions.include.inner_nav') --}}
+                    {{-- @include('users.admin.academicResources.pastQuestions.include.inner_nav') --}}
                 </div>
                 <div class="row">
                     <div class="individual-review-card-container">
@@ -92,7 +92,7 @@
 
                                                             <p class="text-danger">{{ $errors->first('department') }}</p>
                                                         </div>
-                                                        <div class="form-group col-md-4">
+                                                        <div class="form-group col-md-3">
                                                             <label for="academic_year">Academic Session<span
                                                                     class="text-red">*</span>:</label>
                                                             <select name="academic_year" class="form-control" required>
@@ -111,7 +111,36 @@
                                                             </select>
                                                             <p style="color: red">{{ $errors->first('academic_year') }}</p>
                                                         </div>
-                                                        <div class="form-group col-md-4">
+                                                        <div class="form-group col-md-3">
+                                                            <label for="level">Level (Year)<span
+                                                                    class="text-red">*</span>:</label>
+                                                            <select name="level" class="form-control" required>
+                                                                <option value="" disabled selected>Select</option>
+
+                                                                <option value="1"
+                                                                    {{ old('level') == '1' ? 'selected' : '' }}>
+                                                                    Year 1
+                                                                </option>
+                                                                <option value="2"
+                                                                    {{ old('level') == '2' ? 'selected' : '' }}>
+                                                                    Year 2
+                                                                </option>
+                                                                <option value="3"
+                                                                    {{ old('level') == '3' ? 'selected' : '' }}>
+                                                                    Year 3
+                                                                </option>
+                                                                <option value="4"
+                                                                    {{ old('level') == '4' ? 'selected' : '' }}>
+                                                                    Year 4
+                                                                </option>
+                                                                <option value="5"
+                                                                    {{ old('level') == '5' ? 'selected' : '' }}>
+                                                                    Year 5
+                                                                </option>
+                                                            </select>
+                                                            <p style="color: red">{{ $errors->first('level') }}</p>
+                                                        </div>
+                                                        <div class="form-group col-md-2">
                                                             <label for="semester">Semester<span
                                                                     class="text-red">*</span>:</label>
                                                             <select name="semester" class="form-control" required>
@@ -171,8 +200,9 @@
                                                         <div class="form-group col-md-6">
                                                             <label for="course_title">Course Title: <span
                                                                     class="text-red">*</span></label>
-                                                            <input type="text" class="form-control" name="course_title"
-                                                                value="{{ old('course_title') }}" required>
+                                                            <input type="text" class="form-control"
+                                                                name="course_title" value="{{ old('course_title') }}"
+                                                                required>
                                                             <p style="color: red">{{ $errors->first('course_title') }}</p>
                                                         </div>
                                                         <div class="form-group col-md-12">

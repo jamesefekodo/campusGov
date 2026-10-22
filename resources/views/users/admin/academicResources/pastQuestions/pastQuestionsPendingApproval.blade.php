@@ -81,7 +81,9 @@
                                                                         </p>
                                                                         <p
                                                                             class="text-muted mb-0 small text-truncate text-capitalize">
-                                                                            {{ $question->semester }} Semester
+                                                                            {{ $question->semester }} Semester @if ($question->level)
+                                                                                - Year {{ $question->level }}
+                                                                            @endif
                                                                         </p>
                                                                     </div>
                                                                 </div>

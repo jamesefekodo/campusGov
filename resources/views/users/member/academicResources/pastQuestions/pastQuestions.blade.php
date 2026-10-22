@@ -129,7 +129,9 @@
                                                         </td>
 
                                                         <td>
-                                                            {{ ucfirst($pastQuestion->semester) }}
+                                                            {{ ucfirst($pastQuestion->semester) }} semester @if ($pastQuestion->level)
+                                                                - Year {{ $pastQuestion->level }}
+                                                            @endif
                                                         </td>
 
                                                         <td>
@@ -156,45 +158,45 @@
                                                         </td>
 
                                                     </tr>
-                                                    @empty
-                                                        <tr>
-                                                            <td colspan="8" class="text-center">
-                                                                <h3 class="p-1 m-1 text-red">
-                                                                    No Past Questions Found!
-                                                                </h3>
-                                                            </td>
-                                                        </tr>
-                                                    @endforelse
-                                                </tbody>
-                                            </table>
+                                                @empty
+                                                    <tr>
+                                                        <td colspan="8" class="text-center">
+                                                            <h3 class="p-1 m-1 text-red">
+                                                                No Past Questions Found!
+                                                            </h3>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
 
-                                            @php
-                                                $paginatedArray = $data['pastQuestions'];
-                                            @endphp
+                                        @php
+                                            $paginatedArray = $data['pastQuestions'];
+                                        @endphp
 
-                                            @include('layouts.include.pagination')
+                                        @include('layouts.include.pagination')
 
-                                            @if ($data['requestType'] === 'filter')
-                                                <div class="w-100 justify-content-center text-center mb-4">
-                                                    <a class="btn btn-success" href="{{ route('memberPastQuestions') }}">
+                                        @if ($data['requestType'] === 'filter')
+                                            <div class="w-100 justify-content-center text-center mb-4">
+                                                <a class="btn btn-success" href="{{ route('memberPastQuestions') }}">
 
-                                                        <i class="fas fa-chevron-left"></i>
-                                                        Back to All Past Questions
-                                                    </a>
-                                                </div>
-                                            @endif
+                                                    <i class="fas fa-chevron-left"></i>
+                                                    Back to All Past Questions
+                                                </a>
+                                            </div>
+                                        @endif
 
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
+
                 </div>
-
             </div>
-        </div>
 
-        @include('users.admin.academicResources.pastQuestions.include.pastQuestionFilterModal')
-    @endsection
+        </div>
+    </div>
+
+    @include('users.admin.academicResources.pastQuestions.include.pastQuestionFilterModal')
+@endsection

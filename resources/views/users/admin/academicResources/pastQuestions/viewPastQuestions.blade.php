@@ -28,6 +28,10 @@
                                                 <span style="font-weight: bold">Semester:</span>
                                                 <span class="text-black">
                                                     {{ $data['pastQuestion']->semester }} semester
+                                                    @if ($data['pastQuestion']->level)
+                                                        - Year {{ $data['pastQuestion']->level }}
+                                                    @endif
+                                                    -
                                                     {{ $data['pastQuestion']->academic_year . '/' . $data['pastQuestion']->academic_year + 1 }}
                                                 </span>
                                             </div>
@@ -379,7 +383,7 @@
                                         </div>
 
 
-                                        {{-- 
+                                        {{--
 
                                         {{-- ######################################################## --}}
                                         @include('users.admin.academicResources.pastQuestions.include.pastQuestionContributions')
@@ -505,8 +509,8 @@
                 }
 
                 /*
-                                                                             * Make the Bootstrap modal almost full screen.
-                                                                             */
+                                                                                             * Make the Bootstrap modal almost full screen.
+                                                                                             */
                 .past-question-modal-dialog {
                     width: calc(100% - 30px);
                     max-width: 1500px;

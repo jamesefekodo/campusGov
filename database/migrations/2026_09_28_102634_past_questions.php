@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('course_code');
             $table->string('course_title');
             $table->integer('academic_year');
+            $table->integer('level');
             $table->boolean('is_exam')->default(0);
             $table->longText('content')->nullable();
             $table->string('image_1')->nullable();

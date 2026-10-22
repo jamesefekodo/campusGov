@@ -155,7 +155,9 @@
                                                         </td>
 
                                                         <td>
-                                                            {{ $pastQuestion->academic_year }}
+                                                            {{ $pastQuestion->academic_year }}/{{ $pastQuestion->academic_year+1 }} @if ($pastQuestion->level)
+                                                                - Year {{ $pastQuestion->level }}
+                                                            @endif
                                                         </td>
 
                                                         <td>
