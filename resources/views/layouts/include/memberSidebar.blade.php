@@ -72,18 +72,18 @@
                 <span class="submenu-arrow">
                     <i class="fas fa-chevron-down"></i>
                 </span><!--//submenu-arrow-->
-            </a><!--//nav-link--> --}}
-        <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
-            <ul class="submenu-list list-unstyled">
-                <li class="submenu-item"><a
-                        class="submenu-link  {{ Str::startsWith(request()->path(), 'student/members_directory/members') ? 'sidebar-active' : '' }}"
-                        href="
-                            {{-- {{ route('membersDirectory') }} --}}
+            </a><!--//nav-link-->
+            <div id="submenu-5" class="collapse submenu submenu-5" data-bs-parent="#menu-accordion">
+                <ul class="submenu-list list-unstyled">
+                    <li class="submenu-item"><a
+                            class="submenu-link  {{ Str::startsWith(request()->path(), 'student/members_directory/members') ? 'sidebar-active' : '' }}"
+                            href="
+                            {{ route('membersDirectory') }}
                             ">Members</a>
-                </li>
-            </ul>
-        </div>
-        </li><!--//nav-item-->
+                    </li>
+                </ul>
+            </div>
+        </li><!--//nav-item--> --}}
         <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/publications') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-2" aria-expanded="false"
@@ -181,7 +181,30 @@
             </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
-            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'student/events') ? 'sidebar-active-section' : '' }}"
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/archive') ? 'sidebar-active-section' : '' }}"
+                href="#" data-bs-toggle="collapse" data-bs-target="#submenu-11" aria-expanded="false"
+                aria-controls="submenu-11">
+                <span class="nav-icon">
+                    <i class="fas fa-database"></i>
+                </span>
+                <span class="nav-link-text">Archive</span>
+                <span class="submenu-arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span><!--//submenu-arrow-->
+            </a><!--//nav-link-->
+            <div id="submenu-11" class="collapse submenu submenu-11" data-bs-parent="#menu-accordion">
+                <ul class="submenu-list list-unstyled">
+                    <li class="submenu-item"><a
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/archive') ? 'sidebar-active' : '' }}"
+                            href="
+                            {{ route('memberArchive') }}
+                             ">Archive</a>
+                    </li>
+                </ul>
+            </div>
+        </li><!--//nav-item-->
+        <li class="nav-item has-submenu">
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/events') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-4" aria-expanded="false"
                 aria-controls="submenu-4">
                 <span class="nav-icon">

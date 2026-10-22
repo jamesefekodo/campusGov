@@ -337,6 +337,14 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/industry_affiliates/view/{slug}', [IndustryAffiliationController::class, 'memberViewIndustryAffiliate'])->name('memberViewIndustryAffiliate');
 
 
+    // archive files
+    
+    Route::get('member/archive', [ArchiveController::class, 'memberArchive'])->name('memberArchive');
+    Route::get('member/archive/search', [ArchiveController::class, 'memberArchive'])->name('memberArchiveSearch');
+    Route::get('member/archive/file/view/{uuid}', [ArchiveController::class, 'memberViewArchiveFile'])->name('memberViewArchiveFile');
+
+    
+
 });
 
 
@@ -825,8 +833,8 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 // archive
     Route::get('admin/archive', [ArchiveController::class, 'archive'])->name('archive');
     Route::get('admin/archive/search', [ArchiveController::class, 'archive'])->name('archiveSearch');
-    Route::post('admin/archive/search', [ArchiveController::class, 'addNewArchiveFileSubmit'])->name('addNewArchiveFileSubmit');
-    Route::get('admin/archive/view/{uuid}', [ArchiveController::class, 'viewArchiveFile'])->name('viewArchiveFile');
-    Route::put('admin/archive/edit/submit/{uuid}', [ArchiveController::class, 'updateArchiveFileSubmit'])->name('updateArchiveFileSubmit');
-    Route::get('admin/archive/delete/{uuid}', [ArchiveController::class, 'deleteArchiveFile'])->name('deleteArchiveFile');
+    Route::post('admin/archive/file/add_new/submit', [ArchiveController::class, 'addNewArchiveFileSubmit'])->name('addNewArchiveFileSubmit');
+    Route::get('admin/archive/file/view/{uuid}', [ArchiveController::class, 'viewArchiveFile'])->name('viewArchiveFile');
+    Route::put('admin/archive/file/edit/submit/{uuid}', [ArchiveController::class, 'updateArchiveFileSubmit'])->name('updateArchiveFileSubmit');
+    Route::get('admin/archive/file/delete/{uuid}', [ArchiveController::class, 'deleteArchiveFile'])->name('deleteArchiveFile');
 });

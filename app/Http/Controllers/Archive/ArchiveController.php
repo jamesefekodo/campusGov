@@ -182,7 +182,8 @@ class ArchiveController extends Controller
         $file->save();
         return redirect()->back()->with('success', 'Done!');
     }
-    public function deleteArchiveFile($uuid){
+    public function deleteArchiveFile($uuid)
+    {
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
@@ -205,5 +206,56 @@ class ArchiveController extends Controller
 
         $file->delete();
         return redirect()->route('archive')->with('success', 'Done!');
+    }
+
+
+
+    // members
+    public function memberArchive(Request $request)
+    {
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $archiveFiles = '';
+        $totalArchiveFiles = 0;
+
+
+        if (Route::currentRouteName() == 'memberArchiveSearch') {
+            $searchKey = $request->input('searchKey');
+            $archiveFiles = ArchiveFile::where('members_can_see', true)->where('title', 'like', "%$searchKey%")
+                ->orderBy('description', 'desc')
+                ->paginate(20)->withQueryString();
+
+
+            $totalArchiveFiles = $archiveFiles->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } else {
+            $archiveFiles = ArchiveFile::where('members_can_see', true)->orderBy('title')->paginate(20);
+            $totalArchiveFiles = ArchiveFile::where('members_can_see', true)->count();
+            $requestType = 'all';
+            $pageTitle = 'Archive';
+        }
+
+        $data = [
+            'archiveFiles' => $archiveFiles,
+            'totalArchiveFiles' => $totalArchiveFiles,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+        ];
+        return view('users.member.archive.archiveFiles', compact('data'));
+    }
+    public function memberViewArchiveFile($uuid)
+    {
+        $file = ArchiveFile::where('uuid', $uuid)->where('members_can_see', true)->first();
+        if (!$file) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $data = [
+            'file' => $file,
+        ];
+        return view('users.member.archive.viewArchiveFile', compact('data'));
     }
 }
