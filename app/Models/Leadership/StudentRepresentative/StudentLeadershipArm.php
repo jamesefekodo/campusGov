@@ -21,6 +21,7 @@ class StudentLeadershipArm extends Model
     protected $fillable = [
         'tenant_id',
         'slug',
+        'name',
         'description',
         'sort_order',
         'is_active',
@@ -33,9 +34,9 @@ class StudentLeadershipArm extends Model
     // uuid
     protected static function booted(): void
     {
-        static::creating(function ($role) {
-            if (empty($role->uuid)) {
-                $role->uuid = 'sla-' . Str::uuid();
+        static::creating(function ($arm) {
+            $arm->slug = 'sla-' . Str::uuid();
+            if (empty($rolarme->slug)) {
             }
         });
     }

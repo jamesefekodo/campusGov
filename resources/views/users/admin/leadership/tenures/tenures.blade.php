@@ -1,5 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', 'Student Representatives')
+@section('title', 'Student Reps:: Tenures')
 
 @section('content')
     <div class="app-content pt-3 mb-4">
@@ -11,7 +11,7 @@
                 <div class="m-1">
                     <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
                         data-target="#addNewStudentLeadershipTenure">
-                        <i class="fas fa-plus"></i> New File</button>
+                        <i class="fas fa-plus"></i> Add New</button>
                 </div>
             </div>
             @include('users.admin.leadership.tenures.include.addNewStudentLeadershipTenure')

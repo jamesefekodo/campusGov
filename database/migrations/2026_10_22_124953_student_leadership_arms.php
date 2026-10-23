@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tenant_id')->nullable(); // foreign
             $table->string('slug')->unique();
+            $table->string('name');
             $table->text('description');
             $table->integer('sort_order');
             $table->boolean('is_active')->default(true);

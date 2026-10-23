@@ -851,5 +851,11 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // studentLeadershipBodies
     Route::get('admin/leadership/student_rep/config/arms', [LeadershipController::class, 'studentLeadershipBodies'])->name('studentLeadershipBodies');
+    Route::post('admin/leadership/student_rep/config/arms/add_new/submit', [LeadershipController::class, 'addNewStudentLeadershipArmSubmit'])->name('addNewStudentLeadershipArmSubmit');
+    Route::put('admin/leadership/student_rep/config/arms/edit/{slug}/submit', [LeadershipController::class, 'editStudentLeadershipArmSubmit'])->name('editStudentLeadershipArmSubmit');
+    Route::get('admin/leadership/student_rep/config/arms/delete/{slug}/submit', [LeadershipController::class, 'deleteStudentLeadershipArm'])->name('deleteStudentLeadershipArm');
+
+    
+
 
 });

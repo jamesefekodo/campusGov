@@ -132,8 +132,9 @@ class LeadershipController extends Controller
         $tenure->delete();
         return redirect()->back()->with('success', 'Done');
     }
-    public function studentLeadershipBodies(){
-         /** @var \App\Models\User $user */
+    public function studentLeadershipBodies()
+    {
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         abort_unless(
@@ -141,11 +142,59 @@ class LeadershipController extends Controller
             403
         );
 
-        $arms = StudentLeadershipArm::orderBy('academic_session', 'desc')->paginate(20);
+        $arms = StudentLeadershipArm::orderBy('sort_order')->paginate(20);
 
         $data = [
             'arms' => $arms,
         ];
         return view('users.admin.leadership.arms.arms', compact('data'));
+    }
+    public function addNewStudentLeadershipArmSubmit(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'sort_order' => 'required',
+        ]);
+        StudentLeadershipArm::create([
+            'name' => trim($request->name),
+            'description' => trim($request->description),
+            'sort_order' => trim($request->sort_order),
+        ]);
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function editStudentLeadershipArmSubmit($slug, Request $request)
+    {
+        $arm = StudentLeadershipArm::where('slug', $slug)->first();
+        if (!$arm) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $request->validate([
+            'name' => 'required',
+            'description' => 'required',
+            'sort_order' => 'required',
+            'is_active' => 'required',
+        ]);
+
+        $arm->update([
+            'name' => trim($request->name),
+            'description' => trim($request->description),
+            'sort_order' => trim($request->sort_order),
+            'is_active' => trim($request->is_active),
+        ]);
+        return redirect()->back()->with('success', 'Done');
+    }
+    public deleteStudentLeadershipArm($slug){
+          $arm = StudentLeadershipArm::where('slug', $slug)->first();
+        if (!$arm) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+          if ($arm->representatives()->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete arms with representatives, please remove representatives first!');
+        }
+        $tenure->delete();
+        return redirect()->back()->with('success', 'Done');
     }
 }

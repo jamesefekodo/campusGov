@@ -1,5 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', 'Student Representatives')
+@section('title', 'Student Reps:: Arms/Bodies')
 
 @section('content')
     <div class="app-content pt-3 mb-4">
@@ -10,11 +10,11 @@
             <div class="d-flex justify-content-end me-3">
                 <div class="m-1">
                     <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                        data-target="#addNewStudentLeadershipTenure">
-                        <i class="fas fa-plus"></i> New File</button>
+                        data-target="#addNewStudentLeadershipArm">
+                        <i class="fas fa-plus"></i> Add New</button>
                 </div>
             </div>
-            @include('users.admin.leadership.tenures.include.addNewStudentLeadershipTenure')
+            @include('users.admin.leadership.arms.include.addNewStudentLeadershipArm')
 
 
             <div class="individual-review-card-container row">
@@ -41,16 +41,16 @@
                                                     <th scope="col" style="width: 10px" class="table_header">S/N
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Tenure
+                                                        Name
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Session
-                                                    </th>
-                                                    <th scope="col" class="table_header">
-                                                        Period
+                                                        Description
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         Leaders
+                                                    </th>
+                                                    <th scope="col" class="table_header">
+                                                        Status
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         Action
@@ -60,7 +60,7 @@
 
                                             @if ($data['arms']->isEmpty())
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="7" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -71,38 +71,40 @@
                                                     @foreach ($data['arms'] as $arm)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
-                                                            {{-- <td class="">
-                                                                {{ $tenure->name }}
+                                                            <td class="">
+                                                                {{ $arm->name }}
                                                             </td>
                                                             <td class="">
-                                                                {{ $tenure->academic_session }}/{{ $tenure->academic_session + 1 }}
+                                                                {{ $arm->description }}
                                                             </td>
-                                                            <td>
-                                                                {{ \Carbon\Carbon::parse($tenure->start_date)->format('l, d F, Y') }}
-                                                                -
-                                                                @if ($tenure->end_date)
-                                                                    {{ \Carbon\Carbon::parse($tenure->end_date)->format('l, d F, Y') }}
-                                                                @else
-                                                                    till date
-                                                                @endif
+                                                            <td class="">
+                                                                {{ $arm->representatives->count() }}
                                                             </td>
-                                                            <td>
-                                                                {{ $tenure->representatives->count() }}
-                                                            </td> --}}
+                                                            <td class="">
+                                                                @switch($arm->is_active)
+                                                                    @case(true)
+                                                                        <span class="badge bg-green text-white">Active</span>
+                                                                    @break
+
+                                                                    @default
+                                                                        <span class="badge bg-red text-white">In-active</span>
+                                                                @endswitch
+                                                            </td>
+
                                                             <td class="align-middle">
                                                                 <div class="d-flex align-items-center">
-                                                                    {{-- <button type="button"
+                                                                    <button type="button"
                                                                         class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center"
                                                                         data-toggle="modal"
-                                                                        data-target="#editStudentLeadershipTenure_{{ $tenure->slug }}">
+                                                                        data-target="#editStudentLeadershipArm_{{ $arm->slug }}">
                                                                         <i class="fas fa-arrows-rotate me-1"></i> Update
                                                                     </button>
 
                                                                     <button type="button"
                                                                         class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm"
-                                                                        data-url="{{ route('deleteStudentLeadershipTenure', ['slug' => $tenure->slug]) }}">
+                                                                        data-url="{{ route('deleteStudentLeadershipArm', ['slug' => $arm->slug]) }}">
                                                                         <i class="fas fa-trash me-1"></i> Delete
-                                                                    </button> --}}
+                                                                    </button>
                                                                 </div>
                                                             </td>
                                                         </tr>
@@ -132,9 +134,9 @@
             </div>
 
             {{-- ############################## --}}
-            @if ($data['tenures']->isNotEmpty())
-                @foreach ($data['tenures'] as $tenure)
-                    @include('users.admin.leadership.tenures.include.editStudentLeadershipTenure')
+            @if ($data['arms']->isNotEmpty())
+                @foreach ($data['arms'] as $tenure)
+                    @include('users.admin.leadership.arms.include.editStudentLeadershipArm')
                 @endforeach
             @endif
             <script>
