@@ -22,7 +22,6 @@ class StudentLeadershipRepresentative extends Model
         'tenant_id',
         'uuid',
         'username',
-        'arm_slug',
         'position_slug',
         'tenure_slug',
         'description',
@@ -51,15 +50,7 @@ class StudentLeadershipRepresentative extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
-    public function arm(): BelongsTo
-    {
-        return $this->belongsTo(
-            StudentLeadershipArm::class,
-            'arm_slug',
-            'slug'
-        );
-    }
-
+   
     public function position(): BelongsTo
     {
         return $this->belongsTo(

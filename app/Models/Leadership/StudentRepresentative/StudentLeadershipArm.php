@@ -57,13 +57,4 @@ class StudentLeadershipArm extends Model
             'slug'
         );
     }
-
-    public function representatives(): HasMany
-    {
-        return $this->hasMany(
-            StudentLeadershipRepresentative::class,
-            'arm_slug',
-            'slug'
-        );
-    }
 }

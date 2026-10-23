@@ -855,6 +855,12 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/leadership/student_rep/config/arms/edit/{slug}/submit', [LeadershipController::class, 'editStudentLeadershipArmSubmit'])->name('editStudentLeadershipArmSubmit');
     Route::get('admin/leadership/student_rep/config/arms/delete/{slug}/submit', [LeadershipController::class, 'deleteStudentLeadershipArm'])->name('deleteStudentLeadershipArm');
 
+    // positions
+    Route::get('admin/leadership/student_rep/config/positions', [LeadershipController::class, 'studentLeadershipPositions'])->name('studentLeadershipPositions');
+    Route::post('admin/leadership/student_rep/config/positions/add_new/submit', [LeadershipController::class, 'addNewStudentLeadershipPositionSubmit'])->name('addNewStudentLeadershipPositionSubmit');
+    Route::put('admin/leadership/student_rep/config/positions/update/{slug}/submit', [LeadershipController::class, 'editStudentLeadershipPositionSubmit'])->name('editStudentLeadershipPositionSubmit');
+    Route::get('admin/leadership/student_rep/config/positions/delete/{slug}/submit', [LeadershipController::class, 'deleteStudentLeadershipPosition'])->name('deleteStudentLeadershipPosition');
+
     
 
 

@@ -47,9 +47,6 @@
                                                         Description
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Leaders
-                                                    </th>
-                                                    <th scope="col" class="table_header">
                                                         Status
                                                     </th>
                                                     <th scope="col" class="table_header">
@@ -60,7 +57,7 @@
 
                                             @if ($data['arms']->isEmpty())
                                                 <tr>
-                                                    <td colspan="7" class="text-center">
+                                                    <td colspan="6" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
                                                             No Records Found!
                                                         </h3>
@@ -76,9 +73,6 @@
                                                             </td>
                                                             <td class="">
                                                                 {{ $arm->description }}
-                                                            </td>
-                                                            <td class="">
-                                                                {{ $arm->representatives->count() }}
                                                             </td>
                                                             <td class="">
                                                                 @switch($arm->is_active)
@@ -135,7 +129,7 @@
 
             {{-- ############################## --}}
             @if ($data['arms']->isNotEmpty())
-                @foreach ($data['arms'] as $tenure)
+                @foreach ($data['arms'] as $arm)
                     @include('users.admin.leadership.arms.include.editStudentLeadershipArm')
                 @endforeach
             @endif

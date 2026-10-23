@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('tenant_id')->nullable(); // foreign
             $table->string('uuid')->unique();
             $table->string('username'); // foreign
-            $table->string('arm_slug'); // foreign
             $table->string('position_slug'); // foreign
             $table->string('tenure_slug'); // foreign
             $table->text('description')->nullable();
@@ -25,7 +24,6 @@ return new class extends Migration
 
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
-            $table->foreign('arm_slug')->references('slug')->on('student_leadership_arms')->onDelete('cascade')->cascadeOnUpdate();
             $table->foreign('username')->references('username')->on('users')->onDelete('cascade')->cascadeOnUpdate();
             $table->foreign('position_slug')->references('slug')->on('student_leadership_positions')->onDelete('cascade')->cascadeOnUpdate();
             $table->foreign('tenure_slug')->references('slug')->on('student_leadership_tenures')->onDelete('cascade')->cascadeOnUpdate();

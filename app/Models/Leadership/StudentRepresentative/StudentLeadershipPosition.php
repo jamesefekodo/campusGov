@@ -35,9 +35,9 @@ class StudentLeadershipPosition extends Model
     // uuid
     protected static function booted(): void
     {
-        static::creating(function ($role) {
-            if (empty($role->uuid)) {
-                $role->uuid = 'slp-' . Str::uuid();
+        static::creating(function ($position) {
+            if (empty($position->slug)) {
+                $position->slug = 'slp-' . Str::uuid();
             }
         });
     }

@@ -6,10 +6,11 @@
                 {{ Str::startsWith(request()->path(), 'admin/leadership/student_rep/config/tenures') ? 'inner_nav_active' : '' }}">
                 Tenures</div>
         </a>
-        <a {{-- href="{{ route('pastQuestionsApproval') }}" --}}>
+        <a 
+        href="{{ route('studentLeadershipPositions') }}">
             <div
                 class="inner_nav_menu
-                {{ Str::startsWith(request()->path(), 'admin/academic_resources/past_questions/approval') ? 'inner_nav_active' : '' }}">
+                {{ Str::startsWith(request()->path(), 'admin/leadership/student_rep/config/position') ? 'inner_nav_active' : '' }}">
                 Position
             </div>
         </a>
