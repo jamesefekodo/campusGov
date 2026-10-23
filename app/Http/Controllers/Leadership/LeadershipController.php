@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Leadership;
 
 use App\Http\Controllers\Controller;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipArm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -60,5 +62,90 @@ class LeadershipController extends Controller
             'academicSession' => $academicSession,
         ];
         return view('users.admin.leadership.studentReps.studentReps', compact('data'));
+    }
+    public function studentLeadershipTenures()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('leadership.manage'),
+            403
+        );
+
+        $tenures = StudentLeadershipTenure::orderBy('academic_session', 'desc')->paginate(20);
+
+        $data = [
+            'tenures' => $tenures,
+        ];
+        return view('users.admin.leadership.tenures.tenures', compact('data'));
+    }
+    public function addNewStudentLeadershipTenureSubmit(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'academic_session' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        StudentLeadershipTenure::create([
+            'name' => trim($request->name),
+            'academic_session' => trim($request->academic_session),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date ?? null,
+        ]);
+
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function editStudentLeadershipTenureSubmit($slug, Request $request)
+    {
+        $tenure = StudentLeadershipTenure::where('slug', $slug)->first();
+        if (!$tenure) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $request->validate([
+            'name' => 'required',
+            'academic_session' => 'required|integer',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after:start_date',
+        ]);
+
+        $tenure->update([
+            'name' => trim($request->name),
+            'academic_session' => trim($request->academic_session),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date ?? null,
+        ]);
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function deleteStudentLeadershipTenure($slug)
+    {
+        $tenure = StudentLeadershipTenure::where('slug', $slug)->first();
+        if (!$tenure) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        if ($tenure->representatives()->exists()) {
+            return redirect()->back()->with('error', 'Cannot delete tenure with representatives, please remove representatives first!');
+        }
+        $tenure->delete();
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function studentLeadershipBodies(){
+         /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('leadership.manage'),
+            403
+        );
+
+        $arms = StudentLeadershipArm::orderBy('academic_session', 'desc')->paginate(20);
+
+        $data = [
+            'arms' => $arms,
+        ];
+        return view('users.admin.leadership.arms.arms', compact('data'));
     }
 }

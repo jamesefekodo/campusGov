@@ -33,9 +33,9 @@ class StudentLeadershipTenure extends Model
     // uuid
     protected static function booted(): void
     {
-        static::creating(function ($role) {
-            if (empty($role->uuid)) {
-                $role->uuid = 'slt-' . Str::uuid();
+        static::creating(function ($tenure) {
+            if (empty($tenure->slug)) {
+                $tenure->slug = 'slt-' . Str::uuid();
             }
         });
     }

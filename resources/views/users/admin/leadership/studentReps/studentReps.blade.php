@@ -1,5 +1,5 @@
 @extends('layouts.userLayout')
-@section('title', $data['pageTitle'])
+@section('title', 'Student Representatives')
 
 @section('content')
     <div class="app-content pt-3 mb-4">
@@ -7,23 +7,24 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            @if (Auth::user()->hasPermission('archive.create'))
-                <div class="d-flex justify-content-end">
-                    <div class="m-1">
-                        <button class="btn btn-success btn-sm table_btn" data-toggle="modal"
-                            data-target="#addNewArchiveFileModal">
-                            <i class="fas fa-plus"></i> New File</button>
-                    </div>
+            <div class="d-flex justify-content-end">
+                <div class="m-1">
+                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewArchiveFileModal">
+                        <i class="fas fa-plus"></i> New File</button>
                 </div>
-                {{-- @include('users.admin.archive.include.addNewArchiveFileModal') --}}
-            @endif
+            </div>
+            {{-- @include('users.admin.archive.include.addNewArchiveFileModal') --}}
 
-            <div class="individual-review-card-container">
-                <div class="col-md-12 individual-review-card">
+            <div class="individual-review-card-container row">
+                <div class="col-md-1 individual-review-card text-black">
+                    {{-- sidde menu --}}
+                    @include('users.admin.leadership.studentReps.include.studentRepsSideMenu')
+                </div>
+                <div class="col-md-11 individual-review-card">
                     <div class="table_head">
                         <div class="table_head_item col-md-8">
                             <div class="table_title">
-                                {{ $data['pageTitle'] }}
+                                Student Representatives
                             </div>
                         </div>
 
@@ -33,7 +34,7 @@
                                     @csrf
                                     <div class="input-group-append">
                                         <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
-                                            value="{{ $data['searchKey'] }}"><button type="submit"
+                                            {{-- value="{{ $data['searchKey'] }}" --}}><button type="submit"
                                             class="table_search_button btn btn-primary
                                                 "><i
                                                 class="fas fa-search"></i></button>

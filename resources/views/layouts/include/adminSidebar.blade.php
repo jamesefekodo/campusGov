@@ -360,7 +360,7 @@
 
         @if (Auth::user()->hasPermission('leadership.manage'))
             <li class="nav-item has-submenu">
-                <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/marketing') ? 'sidebar-active-section' : '' }}"
+                <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'admin/leadership') ? 'sidebar-active-section' : '' }}"
                     href="#" data-bs-toggle="collapse" data-bs-target="#submenu-12" aria-expanded="false"
                     aria-controls="submenu-12">
                     <span class="nav-icon">
