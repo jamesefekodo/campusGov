@@ -15,18 +15,27 @@
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="POST" 
-                    action="{{ route('editStudentLeadershipRepSubmit', ['uuid' => $leader->uuid]) }}"
-                     enctype="multipart/form-data">
+                    <form class="form my_form" method="POST"
+                        action="{{ route('editStudentLeadershipRepSubmit', ['uuid' => $leader->uuid]) }}"
+                        enctype="multipart/form-data">
                         @csrf
                         @method('PUT')
                         <div class="row">
-                            <div class="form-group col-md-6">
-                                <label for="username">Username: <span class="text-red">*</span></label>
-                                <input type="text" class="form-control" name="username"
-                                    value="{{ $leader->username }}" required>
-                                <p style="color: red">{{ $errors->first('username') }}</p>
-                            </div>
+                            @if (request()->routeIs('viewMemberLeadershipPosition'))
+                                <div class="form-group col-md-12">
+                                    <label for="username">Username: <span class="text-red">*</span></label>
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ $data['member']->username }}" readonly>
+                                    <p style="color: red">{{ $errors->first('username') }}</p>
+                                </div>
+                            @else
+                                <div class="form-group col-md-6">
+                                    <label for="username">Username: <span class="text-red">*</span></label>
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ $leader->username }}" required>
+                                    <p style="color: red">{{ $errors->first('username') }}</p>
+                                </div>
+                            @endif
 
                             <div class="form-group col-md-6">
                                 <label for="position_slug">Position<span class="text-red">*</span>:</label>
@@ -75,7 +84,7 @@
                                     value="{{ $leader->remarks }}">
                                 <p style="color: red">{{ $errors->first('remarks') }}</p>
                             </div>
-                            
+
                         </div>
                         <hr>
 

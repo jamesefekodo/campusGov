@@ -19,13 +19,24 @@
                         action="{{ route('addNewStudentLeadershipRepresentativeSubmit') }}"
                         enctype="multipart/form-data">
                         @csrf
+
                         <div class="row">
-                            <div class="form-group col-md-12">
-                                <label for="username">Username: <span class="text-red">*</span></label>
-                                <input type="text" class="form-control" name="username" value="{{ old('username') }}"
-                                    required>
-                                <p style="color: red">{{ $errors->first('username') }}</p>
-                            </div>
+                            @if (request()->routeIs('viewMemberLeadershipPosition'))
+                                <div class="form-group col-md-12">
+                                    <label for="username">Username: <span class="text-red">*</span></label>
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ $data['member']->username }}" readonly>
+                                    <p style="color: red">{{ $errors->first('username') }}</p>
+                                </div>
+                            @else
+                                <div class="form-group col-md-12">
+                                    <label for="username">Username: <span class="text-red">*</span></label>
+                                    <input type="text" class="form-control" name="username"
+                                        value="{{ old('username') }}" required>
+                                    <p style="color: red">{{ $errors->first('username') }}</p>
+                                </div>
+                            @endif
+
 
                             <div class="form-group col-md-12">
                                 <label for="position_slug">Position<span class="text-red">*</span>:</label>

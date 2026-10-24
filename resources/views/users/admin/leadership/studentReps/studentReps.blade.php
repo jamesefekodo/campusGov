@@ -138,8 +138,8 @@
                                                                         {{ $leader?->tenure?->academic_session }}/{{ $leader?->tenure?->academic_session + 1 }}
                                                                     </p>
                                                                     <p class="text-muted mb-0 small text-truncate">
-                                                                        @if ($leader?->tenure->name && (int) $leader?->tenure->name !== (int) $leader?->tenure->academic_session)
-                                                                            {{ $leader?->tenure?->name }}
+                                                                        @if ($leader?->tenure->name && ($leader?->tenure->name !== $leader?->tenure->academic_session))
+                                                                            ({{ $leader?->tenure?->name }})
                                                                         @endif
                                                                     </p>
                                                                 </div>

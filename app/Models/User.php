@@ -341,7 +341,7 @@ class User extends Authenticatable
 
      public function leadershipPositionsInAssociation()
     {
-        return $this->belongsTo(StudentLeadershipRepresentative::class, 'username', 'username');
+        return $this->hasMany(StudentLeadershipRepresentative::class, 'username', 'username');
     }
 
 

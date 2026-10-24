@@ -14,6 +14,9 @@ use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentRegularization;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipArm;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipPosition;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
 use App\Models\Members\MemberAcademicInfo;
 use App\Models\Members\MemberPersonalProfile;
 use App\Models\Members\MemberReAdmissionApplication;
@@ -1600,13 +1603,21 @@ class MembersManagementController extends Controller
             403
         );
 
+
         $member = User::where('uuid', $uuid)->first();
         if (!$member) {
             return redirect()->back()->with('error', 'Records not found!');
         }
 
+        $arms = StudentLeadershipArm::orderBy('name')->get();
+        $position = StudentLeadershipPosition::orderBy('name')->get();
+        $tenure = StudentLeadershipTenure::orderBy('academic_session', 'desc')->get();
+
         $data = [
             'member' => $member,
+            'arms' => $arms,
+            'position' => $position,
+            'tenure' => $tenure,
         ];
         return view('users.admin.userManagement.members.profile.leadershipPosition', compact('data'));
     }
