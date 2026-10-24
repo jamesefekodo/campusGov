@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('username'); // foreign
             $table->string('position_slug'); // foreign
             $table->string('tenure_slug'); // foreign
-            $table->text('description')->nullable();
+            $table->text('remarks')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

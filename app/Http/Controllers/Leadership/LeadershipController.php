@@ -23,7 +23,9 @@ class LeadershipController extends Controller
             403
         );
 
-        $arms = StudentLeadershipArm::get();
+        $arms = StudentLeadershipArm::orderBy('name')->get();
+        $position = StudentLeadershipPosition::orderBy('name')->get();
+        $tenure = StudentLeadershipTenure::orderBy('academic_session', 'desc')->get();
 
         $studentLeaders = '';
 
@@ -63,8 +65,62 @@ class LeadershipController extends Controller
         $data = [
             'studentLeaders' => $studentLeaders,
             'academicSession' => $academicSession,
+            'arms' => $arms,
+            'position' => $position,
+            'tenure' => $tenure,
         ];
         return view('users.admin.leadership.studentReps.studentReps', compact('data'));
+    }
+    public function addNewStudentLeadershipRepresentativeSubmit(Request $request)
+    {
+        $request->validate([
+            'username' => 'required|exists:users,username',
+            'position_slug' => 'required|exists:student_leadership_positions,slug',
+            'tenure_slug' => 'required|exists:student_leadership_tenures,slug',
+            'remarks' => 'nullable',
+        ]);
+
+        StudentLeadershipRepresentative::create([
+            'username' => $request->username,
+            'position_slug' => $request->position_slug,
+            'tenure_slug' => $request->tenure_slug,
+            'remarks' => $request->remarks,
+        ]);
+
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function editStudentLeadershipRepSubmit($uuid, Request $request)
+    {
+        $rep = StudentLeadershipRepresentative::where('uuid', $uuid)->first();
+        if (!$rep) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $request->validate([
+            'username' => 'required|exists:users,username',
+            'position_slug' => 'required|exists:student_leadership_positions,slug',
+            'tenure_slug' => 'required|exists:student_leadership_tenures,slug',
+            'remarks' => 'nullable',
+            'is_active' => 'required',
+        ]);
+
+        $rep->update([
+            'username' => $request->username,
+            'position_slug' => $request->position_slug,
+            'tenure_slug' => $request->tenure_slug,
+            'remarks' => $request->remarks,
+            'is_active' => $request->is_active,
+        ]);
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function deleteStudentLeadershipRep($uuid)
+    {
+        $rep = StudentLeadershipRepresentative::where('uuid', $uuid)->first();
+        if (!$rep) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+        $rep->delete();
+        return redirect()->back()->with('success', 'Done');
     }
     public function studentLeadershipTenures()
     {
@@ -262,8 +318,9 @@ class LeadershipController extends Controller
         ]);
         return redirect()->back()->with('success', 'Done');
     }
-    public function deleteStudentLeadershipPosition($slug){
- $position = StudentLeadershipPosition::where('slug', $slug)->first();
+    public function deleteStudentLeadershipPosition($slug)
+    {
+        $position = StudentLeadershipPosition::where('slug', $slug)->first();
         if (!$position) {
             return redirect()->back()->with('error', 'Records not found!');
         }

@@ -7,13 +7,13 @@
             <div class="navigation">
                 {{-- @include('users.admin.activeAccount.payments.include.inner_nav') --}}
             </div>
-            <div class="d-flex justify-content-end">
+            <div class="d-flex justify-content-end me-4">
                 <div class="m-1">
-                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewArchiveFileModal">
-                        <i class="fas fa-plus"></i> New File</button>
+                    <button class="btn btn-success btn-sm table_btn" data-toggle="modal" data-target="#addNewStudentRepModal">
+                        <i class="fas fa-plus"></i> Add New Representative</button>
                 </div>
             </div>
-            {{-- @include('users.admin.archive.include.addNewArchiveFileModal') --}}
+            @include('users.admin.leadership.studentReps.include.addNewStudentRepModal')
 
             <div class="individual-review-card-container row">
                 <div class="col-md-1 individual-review-card text-black">
@@ -22,27 +22,20 @@
                 </div>
                 <div class="col-md-11 individual-review-card">
                     <div class="table_head">
-                        <div class="table_head_item col-md-8">
+                        <div class="table_head_item col-md-12">
                             <div class="table_title">
                                 Student Representatives
-                            </div>
-                        </div>
+                                <span class="ms-5 badge bg-warning text-black" data-toggle="modal"
+                                    data-target="#sessionSelector">
+                                    {{ $data['academicSession'] }}/{{ $data['academicSession'] + 1 }}
+                                    <i class="fa fa-filter"></i></span>
 
-                        <div class="table_head_item col-md-4">
-                            <div class="custom_search">
-                                <form type="GET" {{-- action="{{ route('archiveSearch') }}" --}}>
-                                    @csrf
-                                    <div class="input-group-append">
-                                        <input type="search" class="table_search my-2 my-sm-0" name="searchKey"
-                                            {{-- value="{{ $data['searchKey'] }}" --}}><button type="submit"
-                                            class="table_search_button btn btn-primary
-                                                "><i
-                                                class="fas fa-search"></i></button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>
+                    {{-- ###################### --}}
+                    @include('users.admin.leadership.studentReps.include.filterStudentRepsByYearModal')
+                    {{-- ###################### --}}
                     <div class="col-md-12 m-auto">
                         <div class="my_form_container">
                             <div class=" pb-4">
@@ -54,16 +47,19 @@
                                                     <th scope="col" style="width: 10px" class="table_header">S/N
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Title
+                                                        Rep
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Description
+                                                        Position
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Member Access
+                                                        Tenure
                                                     </th>
                                                     <th scope="col" class="table_header">
-                                                        Last Update
+                                                        Status
+                                                    </th>
+                                                    <th scope="col" class="table_header">
+                                                        Remarks
                                                     </th>
                                                     <th scope="col" class="table_header">
                                                         Action
@@ -71,61 +67,122 @@
                                                 </tr>
                                             </thead>
 
-                                            {{-- @if ($data['archiveFiles']->isEmpty())
+                                            @if ($data['studentLeaders']->isEmpty())
                                                 <tr>
-                                                    <td colspan="6" class="text-center">
+                                                    <td colspan="7" class="text-center">
                                                         <h3 class="p-1 m-1 text-red">
-                                                            No Records Found!
+                                                            No student representative/leader records found for the
+                                                            {{ $data['academicSession'] }}/{{ (int) $data['academicSession'] + 1 }}
+                                                            academic session!
                                                         </h3>
                                                     </td>
                                                 </tr>
                                             @else
                                                 <tbody>
-                                                    @foreach ($data['archiveFiles'] as $file)
+                                                    @foreach ($data['studentLeaders'] as $leader)
                                                         <tr class=" align-middle text-center">
                                                             <th>{{ $loop->iteration }}</th>
                                                             <td class="">
-                                                                {{ $file->title }}
+                                                                <div class="d-flex align-items-center gap-2">
+                                                                    {{-- Avatar --}}
+                                                                    <div class="flex-shrink-0">
+                                                                        @php
+                                                                            $user = $leader->theRep;
+                                                                        @endphp
+                                                                        @include('users.admin.userManagement.members.include.profilePictureAndAvatarDisplay')
+                                                                    </div>
+
+                                                                    {{-- Name & Code --}}
+                                                                    <div class="flex-grow-1 min-width-0 text-center">
+                                                                        <p
+                                                                            class="fw-bold mb-0 text-truncate text-capitalize">
+                                                                            @php
+                                                                                $middleInitial = $leader->theRep
+                                                                                    ->memberPersonalProfile->middle_name
+                                                                                    ? strtoupper(
+                                                                                            substr(
+                                                                                                $leader->theRep
+                                                                                                    ->memberPersonalProfile
+                                                                                                    ->middle_name,
+                                                                                                0,
+                                                                                                1,
+                                                                                            ),
+                                                                                        ) . '. '
+                                                                                    : '';
+                                                                            @endphp
+
+                                                                            {{ strtolower($leader->theRep->memberPersonalProfile->first_name) . ' ' . $middleInitial . strtolower($leader->theRep->memberPersonalProfile->last_name) }}
+                                                                        </p>
+                                                                        <p class="text-muted mb-0 small text-truncate">
+                                                                            {{ strtoupper($leader->theRep->memberAcademicInfo->matric_number) }}
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
                                                             </td>
                                                             <td class="">
-                                                                {{ \Illuminate\Support\Str::words($file->description, 10, '...') }}
+                                                                <div class="flex-grow-1 min-width-0 text-center">
+                                                                    <p class="fw-bold mb-0 text-truncate text-capitalize">
+                                                                        {{ $leader?->position?->name }}
+                                                                    </p>
+                                                                    <p class="text-muted mb-0 small text-truncate">
+                                                                        @if ($leader->position && ($leader->position->name !== $leader->position->description))
+                                                                            {{ $leader->position->description }} -
+                                                                        @endif
+                                                                        {{ $leader?->position?->arm?->name }}
+                                                                    </p>
+                                                                </div>
                                                             </td>
                                                             <td class="">
-                                                                @switch($file->members_can_see)
+                                                                <div class="flex-grow-1 min-width-0 text-center">
+                                                                    <p class="fw-bold mb-0 text-truncate text-capitalize">
+                                                                        {{ $leader?->tenure?->academic_session }}/{{ $leader?->tenure?->academic_session + 1 }}
+                                                                    </p>
+                                                                    <p class="text-muted mb-0 small text-truncate">
+                                                                        @if ($leader?->tenure->name && (int) $leader?->tenure->name !== (int) $leader?->tenure->academic_session)
+                                                                            {{ $leader?->tenure?->name }}
+                                                                        @endif
+                                                                    </p>
+                                                                </div>
+                                                            </td>
+                                                            <td class="">
+                                                                @switch($leader->is_active)
                                                                     @case(true)
-                                                                        <span class="badge bg-warning text-black">
-                                                                            Visible to both members and administrators
-                                                                        </span>
+                                                                        <span class="badge bg-green text-white">Active</span>
                                                                     @break
 
                                                                     @default
-                                                                        <span class="badge bg-green text-white">
-                                                                            Visible to only administrators
-                                                                        </span>
+                                                                        <span class="badge bg-red text-white">In-active</span>
                                                                 @endswitch
                                                             </td>
-                                                            <td class="text-start">
-                                                                {{ \Carbon\Carbon::parse($file->updated_at)->format('l, d F, Y') }}
+                                                            <td class="">
+                                                                {{ $leader?->remarks ?? '-' }}
                                                             </td>
                                                             <td class="">
-                                                                <a href="{{ asset('assets/tenant_' . tenant()->id . '/uploads/archive/files/' . $file->file) }}"
-                                                                    download class="btn btn-warning btn-sm me-2">
-                                                                    <i class="fas fa-download"></i> Download
-                                                                </a>
-                                                                <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewArchiveFile', ['uuid' => $file->uuid]) }}">View</a>
+                                                                <button type="button"
+                                                                    class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center"
+                                                                    data-toggle="modal"
+                                                                    data-target="#editStudentLeadershipRep_{{ $leader->uuid }}">
+                                                                    <i class="fas fa-arrows-rotate me-1"></i> Update
+                                                                </button>
+                                                                <button type="button"
+                                                                    class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm"
+                                                                    data-url="{{ route('deleteStudentLeadershipRep', ['uuid' => $leader->uuid]) }}"
+                                                                    >
+                                                                    <i class="fas fa-trash me-1"></i> Delete
+                                                                </button>
+
                                                             </td>
                                                         </tr>
                                                     @endforeach
                                                 </tbody>
-                                            @endif --}}
+                                            @endif
                                         </table>
                                         {{-- Pagination --}}
-                                        {{-- @php
-                                            $paginatedArray = $data['archiveFiles'];
+                                        @php
+                                            $paginatedArray = $data['studentLeaders'];
                                         @endphp
 
-                                        @include('layouts.include.pagination') --}}
+                                        @include('layouts.include.pagination')
 
                                     </div>
 
@@ -141,7 +198,37 @@
                 </div>
             </div>
 
+            @if ($data['studentLeaders']->isNotEmpty())
+                @foreach ($data['studentLeaders'] as $leader)
+                    @include('users.admin.leadership.studentReps.include.editStudentLeadershipRepModal')
+                @endforeach
+            @endif
 
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.querySelectorAll('.delete-confirm').forEach(function(button) {
+                        button.addEventListener('click', function() {
+                            const url = button.dataset.url;
+
+                            Swal.fire({
+                                title: 'Are you sure?',
+                                text: 'This record will be permanently deleted.',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#d33',
+                                cancelButtonColor: '#6c757d',
+                                confirmButtonText: 'Yes, delete!',
+                                cancelButtonText: 'Cancel',
+                                reverseButtons: true
+                            }).then(function(result) {
+                                if (result.isConfirmed && url) {
+                                    window.location.href = url;
+                                }
+                            });
+                        });
+                    });
+                });
+            </script>
 
 
 

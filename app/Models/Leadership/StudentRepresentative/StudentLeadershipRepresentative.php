@@ -7,6 +7,7 @@ use App\Models\Leadership\StudentRepresentative\StudentLeadershipPosition;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
 use App\Models\Tenancy\Tenant;
 use App\Models\Traits\BelongsToTenant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +25,7 @@ class StudentLeadershipRepresentative extends Model
         'username',
         'position_slug',
         'tenure_slug',
-        'description',
+        'remarks',
         'is_active',
     ];
 
@@ -57,6 +58,15 @@ class StudentLeadershipRepresentative extends Model
             StudentLeadershipPosition::class,
             'position_slug',
             'slug'
+        );
+    }
+     
+    public function theRep(): BelongsTo
+    {
+        return $this->belongsTo(
+            User::class,
+            'username',
+            'username'
         );
     }
 

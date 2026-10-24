@@ -843,6 +843,15 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     // leadership
 
     Route::get('admin/leadership/student_reps', [LeadershipController::class, 'studentLeadership'])->name('studentLeadership');
+    Route::post('admin/leadership/student_reps/add_new', [LeadershipController::class, 'addNewStudentLeadershipRepresentativeSubmit'])->name('addNewStudentLeadershipRepresentativeSubmit');
+    Route::put('admin/leadership/student_reps/edit/{uuid}/submit', [LeadershipController::class, 'editStudentLeadershipRepSubmit'])->name('editStudentLeadershipRepSubmit');
+    Route::get('admin/leadership/student_reps/delete/{uuid}', [LeadershipController::class, 'deleteStudentLeadershipRep'])->name('deleteStudentLeadershipRep');
+
+    
+
+    
+
+    
 
     Route::get('admin/leadership/student_rep/config/tenures', [LeadershipController::class, 'studentLeadershipTenures'])->name('studentLeadershipTenures');
     Route::post('admin/leadership/student_rep/config/tenures/add_new', [LeadershipController::class, 'addNewStudentLeadershipTenureSubmit'])->name('addNewStudentLeadershipTenureSubmit');
@@ -860,8 +869,4 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/leadership/student_rep/config/positions/add_new/submit', [LeadershipController::class, 'addNewStudentLeadershipPositionSubmit'])->name('addNewStudentLeadershipPositionSubmit');
     Route::put('admin/leadership/student_rep/config/positions/update/{slug}/submit', [LeadershipController::class, 'editStudentLeadershipPositionSubmit'])->name('editStudentLeadershipPositionSubmit');
     Route::get('admin/leadership/student_rep/config/positions/delete/{slug}/submit', [LeadershipController::class, 'deleteStudentLeadershipPosition'])->name('deleteStudentLeadershipPosition');
-
-    
-
-
 });

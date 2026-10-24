@@ -11,6 +11,7 @@ use App\Models\Elections\ElectionCandidateApplication;
 use App\Models\Finance\Dues\AssociationDue;
 use App\Models\Finance\Transactions\PaymentTransaction;
 use App\Models\Finance\Transactions\PaymentWaiver;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
 use App\Models\Media\MediaPublication;
 use App\Models\Media\MemberSocialMediaHandle;
 use App\Models\Media\PublicationComment;
@@ -336,6 +337,11 @@ class User extends Authenticatable
             'username',
             'username'
         )->where('status', 'approved');
+    }
+
+     public function leadershipPositionsInAssociation()
+    {
+        return $this->belongsTo(StudentLeadershipRepresentative::class, 'username', 'username');
     }
 
 
