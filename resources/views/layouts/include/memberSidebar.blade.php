@@ -181,6 +181,27 @@
             </div>
         </li><!--//nav-item-->
         <li class="nav-item has-submenu">
+            <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/leadership') ? 'sidebar-active-section' : '' }}"
+                href="#" data-bs-toggle="collapse" data-bs-target="#submenu-12" aria-expanded="false"
+                aria-controls="submenu-12">
+                <span class="nav-icon">
+                    <i class="fas fa-users-gear"></i>
+                </span>
+                <span class="nav-link-text">Leadership</span>
+                <span class="submenu-arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span><!--//submenu-arrow-->
+            </a><!--//nav-link-->
+            <div id="submenu-12" class="collapse submenu submenu-12" data-bs-parent="#menu-accordion">
+                <ul class="submenu-list list-unstyled">
+                    <li class="submenu-item"><a
+                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'member/leadership/student_rep') ? 'sidebar-active' : '' }}"
+                            href="{{ route('memberSeeLeaders') }}">Leaders</a>
+                    </li>
+                </ul>
+            </div>
+        </li><!--//nav-item-->
+        <li class="nav-item has-submenu">
             <a class="nav-link submenu-toggle {{ Str::startsWith(request()->path(), 'member/archive') ? 'sidebar-active-section' : '' }}"
                 href="#" data-bs-toggle="collapse" data-bs-target="#submenu-11" aria-expanded="false"
                 aria-controls="submenu-11">
@@ -226,6 +247,7 @@
                 </ul>
             </div>
         </li><!--//nav-item-->
+
         <li class="nav-item">
             <a class="nav-link {{ Str::startsWith(request()->path(), 'member/my_profile') ? 'sidebar-active-section' : '' }}"
                 href="{{ route('memberViewSelfProfile') }}">

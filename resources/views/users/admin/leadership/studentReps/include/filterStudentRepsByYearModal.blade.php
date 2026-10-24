@@ -18,11 +18,13 @@
                     </button>
                 </h4>
             </div>
+    
             <div class="modal-body">
                 <div class="modal_form_wrapper pb-4">
 
                     {{-- <div class="card-body"> --}}
-                    <form class="form my_form" method="GET" {{-- action="{{ $filterRoute }}" --}} enctype="multipart/form-data">
+                    <form class="form my_form" method="GET" action="{{ request()->url() }}"
+                        enctype="multipart/form-data">
                         @csrf
                         <div class="row">
                             <div class="form-group col-md-12">

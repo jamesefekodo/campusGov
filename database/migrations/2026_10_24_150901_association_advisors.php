@@ -18,14 +18,14 @@ return new class extends Migration
             $table->string('name');
             $table->string('position');
             $table->string('photo')->nullable();
-            $table->string('tenure_slug'); // foreign
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
             $table->text('remarks')->nullable();
-            $table->boolean('is_active')->default(true);
+            // $table->boolean('is_active')->default(true);
             $table->timestamps();
 
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();
-            $table->foreign('tenure_slug')->references('slug')->on('student_leadership_tenures')->onDelete('cascade')->cascadeOnUpdate();
         });
     }
 

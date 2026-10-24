@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Leadership;
 
 use App\Http\Controllers\Controller;
-use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
-use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
+use App\Models\Leadership\StudentRepresentative\AssociationAdvisor;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipArm;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipPosition;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 class LeadershipController extends Controller
 {
@@ -329,6 +332,172 @@ class LeadershipController extends Controller
             return redirect()->back()->with('error', 'Cannot delete position with representatives, please remove representatives first!');
         }
         $position->delete();
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function advisors(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('leadership.manage'),
+            403
+        );
+        $tenure = StudentLeadershipTenure::orderByDesc('academic_session')->get();
+
+        $academicSession = $request->academic_session ?? currentAcademicYear();
+
+        $selectedTenure = StudentLeadershipTenure::where(
+            'academic_session',
+            $academicSession
+        )->first();
+
+        $advisors = AssociationAdvisor::query()
+            ->when(
+                $selectedTenure,
+                function ($query) use ($selectedTenure) {
+                    // Use today if the selected tenure has no end date
+                    $tenureStart = $selectedTenure->start_date;
+                    $tenureEnd = $selectedTenure->end_date ?? today();
+
+                    $query
+                        // Advisor must have started by the tenure's effective end
+                        ->whereDate('start_date', '<=', $tenureEnd)
+
+                        // Advisor must not have ended before the tenure started
+                        ->where(function ($query) use ($tenureStart) {
+                            $query->whereNull('end_date')
+                                ->orWhereDate('end_date', '>=', $tenureStart);
+                        });
+                },
+                function ($query) {
+                    // No matching tenure means no results
+                    $query->whereRaw('1 = 0');
+                }
+            )
+            ->orderByDesc('start_date')
+            ->orderBy('name')
+            ->paginate(20);
+
+        $data = [
+            'advisors' => $advisors,
+            'tenure' => $tenure,
+            'academicSession' => $academicSession,
+        ];
+
+        return view('users.admin.leadership.advisors.advisors', compact('data'));
+    }
+    public function addNewStudentLeadershipAdvisorSubmit(Request $request)
+    {
+        $request->validate([
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'name' => 'required',
+            'position' => 'required',
+            'remarks' => 'nullable',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after:start_date',
+        ]);
+        $advisor = new AssociationAdvisor();
+
+        $advisor->name = trim($request->name);
+        $advisor->position = trim($request->position);
+        // $advisor->tenure_slug = trim($request->tenure_slug);
+        $advisor->start_date = $request->start_date;
+        $advisor->end_date = $request->end_date ?? null;
+        $advisor->remarks = trim($request->remarks);
+
+        if ($request->hasFile('photo')) {
+            $tenantId = tenant()->id;
+
+            $directory = public_path("assets/tenant_{$tenantId}/uploads/leadership/advisor");
+
+            // Create the folder if it does not exist
+            if (!File::exists($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            // Delete the old photo if this is an update
+            if (!empty($advisor->photo)) {
+                $oldPhotoPath = $directory . '/' . $advisor->photo;
+
+                if (File::exists($oldPhotoPath)) {
+                    File::delete($oldPhotoPath);
+                }
+            }
+
+            // Clean the advisor name for use as a filename
+            $safeName = Str::slug(pathinfo($advisor->name, PATHINFO_FILENAME));
+
+            $extension = strtolower($request->file('photo')->getClientOriginalExtension());
+
+            // Unique name prevents one advisor overwriting another with the same name
+            $newImageName = $safeName . '-' . uniqid() . '.' . $extension;
+
+            $request->file('photo')->move($directory, $newImageName);
+
+            $advisor->photo = $newImageName;
+        }
+
+        $advisor->save();
+
+        return redirect()->back()->with('success', 'Done');
+    }
+    public function editStudentLeadershipAdvisorSubmit($uuid, Request $request){
+         $advisor = AssociationAdvisor::where('uuid', $uuid)->first();
+        if (!$advisor) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+         $request->validate([
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
+            'name' => 'required',
+            'position' => 'required',
+            'remarks' => 'nullable',
+            'start_date' => 'required|date',
+            'end_date'   => 'nullable|date|after:start_date',
+        ]);
+
+         $advisor->name = trim($request->name);
+        $advisor->position = trim($request->position);
+        // $advisor->tenure_slug = trim($request->tenure_slug);
+        $advisor->start_date = $request->start_date;
+        $advisor->end_date = $request->end_date ?? null;
+        $advisor->remarks = trim($request->remarks);
+
+        if ($request->hasFile('photo')) {
+            $tenantId = tenant()->id;
+
+            $directory = public_path("assets/tenant_{$tenantId}/uploads/leadership/advisor");
+
+            // Create the folder if it does not exist
+            if (!File::exists($directory)) {
+                File::makeDirectory($directory, 0755, true);
+            }
+
+            // Delete the old photo if this is an update
+            if (!empty($advisor->photo)) {
+                $oldPhotoPath = $directory . '/' . $advisor->photo;
+
+                if (File::exists($oldPhotoPath)) {
+                    File::delete($oldPhotoPath);
+                }
+            }
+
+            // Clean the advisor name for use as a filename
+            $safeName = Str::slug(pathinfo($advisor->name, PATHINFO_FILENAME));
+
+            $extension = strtolower($request->file('photo')->getClientOriginalExtension());
+
+            // Unique name prevents one advisor overwriting another with the same name
+            $newImageName = $safeName . '-' . uniqid() . '.' . $extension;
+
+            $request->file('photo')->move($directory, $newImageName);
+
+            $advisor->photo = $newImageName;
+        }
+
+        $advisor->save();
+
         return redirect()->back()->with('success', 'Done');
     }
 }

@@ -379,11 +379,10 @@
                                 Representatives</a>
                         </li>
                         <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/marketing/coupons') ? 'sidebar-active' : '' }}"
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/leadership/advisors') ? 'sidebar-active' : '' }}"
                                 href="
-                            {{-- {{ route('couponsHome') }} --}}
-                             ">Advisory
-                                Council</a>
+                            {{ route('advisors') }}
+                             ">Advisors</a>
                         </li>
                     </ul>
                 </div>

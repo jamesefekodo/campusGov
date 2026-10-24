@@ -59,7 +59,7 @@
                                         <option value="{{ $tenure->slug }}"
                                             {{ old('tenure_slug') == "$tenure->slug" ? 'selected' : '' }}>
                                             {{ $tenure->academic_session }}/{{ $tenure->academic_session + 1 }}
-                                            @if ($tenure->name && (int) $tenure->name !== (int) $tenure->academic_session)
+                                            @if ($tenure->name && $tenure->name !== $tenure->academic_session)
                                                 ({{ $tenure->name }})
                                             @endif
                                         </option>

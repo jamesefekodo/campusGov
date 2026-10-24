@@ -159,13 +159,13 @@
                                                             </td>
                                                             <td class="">
                                                                 <button type="button"
-                                                                    class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center"
+                                                                    class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center m-1"
                                                                     data-toggle="modal"
                                                                     data-target="#editStudentLeadershipRep_{{ $leader->uuid }}">
                                                                     <i class="fas fa-arrows-rotate me-1"></i> Update
                                                                 </button>
                                                                 <button type="button"
-                                                                    class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm"
+                                                                    class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm m-1"
                                                                     data-url="{{ route('deleteStudentLeadershipRep', ['uuid' => $leader->uuid]) }}"
                                                                     >
                                                                     <i class="fas fa-trash me-1"></i> Delete

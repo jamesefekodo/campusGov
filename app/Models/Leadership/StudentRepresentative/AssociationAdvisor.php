@@ -22,13 +22,16 @@ class AssociationAdvisor extends Model
         'name',
         'position',
         'photo',
-        'tenure_slug',
         'remarks',
-        'is_active',
+        'start_date',
+        'end_date',
+        // 'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        // 'is_active' => 'boolean',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     // uuid
@@ -48,14 +51,5 @@ class AssociationAdvisor extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
-    }
-
-    public function tenure(): BelongsTo
-    {
-        return $this->belongsTo(
-            StudentLeadershipTenure::class,
-            'tenure_slug',
-            'slug'
-        );
     }
 }
