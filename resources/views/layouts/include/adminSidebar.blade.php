@@ -374,7 +374,7 @@
                 <div id="submenu-12" class="collapse submenu submenu-12" data-bs-parent="#menu-accordion">
                     <ul class="submenu-list list-unstyled">
                         <li class="submenu-item"><a
-                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/leadership/student_reps') ? 'sidebar-active' : '' }}"
+                                class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/leadership/student_rep') ? 'sidebar-active' : '' }}"
                                 href="{{ route('studentLeadership') }}">Student
                                 Representatives</a>
                         </li>
