@@ -124,7 +124,7 @@
                                                                 </button>
                                                                 <button type="button"
                                                                     class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm m-1"
-                                                                    {{-- data-url="{{ route('deleteStudentLeadershipRep', ['uuid' => $leader->uuid]) }}" --}}>
+                                                                    data-url="{{ route('deleteAssociationAdvisor', ['uuid' => $advisor->uuid]) }}" >
                                                                     <i class="fas fa-trash me-1"></i> Delete
                                                                 </button>
 

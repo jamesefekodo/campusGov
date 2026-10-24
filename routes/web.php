@@ -874,9 +874,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/leadership/advisors', [LeadershipController::class, 'advisors'])->name('advisors');
     Route::post('admin/leadership/advisors/add_new/submit', [LeadershipController::class, 'addNewStudentLeadershipAdvisorSubmit'])->name('addNewStudentLeadershipAdvisorSubmit');
     Route::put('admin/leadership/advisors/edit/{uuid}/submit', [LeadershipController::class, 'editStudentLeadershipAdvisorSubmit'])->name('editStudentLeadershipAdvisorSubmit');
-
-
-
+    Route::get('admin/leadership/advisors/delete/{uuid}', [LeadershipController::class, 'deleteAssociationAdvisor'])->name('deleteAssociationAdvisor');
 
 
 });

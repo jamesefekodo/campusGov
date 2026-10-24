@@ -442,13 +442,14 @@ class LeadershipController extends Controller
 
         return redirect()->back()->with('success', 'Done');
     }
-    public function editStudentLeadershipAdvisorSubmit($uuid, Request $request){
-         $advisor = AssociationAdvisor::where('uuid', $uuid)->first();
+    public function editStudentLeadershipAdvisorSubmit($uuid, Request $request)
+    {
+        $advisor = AssociationAdvisor::where('uuid', $uuid)->first();
         if (!$advisor) {
             return redirect()->back()->with('error', 'Records not found!');
         }
 
-         $request->validate([
+        $request->validate([
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:2048',
             'name' => 'required',
             'position' => 'required',
@@ -457,7 +458,7 @@ class LeadershipController extends Controller
             'end_date'   => 'nullable|date|after:start_date',
         ]);
 
-         $advisor->name = trim($request->name);
+        $advisor->name = trim($request->name);
         $advisor->position = trim($request->position);
         // $advisor->tenure_slug = trim($request->tenure_slug);
         $advisor->start_date = $request->start_date;
@@ -499,5 +500,33 @@ class LeadershipController extends Controller
         $advisor->save();
 
         return redirect()->back()->with('success', 'Done');
+    }
+    public function deleteAssociationAdvisor($uuid)
+    {
+        $advisor = AssociationAdvisor::where('uuid', $uuid)->first();
+        if (!$advisor) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        if (!empty($advisor->photo)) {
+            $tenantId = tenant()->id;
+
+            $photoPath = public_path(
+                "assets/tenant_{$tenantId}/uploads/leadership/advisor/{$advisor->photo}"
+            );
+
+            if (File::exists($photoPath)) {
+                File::delete($photoPath);
+            }
+        }
+        $advisor->delete();
+        return redirect()->back()->with('success', 'Done');
+    }
+
+
+    // members
+    public function memberSeeLeaders(Request $request)
+    {
+        //
     }
 }
