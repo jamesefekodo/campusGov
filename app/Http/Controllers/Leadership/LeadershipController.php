@@ -527,6 +527,83 @@ class LeadershipController extends Controller
     // members
     public function memberSeeLeaders(Request $request)
     {
-        //
+        $academicSession = $request->academic_session ?? currentAcademicYear();
+
+        // Fetch student leaders
+        $studentLeaders = StudentLeadershipRepresentative::query()
+            ->with([
+                'position.arm',
+                'position',
+                'tenure',
+                'theRep.memberPersonalProfile',
+                'theRep.memberSocialMediaHandle.thePlatform',
+            ])
+            ->whereHas('tenure', function ($query) use ($academicSession) {
+                $query->where('academic_session', $academicSession);
+            })
+            ->leftJoin(
+                'student_leadership_positions as positions',
+                'student_leadership_representative.position_slug',
+                '=',
+                'positions.slug'
+            )
+            ->leftJoin(
+                'student_leadership_arms as arms',
+                'positions.arm_slug',
+                '=',
+                'arms.slug'
+            )
+            ->select('student_leadership_representative.*')
+            ->orderBy('arms.sort_order', 'asc')
+            ->orderBy('positions.sort_order', 'asc')
+            ->orderByRaw("
+        CASE
+            WHEN arms.slug = 'executive' THEN 1
+            WHEN arms.slug = 'legislative' THEN 2
+            ELSE 3
+        END ASC
+    ")
+            ->get();
+
+        // Fetch the selected tenure
+        $selectedTenure = StudentLeadershipTenure::where(
+            'academic_session',
+            $academicSession
+        )->first();
+
+        // Fetch advisors
+        $advisors = AssociationAdvisor::query()
+            ->when(
+                $selectedTenure,
+                function ($query) use ($selectedTenure) {
+                    $tenureStart = $selectedTenure->start_date;
+                    $tenureEnd = $selectedTenure->end_date ?? today();
+
+                    $query
+                        ->whereDate('start_date', '<=', $tenureEnd)
+                        ->where(function ($query) use ($tenureStart) {
+                            $query->whereNull('end_date')
+                                ->orWhereDate('end_date', '>=', $tenureStart);
+                        });
+                },
+                function ($query) {
+                    $query->whereRaw('1 = 0');
+                }
+            )
+            ->orderByDesc('start_date')
+            ->orderBy('name')
+            ->get();
+
+        $data = [
+            'studentLeaders' => $studentLeaders,
+            'advisors' => $advisors,
+            'academicSession' => $academicSession,
+            'theTenure' => StudentLeadershipTenure::where('academic_session', $academicSession)->first() ?? null,
+        ];
+
+        return view(
+            'users.member.leadership.associationLeaders',
+            compact('data')
+        );
     }
 }
