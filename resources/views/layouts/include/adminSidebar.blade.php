@@ -461,13 +461,6 @@
                         </li>
                     @endif
 
-                    <li class="submenu-item"><a
-                            class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/other_pages') ? 'sidebar-active' : '' }}"
-                            href="
-                            {{-- {{ route('settingsOtherPages') }} --}}
-                            ">Other
-                            Pages</a>
-                    </li>
                     @if (Auth::user()->hasPermission('manage_seo'))
                         <li class="submenu-item"><a
                                 class="submenu-link text-capitalize {{ Str::startsWith(request()->path(), 'admin/config/seo') ? 'sidebar-active' : '' }}"
@@ -480,17 +473,23 @@
                             Analytics</a>
                     </li> --}}
                     <li class="submenu-item"><a
+                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/themes') ? 'sidebar-active' : '' }}"
+                            href="
+                        {{ route('frontendThemes') }}
+                         ">Themes</a>
+                    </li>
+                    {{-- <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/server') ? 'sidebar-active' : '' }}"
                             href="
-                        {{-- {{ route('basicServerInfo') }} --}}
+                        {{ route('basicServerInfo') }}
                          ">Server</a>
                     </li>
                     <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/system') ? 'sidebar-active' : '' }}"
                             href="
-                        {{-- {{ route('systemSettingsHome') }} --}}
+                        {{ route('systemSettingsHome') }}
                          ">System</a>
-                    </li>
+                    </li> --}}
                 </ul>
             </div>
         </li><!--//nav-item-->

@@ -580,6 +580,10 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/config/user_roles/update/{uuid}', [PermissionAccessController::class, 'updateRoleSubmit'])->name('updateRoleSubmit');
     Route::get('admin/config/user_roles/delete/{uuid}', [PermissionAccessController::class, 'deleteRole'])->name('deleteRole');
 
+    // themes
+    Route::get('admin/config/themes', [ThemeController::class, 'frontendThemes'])->name('frontendThemes');
+
+
     // permissions
     Route::get('/roles/{role:uuid}/permissions', function (Role $role) {
         return view('admin.roles.permissions-edit', compact('role'));

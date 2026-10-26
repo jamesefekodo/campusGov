@@ -4,6 +4,7 @@ namespace App\Models\Tenancy;
 
 use App\Models\Admin\AdminProfile;
 use App\Models\Config\BasicSystemSetting;
+use App\Models\Theme\Frontend\TenantThemeSetting;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -80,5 +81,9 @@ class Tenant extends Model
     public function tenantAdministrators()
     {
         return $this->hasMany(AdminProfile::class, 'tenant_id', 'id');
+    }
+    public function themeSetting()
+    {
+        return $this->hasOne(TenantThemeSetting::class);
     }
 }
