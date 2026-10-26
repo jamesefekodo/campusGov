@@ -10,6 +10,7 @@ use App\Http\Controllers\Config\AcademicConfigController;
 use App\Http\Controllers\Config\PermissionAccessController;
 use App\Http\Controllers\Config\SystemConfigurationController;
 use App\Http\Controllers\Config\SystemPolicyController;
+use App\Http\Controllers\Config\ThemeController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Election\ElectionController;
 use App\Http\Controllers\Election\MemberElectionController;
@@ -73,10 +74,6 @@ Route::get('/unkown_tenant', [AuthController::class, 'unknownTenant'])->name('un
 // payment rollback
 Route::get('/callback/with_paystack/{transaction_id}', [PaymentTransasctionController::class, 'paystackPaymentCallback'])->name('paystackPaymentCallback');
 Route::get('/callback/with_flutterwave', [PaymentTransasctionController::class, 'flutterwavePaymentCallback'])->name('flutterwavePaymentCallback');
-
-// ##############################################################################
-Route::get('/temporary_upload', [FrontendController::class, 'showUploadForm']);
-Route::post('/process_temporary_upload', [FrontendController::class, 'processTemporaryUpload'])->name('processTemporaryUpload');
 
 // ##############################################################################
 // sharing
@@ -347,7 +344,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     //  leaders
     Route::get('member/leadership/student_rep', [LeadershipController::class, 'memberSeeLeaders'])->name('memberSeeLeaders');
 
-    
+
 
 
 });
@@ -582,6 +579,14 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // themes
     Route::get('admin/config/themes', [ThemeController::class, 'frontendThemes'])->name('frontendThemes');
+     Route::post('themes/{frontendTheme}/select', [ThemeController::class, 'selectTheme'])
+        ->name('frontendThemes.select');
+
+    Route::post('themes/{frontendTheme}/reset', [ThemeController::class, 'resetTheme'])
+        ->name('frontendThemes.reset');
+
+    Route::post('themes/update-colors', [ThemeController::class, 'updateColors'])
+        ->name('frontendThemes.updateColors');
 
 
     // permissions

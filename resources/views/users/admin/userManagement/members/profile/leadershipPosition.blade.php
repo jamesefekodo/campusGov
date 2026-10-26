@@ -24,12 +24,14 @@
                                                 Association Leadership Positions
                                             </h5>
 
-                                            <button type="button"
-                                                class="btn btn-primary btn-sm d-inline-flex align-items-center"
-                                                data-toggle="modal" data-target="#addNewStudentRepModal">
-                                                <i class="fas fa-plus me-1"></i>
-                                                Add Position
-                                            </button>
+                                            @if (Auth::user()->hasPermission('leadership.manage'))
+                                                <button type="button"
+                                                    class="btn btn-primary btn-sm d-inline-flex align-items-center"
+                                                    data-toggle="modal" data-target="#addNewStudentRepModal">
+                                                    <i class="fas fa-plus me-1"></i>
+                                                    Add Position
+                                                </button>
+                                            @endif
                                         </div>
 
                                         @include('users.admin.leadership.studentReps.include.addNewStudentRepModal')
@@ -58,7 +60,7 @@
                                                                             @if ($leadership->tenure?->end_date)
                                                                                 -
                                                                                 {{ \Carbon\Carbon::parse($leadership->tenure->end_date)->format('F Y') }}
-                                                                                @endif @if ($leadership?->tenure->name && ($leadership?->tenure->name !== $leadership?->tenure->academic_session))
+                                                                                @endif @if ($leadership?->tenure->name && $leadership?->tenure->name !== $leadership?->tenure->academic_session)
                                                                                     ({{ $leadership->tenure->name }})
                                                                                 @endif
                                                                         </small>
@@ -70,33 +72,38 @@
                                                                 <hr>
 
                                                                 <p class="mb-2">
-                                                                    <span class="text-muted">Arm/Body:</span> {{ $leadership->position->arm->name ?? 'N/A' }}
+                                                                    <span class="text-muted">Arm/Body:</span>
+                                                                    {{ $leadership->position->arm->name ?? 'N/A' }}
                                                                 </p>
 
                                                                 <p class="mb-2">
-                                                                    <span class="text-muted">Position:</span> {{ $leadership->position->name ?? 'N/A' }}
+                                                                    <span class="text-muted">Position:</span>
+                                                                    {{ $leadership->position->name ?? 'N/A' }}
                                                                 </p>
 
                                                                 <p class="mb-2">
-                                                                    <span class="text-muted">Tenure:</span> {{ $leadership->tenure->academic_session }}/{{ $leadership->tenure->academic_session + 1 }}
+                                                                    <span class="text-muted">Tenure:</span>
+                                                                    {{ $leadership->tenure->academic_session }}/{{ $leadership->tenure->academic_session + 1 }}
                                                                 </p>
 
-                                                                <div class="d-flex justify-content-end">
-                                                                    <button type="button"
-                                                                        class="btn btn-warning btn-sm me-2"
-                                                                        data-toggle="modal"
-                                                                        data-target="#editAssociationLeadershipPosition_{{ $leadership->uuid }}">
-                                                                        <i class="fas fa-pen me-1"></i>
-                                                                        Update
-                                                                    </button>
+                                                                @if (Auth::user()->hasPermission('leadership.manage'))
+                                                                    <div class="d-flex justify-content-end">
+                                                                        <button type="button"
+                                                                            class="btn btn-warning btn-sm me-2"
+                                                                            data-toggle="modal"
+                                                                            data-target="#editAssociationLeadershipPosition_{{ $leadership->uuid }}">
+                                                                            <i class="fas fa-pen me-1"></i>
+                                                                            Update
+                                                                        </button>
 
-                                                                    <button type="button"
-                                                                        class="btn btn-danger btn-sm delete-association-leadership"
-                                                                        data-url="{{ route('deleteStudentLeadershipRep', $leadership->uuid) }}">
-                                                                        <i class="fas fa-trash me-1"></i>
-                                                                        Remove
-                                                                    </button>
-                                                                </div>
+                                                                        <button type="button"
+                                                                            class="btn btn-danger btn-sm delete-association-leadership"
+                                                                            data-url="{{ route('deleteStudentLeadershipRep', $leadership->uuid) }}">
+                                                                            <i class="fas fa-trash me-1"></i>
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>

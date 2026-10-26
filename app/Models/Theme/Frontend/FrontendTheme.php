@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class FrontendTheme extends Model
 {
-    protected $table = 'tenant_theme_settings';
+    protected $table = 'frontend_themes';
     protected $fillable = [
         'name',
         'slug',
         'description',
+        'view_path',
         'is_active',
         'default_colors',
     ];

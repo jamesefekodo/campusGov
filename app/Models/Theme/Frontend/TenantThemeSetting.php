@@ -9,10 +9,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class TenantThemeSetting extends Model
 {
+    protected $table = 'tenant_theme_settings';
+
     use BelongsToTenant;
+
     protected $fillable = [
         'tenant_id',
-        'theme_id',
+        'frontend_theme_id',
         'color_overrides',
     ];
 
@@ -27,6 +30,9 @@ class TenantThemeSetting extends Model
 
     public function theme()
     {
-        return $this->belongsTo(FrontendTheme::class);
+        return $this->belongsTo(
+            FrontendTheme::class,
+            'frontend_theme_id'
+        );
     }
 }

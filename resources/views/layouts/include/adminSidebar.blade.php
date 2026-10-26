@@ -472,12 +472,14 @@
                             href="{{ route('googleAnalyticsSettings') }}">Google
                             Analytics</a>
                     </li> --}}
-                    <li class="submenu-item"><a
-                            class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/themes') ? 'sidebar-active' : '' }}"
-                            href="
+                    @if (Auth::user()->hasPermission('themes.manage'))
+                        <li class="submenu-item"><a
+                                class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/themes') ? 'sidebar-active' : '' }}"
+                                href="
                         {{ route('frontendThemes') }}
                          ">Themes</a>
-                    </li>
+                        </li>
+                    @endif
                     {{-- <li class="submenu-item"><a
                             class="submenu-link {{ Str::startsWith(request()->path(), 'admin/config/server') ? 'sidebar-active' : '' }}"
                             href="
