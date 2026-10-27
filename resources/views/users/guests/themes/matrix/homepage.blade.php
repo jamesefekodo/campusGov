@@ -562,6 +562,40 @@
                 font-size: 2rem;
             }
         }
+
+        .department-card {
+            display: flex;
+            flex-direction: column;
+            padding: 2.75rem 2.25rem;
+        }
+
+        .department-card i {
+            font-size: 2.75rem;
+        }
+
+        .department-card h3 {
+            font-size: 1.55rem;
+            line-height: 1.35;
+            min-height: 66px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .department-description {
+            flex-grow: 1;
+            min-height: 84px;
+            margin-bottom: 1.75rem;
+        }
+
+        .department-link {
+            font-weight: 600;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+
+        .department-card:hover .department-link {
+            transform: translateX(4px);
+        }
     </style>
 </head>
 
@@ -800,18 +834,21 @@
                                 {{ $profile->last_name }}
                             </h4>
                             <p class="mb-0">President, {{ strtoupper($data['basicInfo']->association_acronym) }},
-                                {{ $data['currentAcademicYear'] }}/{{ $data['currentAcademicYear']+1 }} Session.</p>
+                                {{ $data['currentAcademicYear'] }}/{{ $data['currentAcademicYear'] + 1 }} Session.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="p-4 rounded shadow-sm overlay-glass">
-                        <h3 style="color: var(--theme-primary)">President's Address</h3>
+                        <h3 style="color: var(--theme-primary)">President's Remarks</h3>
 
-                        <p>
-                            This is placeholder text for the president’s remarks. Replace this paragraph with the
-                            actual welcome message, vision, and priorities for the association.
+                        <p class="text-justify">
+                            {!! \Illuminate\Support\Str::words(
+                                strip_tags(html_entity_decode($data['basicInfo']->president_remarks)),
+                                150,
+                                '...',
+                            ) !!}
                         </p>
 
                         <div class="d-flex justify-content-end">
@@ -823,7 +860,7 @@
         </div>
     @endif
 
-    <section class="services-section">
+    {{-- <section class="services-section">
         <div class="container my-5">
             <h2 class="section-title">Student <span>Associations</span></h2>
 
@@ -873,69 +910,232 @@
                 </div>
             </div>
         </div>
-    </section>
-
+    </section> --}}
+    {{-- faculties start --}}
     <section class="services-section">
         <div class="container">
-            <h2 class="section-title">Our <span>Faculty/Departments</span></h2>
+            <h2 class="section-title">
+                Our <span>Faculties</span>
+            </h2>
 
             <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-cogs w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Faculty of Engineering (FENG)</h3>
-                        <p>Placeholder description for the faculty of engineering.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
-                    </div>
-                </div>
+                @php
+                    $facultyIconKeywords = [
+                        'engineering' => 'fas fa-gears',
+                        'science' => 'fas fa-flask-vial',
+                        'environment' => 'fas fa-leaf',
+                        'health' => 'fas fa-heart-pulse',
+                        'medical' => 'fas fa-stethoscope',
+                        'medicine' => 'fas fa-stethoscope',
+                        'nursing' => 'fas fa-user-nurse',
+                        'pharmacy' => 'fas fa-pills',
+                        'law' => 'fas fa-scale-balanced',
+                        'legal' => 'fas fa-gavel',
+                        'business' => 'fas fa-briefcase',
+                        'management' => 'fas fa-clipboard-list',
+                        'administration' => 'fas fa-clipboard-list',
+                        'account' => 'fas fa-calculator',
+                        'finance' => 'fas fa-money-bill-trend-up',
+                        'banking' => 'fas fa-building-columns',
+                        'social' => 'fas fa-people-group',
+                        'education' => 'fas fa-graduation-cap',
+                        'agric' => 'fas fa-tractor',
+                        'art' => 'fas fa-palette',
+                        'design' => 'fas fa-pen-ruler',
+                        'communication' => 'fas fa-comments',
+                        'information' => 'fas fa-database',
+                        'technology' => 'fas fa-microchip',
+                    ];
+                @endphp
 
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-cogs w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Mechanical Engineering</h3>
-                        <p>Placeholder description for the mechanical engineering department.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
-                    </div>
-                </div>
+                @foreach ($data['faculties'] as $faculty)
+                    @php
+                        $facultyName = strtolower($faculty->name ?? '');
+                        $iconClass = 'fas fa-building-columns';
 
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-lightbulb w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Electrical Engineering</h3>
-                        <p>Placeholder description for the electrical engineering department.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
-                    </div>
-                </div>
+                        foreach ($facultyIconKeywords as $keyword => $icon) {
+                            if (str_contains($facultyName, $keyword)) {
+                                $iconClass = $icon;
+                                break;
+                            }
+                        }
+                    @endphp
 
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-microchip w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Computer Engineering</h3>
-                        <p>Placeholder description for the computer engineering department.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
-                    </div>
-                </div>
+                    <div class="col-sm-6 col-md-4">
+                        <div class="service-card">
+                            <i class="{{ $iconClass }} w-100 text-center"></i>
 
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-drafting-compass w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Civil Engineering</h3>
-                        <p>Placeholder description for the civil engineering department.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
-                    </div>
-                </div>
+                            <h3 class="w-100 text-center">
+                                {{ $faculty->name }}
+                                @if ($faculty->acronym)
+                                    ({{ $faculty->acronym }})
+                                @endif
+                            </h3>
 
-                <div class="col-md-4">
-                    <div class="service-card">
-                        <i class="fas fa-flask w-100 text-center"></i>
-                        <h3 class="w-100 text-center">Chemical Engineering</h3>
-                        <p>Placeholder description for the chemical engineering department.</p>
-                        <a href="#" class="w-100 text-end d-block">Learn More</a>
+                            <p>
+                                {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($faculty->description ?? '')), 12, '...') !!}
+                            </p>
+
+                            <a
+                            {{-- href="{{ $faculty->slug ? route('guestViewFaculty', ['slug' => $faculty->slug]) : '#' }}" --}}
+                                class="w-100 text-end d-block">
+                                Learn More
+                            </a>
+                        </div>
                     </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </section>
+    {{-- faculties end --}}
+
+    {{-- departments start --}}
+    <section class="services-section">
+        <div class="container">
+            <h2 class="section-title">
+                Our <span>Faculties/Departments</span>
+            </h2>
+
+            <div class="row g-4">
+                @php
+                    $iconKeywords = [
+                        // Engineering
+                        'mechanical' => 'fas fa-gears',
+                        'electrical' => 'fas fa-bolt',
+                        'electronic' => 'fas fa-microchip',
+                        'computer' => 'fas fa-laptop-code',
+                        'software' => 'fas fa-code',
+                        'civil' => 'fas fa-helmet-safety',
+                        'chemical' => 'fas fa-flask',
+                        'petroleum' => 'fas fa-oil-well',
+                        'gas' => 'fas fa-fire-flame-simple',
+                        'material' => 'fas fa-layer-group',
+                        'production' => 'fas fa-industry',
+                        'industrial' => 'fas fa-industry',
+                        'mechatronic' => 'fas fa-robot',
+                        'robot' => 'fas fa-robot',
+                        'agric' => 'fas fa-tractor',
+                        'biomedical' => 'fas fa-heart-pulse',
+                        'telecom' => 'fas fa-tower-broadcast',
+                        'aeronautic' => 'fas fa-jet-fighter-up',
+                        'aviation' => 'fas fa-plane',
+                        'maritime' => 'fas fa-ship',
+                        'survey' => 'fas fa-ruler-combined',
+                        'architecture' => 'fas fa-compass-drafting',
+                        'weld' => 'fas fa-screwdriver-wrench',
+
+                        // Science
+                        'science' => 'fas fa-flask-vial',
+                        'biology' => 'fas fa-dna',
+                        'microbio' => 'fas fa-bacteria',
+                        'chemistry' => 'fas fa-flask',
+                        'physics' => 'fas fa-atom',
+                        'mathematic' => 'fas fa-square-root-variable',
+                        'statistics' => 'fas fa-chart-line',
+                        'geology' => 'fas fa-mountain',
+                        'geophysics' => 'fas fa-globe',
+                        'environment' => 'fas fa-leaf',
+                        'forestry' => 'fas fa-tree',
+                        'fisheries' => 'fas fa-fish',
+                        'nutrition' => 'fas fa-apple-whole',
+
+                        // Health
+                        'nursing' => 'fas fa-user-nurse',
+                        'medicine' => 'fas fa-stethoscope',
+                        'medical' => 'fas fa-stethoscope',
+                        'health' => 'fas fa-heart-pulse',
+                        'pharmacy' => 'fas fa-pills',
+                        'dental' => 'fas fa-tooth',
+                        'optometry' => 'fas fa-glasses',
+                        'radiography' => 'fas fa-x-ray',
+                        'physiotherapy' => 'fas fa-person-walking',
+
+                        // Business / Management
+                        'business' => 'fas fa-briefcase',
+                        'account' => 'fas fa-calculator',
+                        'banking' => 'fas fa-building-columns',
+                        'finance' => 'fas fa-money-bill-trend-up',
+                        'marketing' => 'fas fa-bullhorn',
+                        'entrepreneur' => 'fas fa-lightbulb',
+                        'management' => 'fas fa-clipboard-list',
+                        'administration' => 'fas fa-clipboard-list',
+                        'office' => 'fas fa-file-invoice',
+                        'procurement' => 'fas fa-cart-shopping',
+                        'logistics' => 'fas fa-truck-fast',
+                        'transport' => 'fas fa-truck',
+                        'insurance' => 'fas fa-shield-halved',
+                        'hospitality' => 'fas fa-utensils',
+                        'tourism' => 'fas fa-plane-departure',
+
+                        // Social Sciences / Law
+                        'law' => 'fas fa-scale-balanced',
+                        'legal' => 'fas fa-gavel',
+                        'mass' => 'fas fa-bullhorn',
+                        'communication' => 'fas fa-comments',
+                        'journalism' => 'fas fa-newspaper',
+                        'media' => 'fas fa-photo-film',
+                        'sociology' => 'fas fa-people-group',
+                        'psychology' => 'fas fa-brain',
+                        'political' => 'fas fa-landmark',
+                        'public' => 'fas fa-landmark',
+                        'economics' => 'fas fa-chart-pie',
+                        'criminology' => 'fas fa-user-shield',
+
+                        // Education / Humanities
+                        'education' => 'fas fa-graduation-cap',
+                        'teaching' => 'fas fa-chalkboard-user',
+                        'english' => 'fas fa-book-open',
+                        'language' => 'fas fa-language',
+                        'linguistic' => 'fas fa-language',
+                        'history' => 'fas fa-landmark-dome',
+                        'religious' => 'fas fa-place-of-worship',
+                        'islamic' => 'fas fa-mosque',
+                        'christian' => 'fas fa-church',
+                        'music' => 'fas fa-music',
+                        'art' => 'fas fa-palette',
+                        'design' => 'fas fa-pen-ruler',
+                        'fashion' => 'fas fa-shirt',
+                    ];
+                @endphp
+
+                @foreach ($data['departments'] as $department)
+                    @php
+                        $departmentName = strtolower($department->name ?? '');
+                        $iconClass = 'fas fa-building-columns';
+
+                        foreach ($iconKeywords as $keyword => $icon) {
+                            if (str_contains($departmentName, $keyword)) {
+                                $iconClass = $icon;
+                                break;
+                            }
+                        }
+                    @endphp
+
+                    {{-- <div class="col-sm-6 col-md-4 col-lg-3"> --}}
+                    <div class="col-sm-6 col-md-4">
+                        <div class="service-card">
+                            <i class="{{ $iconClass }} w-100 text-center"></i>
+
+                            <h3 class="w-100 text-center">
+                                {{ $department->name }}
+                            </h3>
+
+                            <p>
+                                {!! \Illuminate\Support\Str::words(strip_tags(html_entity_decode($department->description ?? '')), 12, '...') !!}
+                            </p>
+
+                            <a {{-- href="{{ $department->slug
+                            ? route('guestViewDepartment', ['slug' => $department->slug])
+                            : '#' }}" --}} class="w-100 text-end d-block">
+                                Learn More
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+    {{-- departments end --}}
 
     <section class="services-section">
         <div class="container">
@@ -1110,7 +1310,7 @@
             </div>
 
             <div class="text-center">
-                <a href="#">Transcend Technologies</a>
+                <a href="https://odusystems.com.ng/" target="_blank">&copy; 2025{{ date('Y') > 2025 ? ' - ' . date('Y') : '' }} - CampusGov (V0.2)</a>
             </div>
         </div>
     </footer>

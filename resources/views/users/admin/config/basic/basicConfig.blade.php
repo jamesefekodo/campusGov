@@ -272,7 +272,7 @@
                                                             <label for="description">
                                                                 President's Remarks<span class="text-red">*</span>:
                                                             </label>
-                                                            <textarea id="president_remarks" name="president_remarks" required>{{ $data['basicSystemSetting']->president_remarks }}</textarea>
+                                                            <textarea id="presidentRemarks" name="president_remarks" required>{{ $data['basicSystemSetting']->president_remarks }}</textarea>
                                                             <p style="color: red">{{ $errors->first('president_remarks') }}</p>
                                                             <script>
                                                                 $(document).ready(function() {
