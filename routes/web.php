@@ -156,7 +156,7 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 
 
     // context switching
-    Route::post('/user-context/{context}', [PermissionAccessController::class, 'toggleLikeContribution'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
+    Route::post('/user-context/{context}', [PermissionAccessController::class, 'switchUserContext'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
 });
 
 // Route::middleware('auth')

@@ -16,7 +16,7 @@ class ThemeController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('themes.read'),
+            $user->hasPermission('themes.manage'),
             403
         );
 
@@ -52,7 +52,7 @@ class ThemeController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('themes.update'),
+            $user->hasPermission('themes.manage'),
             403
         );
 
@@ -81,7 +81,7 @@ class ThemeController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('themes.update'),
+            $user->hasPermission('themes.manage'),
             403
         );
 
@@ -152,7 +152,7 @@ class ThemeController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('themes.update'),
+            $user->hasPermission('themes.manage'),
             403
         );
 

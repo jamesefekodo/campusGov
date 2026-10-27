@@ -47,7 +47,7 @@
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="sort_order">Sort Order: <span class="text-red">*</span></label>
-                                <input type="text" class="form-control" name="sort_order"
+                                <input type="number" class="form-control" name="sort_order"
                                     value="{{ old('sort_order') }}" required>
                                 <p style="color: red">{{ $errors->first('sort_order') }}</p>
                             </div>

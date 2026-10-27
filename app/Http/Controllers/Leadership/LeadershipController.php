@@ -216,7 +216,7 @@ class LeadershipController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'sort_order' => 'required',
+            'sort_order' => 'required|integer|min:0',
         ]);
         StudentLeadershipArm::create([
             'name' => trim($request->name),
@@ -235,7 +235,7 @@ class LeadershipController extends Controller
         $request->validate([
             'name' => 'required',
             'description' => 'required',
-            'sort_order' => 'required',
+            'sort_order' => 'required|integer|min:0',
             'is_active' => 'required',
         ]);
 
@@ -285,7 +285,7 @@ class LeadershipController extends Controller
             'name' => 'required',
             'description' => 'required',
             'arm_slug' => 'required',
-            'sort_order' => 'required',
+            'sort_order' => 'required|integer|min:0',
         ]);
 
         StudentLeadershipPosition::create([
@@ -307,7 +307,7 @@ class LeadershipController extends Controller
             'name' => 'required',
             'description' => 'required',
             'arm_slug' => 'required',
-            'sort_order' => 'required',
+            'sort_order' => 'required|integer|min:0',
             'is_active' => 'required',
         ]);
 

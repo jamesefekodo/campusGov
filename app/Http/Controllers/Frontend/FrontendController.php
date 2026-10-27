@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConfig\Faculty;
+use App\Models\Config\HomepageSlider;
+use App\Models\Members\MemberAcademicInfo;
 use App\Services\ThemeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,9 +61,42 @@ class FrontendController extends Controller
         $theme = $themeService->activeTheme($tenant);
         $themeColors = $themeService->forTenant($tenant);
 
+        // ############################
+        $basicInfo = basicSystemInfo();
+        $operationalLevel = $basicInfo->operational_level;
+        $undergraduatesCount = MemberAcademicInfo::where('academic_status', 'student')
+            ->whereHas('userProfile', function ($query) {
+                $query->where('account_type', 2)->where('account_status', 2);
+            })->count();
+        $alumniCount = MemberAcademicInfo::query()
+            ->where('academic_status', 'alumni')
+            ->whereHas('userProfile', function ($query) {
+                $query->where('account_type', 2)
+                    ->where('account_status', 2);
+            })
+            ->count();
+        // Format function: rounds to nearest 5 and appends '+'
+        $formatCount = function ($count) {
+            $rounded = round($count / 5) * 5;
+            return $rounded . '+';
+        };
+
+        $undergraduates = $formatCount($undergraduatesCount);
+        $alumni = $formatCount($alumniCount);
+
+        $faculties = Faculty::where('is_active', true)->count();
+
+        $data = [
+            'sliders' => HomepageSlider::orderBy('order')->get(),
+            'operationalLevel' => $operationalLevel,
+            'undergraduates' => $undergraduates,
+            'alumni' => $alumni,
+        ];
+
         return view($themeService->homepageView($tenant), [
             'theme' => $theme,
             'themeColors' => $themeColors,
+            'data' => $data,
         ]);
     }
 

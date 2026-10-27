@@ -1,14 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | NAPES-OGITECH</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @php
+        $systemInfo = basicSystemInfo();
+
+        $associationName = $systemInfo->association_name ?? ($systemInfo->association_acronym ?? config('app.name'));
+
+        $associationAcronym = $systemInfo->association_acronym ?? config('app.name');
+
+        $schoolAcronym = $systemInfo->school_acronym ?? null;
+    @endphp
+
+
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+
+    <!-- Toastr CSS and JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+
+    <title>
+        @yield('title') | {{ basicSystemInfo()->association_acronym ?? config('app.name') }}
+    </title>
+    <meta name="description" content="Welcome to {{ $associationName }}. Login or register to access the platform.">
+    <link rel="icon" type="image/x-icon" href="{{ associationLogo() }}">
+
+
+
+    @livewireStyles
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+
+    {{-- OG data --}}
+    <meta property="og:url"
+        content="{{ tenant()->domain ? 'https://' . tenant()->domain : config('app.url') ?? url()->current() }}">
+    <meta property="og:type" content="website">
+
+    {{-- OG Title --}}
+    <meta property="og:title" content="@yield('og_title', seoSettings()->meta_title ?? ($associationName ?? ($associationAcronym ?? config('app.name'))))">
+    <meta property="og:description" content="@yield('og_description', seoSettings()->meta_description ?? 'CampusGov - Management System for Student Unions/Associations')">
+    <meta property="og:image" content="@yield('og_image', associationLogo())">
+
+    {{-- SEO --}}
+    <meta name="description" content="@yield('meta_description', seoSettings()->meta_description ?? 'CampusGov - Management System for Student Unions/Associations')">
+    <meta name="keywords" content="@yield('meta_keywords', seoSettings()->meta_keywords ?? '')">
+
+    {{-- Header Scripts --}}
+    {!! seoSettings()->header_scripts ?? '' !!}
+
     <style>
+        :root {
+            --theme-primary: {{ $themeColors['primary'] ?? '#1696e7' }};
+            --theme-secondary: {{ $themeColors['secondary'] ?? '#22d3ee' }};
+            --theme-accent: {{ $themeColors['accent'] ?? '#dc2626' }};
+            --theme-background: {{ $themeColors['background'] ?? '#0f172a' }};
+            --theme-surface: {{ $themeColors['surface'] ?? 'rgba(30, 41, 59, 0.5)' }};
+            --theme-text: {{ $themeColors['text'] ?? '#ffffff' }};
+            --theme-muted: {{ $themeColors['muted_text'] ?? '#9ca3af' }};
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,8 +74,8 @@
 
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0f172a;
-            color: #fff;
+            background-color: var(--theme-background);
+            color: var(--theme-text);
             overflow-x: hidden;
         }
 
@@ -44,26 +101,79 @@
             color: rgba(255, 255, 255, 0.85) !important;
             font-size: 0.95rem;
             padding: 0.5rem 1rem !important;
-            transition: transform 0.3s ease, color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
         }
 
-        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link:hover {
+            color: var(--theme-secondary) !important;
+            transform: scale(1.2);
+        }
+
         .navbar-nav .nav-link.active {
-            color: #1696e7 !important;
-            transform: scale(1.1);
+            color: var(--theme-primary) !important;
+            transform: scale(1.2);
+        }
+
+        .navbar-nav .nav-link.active::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 1rem;
+            right: 1rem;
+            height: 2px;
+            background: var(--theme-primary);
+        }
+
+        .dropdown-menu {
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+        }
+
+        .dropdown-item {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover,
+        .dropdown-item:focus {
+            background: color-mix(in srgb, var(--theme-primary) 12%, transparent);
+            color: var(--theme-primary);
+        }
+
+        .dropdown-divider {
+            border-color: rgba(255, 255, 255, 0.1);
+            margin: 0.5rem 0;
+        }
+
+        @media (min-width: 992px) {
+            .nav-item.dropdown:hover .dropdown-menu {
+                display: block;
+            }
         }
 
         .login-btn {
-            border: 2px solid #1696e7;
-            color: #1696e7;
+            background: transparent;
+            border: 2px solid var(--theme-primary);
+            color: var(--theme-primary);
             padding: 0.5rem 1.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
         }
 
         .login-btn:hover {
-            background: #1696e7;
-            color: #0f172a;
+            background: var(--theme-primary);
+            color: var(--theme-background);
         }
 
         .hero-carousel {
@@ -79,12 +189,10 @@
             content: "";
             position: absolute;
             inset: 0;
-            background: linear-gradient(
-                to left,
-                rgba(15, 23, 42, 0.9),
-                rgba(15, 23, 42, 0.6),
-                transparent
-            );
+            background: linear-gradient(to left,
+                    color-mix(in srgb, var(--theme-background) 90%, transparent),
+                    color-mix(in srgb, var(--theme-background) 60%, transparent),
+                    transparent);
             z-index: 1;
         }
 
@@ -92,25 +200,38 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+            object-position: center;
+            margin-top: 30px;
         }
 
         .carousel-caption {
             position: absolute;
-            right: 8%;
+            left: auto !important;
+            right: 8% !important;
             bottom: 15%;
+            transform: none !important;
             text-align: left;
             max-width: 550px;
             z-index: 2;
         }
 
+
+
         .glass-card {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(12px);
+            background: color-mix(in srgb, var(--theme-background) 70%, transparent);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 2rem;
             padding: 3rem;
-            color: #fff;
+            color: var(--theme-text);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px color-mix(in srgb, var(--theme-primary) 60%, transparent);
         }
 
         .glass-card h1 {
@@ -144,16 +265,16 @@
         }
 
         .carousel-indicators button.active {
-            background-color: #1696e7;
+            background-color: var(--theme-primary);
         }
 
         .stats-section {
-            background: rgba(30, 41, 59, 0.5);
+            background: var(--theme-surface);
             padding: 5rem 0;
         }
 
         .stat-card {
-            background: rgba(30, 41, 59, 0.5);
+            background: var(--theme-surface);
             border: 1px solid rgba(71, 85, 105, 0.5);
             border-radius: 1.5rem;
             padding: 3rem 2rem;
@@ -162,20 +283,20 @@
         }
 
         .stat-card:hover {
-            border-color: rgba(34, 211, 238, 0.5);
+            border-color: color-mix(in srgb, var(--theme-secondary) 50%, transparent);
             transform: translateY(-5px);
         }
 
         .stat-card i {
             font-size: 3rem;
-            color: #1696e7;
+            color: var(--theme-primary);
             margin-bottom: 1.5rem;
         }
 
         .stat-card h3 {
             font-size: 3rem;
             font-weight: 700;
-            color: #1696e7;
+            color: var(--theme-primary);
         }
 
         .section-title {
@@ -186,16 +307,16 @@
         }
 
         .section-title span {
-            color: #1696e7;
+            color: var(--theme-primary);
         }
 
         .services-section {
             padding: 5rem 0;
-            background: #0f172a;
+            background: var(--theme-background);
         }
 
         .service-card {
-            background: rgba(30, 41, 59, 0.5);
+            background: var(--theme-surface);
             border: 1px solid rgba(71, 85, 105, 0.5);
             border-radius: 1.5rem;
             padding: 2.5rem;
@@ -204,13 +325,13 @@
         }
 
         .service-card:hover {
-            border-color: rgba(100, 190, 242, 0.5);
+            border-color: color-mix(in srgb, var(--theme-primary) 50%, transparent);
             transform: translateY(-5px);
         }
 
         .service-card i {
             font-size: 3rem;
-            color: #1696e7;
+            color: var(--theme-primary);
             margin-bottom: 1.5rem;
         }
 
@@ -220,12 +341,16 @@
         }
 
         .service-card p {
-            color: #9ca3af;
+            color: var(--theme-muted);
             line-height: 1.8;
         }
 
+        .service-card a {
+            color: var(--theme-primary);
+        }
+
         .association-card {
-            background: rgba(15, 23, 42, 0.7);
+            background: color-mix(in srgb, var(--theme-background) 70%, transparent);
             backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 1.5rem;
@@ -236,7 +361,7 @@
 
         .association-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 30px rgba(22, 150, 231, 0.4);
+            box-shadow: 0 8px 30px color-mix(in srgb, var(--theme-primary) 40%, transparent);
         }
 
         .association-logo {
@@ -246,14 +371,14 @@
         }
 
         .btn-red {
-            background-color: #dc2626;
-            border-color: #dc2626;
+            background-color: var(--theme-accent);
+            border-color: var(--theme-accent);
             color: white;
         }
 
         .btn-red:hover {
-            background-color: #b91c1c;
-            border-color: #b91c1c;
+            background-color: color-mix(in srgb, var(--theme-accent) 80%, black);
+            border-color: color-mix(in srgb, var(--theme-accent) 80%, black);
             color: white;
         }
 
@@ -330,7 +455,7 @@
 
         .news-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 30px 60px rgba(22, 150, 231, 0.35);
+            box-shadow: 0 30px 60px color-mix(in srgb, var(--theme-primary) 35%, transparent);
         }
 
         .news-image {
@@ -348,7 +473,7 @@
             position: absolute;
             top: 14px;
             right: 14px;
-            background: #dc2626;
+            background: var(--theme-accent);
             color: #fff;
             font-size: 11px;
             padding: 6px 12px;
@@ -357,7 +482,7 @@
         }
 
         .btn-read {
-            background: #dc2626;
+            background: var(--theme-accent);
             color: #fff;
             padding: 8px 16px;
             border-radius: 10px;
@@ -365,33 +490,39 @@
         }
 
         .btn-read:hover {
-            background: #b91c1c;
+            background: color-mix(in srgb, var(--theme-accent) 80%, black);
             color: #fff;
         }
 
         .cta-section {
-            background: linear-gradient(
-                to right,
-                rgba(17, 89, 94, 0.5),
-                rgba(15, 23, 42, 1)
-            );
+            background: linear-gradient(to right,
+                    color-mix(in srgb, var(--theme-secondary) 25%, transparent),
+                    var(--theme-background));
             padding: 5rem 0;
         }
 
         .btn-primary-custom {
-            background: #1696e7;
-            color: #0f172a;
+            background: var(--theme-primary);
+            color: var(--theme-background);
             padding: 1rem 2.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
         }
 
+        .btn-primary-custom:hover {
+            background: var(--theme-secondary);
+        }
+
         .btn-outline-custom {
             border: 2px solid rgba(255, 255, 255, 0.3);
-            color: #fff;
+            color: var(--theme-text);
             padding: 1rem 2.5rem;
             border-radius: 0.5rem;
             font-weight: 600;
+        }
+
+        .btn-outline-custom:hover {
+            border-color: var(--theme-primary);
         }
 
         footer {
@@ -405,11 +536,11 @@
         }
 
         footer ul li a {
-            color: #9ca3af;
+            color: var(--theme-muted);
         }
 
         footer ul li a:hover {
-            color: #1696e7;
+            color: var(--theme-primary);
         }
 
         @media (max-width: 768px) {
@@ -431,377 +562,185 @@
                 font-size: 2rem;
             }
         }
-        /* Navbar */
-.navbar {
-    background-color: rgba(15, 23, 42, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 1rem 2rem;
-}
-
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    color: #fff !important;
-    margin-left: 15px;
-}
-
-.navbar-nav .nav-link {
-    color: rgba(255, 255, 255, 0.85) !important;
-    font-size: 0.95rem;
-    padding: 0.5rem 1rem !important;
-    transition: all 0.3s ease;
-    position: relative;
-}
-
-.navbar-nav .nav-link:hover {
-    color: #22d3ee !important;
-    transform: scale(1.2);
-}
-
-.navbar-nav .nav-link.active {
-    color: #1696e7 !important;
-    transform: scale(1.2);
-}
-
-.navbar-nav .nav-link.active::after {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    left: 1rem;
-    right: 1rem;
-    height: 2px;
-    background: #1696e7;
-}
-
-/* Dropdown menu */
-.dropdown-menu {
-    background: rgba(15, 23, 42, 0.98);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 0.75rem;
-    padding: 0.5rem;
-    margin-top: 0.5rem;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
-}
-
-.dropdown-item {
-    color: rgba(255, 255, 255, 0.85);
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.dropdown-item:hover,
-.dropdown-item:focus {
-    background: rgba(100, 190, 242, 0.1);
-    color: #1696e7;
-}
-
-.dropdown-divider {
-    border-color: rgba(255, 255, 255, 0.1);
-    margin: 0.5rem 0;
-}
-
-/* Open dropdown on hover for desktop */
-@media (min-width: 992px) {
-    .nav-item.dropdown:hover .dropdown-menu {
-        display: block;
-    }
-}
-
-/* Login button */
-.login-btn {
-    background: transparent;
-    border: 2px solid #1696e7;
-    color: #1696e7;
-    padding: 0.5rem 1.5rem;
-    border-radius: 0.5rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-left: 0.5rem;
-}
-
-.login-btn:hover {
-    background: #1696e7;
-    color: #0f172a;
-}
     </style>
 </head>
+
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-    <div class="container-fluid px-4">
-        <a class="navbar-brand" href="#">
-            <img src="https://placehold.co/80x60/0f172a/ffffff?text=Logo" alt="Logo" width="80px">
-            <img src="https://placehold.co/65x60/0f172a/ffffff?text=OGITECH" alt="OGITECH" width="65px">
-        </a>
+        <div class="container-fluid px-4">
+            <a class="navbar-brand" href="{{ route('homepage') }}">
+                <img src="{{ associationLogo() }}" alt="{{ $associationAcronym }} Logo" width="80px">
+                @if (schoolLogo())
+                    <img src="{{ schoolLogo() }}" alt="OGITECH" width="65px">
+                @endif
+            </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">Home</a>
-                </li>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mx-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('homepage') }}">Home</a>
+                    </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        About
-                    </a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            About
+                        </a>
 
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-users"></i>
-                                NAPES
-                            </a>
-                        </li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">NAPES</a></li>
+                            <li><a class="dropdown-item" href="#">NAEES</a></li>
+                            <li><a class="dropdown-item" href="#">NACOMES</a></li>
+                            <li><a class="dropdown-item" href="#">NAMES</a></li>
+                            <li><a class="dropdown-item" href="#">Faculty of Engineering</a></li>
+                        </ul>
+                    </li>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-bolt"></i>
-                                NAEES
-                            </a>
-                        </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Media
+                        </a>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-microchip"></i>
-                                NACOMES
-                            </a>
-                        </li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Publications</a></li>
+                            <li><a class="dropdown-item" href="#">News</a></li>
+                            <li><a class="dropdown-item" href="#">Articles</a></li>
+                            <li><a class="dropdown-item" href="#">Gallery</a></li>
+                        </ul>
+                    </li>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-cogs"></i>
-                                NAMES
-                            </a>
-                        </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Events
+                        </a>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-university"></i>
-                                Faculty of Engineering
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Regular Events</a></li>
+                            <li><a class="dropdown-item" href="#">Elections</a></li>
+                            <li><a class="dropdown-item" href="#">Upcoming Events</a></li>
+                        </ul>
+                    </li>
 
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Media
-                    </a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Academic Resources
+                        </a>
 
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-newspaper"></i>
-                                Publications
-                            </a>
-                        </li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Past Questions</a></li>
+                            <li><a class="dropdown-item" href="#">Recommended Courses</a></li>
+                            <li><a class="dropdown-item" href="#">Recommended Books</a></li>
+                            <li><a class="dropdown-item" href="#">Engineering & Tech Bodies</a></li>
+                        </ul>
+                    </li>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-bullhorn"></i>
-                                News
-                            </a>
-                        </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Payments
+                        </a>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-pen-nib"></i>
-                                Articles
-                            </a>
-                        </li>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Invoice</a></li>
+                            <li><a class="dropdown-item" href="#">Donation</a></li>
+                        </ul>
+                    </li>
+                </ul>
 
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-images"></i>
-                                Gallery
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Events
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-calendar-days"></i>
-                                Regular Events
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-person-booth"></i>
-                                Elections
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-clock"></i>
-                                Upcoming Events
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Academic Resources
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-book"></i>
-                                Past Questions
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-graduation-cap"></i>
-                                Recommended Courses
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-book-open"></i>
-                                Recommended Books
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-network-wired"></i>
-                                Engineering & Tech Bodies
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        Payments
-                    </a>
-
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-file-invoice"></i>
-                                Invoice
-                            </a>
-                        </li>
-
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-hand-holding-heart"></i>
-                                Donation
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
-
-            <a href="#" class="login-btn">Login</a>
-        </div>
-    </div>
-</nav>
-
-    <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="6000">
-        <div class="carousel-indicators">
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
-            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
-        </div>
-
-        <div class="carousel-inner">
-            <div class="carousel-item active">
-                <img src="https://placehold.co/1920x1080/0f172a/1696e7?text=Hero+Slider+1" alt="Slider 1">
-
-                <div class="carousel-caption">
-                    <div class="glass-card">
-                        <h1>Welcome to NAPES-OGITECH</h1>
-                        <h3>Engineering in practice.</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="carousel-item">
-                <img src="https://placehold.co/1920x1080/111827/22d3ee?text=Hero+Slider+2" alt="Slider 2">
-
-                <div class="carousel-caption">
-                    <div class="glass-card">
-                        <h1>Student Associations</h1>
-                        <h3>Connect, collaborate, and grow.</h3>
-                    </div>
-                </div>
-            </div>
-
-            <div class="carousel-item">
-                <img src="https://placehold.co/1920x1080/020617/63b4e6?text=Hero+Slider+3" alt="Slider 3">
-
-                <div class="carousel-caption">
-                    <div class="glass-card">
-                        <h1>Academic Resources</h1>
-                        <h3>Access past questions, books, and courses.</h3>
-                    </div>
-                </div>
+                <a href="{{ route('loginPage') }}" class="login-btn">Login</a>
             </div>
         </div>
+    </nav>
 
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
+    @if ($data['sliders']->isNotEmpty())
+        <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel" data-bs-interval="6000">
+            <div class="carousel-indicators">
+                @foreach ($data['sliders'] as $key => $slider)
+                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $key }}"
+                        class="{{ $key === 0 ? 'active' : '' }}"></button>
+                @endforeach
+            </div>
 
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </div>
+            <div class="carousel-inner">
+                @foreach ($data['sliders'] as $key => $slider)
+                    <div class="carousel-item {{ $key === 0 ? 'active' : '' }}">
+                        <img src="{{ asset('assets/tenant_' . tenant()->id . '/uploads/sliders/' . $slider->background_image) }}"
+                            alt="{{ $slider->header }}">
+
+                        <div class="carousel-caption">
+                            <div class="glass-card">
+                                <h1>{{ $slider->header }}</h1>
+                                <h3>{{ $slider->description }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel"
+                data-bs-slide="prev">
+                <span class="carousel-control-prev-icon"></span>
+            </button>
+
+            <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel"
+                data-bs-slide="next">
+                <span class="carousel-control-next-icon"></span>
+            </button>
+        </div>
+    @endif
 
     <section class="stats-section">
         <div class="container">
             <div class="row g-4">
+                {{-- department --}}
+        {{-- faculty --}}
+        {{-- institute --}}
                 <div class="col-md-4">
                     <div class="stat-card">
-                        <i class="fa fa-graduation-cap"></i>
-                        <h3 class="stat-number" data-target="1200" data-suffix="+">0</h3>
+                        <i class="fa fa-user-graduate"></i>
+                        <h3 class="stat-number" data-target="{{ $data['undergraduates'] }}" data-suffix="+">0</h3>
                         <p>Undergraduates</p>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="stat-card">
-                        <i class="fa fa-users"></i>
-                        <h3 class="stat-number" data-target="850" data-suffix="+">0</h3>
-                        <p>Alumni</p>
+                        <i class="fa fa-user-tie"></i>
+                        <h3 class="stat-number" data-target="{{ $data['alumni'] }}" data-suffix="+">0</h3>
+                        <p>Alumni Networds</p>
                     </div>
                 </div>
 
                 <div class="col-md-4">
                     <div class="stat-card">
-                        <i class="fa fa-people-carry"></i>
+                        <i class="fa fa-building-columns"></i>
                         <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
-                        <p>Associations</p>
+                        <p>Faculties</p>
                     </div>
+                </div>
+
+                 <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fa fa-sitemap"></i>
+                        <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
+                        <p>Departments</p>
+                    </div>
+                </div>
+                 <div class="col-md-4">
+                    <div class="stat-card">
+                        <i class="fa fa-book-open"></i>
+                        <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
+                        <p>Academic Resources</p>
+                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -823,7 +762,7 @@
 
             <div class="col-md-6">
                 <div class="p-4 rounded shadow-sm overlay-glass">
-                    <h3 style="color:#1696e7">President's Address</h3>
+                    <h3 style="color: var(--theme-primary)">President's Address</h3>
 
                     <p>
                         This is placeholder text for the president’s remarks. Replace this paragraph with the
@@ -1001,7 +940,8 @@
                     <div class="news-card">
                         <div class="news-image position-relative">
                             <span class="news-badge">News</span>
-                            <img src="https://placehold.co/800x500/0f172a/1696e7?text=Publication+1" alt="Publication">
+                            <img src="https://placehold.co/800x500/0f172a/1696e7?text=Publication+1"
+                                alt="Publication">
                         </div>
 
                         <div class="p-3 flex-grow-1">
@@ -1024,7 +964,8 @@
                     <div class="news-card">
                         <div class="news-image position-relative">
                             <span class="news-badge">Article</span>
-                            <img src="https://placehold.co/800x500/111827/22d3ee?text=Publication+2" alt="Publication">
+                            <img src="https://placehold.co/800x500/111827/22d3ee?text=Publication+2"
+                                alt="Publication">
                         </div>
 
                         <div class="p-3 flex-grow-1">
@@ -1047,7 +988,8 @@
                     <div class="news-card">
                         <div class="news-image position-relative">
                             <span class="news-badge">News</span>
-                            <img src="https://placehold.co/800x500/020617/63b4e6?text=Publication+3" alt="Publication">
+                            <img src="https://placehold.co/800x500/020617/63b4e6?text=Publication+3"
+                                alt="Publication">
                         </div>
 
                         <div class="p-3 flex-grow-1">
@@ -1159,7 +1101,9 @@
                     });
                 }
             });
-        }, { threshold: 0.5 });
+        }, {
+            threshold: 0.5
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
             const statsSection = document.querySelector('.stats-section');
@@ -1169,5 +1113,31 @@
             }
         });
     </script>
+
+    @include('layouts.include.toastrNotificationFunction')
+
+
+
+    <script>
+        document.querySelectorAll('form').forEach(form => {
+
+            form.addEventListener('submit', function() {
+
+                const btn = form.querySelector('.submit-btn');
+
+                if (!btn) return;
+
+                btn.disabled = true;
+
+                btn.querySelector('.btn-text').style.display = 'none';
+                btn.querySelector('.btn-loading').style.display = 'inline';
+            });
+
+        });
+    </script>
+
+    @livewireScripts
+
 </body>
+
 </html>
