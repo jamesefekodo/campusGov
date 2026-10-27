@@ -157,6 +157,11 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 
     // context switching
     Route::post('/user-context/{context}', [PermissionAccessController::class, 'switchUserContext'])->whereIn('context', ['personal', 'admin'])->name('user.context.switch');
+
+
+    // guest routes
+        Route::get('/about_us', [FrontendController::class, 'guestAboutUs'])->name('guestAboutUs');
+
 });
 
 // Route::middleware('auth')

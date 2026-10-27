@@ -1176,3 +1176,20 @@ if (!function_exists('countPastQuestionsPendingApproval')) {
             ->count();
     }
 }
+
+
+if (!function_exists('activeFaculties')) {
+    function activeFaculties()
+    {
+        return Faculty::where('is_active', true)->orderBy('name')
+            ->get();
+    }
+}
+
+if (!function_exists('activeDepartments')) {
+    function activeDepartments()
+    {
+        return Department::where('is_active', true)->orderBy('name')->get();
+    }
+}
+

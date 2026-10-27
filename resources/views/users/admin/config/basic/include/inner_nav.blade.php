@@ -14,6 +14,13 @@
                 {{ Str::startsWith(request()->path(), 'admin/config/basics/sliders') ? 'inner_nav_active' : '' }}">
                     Slider</div>
             </a>
+
+            <a href="{{ route('contacts') }}">
+                <div
+                    class="inner_nav_menu
+                {{ Str::startsWith(request()->path(), 'admin/config/basics/sliders') ? 'inner_nav_active' : '' }}">
+                    Contacts</div>
+            </a>
         @endif
 
     </div>

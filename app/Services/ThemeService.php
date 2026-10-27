@@ -8,29 +8,29 @@ use Illuminate\Support\Facades\Cache;
 
 class ThemeService
 {
-   public function activeTheme(Tenant $tenant): ?FrontendTheme
-{
-    $themeId = Cache::remember(
-        "tenant_active_theme_id_{$tenant->id}",
-        now()->addHours(24),
-        function () use ($tenant) {
-            $setting = $tenant->themeSetting()->with('theme')->first();
+    public function activeTheme(Tenant $tenant): ?FrontendTheme
+    {
+        $themeId = Cache::remember(
+            "tenant_active_theme_id_{$tenant->id}",
+            now()->addHours(24),
+            function () use ($tenant) {
+                $setting = $tenant->themeSetting()->with('theme')->first();
 
-            $theme = $setting?->theme
-                ?? FrontendTheme::where('slug', 'matrix')
+                $theme = $setting?->theme
+                    ?? FrontendTheme::where('slug', 'matrix')
                     ->where('is_active', true)
                     ->first();
 
-            return $theme?->id;
+                return $theme?->id;
+            }
+        );
+
+        if (! $themeId) {
+            return null;
         }
-    );
 
-    if (! $themeId) {
-        return null;
+        return FrontendTheme::find($themeId);
     }
-
-    return FrontendTheme::find($themeId);
-}
 
 
     public function homepageView(Tenant $tenant): string
@@ -75,5 +75,26 @@ class ThemeService
     {
         Cache::forget("tenant_active_theme_{$tenant->id}");
         Cache::forget("tenant_theme_{$tenant->id}");
+    }
+
+    public function view(Tenant $tenant, string $page): string
+    {
+        $theme = $this->activeTheme($tenant);
+
+        $basePath = $theme?->view_path;
+
+        if ($basePath) {
+            // Your DB stores the homepage view as the theme path.
+            // Remove ".homepage" so other pages can be resolved.
+            $basePath = preg_replace('/\.homepage$/', '', $basePath);
+
+            $themeView = "{$basePath}.{$page}";
+
+            if (view()->exists($themeView)) {
+                return $themeView;
+            }
+        }
+
+        return "users.guests.{$page}";
     }
 }

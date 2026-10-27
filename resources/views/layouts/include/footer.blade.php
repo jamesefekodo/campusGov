@@ -5,8 +5,10 @@
         </span>
         <span class="position-relative d-inline-block" id="footer-brand-trigger" style="cursor: pointer;"
             title="Click to view project details">
-            <span style="color: var(--system-secondary) !important">
-                &copy; 2025{{ date('Y') > 2025 ? ' - ' . date('Y') : '' }} - CampusGov (V0.2)
+            <span style="color: var(--system-secondary) !important">©
+                {{ strtoupper(basicSystemInfo()->association_acronym) }}
+                {{ strtoupper(basicSystemInfo()->school_acronym) }}
+                (2025{{ date('Y') > 2025 ? ' – ' . date('Y') : '' }}). All Rights Reserved. | CampusGov (v0.2)
             </span>
 
             {{-- Larger, Smart Popover / Modal Snippet --}}
