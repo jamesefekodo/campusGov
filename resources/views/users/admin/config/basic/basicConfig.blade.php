@@ -276,7 +276,7 @@
                                                             <p style="color: red">{{ $errors->first('president_remarks') }}</p>
                                                             <script>
                                                                 $(document).ready(function() {
-                                                                    $('#presidentRemarks').summernote({
+                                                                    $('#presidentRemark').summernote({
                                                                         height: 200, // Set editor height
                                                                         toolbar: [
                                                                             // [groupName, [list of buttons]]
