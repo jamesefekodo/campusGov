@@ -700,9 +700,9 @@
     <section class="stats-section">
         <div class="container">
             <div class="row g-4">
-                {{-- department --}}
-        {{-- faculty --}}
-        {{-- institute --}}
+                {{--  --}}
+                {{--  --}}
+                {{--  --}}
                 <div class="col-md-4">
                     <div class="stat-card">
                         <i class="fa fa-user-graduate"></i>
@@ -718,64 +718,110 @@
                         <p>Alumni Networds</p>
                     </div>
                 </div>
+                @if ($data['operationalLevel'] == 'institute')
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <i class="fa fa-building-columns"></i>
+                            <h3 class="stat-number" data-target="{{ $data['faculties']->count() }}" data-suffix="">0
+                            </h3>
+                            <p>Faculties</p>
+                        </div>
+                    </div>
+                @elseif ($data['operationalLevel'] == 'faculty')
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <i class="fa fa-sitemap"></i>
+                            <h3 class="stat-number" data-target="{{ $data['departments']->count() }}"
+                                data-suffix="">0
+                            </h3>
+                            <p>Departments</p>
+                        </div>
+                    </div>
+                @else
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <i class="fa fa-book-open"></i>
+                            <h3 class="stat-number" data-target="{{ $data['totalAcademicResources'] }}"
+                                data-suffix="">0
+                            </h3>
+                            <p>Academic Resources</p>
+                        </div>
 
-                <div class="col-md-4">
-                    <div class="stat-card">
-                        <i class="fa fa-building-columns"></i>
-                        <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
-                        <p>Faculties</p>
                     </div>
-                </div>
+                @endif
 
-                 <div class="col-md-4">
-                    <div class="stat-card">
-                        <i class="fa fa-sitemap"></i>
-                        <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
-                        <p>Departments</p>
-                    </div>
-                </div>
-                 <div class="col-md-4">
-                    <div class="stat-card">
-                        <i class="fa fa-book-open"></i>
-                        <h3 class="stat-number" data-target="12" data-suffix="">0</h3>
-                        <p>Academic Resources</p>
-                    </div>
-                    
-                </div>
+
+
             </div>
         </div>
     </section>
+    @if ($data['thePresident'])
+        <div class="container my-5">
+            <div class="row align-items-center g-4">
+                <div class="col-md-6">
+                    {{-- ###################### --}}
+                    @php
+                        $presidentPhoto = asset('system/images/default_profile_pic.webp');
+                        if (
+                            $data['thePresident']->theRep->photo &&
+                            file_exists(
+                                public_path(
+                                    'assets/tenant_' .
+                                        tenant()->id .
+                                        '/uploads/users/members/photo/' .
+                                        $data['thePresident']->theRep->photo,
+                                ),
+                            )
+                        ) {
+                            $presidentPhoto = asset(
+                                'assets/tenant_' .
+                                    tenant()->id .
+                                    '/uploads/users/members/photo/' .
+                                    $data['thePresident']->theRep->photo,
+                            );
+                        }
 
-    <div class="container my-5">
-        <div class="row align-items-center g-4">
-            <div class="col-md-6">
-                <div class="position-relative rounded overflow-hidden shadow-sm">
-                    <img src="https://placehold.co/800x600/0f172a/1696e7?text=President+Photo"
-                        class="img-fluid w-100 president-img" alt="President">
+                        $profile = $data['thePresident']->theRep->memberPersonalProfile;
 
-                    <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white overlay-glass text-center">
-                        <h4 class="mb-1">John Doe</h4>
-                        <p class="mb-0">President, NAPES, 2025/2026 Session.</p>
+                        $middleInitial = trim(strtoupper(substr($profile->middle_name ?? '', 0, 1)));
+                    @endphp
+                    {{-- ########################### --}}
+
+                    <div class="position-relative rounded overflow-hidden shadow-sm">
+                        <img src="{{ $presidentPhoto }}" class="img-fluid w-100 president-img" alt="President">
+
+                        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white overlay-glass text-center">
+
+                            <h4 class="mb-1">
+                                {{ $profile->first_name }}
+                                @if ($middleInitial)
+                                    {{ $middleInitial }}.
+                                @endif
+                                {{ $profile->last_name }}
+                            </h4>
+                            <p class="mb-0">President, {{ strtoupper($data['basicInfo']->association_acronym) }},
+                                {{ $data['currentAcademicYear'] }}/{{ $data['currentAcademicYear']+1 }} Session.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-md-6">
-                <div class="p-4 rounded shadow-sm overlay-glass">
-                    <h3 style="color: var(--theme-primary)">President's Address</h3>
+                <div class="col-md-6">
+                    <div class="p-4 rounded shadow-sm overlay-glass">
+                        <h3 style="color: var(--theme-primary)">President's Address</h3>
 
-                    <p>
-                        This is placeholder text for the president’s remarks. Replace this paragraph with the
-                        actual welcome message, vision, and priorities for the association.
-                    </p>
+                        <p>
+                            This is placeholder text for the president’s remarks. Replace this paragraph with the
+                            actual welcome message, vision, and priorities for the association.
+                        </p>
 
-                    <div class="d-flex justify-content-end">
-                        <a href="#" class="btn btn-primary">More</a>
+                        <div class="d-flex justify-content-end">
+                            <a href="#" class="btn btn-primary">More</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 
     <section class="services-section">
         <div class="container my-5">

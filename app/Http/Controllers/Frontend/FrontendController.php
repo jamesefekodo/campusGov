@@ -3,8 +3,14 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\AcademicConfig\Department;
 use App\Models\AcademicConfig\Faculty;
+use App\Models\AcademicResources\IndustryAffiliate;
+use App\Models\AcademicResources\PastQuestion;
+use App\Models\AcademicResources\RecommendedBook;
+use App\Models\AcademicResources\RecommendedCourse;
 use App\Models\Config\HomepageSlider;
+use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
 use App\Models\Members\MemberAcademicInfo;
 use App\Services\ThemeService;
 use Illuminate\Http\Request;
@@ -84,13 +90,39 @@ class FrontendController extends Controller
         $undergraduates = $formatCount($undergraduatesCount);
         $alumni = $formatCount($alumniCount);
 
-        $faculties = Faculty::where('is_active', true)->count();
+        $faculties = Faculty::where('is_active', true)->orderBy('name')->get();
+        $departments = Department::where('is_active', true)->orderBy('name')->get();
+
+        $pastquestions = PastQuestion::where('approval_status', 'approved')->count();
+        $recommendedCourses = RecommendedCourse::where('is_published', true)->count();
+        $recommendedBooks = RecommendedBook::where('is_published', true)->count();
+        $industryAffilates = IndustryAffiliate::where('is_published', true)->count();
+
+        $totalAcademicResources = $pastquestions + $recommendedCourses + $recommendedBooks + $industryAffilates;
+
+        $academicSession = currentAcademicYear();
+        $thePresident = StudentLeadershipRepresentative::query()
+            ->whereHas('tenure', function ($query) use ($academicSession) {
+                $query->where('academic_session', $academicSession);
+            })
+            ->whereHas('position', function ($query) {
+                $query->whereRaw('LOWER(name) = ?', ['president']);
+            })
+            ->with(['position', 'tenure', 'theRep'])
+            ->first();
+
 
         $data = [
             'sliders' => HomepageSlider::orderBy('order')->get(),
             'operationalLevel' => $operationalLevel,
             'undergraduates' => $undergraduates,
             'alumni' => $alumni,
+            'faculties' => $faculties,
+            'departments' => $departments,
+            'totalAcademicResources' => $totalAcademicResources,
+            'thePresident' => $thePresident,
+            'basicInfo' => $basicInfo,
+            'currentAcademicYear' => currentAcademicYear(),
         ];
 
         return view($themeService->homepageView($tenant), [

@@ -7,8 +7,7 @@
                 {{ Str::startsWith(request()->path(), 'admin/config/basics/basics') ? 'inner_nav_active' : '' }}">
                     Basic</div>
             </a>
-        @endif
-        @if (Auth::user()->hasPermission('basic_system_config.read'))
+
             <a href="{{ route('homepageSliders') }}">
                 <div
                     class="inner_nav_menu

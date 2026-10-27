@@ -245,13 +245,38 @@
                                                         </div>
                                                         <div class="form-group col-md-12">
                                                             <label for="description">
-                                                                Association Description<span class="text-red">*</span>:
+                                                                About Association (Description)<span class="text-red">*</span>:
                                                             </label>
                                                             <textarea id="description" name="description" required>{{ $data['basicSystemSetting']->description }}</textarea>
                                                             <p style="color: red">{{ $errors->first('description') }}</p>
                                                             <script>
                                                                 $(document).ready(function() {
                                                                     $('#description').summernote({
+                                                                        height: 200, // Set editor height
+                                                                        toolbar: [
+                                                                            // [groupName, [list of buttons]]
+                                                                            ['style', ['bold', 'italic', 'underline', 'clear']],
+                                                                            ['font', ['strikethrough', 'superscript', 'subscript']],
+                                                                            ['fontsize', ['fontsize']],
+                                                                            ['color', ['color']],
+                                                                            ['para', ['ul', 'ol', 'paragraph']],
+                                                                            ['height', ['height']],
+                                                                            ['insert', []],
+                                                                            ['view', []]
+                                                                        ]
+                                                                    });
+                                                                });
+                                                            </script>
+                                                        </div>
+                                                         <div class="form-group col-md-12">
+                                                            <label for="description">
+                                                                President's Remarks<span class="text-red">*</span>:
+                                                            </label>
+                                                            <textarea id="president_remarks" name="president_remarks" required>{{ $data['basicSystemSetting']->president_remarks }}</textarea>
+                                                            <p style="color: red">{{ $errors->first('president_remarks') }}</p>
+                                                            <script>
+                                                                $(document).ready(function() {
+                                                                    $('#presidentRemarks').summernote({
                                                                         height: 200, // Set editor height
                                                                         toolbar: [
                                                                             // [groupName, [list of buttons]]

@@ -60,9 +60,10 @@
                                                                             @if ($leadership->tenure?->end_date)
                                                                                 -
                                                                                 {{ \Carbon\Carbon::parse($leadership->tenure->end_date)->format('F Y') }}
-                                                                                @endif @if ($leadership?->tenure->name && $leadership?->tenure->name !== $leadership?->tenure->academic_session)
-                                                                                    ({{ $leadership->tenure->name }})
                                                                                 @endif
+                                                                                @if ($leadership?->tenure?->name && !is_numeric($leadership->tenure->name))
+                                                                            ({{ $leadership->tenure->name }})
+                                                                        @endif
                                                                         </small>
                                                                     </div>
 

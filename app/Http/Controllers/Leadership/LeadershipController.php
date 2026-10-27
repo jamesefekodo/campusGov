@@ -63,6 +63,15 @@ class LeadershipController extends Controller
             ->with(['position.arm', 'position', 'tenure'])
             ->paginate(20);
 
+        $thePresident = StudentLeadershipRepresentative::query()
+            ->whereHas('tenure', function ($query) use ($academicSession) {
+                $query->where('academic_session', $academicSession);
+            })
+            ->whereHas('position', function ($query) {
+                $query->whereRaw('LOWER(name) = ?', ['president']);
+            })
+            ->with(['position', 'tenure', 'theRep'])
+            ->first();
 
 
         $data = [
@@ -71,6 +80,7 @@ class LeadershipController extends Controller
             'arms' => $arms,
             'position' => $position,
             'tenure' => $tenure,
+            'thePresident' => $thePresident,
         ];
         return view('users.admin.leadership.studentReps.studentReps', compact('data'));
     }

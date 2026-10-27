@@ -122,10 +122,13 @@
                                                             <td class="">
                                                                 <div class="flex-grow-1 min-width-0 text-center">
                                                                     <p class="fw-bold mb-0 text-truncate text-capitalize">
-                                                                        {{ $leader?->position?->name }}
+                                                                        {{ $leader?->position?->name }} @if ($data['thePresident'] && $data['thePresident']->username == $leader->username)
+                                                                            <i class="fas fa-crown text-warning ms-1"
+                                                                                title="President"></i>
+                                                                        @endif
                                                                     </p>
                                                                     <p class="text-muted mb-0 small text-truncate">
-                                                                        @if ($leader->position && ($leader->position->name !== $leader->position->description))
+                                                                        @if ($leader->position && $leader->position->name !== $leader->position->description)
                                                                             {{ $leader->position->description }} -
                                                                         @endif
                                                                         {{ $leader?->position?->arm?->name }}
@@ -138,8 +141,8 @@
                                                                         {{ $leader?->tenure?->academic_session }}/{{ $leader?->tenure?->academic_session + 1 }}
                                                                     </p>
                                                                     <p class="text-muted mb-0 small text-truncate">
-                                                                        @if ($leader?->tenure->name && ($leader?->tenure->name !== $leader?->tenure->academic_session))
-                                                                            ({{ $leader?->tenure?->name }})
+                                                                        @if ($leader?->tenure?->name && !is_numeric($leader->tenure->name))
+                                                                            ({{ $leader->tenure->name }})
                                                                         @endif
                                                                     </p>
                                                                 </div>
@@ -166,8 +169,7 @@
                                                                 </button>
                                                                 <button type="button"
                                                                     class="btn btn-danger btn-sm d-inline-flex align-items-center delete-confirm m-1"
-                                                                    data-url="{{ route('deleteStudentLeadershipRep', ['uuid' => $leader->uuid]) }}"
-                                                                    >
+                                                                    data-url="{{ route('deleteStudentLeadershipRep', ['uuid' => $leader->uuid]) }}">
                                                                     <i class="fas fa-trash me-1"></i> Delete
                                                                 </button>
 
