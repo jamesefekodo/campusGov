@@ -38,6 +38,7 @@ return new class extends Migration
             $table->text('footer_plus')->nullable();
             $table->integer('school_founding_year');
             $table->decimal('account_balance', 15, 2)->default(0);
+            $table->longText('president_remarks')->nullable();
             $table->timestamps();
 
             $table->foreign('tenant_id')->references('id')->on('tenants')->nullOnDelete()->cascadeOnUpdate();

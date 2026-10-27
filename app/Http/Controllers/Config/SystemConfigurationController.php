@@ -218,12 +218,14 @@ class SystemConfigurationController extends Controller
             'tertiary_colour' => 'nullable',
             'is_polytechnic' => 'required',
             'school_founding_year' => 'required',
+            'president_remarks' => 'nullable',
         ]);
 
         $basicSystemSetting->association_name = trim($request->association_name);
         $basicSystemSetting->association_acronym = trim($request->association_acronym);
         $basicSystemSetting->association_slogan = trim($request->association_slogan);
         $basicSystemSetting->description = $request->description;
+        $basicSystemSetting->president_remarks = $request->president_remarks;
         $basicSystemSetting->operational_level = trim($request->operational_level);
         $basicSystemSetting->school_name = trim($request->school_name);
         $basicSystemSetting->school_acronym = trim($request->school_acronym);
