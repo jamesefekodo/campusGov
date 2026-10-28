@@ -148,47 +148,67 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        function animateCounter(element, target, duration, suffix = '') {
-            let current = 0;
-            const increment = target / (duration / 16);
+    function animateCounter(element, target, duration = 1800, suffix = '') {
+        const numericTarget = parseInt(target, 10);
 
-            const timer = setInterval(() => {
-                current += increment;
-
-                if (current >= target) {
-                    element.textContent = target + suffix;
-                    clearInterval(timer);
-                } else {
-                    element.textContent = Math.floor(current) + suffix;
-                }
-            }, 16);
+        if (isNaN(numericTarget)) {
+            element.textContent = target;
+            return;
         }
 
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
-                    entry.target.classList.add('animated');
+        const startTime = performance.now();
 
-                    entry.target.querySelectorAll('.stat-number').forEach(counter => {
-                        const target = parseInt(counter.getAttribute('data-target'));
-                        const suffix = counter.getAttribute('data-suffix') || '';
+        function update(currentTime) {
+            const progress = Math.min((currentTime - startTime) / duration, 1);
+            const easedProgress = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.floor(numericTarget * easedProgress);
 
-                        animateCounter(counter, target, 2000, suffix);
-                    });
-                }
-            });
-        }, {
-            threshold: 0.5
-        });
+            element.textContent = currentValue + suffix;
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const statsSection = document.querySelector('.stats-section');
-
-            if (statsSection) {
-                observer.observe(statsSection);
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            } else {
+                element.textContent = numericTarget + suffix;
             }
-        });
-    </script>
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const counters = document.querySelectorAll('.stat-number[data-target]');
+
+        if (!counters.length) return;
+
+        const observer = new IntersectionObserver(
+            (entries, observer) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+
+                    const element = entry.target;
+
+                    if (element.dataset.animated === 'true') return;
+
+                    element.dataset.animated = 'true';
+
+                    animateCounter(
+                        element,
+                        element.dataset.target,
+                        1800,
+                        element.dataset.suffix || ''
+                    );
+
+                    observer.unobserve(element);
+                });
+            },
+            {
+                threshold: 0.35
+            }
+        );
+
+        counters.forEach(counter => observer.observe(counter));
+    });
+</script>
 
     @include('layouts.include.toastrNotificationFunction')
 

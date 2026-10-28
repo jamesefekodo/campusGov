@@ -15,8 +15,23 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('tenant_id')->nullable();
             $table->string('username')->unique(); // Foreign
-            $table->string('phone1'); // Foreign
-            $table->string('email1'); // Foreign
+
+            // $table->string('phone1'); // Foreign
+            // $table->string('email1'); // Foreign
+            $table->foreign(
+                ['tenant_id', 'email1'],
+                'member_profiles_tenant_email_foreign'
+            )->references(
+                ['tenant_id', 'email']
+            )->on('users');
+
+            $table->foreign(
+                ['tenant_id', 'phone1'],
+                'member_profiles_tenant_phone_foreign'
+            )->references(
+                ['tenant_id', 'phone']
+            )->on('users');
+
             $table->string('phone2')->nullable();
             $table->string('email2')->nullable();
             $table->string('first_name')->nullable();

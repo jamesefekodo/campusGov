@@ -1002,17 +1002,39 @@ class MembersManagementController extends Controller
         }
 
         request()->validate([
+            // 'email' => [
+            //     'required',
+            //     'email',
+            //     Rule::unique('users', 'email')->ignore($member->username, 'username'),
+            //     Rule::unique('member_personal_profiles', 'email2')->ignore($member->username, 'username'),
+            // ],
+            // 'phone' => [
+            //     'required',
+            //     'string',
+            //     Rule::unique('users', 'phone')->ignore($member->username, 'username'),
+            //     Rule::unique('member_personal_profiles', 'phone2')->ignore($member->username, 'username'),
+            // ],
+
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users', 'email')->ignore($member->username, 'username'),
-                Rule::unique('member_personal_profiles', 'email2')->ignore($member->username, 'username'),
+                Rule::unique('users', 'email')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
+                Rule::unique('member_personal_profiles', 'email2')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
             ],
+
             'phone' => [
                 'required',
                 'string',
-                Rule::unique('users', 'phone')->ignore($member->username, 'username'),
-                Rule::unique('member_personal_profiles', 'phone2')->ignore($member->username, 'username'),
+                Rule::unique('users', 'phone')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
+                Rule::unique('member_personal_profiles', 'phone2')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
             ],
         ]);
 
@@ -1077,17 +1099,36 @@ class MembersManagementController extends Controller
             'nationality' => 'required|string',
             'state_of_origin' => 'required|string',
             'lga_of_origin' => 'required|string',
+            // 'email2' => [
+            //     'nullable',
+            //     'email',
+            //     'unique:users,email',
+            //     Rule::unique('member_personal_profiles', 'email2')->ignore($member->username, 'username'),
+            // ],
+            // 'phone2' => [
+            //     'nullable',
+            //     'string',
+            //     'unique:users,phone',
+            //     Rule::unique('member_personal_profiles', 'phone2')->ignore($member->username, 'username'),
+            // ],
             'email2' => [
                 'nullable',
                 'email',
-                'unique:users,email',
-                Rule::unique('member_personal_profiles', 'email2')->ignore($member->username, 'username'),
+                Rule::unique('users', 'email')
+                    ->where('tenant_id', tenantId()),
+                Rule::unique('member_personal_profiles', 'email2')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
             ],
+
             'phone2' => [
                 'nullable',
                 'string',
-                'unique:users,phone',
-                Rule::unique('member_personal_profiles', 'phone2')->ignore($member->username, 'username'),
+                Rule::unique('users', 'phone')
+                    ->where('tenant_id', tenantId()),
+                Rule::unique('member_personal_profiles', 'phone2')
+                    ->where('tenant_id', tenantId())
+                    ->ignore($member->username, 'username'),
             ],
             'address1' => 'required|string',
             'address2' => 'nullable|string',

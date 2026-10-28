@@ -5,7 +5,7 @@
         </span>
         <span class="position-relative d-inline-block" id="footer-brand-trigger" style="cursor: pointer;"
             title="Click to view project details">
-            <span style="color: var(--system-secondary) !important">©
+            <span class="text-white">©
                 {{ strtoupper(basicSystemInfo()->association_acronym) }}
                 {{ strtoupper(basicSystemInfo()->school_acronym) }}
                 (2025{{ date('Y') > 2025 ? ' – ' . date('Y') : '' }}). All Rights Reserved. | CampusGov (v0.2)

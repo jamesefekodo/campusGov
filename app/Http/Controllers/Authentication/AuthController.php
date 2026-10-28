@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 
 class AuthController extends Controller
@@ -251,9 +252,23 @@ class AuthController extends Controller
             //     'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/',
             //     'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',
             // ],
-            'email' => 'required|email|unique:users,email|unique:member_personal_profiles,email2',
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users', 'email')
+                    ->where('tenant_id', tenantId()),
+                Rule::unique('member_personal_profiles', 'email2')
+                    ->where('tenant_id', tenantId()),
+            ],
 
-            'phone' => 'required|string|unique:users,phone|unique:member_personal_profiles,phone2',
+            'phone' => [
+                'required',
+                'string',
+                Rule::unique('users', 'phone')
+                    ->where('tenant_id', tenantId()),
+                Rule::unique('member_personal_profiles', 'phone2')
+                    ->where('tenant_id', tenantId()),
+            ],
             'password' => $passwordRules,
             'confirm_password' => 'required|string|same:password',
         ], [

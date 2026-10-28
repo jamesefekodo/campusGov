@@ -18,9 +18,21 @@ return new class extends Migration
             $table->string('username')->unique();
             $table->integer('account_type')->default(2); // 0 - root for association, 1-admin , 2- student ---------- 90 - odu root
             $table->integer('account_status')->default(0); // 0 - new , 1- awaiting approval , 2- active, 3 - disabled
-            $table->string('phone')->unique();
             $table->string('photo')->nullable();
-            $table->string('email')->unique();
+
+            // $table->string('phone')->unique();
+            // $table->string('email')->unique();
+
+            $table->unique(
+                ['tenant_id', 'email'],
+                'users_tenant_email_unique'
+            );
+
+            $table->unique(
+                ['tenant_id', 'phone'],
+                'users_tenant_phone_unique'
+            );
+
             $table->boolean('require_login_mfa')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->boolean('email_verification')->default(false);
