@@ -96,39 +96,41 @@
                             href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             About Us
                         </a>
-                        @php
-                            $departmentItems = departments();
-                        @endphp
+
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about_us') ? 'active' : '' }}"
                                     href="{{ route('guestAboutUs') }}">{{ strtoupper(basicSystemInfo()->association_acronym) }}
                                     - {{ strtoupper(basicSystemInfo()->school_acronym) }}</a></li>
 
-                            @if (basicSystemInfo()->operationalLevel == 'institute' && activeFaculties()->isNotEmpty())
+                            {{-- school level --}}
+                            @if (basicSystemInfo()->operational_level == 'institute' && activeFaculties()->isNotEmpty())
                                 @foreach (activeFaculties() as $faculty)
-                                    <li><a class="dropdown-item"
-                                            href="{{ route('guestViewFaculty', ['uuid' => $leader->uuid]) }}">{{ Str::limit($faculty->name, 25) }}
+                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/faculty/' . $faculty->uuid) ? 'active' : '' }}"
+                                            href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}">{{ Str::limit($faculty->name, 25) }}
                                             @if ($faculty->acronym)
                                                 ({{ $faculty->acronym }})
                                             @endif
                                         </a></li>
                                 @endforeach
-                            @elseif (basicSystemInfo()->operationalLevel == 'faculty' && activeFaculties()->isNotEmpty())
+                                {{-- faculty --}}
+                            @elseif (basicSystemInfo()->operational_level == 'faculty' && activeFaculties()->isNotEmpty())
                                 @foreach (activeFaculties() as $faculty)
-                                    <li><a class="dropdown-item" href="#">{{ Str::limit($faculty->name, 25) }}
+                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/faculty/' . $faculty->uuid) ? 'active' : '' }}"
+                                            href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}">{{ Str::limit($faculty->name, 25) }}
                                             @if ($faculty->acronym)
                                                 ({{ $faculty->acronym }})
                                             @endif
                                         </a></li>
                                 @endforeach
                                 @foreach (activeDepartments() as $department)
-                                    <li><a class="dropdown-item" href="#">{{ Str::limit($department->name, 25) }}
+                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/department/' . $department->uuid) ? 'active' : '' }}"
+                                            href="{{ route('guestViewDepartment', ['uuid' => $department->uuid]) }}">{{ Str::limit($department->name, 25) }}
                                         </a></li>
                                 @endforeach
                                 {{-- department --}}
-                            @elseif (activeDepartments()->isNotEmpty())
+                            @elseif (basicSystemInfo()->operational_level == 'department' && activeDepartments()->isNotEmpty())
                                 @foreach (activeDepartments() as $department)
-                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/department/'. $department->uuid) ? 'active' : '' }}"
+                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/department/' . $department->uuid) ? 'active' : '' }}"
                                             href="{{ route('guestViewDepartment', ['uuid' => $department->uuid]) }}">{{ Str::limit($department->name, 25) }}
                                         </a></li>
                                 @endforeach

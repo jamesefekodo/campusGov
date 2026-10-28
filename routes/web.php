@@ -162,6 +162,9 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     // guest routes
     Route::get('/about_us', [FrontendController::class, 'guestAboutUs'])->name('guestAboutUs');
     Route::get('/about/department/{uuid}', [FrontendController::class, 'guestViewDepartment'])->name('guestViewDepartment');
+    Route::get('/about/faculty/{uuid}', [FrontendController::class, 'guestViewFaculty'])->name('guestViewFaculty');
+
+    
 });
 
 // Route::middleware('auth')

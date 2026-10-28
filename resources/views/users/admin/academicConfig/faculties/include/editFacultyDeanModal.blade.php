@@ -46,7 +46,7 @@
                             <div class="form-group col-md-4">
                                 <label for="phone">Phone:</label>
                                 <input type="text" class="form-control" name="phone"
-                                    value="{{ $data['faculty']->facultyHead->assumed_office_on }}">
+                                    value="{{ $data['faculty']->facultyHead->phone }}">
                                 <p style="color: red">{{ $errors->first('phone') }}</p>
                             </div>
                             <div class="form-group col-md-4">

@@ -91,7 +91,7 @@
                     </div>
 
                     <div class="mx-actions">
-                        <a {{-- href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}" --}} class="mx-button">
+                        <a href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}" class="mx-button">
                             <i class="fa-solid fa-arrow-right"></i>
                             View {{ $faculty->name }}
                         </a>

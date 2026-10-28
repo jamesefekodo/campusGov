@@ -320,4 +320,38 @@ class FrontendController extends Controller
             'data' => $data,
         ]);
     }
+
+    public function guestViewFaculty($uuid)
+    {
+        $redirect = $this->checkLogin();
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+        $tenant = tenant();
+
+        $themeService = app(ThemeService::class);
+
+        $theme = $themeService->activeTheme($tenant);
+        $themeColors = $themeService->forTenant($tenant);
+
+        $faculty = Faculty::where('uuid', $uuid)->where('is_active', true)->first();
+        if (!$faculty) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+
+
+        $data = [
+            'faculty' => $faculty,
+        ];
+
+
+        return view($themeService->view($tenant, 'about.aboutFaculty'), [
+            'theme' => $theme,
+            'themeColors' => $themeColors,
+            'data' => $data,
+        ]);
+    }
 }
