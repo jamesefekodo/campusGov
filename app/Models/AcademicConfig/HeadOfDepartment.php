@@ -13,14 +13,18 @@ class HeadOfDepartment extends Model
     use HasFactory;
     protected $table = 'head_of_departments';
     protected $fillable = [
-        'uuid',
         'tenant_id',
-        'slug',
+        'uuid',
         'department',
         'name',
-        'administrative_head_title',
-        'description',
+        'qualifications',
+        'photo',
+        'phone',
+        'email',
+        'profile',
         'is_active',
+        'assumed_office_on',
+        'tenure_end_on',
     ];
 
 

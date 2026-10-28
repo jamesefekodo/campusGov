@@ -738,7 +738,7 @@ class AcademicConfigController extends Controller
         $request->validate([
             'name' => 'required|string',
             'qualifications' => 'nullable|string',
-            'assumed_office_on' => 'nullable',
+            'assumed_office_on' => 'required',
             'phone' => 'nullable',
             'email' => 'nullable|email',
             'profile' => 'nullable',
@@ -794,16 +794,16 @@ class AcademicConfigController extends Controller
         $request->validate([
             'name' => 'required|string',
             'qualifications' => 'nullable|string',
-            'assumed_office_on' => 'nullable',
+            'assumed_office_on' => 'required',
             'phone' => 'nullable',
             'email' => 'nullable|email',
             'profile' => 'nullable',
             'photo' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:300',
         ]);
 
-        $department = Faculty::where('uuid', $request->department)->first();
+        $department = Department::where('uuid', $request->department)->first();
         if (!$department) {
-            return redirect()->back()->with('error', 'Faculty record not found!');
+            return redirect()->back()->with('error', 'Department record not found!');
         }
 
         $head = $department->hod;
@@ -926,7 +926,7 @@ class AcademicConfigController extends Controller
 
         if (Route::currentRouteName() == 'pastDepartmentHeadsSearch') {
             $searchKey = $request->input('searchKey');
-            $pastHeads = HeadOfDepartment::where('department', $department->slug)->where('name', 'like', "%$searchKey%")
+            $pastHeads = HeadOfDepartment::where('department', $department->slug)->where('is_active', false)->where('name', 'like', "%$searchKey%")
                 ->orWhere('qualifications', 'like', "%$searchKey%")
                 ->orWhere('phone', 'like', "%$searchKey%")
                 ->orWhere('email', 'like', "%$searchKey%")
@@ -939,7 +939,7 @@ class AcademicConfigController extends Controller
             $requestType = 'search';
             $pageTitle = 'Search Results:: ' . $searchKey;
         } else {
-            $pastHeads = HeadOfDepartment::where('department', $department->slug)
+            $pastHeads = HeadOfDepartment::where('department', $department->slug)->where('is_active', false)
                 ->orderBy('tenure_end_on', 'desc')
                 ->paginate(20);
             $totalPastHeads = $department->pastHods->count();

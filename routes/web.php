@@ -160,8 +160,8 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
 
 
     // guest routes
-        Route::get('/about_us', [FrontendController::class, 'guestAboutUs'])->name('guestAboutUs');
-
+    Route::get('/about_us', [FrontendController::class, 'guestAboutUs'])->name('guestAboutUs');
+    Route::get('/about/department/{uuid}', [FrontendController::class, 'guestViewDepartment'])->name('guestViewDepartment');
 });
 
 // Route::middleware('auth')
@@ -545,6 +545,13 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/config/basics/sliders/add_new/submit', [SystemConfigurationController::class, 'addNewSliderSubmit'])->name('addNewSliderSubmit');
     Route::put('admin/config/basics/sliders/update/{id}/submit', [SystemConfigurationController::class, 'editSliderSubmit'])->name('editSliderSubmit');
 
+    // contact settings
+    Route::get('admin/config/basics/contacts', [SystemConfigurationController::class, 'contacts'])->name('contacts');
+    Route::put('admin/config/basics/contacts/update/submit', [SystemConfigurationController::class, 'updateContactDetailsSubmit'])->name('updateContactDetailsSubmit');
+
+        
+
+    
 
     // seo settings
     Route::get('admin/config/seo', [SystemConfigurationController::class, 'seoConfig'])->name('seoConfig');

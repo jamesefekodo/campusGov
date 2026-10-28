@@ -1488,4 +1488,55 @@ class SystemConfigurationController extends Controller
 
         return redirect()->back()->with('success', 'Done!');
     }
+    public function contacts()
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.read'),
+            403
+        );
+
+        $basicSystemSetting = basicSystemInfo();
+
+        $data = [
+            'basicSystemSetting' => $basicSystemSetting,
+        ];
+
+        return view('users.admin.config.basic.contacts', compact('data'));
+    }
+    public function updateContactDetailsSubmit(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        abort_unless(
+            $user->hasPermission('basic_system_config.update'),
+            403
+        );
+
+        $request->validate([
+            'email' => 'nullable|email',
+            'phone' => 'nullable',
+            'address' => 'nullable',
+            'facebook_link' => 'nullable|url',
+            'instagram_link' => 'nullable|url',
+            'twitter_link' => 'nullable|url',
+            'linkedin_link' => 'nullable|url',
+        ]);
+
+        $basicSystemSetting = BasicSystemSetting::where('tenant_id', app('tenant')->id)->first();
+
+        $basicSystemSetting->update([
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'address' => $request->address,
+            'facebook_link' => $request->facebook_link,
+            'instagram_link' => $request->instagram_link,
+            'twitter_link' => $request->twitter_link,
+            'linkedin_link' => $request->linkedin_link,
+        ]);
+        return redirect()->back()->with('success', 'Done!');
+    }
 }

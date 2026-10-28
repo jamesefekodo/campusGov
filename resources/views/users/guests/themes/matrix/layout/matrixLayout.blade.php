@@ -128,7 +128,8 @@
                                 {{-- department --}}
                             @elseif (activeDepartments()->isNotEmpty())
                                 @foreach (activeDepartments() as $department)
-                                    <li><a class="dropdown-item" href="#">{{ Str::limit($department->name, 25) }}
+                                    <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/department/'. $department->uuid) ? 'active' : '' }}"
+                                            href="{{ route('guestViewDepartment', ['uuid' => $department->uuid]) }}">{{ Str::limit($department->name, 25) }}
                                         </a></li>
                                 @endforeach
                             @endif
@@ -193,12 +194,12 @@
             </div>
         </div>
     </nav>
-<div class="mb-5">
-    @yield('content')
+    <div class="mb-5">
+        @yield('content')
 
-    @include('layouts.include.supportModal')
+        @include('layouts.include.supportModal')
 
-</div>
+    </div>
 
 
     <footer>

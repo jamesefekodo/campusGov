@@ -41,13 +41,13 @@
                             <div class="form-group col-md-4">
                                 <label for="assumed_office_on">Assumed Office On</label>
                                 <input type="date" class="form-control" name="assumed_office_on"
-                                    value="{{ $data['department']->hod->assumed_office_on }}">
+                                    value="{{ $data['department']->hod->assumed_office_on }}" required>
                                 <p style="color: red">{{ $errors->first('assumed_office_on') }}</p>
                             </div>
                             <div class="form-group col-md-4">
                                 <label for="phone">Phone:</label>
                                 <input type="text" class="form-control" name="phone"
-                                    value="{{ $data['department']->hod->assumed_office_on }}">
+                                    value="{{ $data['department']->hod->phone }}">
                                 <p style="color: red">{{ $errors->first('phone') }}</p>
                             </div>
                             <div class="form-group col-md-4">

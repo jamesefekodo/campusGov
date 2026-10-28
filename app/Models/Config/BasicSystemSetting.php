@@ -38,6 +38,7 @@ class BasicSystemSetting extends Model
         'school_founding_year',
         'account_balance',
         'president_remarks',
+        'linkedin_link',
     ];
 
     // caset attributes

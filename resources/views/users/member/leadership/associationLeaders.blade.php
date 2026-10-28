@@ -225,9 +225,9 @@
 
                                                         <div class="advisor-service-period">
                                                             <i class="fa fa-calendar-alt me-1"></i>
-                                                            {{ $advisor->tenure?->start_date?->format('F Y') ?? 'N/A' }}
+                                                            {{ $advisor->start_date?->format('F Y') ?? 'N/A' }}
                                                             –
-                                                            {{ $advisor->tenure?->end_date?->format('F Y') ?? 'Present' }}
+                                                            {{ $advisor->end_date?->format('F Y') ?? 'Present' }}
                                                         </div>
                                                     </div>
                                                 </div>

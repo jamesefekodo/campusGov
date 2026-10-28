@@ -40,7 +40,7 @@
                             <div class="form-group col-md-4">
                                 <label for="assumed_office_on">Assumed Office On</label>
                                 <input type="date" class="form-control" name="assumed_office_on"
-                                    value="{{ old('assumed_office_on') }}">
+                                    value="{{ old('assumed_office_on') }}" required>
                                 <p style="color: red">{{ $errors->first('assumed_office_on') }}</p>
                             </div>
                             <div class="form-group col-md-4">

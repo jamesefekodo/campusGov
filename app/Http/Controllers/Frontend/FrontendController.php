@@ -190,7 +190,7 @@ class FrontendController extends Controller
             ->first();
 
 
-              $academicSession = $request->academic_session ?? currentAcademicYear();
+        $academicSession = $request->academic_session ?? currentAcademicYear();
 
         // Fetch student leaders
         $studentLeaders = StudentLeadershipRepresentative::query()
@@ -287,4 +287,37 @@ class FrontendController extends Controller
     //         'themeColors' => $themeService->forTenant($tenant),
     //     ]);
     // }
+    public function guestViewDepartment($uuid)
+    {
+        $redirect = $this->checkLogin();
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+        $tenant = tenant();
+
+        $themeService = app(ThemeService::class);
+
+        $theme = $themeService->activeTheme($tenant);
+        $themeColors = $themeService->forTenant($tenant);
+
+        $department = Department::where('uuid', $uuid)->where('is_active', true)->first();
+        if (!$department) {
+            return redirect()->back()->with('error', 'No records found!');
+        }
+
+
+
+        $data = [
+            'department' => $department,
+        ];
+
+
+        return view($themeService->view($tenant, 'about.aboutDepartment'), [
+            'theme' => $theme,
+            'themeColors' => $themeColors,
+            'data' => $data,
+        ]);
+    }
 }
