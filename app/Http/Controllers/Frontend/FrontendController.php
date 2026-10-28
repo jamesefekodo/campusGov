@@ -13,11 +13,14 @@ use App\Models\Config\HomepageSlider;
 use App\Models\Leadership\StudentRepresentative\AssociationAdvisor;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipRepresentative;
 use App\Models\Leadership\StudentRepresentative\StudentLeadershipTenure;
+use App\Models\Media\MediaPublication;
+use App\Models\Media\TagsForPublication;
 use App\Models\Members\MemberAcademicInfo;
 use App\Services\ThemeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -349,6 +352,158 @@ class FrontendController extends Controller
 
 
         return view($themeService->view($tenant, 'about.aboutFaculty'), [
+            'theme' => $theme,
+            'themeColors' => $themeColors,
+            'data' => $data,
+        ]);
+    }
+
+    public function newsAndArticles(Request $request)
+    {
+        $redirect = $this->checkLogin();
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+        $tenant = tenant();
+
+        $themeService = app(ThemeService::class);
+
+        $theme = $themeService->activeTheme($tenant);
+        $themeColors = $themeService->forTenant($tenant);
+
+
+        $requestType = '';
+        $searchKey = '';
+        $pageTitle = '';
+        $publications = '';
+        $totalPublications = 0;
+
+        // sort by
+        if ($request->sort_by == 'title') {
+            $sortBy = 'title';
+        } elseif ($request->sort_by == 'date_published') {
+            $sortBy = 'published_at';
+        } elseif ($request->sort_by == 'last_update') {
+            $sortBy = 'last_update';
+        } elseif ($request->sort_by == 'views') {
+            $sortBy = 'views';
+        } else {
+            $sortBy = 'published_at';
+        }
+
+        // sorting order
+        $sortOrder = ($request->sort_order === 'desc') ? 'desc' : 'asc';
+
+
+
+        if (Route::currentRouteName() == 'newsAndArticlesSearch') {
+            $searchKey = $request->input('searchKey');
+            $publications = MediaPublication::query()
+                ->where('approval_status', 'approved')
+                ->where(function ($query) use ($searchKey) {
+                    $query->where('title', 'like', "%{$searchKey}%")
+                        ->orWhere('content', 'like', "%{$searchKey}%")
+                        ->orWhere('meta_description', 'like', "%{$searchKey}%")
+                        ->orWhere('meta_keywords', 'like', "%{$searchKey}%");
+                })
+                ->orderBy($sortBy, $sortOrder)
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalPublications = $publications->total();
+            $requestType = 'search';
+            $pageTitle = 'Search Results :: ' . $searchKey;
+        } elseif (Route::currentRouteName() == 'newsAndArticlesWihTag') {
+            $tag = TagsForPublication::where('slug', $request->slug)->first();
+            if (!$tag) {
+                return redirect()->back('error', 'Slug records not found!');
+            }
+            // Fetch publications belonging to this tag using the relationship
+            $publications = $tag->publications()
+                ->where('approval_status', 'approved')->where('is_active', true)
+                ->orderBy($sortBy, $sortOrder)
+                ->paginate(20)
+                ->withQueryString();
+
+            $totalPublications = $publications->total();
+            $requestType = 'byTag';
+            $pageTitle = "Media Publications with tag :: '" . $tag->name . "'";
+        } else {
+            $publications = MediaPublication::where('approval_status', 'approved')->where('is_active', true)
+                ->orderBy($sortBy, $sortOrder)
+                ->paginate(20)->withQueryString();
+            $totalPublications = MediaPublication::where('approval_status', 'approved')->where('is_active', true)
+                ->orderBy($sortBy, $sortOrder)->count();
+            $requestType = 'all';
+            $pageTitle = 'Media Publications';
+        }
+
+
+
+        $data = [
+            'publications' => $publications,
+            'totalPublications' => $totalPublications,
+            'requestType' => $requestType,
+            'searchKey' => $searchKey,
+            'pageTitle' => $pageTitle,
+            'sortBy' => $sortBy,
+            'sortOrder' => $sortOrder,
+        ];
+
+
+        return view($themeService->view($tenant, 'media.publications'), [
+            'theme' => $theme,
+            'themeColors' => $themeColors,
+            'data' => $data,
+        ]);
+    }
+
+    public function guestViewNewsAndArticle($uuid){
+ $redirect = $this->checkLogin();
+
+        if ($redirect) {
+            return $redirect;
+        }
+
+        $tenant = tenant();
+
+        $themeService = app(ThemeService::class);
+
+        $theme = $themeService->activeTheme($tenant);
+        $themeColors = $themeService->forTenant($tenant);
+
+
+       $publication = MediaPublication::with([
+            'likes',
+            'mainComments.user',
+            'mainComments.likes',
+            'mainComments.replies.user',
+            'mainComments.replies.likes',
+        ])->withCount([
+            'likes',
+
+            'comments' => function ($query) {
+                $query->where('status', 'approved')
+                    ->where('is_active', true);
+            },
+        ])->where('approval_status', 'approved')->where('is_active', true)->where('uuid', $uuid)->first();
+
+        if (!$publication) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
+        $publication->increment('views');
+
+
+
+        $data = [
+            'publication' => $publication,
+        ];
+
+
+        return view($themeService->view($tenant, 'media.viewPublication'), [
             'theme' => $theme,
             'themeColors' => $themeColors,
             'data' => $data,

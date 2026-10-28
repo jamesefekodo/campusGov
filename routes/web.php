@@ -164,7 +164,10 @@ Route::middleware(['authenticationMiddlewares'])->group(function () {
     Route::get('/about/department/{uuid}', [FrontendController::class, 'guestViewDepartment'])->name('guestViewDepartment');
     Route::get('/about/faculty/{uuid}', [FrontendController::class, 'guestViewFaculty'])->name('guestViewFaculty');
 
-    
+    Route::get('/media/publications', [FrontendController::class, 'newsAndArticles'])->name('newsAndArticles');
+    Route::get('/media/publications/search', [FrontendController::class, 'newsAndArticles'])->name('newsAndArticlesSearch');
+    Route::get('/media/publications/tags/{slug}', [FrontendController::class, 'newsAndArticles'])->name('newsAndArticlesWihTag');
+    Route::get('/media/publications/view/{uuid}', [FrontendController::class, 'guestViewNewsAndArticle'])->name('guestViewNewsAndArticle');
 });
 
 // Route::middleware('auth')
@@ -337,7 +340,7 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
     Route::get('member/academic_resources/recommended_courses/view/{slug}', [RecommendedCourseController::class, 'memberViewRecommendedCourse'])->name('memberViewRecommendedCourse');
 
     // member Industry Affiliates
-       Route::get('member/academic_resources/industry_affiliates', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliates');
+    Route::get('member/academic_resources/industry_affiliates', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliates');
     Route::get('member/academic_resources/industry_affiliates/search', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliatesSearch');
     Route::get('member/academic_resources/industry_affiliates/filter/tag/{slug}', [IndustryAffiliationController::class, 'memberIndustryAffiliates'])->name('memberIndustryAffiliatesFilter');
     Route::get('member/academic_resources/industry_affiliates/view/{slug}', [IndustryAffiliationController::class, 'memberViewIndustryAffiliate'])->name('memberViewIndustryAffiliate');
@@ -351,10 +354,6 @@ Route::middleware(['authenticationMiddlewares', 'studentMiddlewares'])->group(fu
 
     //  leaders
     Route::get('member/leadership/student_rep', [LeadershipController::class, 'memberSeeLeaders'])->name('memberSeeLeaders');
-
-
-
-
 });
 
 
@@ -552,9 +551,9 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::get('admin/config/basics/contacts', [SystemConfigurationController::class, 'contacts'])->name('contacts');
     Route::put('admin/config/basics/contacts/update/submit', [SystemConfigurationController::class, 'updateContactDetailsSubmit'])->name('updateContactDetailsSubmit');
 
-        
 
-    
+
+
 
     // seo settings
     Route::get('admin/config/seo', [SystemConfigurationController::class, 'seoConfig'])->name('seoConfig');
@@ -594,7 +593,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
 
     // themes
     Route::get('admin/config/themes', [ThemeController::class, 'frontendThemes'])->name('frontendThemes');
-     Route::post('themes/{frontendTheme}/select', [ThemeController::class, 'selectTheme'])
+    Route::post('themes/{frontendTheme}/select', [ThemeController::class, 'selectTheme'])
         ->name('frontendThemes.select');
 
     Route::post('themes/{frontendTheme}/reset', [ThemeController::class, 'resetTheme'])
@@ -859,7 +858,7 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/academic_resources/industry_affiliate/tag/{slug}/edit/submit', [IndustryAffiliationController::class, 'editIndustryAffilateTagSubmit'])->name('editIndustryAffilateTagSubmit');
     Route::get('admin/academic_resources/industry_affiliate/tag/{slug}/delete/submit', [IndustryAffiliationController::class, 'removeIndustryAffiliatesTag'])->name('removeIndustryAffiliatesTag');
 
-// archive
+    // archive
     Route::get('admin/archive', [ArchiveController::class, 'archive'])->name('archive');
     Route::get('admin/archive/search', [ArchiveController::class, 'archive'])->name('archiveSearch');
     Route::post('admin/archive/file/add_new/submit', [ArchiveController::class, 'addNewArchiveFileSubmit'])->name('addNewArchiveFileSubmit');
@@ -899,6 +898,4 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::post('admin/leadership/advisors/add_new/submit', [LeadershipController::class, 'addNewStudentLeadershipAdvisorSubmit'])->name('addNewStudentLeadershipAdvisorSubmit');
     Route::put('admin/leadership/advisors/edit/{uuid}/submit', [LeadershipController::class, 'editStudentLeadershipAdvisorSubmit'])->name('editStudentLeadershipAdvisorSubmit');
     Route::get('admin/leadership/advisors/delete/{uuid}', [LeadershipController::class, 'deleteAssociationAdvisor'])->name('deleteAssociationAdvisor');
-
-
 });

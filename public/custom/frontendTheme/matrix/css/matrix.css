@@ -2252,3 +2252,98 @@ footer ul li a:hover {
         transition-duration: 0.01ms !important;
     }
 }
+
+.publication-view {
+    padding-bottom: 90px;
+}
+
+.publication-view .publication-title {
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 850;
+    letter-spacing: -1.2px;
+    line-height: 1.2;
+    color: var(--mx-ink);
+}
+
+.publication-view .publication-meta {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 22px;
+    color: var(--mx-muted);
+    font-size: 13px;
+}
+
+.publication-view .publication-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.publication-view .publication-meta i {
+    color: var(--theme-primary);
+}
+
+/* Wide image container */
+.publication-view .publication-cover-container {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding: 18px;
+}
+
+/* Full image, never cropped */
+.publication-view .publication-cover-preview {
+    width: 100%;
+    height: auto;
+    max-height: 680px;
+    object-fit: contain;
+    cursor: zoom-in;
+    border-radius: 14px;
+}
+
+/* Wide but readable article body */
+.publication-view .publication-body {
+    width: 100%;
+    max-width: 980px;
+    padding-inline: 16px;
+}
+
+.publication-view .publication-content {
+    font-size: 16px;
+    line-height: 2;
+    color: var(--mx-body);
+    overflow-wrap: anywhere;
+}
+
+.publication-view .publication-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 14px;
+}
+
+.publication-view .publication-content h2,
+.publication-view .publication-content h3 {
+    color: var(--mx-ink);
+    font-weight: 800;
+    margin-top: 1.75rem;
+}
+
+@media (max-width: 767px) {
+    .publication-view {
+        padding-bottom: 65px;
+    }
+
+    .publication-view .publication-cover-preview {
+        max-height: 380px;
+    }
+
+    .publication-view .publication-title {
+        font-size: clamp(26px, 8vw, 36px);
+        letter-spacing: -0.8px;
+    }
+
+    .publication-view .publication-content {
+        font-size: 15px;
+    }
+}
