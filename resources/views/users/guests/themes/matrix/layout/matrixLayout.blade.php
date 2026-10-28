@@ -73,7 +73,7 @@
 
     @include('users.guests.themes.matrix.layout.include.matrixNavBar')
 
-    
+
     <div class="mb-5">
         @yield('content')
 
@@ -86,22 +86,40 @@
         <div class="container">
             <div class="row g-4 mb-4">
                 <div class="col-md-3">
-                    <h5>NAPES-OGITECH</h5>
-                    <p>Engineering in practice!</p>
+                    <h5>{{ strtoupper(basicSystemInfo()->association_acronym) }} -
+                        {{ strtoupper(basicSystemInfo()->school_acronym) }}</h5>
+                    <p>{{ basicSystemInfo()->association_slogan }}</p>
                 </div>
 
                 <div class="col-md-3">
                     <h5>About</h5>
                     <ul>
-                        <li><a href="#">Faculty/Departments & Leaders</a></li>
-                        <li><a href="#">Associations & Leaders</a></li>
+                        <li><a href="{{ route('guestAboutUs') }}">{{ strtoupper(basicSystemInfo()->association_acronym) }}
+                                - {{ strtoupper(basicSystemInfo()->school_acronym) }}</a></li>
+                        @if (basicSystemInfo()->operational_level == 'faculty' && activeFaculties()->isNotEmpty())
+                            @foreach (activeFaculties() as $faculty)
+                                <li><a href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}">{{ Str::limit($faculty->name, 20) }}
+                                        @if ($faculty->acronym)
+                                            ({{ $faculty->acronym }})
+                                        @endif
+                                    </a></li>
+                            @endforeach
+                        @elseif (basicSystemInfo()->operational_level == 'department' && activeDepartments()->isNotEmpty())
+                            @foreach (activeDepartments() as $department)
+                                <li><a href="{{ route('guestViewDepartment', ['uuid' => $department->uuid]) }}">{{ Str::limit($department->name, 20) }}
+                                        @if ($faculty->acronym)
+                                            ({{ $faculty->acronym }})
+                                        @endif
+                                    </a></li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
 
                 <div class="col-md-3">
                     <h5>Resources</h5>
                     <ul>
-                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Media</a></li>
                         <li><a href="#">Academic Resources</a></li>
                         <li><a href="#">Documentation</a></li>
                         <li><a href="#">Download App</a></li>

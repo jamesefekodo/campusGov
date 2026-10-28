@@ -116,6 +116,30 @@ class FrontendController extends Controller
             ->with(['position', 'tenure', 'theRep'])
             ->first();
 
+        $academicSession = currentAcademicYear() ?? 2026;
+
+        // Fetch student leaders
+        $studentLeaders = StudentLeadershipRepresentative::query()
+            ->with([
+                'position.arm',
+                'position',
+                'tenure',
+                'theRep.memberPersonalProfile',
+                'theRep.memberSocialMediaHandle.thePlatform',
+            ])
+            ->whereHas('tenure', function ($query) use ($academicSession) {
+                $query->where('academic_session', $academicSession);
+            })
+            ->get()
+            ->shuffle();
+        $publications = MediaPublication::query()
+            ->where('approval_status', 'approved')
+            ->where('is_active', true)
+            ->with(['authorUser.memberPersonalProfile', 'tags'])
+            ->inRandomOrder()
+            ->limit(10)
+            ->get();
+
 
         $data = [
             'sliders' => HomepageSlider::orderBy('order')->get(),
@@ -128,6 +152,9 @@ class FrontendController extends Controller
             'thePresident' => $thePresident,
             'basicInfo' => $basicInfo,
             'currentAcademicYear' => currentAcademicYear(),
+
+            'studentLeaders' => $studentLeaders,
+            'publications' => $publications,
         ];
 
         return view($themeService->homepageView($tenant), [
@@ -460,8 +487,9 @@ class FrontendController extends Controller
         ]);
     }
 
-    public function guestViewNewsAndArticle($uuid){
- $redirect = $this->checkLogin();
+    public function guestViewNewsAndArticle($uuid)
+    {
+        $redirect = $this->checkLogin();
 
         if ($redirect) {
             return $redirect;
@@ -475,7 +503,7 @@ class FrontendController extends Controller
         $themeColors = $themeService->forTenant($tenant);
 
 
-       $publication = MediaPublication::with([
+        $publication = MediaPublication::with([
             'likes',
             'mainComments.user',
             'mainComments.likes',

@@ -38,7 +38,7 @@ class SharingController extends Controller
                 ]);
 
             default:
-                return redirect()->route('guestViewMediaPublication', [
+                return redirect()->route('guestViewNewsAndArticle', [
                     'uuid' => $publication->uuid
                 ]);
         }
