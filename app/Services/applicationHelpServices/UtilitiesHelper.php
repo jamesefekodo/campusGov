@@ -1068,65 +1068,196 @@ if (!function_exists('resolveAcademicContextForDue')) {
     }
 }
 
+// if (!function_exists('emailSafeLogo')) {
+//     function emailSafeLogo(string $backgroundColor = '#f0f0f0'): string
+//     {
+//         $defaultSettings = basicSystemInfo();
+//         $logoPath = null;
+//         $tenantId = tenant()->id;
+
+//         if (
+//             $defaultSettings &&
+//             $defaultSettings->association_logo &&
+//             $tenantId &&
+//             file_exists(public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo))
+//         ) {
+//             $logoPath = public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo);
+//         } else {
+//             $logoPath = public_path('system/images/transcend_logo.webp');
+//         }
+
+//         $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+//         $source = $ext === 'webp' ? imagecreatefromwebp($logoPath) : imagecreatefrompng($logoPath);
+
+//         $width = imagesx($source);
+//         $height = imagesy($source);
+
+//         $flattened = imagecreatetruecolor($width, $height);
+
+//         // Parse hex colour into RGB
+//         $hex = ltrim($backgroundColor, '#');
+//         $r = hexdec(substr($hex, 0, 2));
+//         $g = hexdec(substr($hex, 2, 2));
+//         $b = hexdec(substr($hex, 4, 2));
+//         $bgColor = imagecolorallocate($flattened, $r, $g, $b);
+
+//         imagefill($flattened, 0, 0, $bgColor);
+//         imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
+
+//         $outputDir = public_path('system/images/email-safe');
+//         if (!is_dir($outputDir)) {
+//             @mkdir($outputDir, 0775, true);
+//         }
+
+//         $outputPath = $outputDir . '/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png';
+//         // imagepng($flattened, $outputPath);
+//         if (!imagepng($flattened, $outputPath)) {
+//             imagedestroy($source);
+//             imagedestroy($flattened);
+
+//             throw new \RuntimeException(
+//                 "Failed to generate email-safe logo at: {$outputPath}"
+//             );
+//         }
+
+
+//         imagedestroy($source);
+//         imagedestroy($flattened);
+
+//         return asset('system/images/email-safe/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png');
+//     }
+// }
+
 if (!function_exists('emailSafeLogo')) {
     function emailSafeLogo(string $backgroundColor = '#f0f0f0'): string
     {
-        $defaultSettings = basicSystemInfo();
-        $logoPath = null;
-        $tenantId = tenantId();
+        $tenantId = tenant()?->id;
+        $settings = basicSystemInfo();
 
-        if (
-            $defaultSettings &&
-            $defaultSettings->association_logo &&
-            $tenantId &&
-            file_exists(public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo))
-        ) {
-            $logoPath = public_path('assets/tenant_' . $tenantId . '/uploads/tenantProfile/' . $defaultSettings->association_logo);
-        } else {
-            $logoPath = public_path('system/images/transcend_logo.webp');
+        $logoFilename = $settings->association_logo ?? null;
+
+        $tenantLogoPath = null;
+
+        if ($tenantId && $logoFilename) {
+            $tenantLogoPath = public_path(
+                'assets/tenant_' . $tenantId .
+                '/uploads/tenantProfile/' . $logoFilename
+            );
         }
 
-        $ext = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
-        $source = $ext === 'webp' ? imagecreatefromwebp($logoPath) : imagecreatefrompng($logoPath);
+        // Select the tenant logo when it exists and is readable.
+        if (
+            $tenantLogoPath &&
+            is_file($tenantLogoPath) &&
+            is_readable($tenantLogoPath)
+        ) {
+            $logoPath = $tenantLogoPath;
+        } else {
+            $logoPath = public_path(
+                'system/images/transcend_logo.webp'
+            );
+
+            logger()->warning('Email logo fallback selected', [
+                'tenant_id' => $tenantId,
+                'settings_id' => $settings->id ?? null,
+                'association_logo' => $logoFilename,
+                'tenant_logo_path' => $tenantLogoPath,
+                'file_exists' => $tenantLogoPath
+                    ? file_exists($tenantLogoPath)
+                    : false,
+            ]);
+        }
+
+        if (!is_file($logoPath) || !is_readable($logoPath)) {
+            throw new \RuntimeException(
+                "Email logo file is missing or unreadable: {$logoPath}"
+            );
+        }
+
+        $hex = ltrim($backgroundColor, '#');
+
+        if (!preg_match('/^[0-9a-fA-F]{6}$/', $hex)) {
+            throw new \InvalidArgumentException(
+                'Background colour must be a six-digit hex colour.'
+            );
+        }
+
+        $hex = strtolower($hex);
+        $extension = strtolower(pathinfo($logoPath, PATHINFO_EXTENSION));
+
+        $source = match ($extension) {
+            'webp' => imagecreatefromwebp($logoPath),
+            'png'  => imagecreatefrompng($logoPath),
+            'jpg', 'jpeg' => imagecreatefromjpeg($logoPath),
+            default => throw new \RuntimeException(
+                "Unsupported email logo format: {$extension}"
+            ),
+        };
+
+        if ($source === false) {
+            throw new \RuntimeException(
+                "Unable to read email logo: {$logoPath}"
+            );
+        }
 
         $width = imagesx($source);
         $height = imagesy($source);
 
         $flattened = imagecreatetruecolor($width, $height);
 
-        // Parse hex colour into RGB
-        $hex = ltrim($backgroundColor, '#');
         $r = hexdec(substr($hex, 0, 2));
         $g = hexdec(substr($hex, 2, 2));
         $b = hexdec(substr($hex, 4, 2));
+
         $bgColor = imagecolorallocate($flattened, $r, $g, $b);
 
         imagefill($flattened, 0, 0, $bgColor);
-        imagecopy($flattened, $source, 0, 0, 0, 0, $width, $height);
+        imagecopy(
+            $flattened,
+            $source,
+            0,
+            0,
+            0,
+            0,
+            $width,
+            $height
+        );
 
         $outputDir = public_path('system/images/email-safe');
-        if (!is_dir($outputDir)) {
-            @mkdir($outputDir, 0775, true);
+
+        if (!is_dir($outputDir) &&
+            !mkdir($outputDir, 0775, true) &&
+            !is_dir($outputDir)
+        ) {
+            imagedestroy($source);
+            imagedestroy($flattened);
+
+            throw new \RuntimeException(
+                "Unable to create email logo directory: {$outputDir}"
+            );
         }
 
-        $outputPath = $outputDir . '/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png';
-        // imagepng($flattened, $outputPath);
+        $tenantKey = $tenantId ?? 'default';
+
+        $outputFilename = "logo-{$tenantKey}-{$hex}.png";
+        $outputPath = $outputDir . DIRECTORY_SEPARATOR . $outputFilename;
+
         if (!imagepng($flattened, $outputPath)) {
             imagedestroy($source);
             imagedestroy($flattened);
 
             throw new \RuntimeException(
-                "Failed to generate email-safe logo at: {$outputPath}"
+                "Failed to generate email-safe logo: {$outputPath}"
             );
         }
-
 
         imagedestroy($source);
         imagedestroy($flattened);
 
-        return asset('system/images/email-safe/logo-' . ($tenantId ?? 'default') . '-' . $hex . '.png');
+        return asset('system/images/email-safe/' . $outputFilename);
     }
 }
+
 
 if (!function_exists('emailFromName')) {
     function emailFromName(): string

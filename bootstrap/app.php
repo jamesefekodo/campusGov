@@ -27,6 +27,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $roleMiddleware = RoleMiddleware::class;
         $permissionMiddleware = PermissionMiddleware::class;
 
+         // Initialize tenant before session and authentication processing.
+    $middleware->web(prepend: [
+        $tenancy,
+    ]);
+    
 
         // Authentication
         $middleware->appendToGroup('authenticationMiddlewares', [

@@ -246,7 +246,10 @@ class SystemConfigurationController extends Controller
             File::ensureDirectoryExists($uploadPath);
 
             // Base filename
-            $baseName = strtolower($basicSystemSetting->association_name ?: config('app.name'));
+
+            // $baseName = strtolower($basicSystemSetting->association_name ?: config('app.name'));
+            $baseName = strtolower($basicSystemSetting->association_acronym . '_logo'  ?: config('app.name'));
+
 
             $baseName = Str::of($baseName)
                 ->replaceMatches('/[^A-Za-z0-9]+/', '_')
@@ -365,7 +368,9 @@ class SystemConfigurationController extends Controller
             File::ensureDirectoryExists($uploadPath2);
 
             // Base filename
-            $baseName2 = strtolower($basicSystemSetting->school_name ?: config('app.name'));
+            // $baseName2 = strtolower($basicSystemSetting->school_name ?: config('app.name'));
+            $baseName2 = strtolower($basicSystemSetting->association_acronym . '_school_logo'  ?: config('app.name'));
+
 
             $baseName2 = Str::of($baseName2)
                 ->replaceMatches('/[^A-Za-z0-9]+/', '_')

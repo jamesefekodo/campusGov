@@ -34,6 +34,8 @@
                             activeDepartments()->isNotEmpty()
                         ) {
                             $showDepartment = true;
+                        } elseif (basicSystemInfo()->operational_level == 'department') {
+                            $showDepartment = true;
                         }
                     @endphp
 
@@ -43,7 +45,7 @@
                                 - {{ strtoupper(basicSystemInfo()->school_acronym) }}</a></li>
 
                         {{-- school level --}}
-                        @if ($showfaculties || $showSingleFaculty)
+                        @if ($showfaculties)
                             @foreach (activeFaculties() as $faculty)
                                 <li><a class="dropdown-item {{ Str::startsWith(request()->path(), 'about/faculty/' . $faculty->uuid) ? 'active' : '' }}"
                                         href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}">{{ Str::limit($faculty->name, 25) }}

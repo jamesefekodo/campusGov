@@ -59,7 +59,7 @@ Route::get('/clear-cache', function () {
 });
 
 
-// general routes (no middleware).... jqajax, callbacks and so on
+// general routes.... jqajax, callbacks and so on
 Route::get('/fetch-program-types', [AcademicConfigController::class, 'fetchProgramTypes'])
     ->name('fetchProgramTypes');
 Route::get('/fetch-departments', [AcademicConfigController::class, 'fetchDepartments'])
