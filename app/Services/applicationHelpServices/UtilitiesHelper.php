@@ -170,6 +170,12 @@ if (!function_exists('tenantId')) {
         return tenant()?->id;
     }
 }
+if (!function_exists('tenantId')) {
+    function tenantId()
+    {
+        return tenant()?->id;
+    }
+}
 
 if (!function_exists('homepageSliders')) {
     function homepageSliders()

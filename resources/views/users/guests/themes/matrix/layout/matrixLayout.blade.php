@@ -96,6 +96,7 @@
                     <ul>
                         <li><a href="{{ route('guestAboutUs') }}">{{ strtoupper(basicSystemInfo()->association_acronym) }}
                                 - {{ strtoupper(basicSystemInfo()->school_acronym) }}</a></li>
+
                         @if (basicSystemInfo()->operational_level == 'faculty' && activeFaculties()->isNotEmpty())
                             @foreach (activeFaculties() as $faculty)
                                 <li><a href="{{ route('guestViewFaculty', ['uuid' => $faculty->uuid]) }}">{{ Str::limit($faculty->name, 20) }}
@@ -107,8 +108,8 @@
                         @elseif (basicSystemInfo()->operational_level == 'department' && activeDepartments()->isNotEmpty())
                             @foreach (activeDepartments() as $department)
                                 <li><a href="{{ route('guestViewDepartment', ['uuid' => $department->uuid]) }}">{{ Str::limit($department->name, 20) }}
-                                        @if ($faculty->acronym)
-                                            ({{ $faculty->acronym }})
+                                        @if ($department->acronym)
+                                            ({{ $department->acronym }})
                                         @endif
                                     </a></li>
                             @endforeach

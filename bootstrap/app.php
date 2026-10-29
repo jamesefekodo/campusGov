@@ -30,8 +30,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Authentication
         $middleware->appendToGroup('authenticationMiddlewares', [
-            $authMiddleware,
             $tenancy,
+            $authMiddleware,
             $tenancyEnvConfig,
         ]);
 
