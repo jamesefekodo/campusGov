@@ -127,27 +127,27 @@
                             <div class="form-group col-md-6">
                                 <label for="username">Username<span class="text-red">*</span>:</label>
                                 <input type="text" class="form-control" name="username"
-                                    value="{{ $data['admin']->username }}" readonly>
+                                    value="{{ $data['admin']?->username }}" readonly>
                                 <p style="color: red">{{ $errors->first('username') }}</p>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="name">Full Name<span class="text-red">*</span>:</label>
                                 <input type="text" class="form-control" name="name"
-                                    value="{{ $data['admin']->adminProfile->name }}" required>
+                                    value="{{ $data['admin']?->adminProfile->name }}" required>
                                 <p style="color: red">{{ $errors->first('name') }}</p>
                             </div>
 
                             <div class="form-group col-md-6">
                                 <label for="phone">Phone<span class="text-red">*</span>:</label>
                                 <input type="text" class="form-control" name="phone"
-                                    value="{{ $data['admin']->phone }}" required>
+                                    value="{{ $data['admin']?->phone }}" required>
                                 <p style="color: red">{{ $errors->first('phone') }}</p>
                             </div>
 
                             <div class="form-group col-md-6">
                                 <label for="email">Email<span class="text-red">*</span>:</label>
                                 <input type="email" class="form-control" name="email"
-                                    value="{{ $data['admin']->email }}" required>
+                                    value="{{ $data['admin']?->email }}" required>
                                 <p style="color: red">{{ $errors->first('email') }}</p>
                             </div>
 
@@ -155,13 +155,13 @@
                             <div class="form-group col-md-6">
                                 <label for="position">Position<span class="text-red">*</span>:</label>
                                 <input type="text" class="form-control" name="position"
-                                    value="{{ $data['admin']->adminProfile->position }}" required>
+                                    value="{{ $data['admin']?->adminProfile->position }}" required>
                                 <p style="color: red">{{ $errors->first('position') }}</p>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="description">Description<span class="text-red">*</span>:</label>
                                 <input type="text" class="form-control" name="description"
-                                    value="{{ $data['admin']->adminProfile->description }}" required>
+                                    value="{{ $data['admin']?->adminProfile->description }}" required>
                                 <p style="color: red">{{ $errors->first('description') }}</p>
                             </div>
 

@@ -87,7 +87,7 @@
                                                     {{ \Carbon\Carbon::parse($data['admin']?->adminProfile?->created_at)->format('l, d F, Y h:i A') }}
                                                 @endif
                                                 -
-                                                @if ($data['admin']?->adminProfile->created_by)
+                                                @if ($data['admin']?->adminProfile?->created_by)
 
                                                     @if ($data['admin']->createdBy?->memberPersonalProfile)
                                                         {{ trim(
