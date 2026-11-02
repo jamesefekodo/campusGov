@@ -233,7 +233,9 @@ class AuthController extends Controller
                 'unique:users,username',
                 'regex:/^\S*$/u',           // No spaces allowed
                 'min:8',                    // Minimum 8 characters
-                'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',  // No email format
+                'regex:/^[a-zA-Z0-9_-]+$/', // Only letters, numbers, underscores, and dashes (automatically prevents spaces and emojis)
+                // 'not_regex:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',  // No email format
+                'not_regex:/@/', // A quick way to prevent email-like inputs if '@' is the main giveaway
                 'not_regex:/[\x{1F600}-\x{1F64F}\x{1F300}-\x{1F5FF}\x{1F680}-\x{1F6FF}\x{1F700}-\x{1F77F}\x{1F780}-\x{1F7FF}\x{1F800}-\x{1F8FF}\x{1F900}-\x{1F9FF}\x{1FA00}-\x{1FA6F}\x{1FA70}-\x{1FAFF}\x{2600}-\x{26FF}\x{2700}-\x{27BF}\x{2300}-\x{23FF}\x{2B50}]/u',
             ],
             // 'username' => [

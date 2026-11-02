@@ -568,10 +568,6 @@ Route::middleware(['authenticationMiddlewares', 'adminMiddlewares'])->group(func
     Route::put('admin/help/chat/edit/{id}/submit', [SupportController::class, 'editWhatsAppSupportLineSubmit'])->name('editWhatsAppSupportLineSubmit');
 
 
-
-
-
-
     // policy setup
     Route::get('admin/config/policies', [SystemPolicyController::class, 'systemPolicies'])->name('systemPolicies');
     Route::get('admin/config/policies/search', [SystemPolicyController::class, 'systemPolicies'])->name('systemPoliciesSearch');

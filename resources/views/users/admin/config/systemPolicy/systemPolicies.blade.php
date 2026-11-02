@@ -93,7 +93,7 @@
 
                                                             <td>
                                                                 <a class="btn btn-primary btn-sm"
-                                                                    href="{{ route('viewPolicy', ['slug' => $policy->slug]) }}">View</a>
+                                                                    href="{{ route('viewPolicy', ['slug' => $policy->slug]) }}"><i class="fas fa-eye me-1"></i> View</a>
                                                             </td>
                                                         </tr>
                                                     @endforeach
