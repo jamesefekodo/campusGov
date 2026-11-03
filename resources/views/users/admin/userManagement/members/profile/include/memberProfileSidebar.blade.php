@@ -124,4 +124,39 @@
         @endswitch
     </p>
 
+    @if (Str::startsWith(request()->path(), 'admin/user_management/members') && Auth::user()->hasPermission('verify_users') && $data['member']->account_status !== 3)
+        <a href="#" id="disableAccountLink">
+            <p class="custom-btn bg-red btn-block text-white text-center text-uppercase w-100 my-2"> <i
+                    class="fas fa-user-slash me-1"></i>
+                Disable Account
+            </p>
+        </a>
+
+
+
+    <script>
+        document.getElementById('disableAccountLink').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Disable Account',
+                html: `
+    Are you sure you want to disable this member's profile?
+`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Continue',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href =
+                        "{{ route('disableUserAccount', ['uuid' => $data['member']->uuid]) }}";
+                }
+            });
+        });
+    </script>
+    @endif
+
 </div>

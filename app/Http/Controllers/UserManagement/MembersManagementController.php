@@ -39,12 +39,16 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
 
         $uuid = request()->route('uuid');
-        $user = User::where('uuid', $uuid)->firstOrFail();
+        $user = User::where('uuid', $uuid)->first();
+        if (!$user) {
+            return redirect()->back()->with('error', 'Records not found!');
+        }
+
 
         if ($user->account_status === 3) {
             return redirect()->back()->with('error', 'User account is already disabled.');
@@ -61,7 +65,7 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
 
@@ -992,7 +996,7 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
         $member = User::where('uuid', $uuid)->first();
@@ -1330,7 +1334,7 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
 
@@ -1439,7 +1443,7 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
 
@@ -1511,7 +1515,7 @@ class MembersManagementController extends Controller
         $user = Auth::user();
 
         abort_unless(
-            $user->hasPermission('member_profile.update'),
+            $user->hasPermission('verify_users'),
             403
         );
         $member = User::where('uuid', $uuid)->first();

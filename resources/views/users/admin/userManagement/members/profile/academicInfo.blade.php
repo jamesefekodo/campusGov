@@ -167,7 +167,7 @@
                                     </div>
                                     <hr>
 
-                                    @if (Auth::user()->hasPermission('member_profile.update'))
+                                    @if (Auth::user()->hasPermission('verify_users'))
                                         <div class="d-flex justify-content-end flex-wrap mt-3">
                                             <a href="{{ route('editMemberAcademicInfo', ['uuid' => $data['member']?->uuid]) }}"
                                                 class="btn btn-warning m-1 d-flex align-items-center">
