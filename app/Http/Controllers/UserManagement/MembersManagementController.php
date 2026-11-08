@@ -339,7 +339,7 @@ class MembersManagementController extends Controller
                         ->limit(1)
                 )
 
-                ->paginate(50);
+                ->paginate(50)->withQueryString();
 
             $totalMembers = $members->total();
             $requestType = 'filter';
@@ -354,7 +354,7 @@ class MembersManagementController extends Controller
                         ->whereColumn('member_personal_profiles.username', 'member_academic_infos.username')
                         ->limit(1)
                 )
-                ->paginate(50);
+                ->paginate(50)->withQueryString();
             $totalMembers = MemberAcademicInfo::where('academic_status', 'student')->count();
             $requestType = 'all';
             $pageTitle = 'Student Members';
@@ -548,7 +548,7 @@ class MembersManagementController extends Controller
                         ->limit(1)
                 )
 
-                ->paginate(50);
+                ->paginate(50)->withQueryString();
 
             $totalMembers = $members->total();
             $requestType = 'filter';
@@ -563,7 +563,7 @@ class MembersManagementController extends Controller
                         ->whereColumn('member_personal_profiles.username', 'member_academic_infos.username')
                         ->limit(1)
                 )
-                ->paginate(50);
+                ->paginate(50)->withQueryString();
             $totalMembers = MemberAcademicInfo::where('academic_status', '!=', 'student')->count();
             $requestType = 'all';
             $pageTitle = 'Non-Student Members';
