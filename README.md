@@ -1,58 +1,402 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+ <div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+# CampusGov
+
+### Student Organisation Management, Simplified.
+
+**A Web-Based Management System for Student Union Governments and Associations**
+
+<p>
+  <img src="https://img.shields.io/badge/Laravel-13-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/PHP-8.3%2B-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP 8.3+">
+  <img src="https://img.shields.io/badge/Livewire-4-FB70A9?style=for-the-badge&logo=livewire&logoColor=white" alt="Livewire 4">
+  <img src="https://img.shields.io/badge/MySQL-Database-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL">
 </p>
 
-## About Laravel
+<p>
+  <a href="https://github.com/jamesefekodo/campusGov">Repository</a> •
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#technology-stack">Technology Stack</a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+</div>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## About CampusGov
 
-## Learning Laravel
+**CampusGov** is an integrated web-based management platform designed to simplify the administration of Student Union Governments (SUGs), departmental associations, faculty associations, and other student-led organisations.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+It provides a centralised digital environment for managing membership records, organisational structures, student leadership, elections, financial activities, events, publications, academic resources, and administrative documentation.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Developed using **NACOMES (National Association of Computer Engineering Students), OGITECH Chapter**, as a case study, CampusGov adopts a flexible organisational management approach intended to support different student organisations.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Features
 
-## Agentic Development
+CampusGov brings essential student organisation management functions into one platform.
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+<table>
+<tr>
+<td width="50%" valign="top">
 
-```bash
-composer require laravel/boost --dev
+### 👥 Membership Management
 
-php artisan boost:install
+- Member registration and accounts
+- Personal and academic profiles
+- Academic history
+- Skills and employment records
+- Awards and leadership experience
+- Social media profiles
+- Membership verification
+
+</td>
+<td width="50%" valign="top">
+
+### 🏛️ Organisational Administration
+
+- Multi-tenant organisation structure
+- Faculty and department management
+- Academic programmes
+- Administrative profiles
+- Organisational policies
+- System configuration
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 🔐 Roles and Permissions
+
+- Root administrator privileges
+- Role-based access control
+- Granular permission assignment
+- Restricted administrative access
+- Session-based administrative access management
+
+</td>
+<td width="50%" valign="top">
+
+### 🗳️ Election Management
+
+- Election administration
+- Election positions
+- Voter eligibility groups
+- Candidate applications
+- Standard voting records
+- Monetary voting records
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 💰 Financial Management
+
+- Association dues
+- Payment methods
+- Electronic payment configuration
+- Payment transactions
+- Payment regularisation
+- Payment waivers
+- Invoices
+- Financial claims
+- Donations
+
+</td>
+<td width="50%" valign="top">
+
+### 🎓 Student Leadership
+
+- Leadership arms
+- Leadership positions
+- Leadership tenures
+- Representative assignments
+- Association advisers
+
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+
+### 📰 Events and Publications
+
+- Event management
+- Media publications
+- Publication categorisation
+- Tags and classifications
+- Likes and comments
+- Publication approval
+
+</td>
+<td width="50%" valign="top">
+
+### 📚 Academic Resources
+
+- Past questions
+- Past question contributions
+- Recommended books
+- Recommended courses
+- Industry affiliates
+- Resource categorisation
+
+</td>
+</tr>
+</table>
+
+### 📁 Organisational Archives
+
+Centralised management of organisational documents and records to support information preservation and administrative continuity.
+
+---
+
+## Technology Stack
+
+CampusGov is developed using modern web technologies and frameworks.
+
+| Technology | Application |
+|:---|:---|
+| **PHP 8.3+** | Backend programming |
+| **Laravel 13** | Application framework |
+| **Livewire 4** | Interactive application components |
+| **MySQL** | Relational database |
+| **HTML5** | Web structure |
+| **CSS3** | Interface styling |
+| **JavaScript** | Client-side interactions |
+| **Composer** | PHP dependency management |
+| **Node.js / npm** | Frontend asset management |
+| **mPDF** | PDF document generation |
+
+## System Architecture
+
+CampusGov adopts a layered web application architecture.
+
+```text
+              USERS
+                |
+                v
+       PRESENTATION LAYER
+      Web Interface / Livewire
+                |
+                v
+       APPLICATION LAYER
+     Laravel / Business Logic
+       Authentication / Access
+                |
+                v
+          DATA LAYER
+         MySQL Database
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+The application uses Laravel's MVC architecture, with Livewire providing interactive user interface components.
+
+## Access Control
+
+CampusGov uses a role-based access control structure to manage system privileges.
+
+| User Category | Access Level |
+|:---|:---|
+| Root Administrator | Unrestricted system access |
+| Administrators | Access based on assigned roles and permissions |
+| Members with Administrative Roles | Access limited to assigned administrative privileges |
+| General Members | Member-facing functions and personal profile management |
+
+Administrative privileges can be reassigned by the root administrator in accordance with academic session arrangements.
+
+---
+
+## Installation
+
+### Requirements
+
+Ensure the following are installed:
+
+- PHP 8.3 or later
+- Composer
+- MySQL
+- Node.js and npm
+- Apache, Nginx, or PHP development server
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/jamesefekodo/campusGov.git
+
+cd campusGov
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+
+npm install
+```
+
+### 3. Configure Environment
+
+```bash
+cp .env.example .env
+
+php artisan key:generate
+```
+
+On Windows Command Prompt:
+
+```cmd
+copy .env.example .env
+```
+
+### 4. Configure Database
+
+Create a MySQL database and update the database settings in `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=campusgov
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 5. Run Migrations
+
+```bash
+php artisan migrate
+```
+
+Run seeders if required by the installation:
+
+```bash
+php artisan db:seed
+```
+
+### 6. Build Frontend Assets
+
+```bash
+npm run build
+```
+
+For development:
+
+```bash
+npm run dev
+```
+
+### 7. Configure Storage
+
+```bash
+php artisan storage:link
+```
+
+### 8. Start the Application
+
+```bash
+php artisan serve
+```
+
+Access the application at:
+
+```text
+http://127.0.0.1:8000
+```
+
+> **Note:** These are standard Laravel installation steps. Additional application-specific configuration, database seeding, and service credentials may be required.
+
+---
+
+## Project Structure
+
+```text
+campusGov/
+│
+├── app/
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   └── Middleware/
+│   ├── Livewire/
+│   ├── Models/
+│   └── Providers/
+│
+├── bootstrap/
+├── config/
+├── database/
+│   ├── migrations/
+│   ├── seeders/
+│   └── factories/
+│
+├── public/
+├── resources/
+│   ├── views/
+│   ├── css/
+│   └── js/
+│
+├── routes/
+├── storage/
+├── tests/
+│
+├── artisan
+├── composer.json
+├── package.json
+└── README.md
+```
+
+## Intended Applications
+
+CampusGov is designed for:
+
+- Student Union Governments
+- Departmental associations
+- Faculty-based student associations
+- Professional student organisations
+- Other student-led organisations
+
+Its organisational structure is intended to make it adaptable beyond the original NACOMES case study.
+
+---
 
 ## Contributing
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Contributions, suggestions, bug reports, and improvements are welcome.
 
-## Code of Conduct
+If you would like to contribute:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+1. Fork the repository.
+2. Create a feature branch.
+3. Implement your changes.
+4. Submit a pull request.
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Author
+
+<div align="center">
+
+**James Oghenekevwe Efekodo**
+
+Software Developer | System Architect
+
+[GitHub Profile](https://github.com/jamesefekodo)
+
+</div>
+
+---
+
+<div align="center">
+
+**CampusGov**
+
+*Building a more organised and digitally empowered student administration.*
+
+<sub>Developed with Laravel and Livewire.</sub>
+
+</div>
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+No license has currently been specified. Refer to the repository owner for permission to use, modify, or redistribute the project.
+
