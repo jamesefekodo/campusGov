@@ -30,7 +30,7 @@
 
 It provides a centralised digital environment for managing membership records, organisational structures, student leadership, elections, financial activities, events, publications, academic resources, and administrative documentation.
 
-Developed using **NACOMES (National Association of Computer Engineering Students), OGITECH Chapter**, as a case study, CampusGov adopts a flexible organisational management approach intended to support different student organisations.
+Developed using ***NAPES (National Association of Polytechnic Engineering Students) and NACOMES (National Association of Computer Engineering Students), OGITECH Chapter**, as a case study, CampusGov adopts a flexible organisational management approach intended to support different student organisations.
 
 ## Features
 
